@@ -1,2 +1,48 @@
-# DrandallCode
-Just a place to hold my code
+# Using git
+- Ensure git is installed
+    - `git --version`
+    - If needed, download git or git-for-windows
+- Download the code to your computer
+    - cd to the directory which will hold the project (cd ~\source\repos)
+    - `git clone https://github.com/dstbstr/DrandallCode`
+- Create a branch to work in
+    - git branch myName/myFeature (`git branch durandal/creatingTests`)
+    - git checkout myName/myFeature (`git checkout durandal/creatingTests`)
+- Write your amazing code
+- Save your changes to git
+    - See what git thinks it's going to add
+    - `git status`
+    - If everything looks right
+        - `git add -A`
+    - Otherwise
+        - `git add someFile.cpp`
+        - Or update the .gitignore if it should never include this type of file
+    - Save your changes locally
+    - `git commit -m "My useful commit message here"`
+- Get ready to merge
+    - `git checkout main`
+        - If there are problems, ensure that everything is committed or reverted
+        - Optionally look at `git stash`
+    - Pull down the latest version of main
+    - `git pull`
+        - if main is already up to date, you should be able to stop here
+    - Switch back to your branch
+    - `git checkout myName/myFeature`
+    - Merge the changes from main into your stuff
+    - `git merge main`
+        - Resolve any conflicts
+    - Commit the merge
+    - `git add -A`
+    - `git commit -m "Merged with main"`
+- Push your changes to remote
+    - Until now, everything only exists on your computer
+    - To tell github about it
+    - `git push -u origin myName/myFeature`
+    - after the first push of a branch to remote, the command can be simplified to
+    - `git push`
+- Merge into main
+  - If everything looks right, we'll do the opposite of what we did before
+  - `git checkout main`
+  - `git merge myName/MyFeature`
+  - `git add -A`
+  - `git push`
