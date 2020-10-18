@@ -2,6 +2,7 @@
 - Ensure git is installed
     - `git --version`
     - If needed, download git or git-for-windows
+- Ask me to add you to the contributors in github if needed
 - Download the code to your computer
     - cd to the directory which will hold the project (cd ~\source\repos)
     - `git clone https://github.com/dstbstr/DrandallCode`
