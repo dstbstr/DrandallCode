@@ -1,0 +1,51 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "generateWindows",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/Build"
+            },
+            "command": "cmake -G 'Visual Studio 15 2017 Win64' -DCMAKE_BUILD_TYPE=Debug .."
+        },
+        {
+            "label": "generateNix",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/Build"
+            },
+            "command": "cmake -G 'Unix Makefiles' -DCMAKE_BUILD_TYPE=Debug .."
+        },
+        {
+            "label": "buildWindows",
+            "type": "shell",
+            "command": "cmake --build .",
+            "options": {
+                "cwd": "${workspaceRoot}/Build"
+            },
+            "dependsOn": [
+                "generateWindows"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "buildNix",
+            "type": "shell",
+            "command": "cmake --build .",
+            "options": {
+                "cwd": "${workspaceRoot}/Build"
+            },
+            "dependsOn": [
+                "generateNix"
+            ],
+            "group": "build"
+        }
+    ]
+}
