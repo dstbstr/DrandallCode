@@ -42,10 +42,5 @@ target_link_libraries(${PROJECT_NAME} gtest)
 target_link_libraries(${PROJECT_NAME} gmock)
 target_link_libraries(${PROJECT_NAME} ScratchLib)
 
-target_sources(${PROJECT_NAME} 
-    PRIVATE 
-        src/Singers/HappyBirthday.test.cpp
-        src/Utilities/StringUtilities.test.cpp)
-target_include_directories(${PROJECT_NAME} PUBLIC CppScratch)
-
-#add_test(NAME example_test COMMAND example)
+file(GLOB_RECURSE sources CONFIGURE_DEPENDS "src/*.cpp")
+target_sources(${PROJECT_NAME} PRIVATE ${sources})
