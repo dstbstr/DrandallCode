@@ -1,1 +1,6 @@
+#Exclude all files without extensions
+*
+!/**/
+!*.*
+
 **/Build/*
