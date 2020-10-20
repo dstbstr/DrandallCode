@@ -24,7 +24,6 @@ namespace StrUtil
     // trim both ends
     static inline std::string trim(std::string s)
     {
-        std::string result = trimStart(s);
-        return trimEnd(result);
+        return trimStart(trimEnd(s));
     }
 } // namespace StrUtil

@@ -15,7 +15,7 @@ if (NOT CONFIGURED_ONCE)
         CACHE STRING "Flags used by the compiler during all build types." FORCE)
 endif()
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(ScratchLib)
 add_subdirectory(ScratchExe)
