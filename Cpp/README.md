@@ -7,11 +7,16 @@
     - C/C++
     - CMake
     - C++ TestMate
+    - Clang Format
+    - Markdown All in One
   - Reload VsCode
 - Compiler
   - Download [CMake](https://cmake.org/download/)
   - Ensure that you have a compiler (clang, gcc, msvc)
   - Update .vscode/tasks.json to generate files for your compiler
+- Formatting
+  - If you don't already have it, install [LLVM](https://llvm.org/releases/)
+  - Required for clang-format to work
 - Tasks.json
     - Update the proper build configuration to be default
 - Run the program
