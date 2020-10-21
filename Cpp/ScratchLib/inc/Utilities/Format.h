@@ -12,8 +12,8 @@ namespace StrUtil {
 
     template<class T>
     auto StringForward(T&& arg) {
-        if constexpr (std::is_same_v<std::string&&, std::remove_cv<std::remove_reference<T>>>) {
-            return arg.c_str();
+        if constexpr (std::is_same_v<std::string, std::remove_cv_t<std::remove_reference_t<T>>>) {
+            return std::forward<T>(arg).c_str();
         } else {
             return std::forward<T>(arg);
         }
@@ -28,7 +28,7 @@ namespace StrUtil {
 
     template<class... Args>
     std::string Format(const std::string fmt, Args&&... args) {
-        return _FormatImpl(fmt, StringForward(args)...);
+        return _FormatImpl(fmt, StringForward(std::forward<Args>(args))...);
     }
 }
 #pragma warning(pop)
