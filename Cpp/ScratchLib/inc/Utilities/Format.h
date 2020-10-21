@@ -1,15 +1,12 @@
 #ifndef FORMAT_H
 #define FORMAT_H
-#include <string>
-//#include <iostream>
 #include <memory>
+#include <string>
 #include <type_traits>
-//#include <stdio.h>
 
 #pragma warning(push)
-#pragma warning(disable:4840)
+#pragma warning(disable : 4840)
 namespace StrUtil {
-
     template<class T>
     auto StringForward(T&& arg) {
         if constexpr (std::is_same_v<std::string, std::remove_cv_t<std::remove_reference_t<T>>>) {
@@ -30,6 +27,6 @@ namespace StrUtil {
     std::string Format(const std::string fmt, Args&&... args) {
         return _FormatImpl(fmt, StringForward(std::forward<Args>(args))...);
     }
-}
+} // namespace StrUtil
 #pragma warning(pop)
 #endif // FORMAT_H
