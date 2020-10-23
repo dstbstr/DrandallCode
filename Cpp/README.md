@@ -17,6 +17,7 @@
 - Formatting
   - If you don't already have it, install [LLVM](https://llvm.org/releases/)
   - Required for clang-format to work
+  - The VSCode keyboard shortcut for auto formatting is Ctrl+K Ctrl+D (may need to select the clang-formatter)
 - Tasks.json
     - Update the proper build configuration to be default
 - Run the program
