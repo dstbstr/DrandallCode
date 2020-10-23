@@ -1,7 +1,8 @@
-#include "gtest/gtest.h"
-
+#include "TestCommon.h"
 #include "Utilities/Format.h"
+
 #include <string>
+
 
 TEST(Format, WorksWithSimpleSubstitution) {
     auto result = StrUtil::Format("%d", 7);
