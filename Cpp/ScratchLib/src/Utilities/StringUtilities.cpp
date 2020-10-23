@@ -20,7 +20,10 @@ namespace StrUtil {
             last = next + delimiter.size();
         }
 
-        result.push_back(input.substr(last));
+        auto lastEntry = input.substr(last);
+        if (lastEntry.length() > 0) {
+            result.push_back(lastEntry);
+        }
         return result;
     }
 } // namespace StrUtil
