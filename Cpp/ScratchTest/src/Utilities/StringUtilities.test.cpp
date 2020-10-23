@@ -212,3 +212,16 @@ TEST(SplitString, SplitStringWorksWithMultipleCharacterDelimiters) {
     ASSERT_EQ(result[0], "one");
     ASSERT_EQ(result[2], "three");
 }
+
+TEST(SplitString, StringStartingWithDelimiterDoesNotAddEmptyEntry) {
+    auto result = StrUtil::Split(",one,two", ",");
+    ASSERT_EQ(2, result.size());
+    ASSERT_EQ(result[0], "one");
+}
+
+TEST(SplitString, SplitStringRemovesEmptyEntries) {
+    auto result = StrUtil::Split("one,,,,two", ",");
+    ASSERT_EQ(2, result.size());
+    ASSERT_EQ(result[0], "one");
+    ASSERT_EQ(result[1], "two");
+}
