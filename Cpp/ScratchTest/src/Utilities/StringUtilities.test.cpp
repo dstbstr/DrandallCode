@@ -225,3 +225,10 @@ TEST(SplitString, SplitStringRemovesEmptyEntries) {
     ASSERT_EQ(result[0], "one");
     ASSERT_EQ(result[1], "two");
 }
+
+TEST(SplitString, StringEndingWIthDelimiterDoesNotAddEmptyEntry) {
+    auto result = StrUtil::Split("one,two,", ",");
+    ASSERT_EQ(2, result.size());
+    ASSERT_EQ(result[0], "one");
+    ASSERT_EQ(result[1], "two");
+}
