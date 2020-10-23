@@ -49,9 +49,9 @@ namespace StrUtil {
         return stream.str();
     }
 
-    std::vector<std::string> Split(std::string input, std::string delimiter);
+    std::vector<std::string_view> Split(std::string_view input, std::string_view delimiter);
 
-    bool EqualsIgnoreCase(const std::string& lhs, const std::string& rhs);
+    bool EqualsIgnoreCase(std::string_view lhs, std::string_view rhs);
 
     static inline std::string trimStart(std::string s) {
         s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) { return !std::isspace(ch); }));
