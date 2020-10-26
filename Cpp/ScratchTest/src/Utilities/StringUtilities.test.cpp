@@ -1,5 +1,6 @@
-#include "TestCommon.h"
 #include "Utilities/StringUtilities.h"
+
+#include "TestCommon.h"
 
 TEST(TrimStart, RemovesSpaceFromStart) {
     std::string test = " test";
