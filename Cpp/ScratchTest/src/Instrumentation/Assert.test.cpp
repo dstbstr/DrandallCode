@@ -7,8 +7,6 @@
 #pragma warning(disable : 4127) // comparing against a constant
 class AssertTest : public ::testing::Test {
     AssertToException ate{};
-
-protected:
 };
 
 TEST_F(AssertTest, AssertWithFalseConditionAsserts) {
