@@ -1,5 +1,5 @@
-#ifndef SERVICELOCATOR_H
-#define SERVICELOCATOR_H
+#ifndef __SERVICELOCATOR_H__
+#define __SERVICELOCATOR_H__
 
 template<class T>
 class ServiceLocator {
@@ -12,7 +12,14 @@ public:
         return *service;
     }
 
+    static bool IsSet() {
+        return service != nullptr;
+    }
+
 private:
-    inline static T* service{nullptr};
+    static T* service;
 };
-#endif
+
+template<class T>
+T* ServiceLocator<T>::service = nullptr;
+#endif // __SERVICELOCATOR_H__
