@@ -1,20 +1,11 @@
-#ifndef BASEEVENT_H
-#define BASEEVENT_H
+#ifndef __BASEEVENT_H__
+#define __BASEEVENT_H__
 
 #include "DesignPatterns/PubSub.h"
 
 template<class DerivedEvent>
 class BaseEvent {
-public:
-    BaseEvent() {
-        coordinator; // force static constructor
-    }
-
 private:
-    static EventCoordinator<DerivedEvent>* coordinator;
+    static inline EventCoordinator<DerivedEvent>* coordinator;
 };
-
-template<class DerivedEvent>
-EventCoordinator<DerivedEvent>* BaseEvent<DerivedEvent>::coordinator = new EventCoordinator<DerivedEvent>();
-
-#endif
+#endif // __BASEEVENT_H__

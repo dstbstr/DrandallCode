@@ -1,5 +1,5 @@
-#ifndef PUBSUB_H
-#define PUBSUB_H
+#ifndef __PUBSUB_H__
+#define __PUBSUB_H__
 
 #include "DesignPatterns/ServiceLocator.h"
 
@@ -18,11 +18,14 @@ class IPublisher {
 
 public:
     IPublisher() : head(nullptr) {
-        ServiceLocator<EventCoordinator<TEventType> >::Get().AddPublisher(*this);
+        if(!ServiceLocator<EventCoordinator<TEventType>>::IsSet()) {
+            new EventCoordinator<TEventType>();
+        }
+        ServiceLocator<EventCoordinator<TEventType>>::Get().AddPublisher(*this);
     }
 
     virtual ~IPublisher() {
-        ServiceLocator<EventCoordinator<TEventType> >::Get().RemovePublisher(*this);
+        ServiceLocator<EventCoordinator<TEventType>>::Get().RemovePublisher(*this);
     }
 
     virtual void RaiseEvent(const TEventType& event) {
@@ -76,11 +79,14 @@ class ISubscriber {
 
 public:
     ISubscriber() : next(nullptr) {
-        ServiceLocator<EventCoordinator<TEventType> >::Get().AddSubscriber(*this);
+        if(!ServiceLocator<EventCoordinator<TEventType>>::IsSet()) {
+            new EventCoordinator<TEventType>();
+        }
+        ServiceLocator<EventCoordinator<TEventType>>::Get().AddSubscriber(*this);
     }
 
     virtual ~ISubscriber() {
-        ServiceLocator<EventCoordinator<TEventType> >::Get().RemoveSubscriber(*this);
+        ServiceLocator<EventCoordinator<TEventType>>::Get().RemoveSubscriber(*this);
     }
 
     virtual void Notify(const TEventType& event) = 0;
@@ -94,8 +100,8 @@ private:
 template<class TEvent>
 class EventCoordinator {
 public:
-    EventCoordinator() : subscribers(0), publishers(0) {
-        ServiceLocator<EventCoordinator<TEvent> >::Set(*this);
+    EventCoordinator() {
+        ServiceLocator<EventCoordinator<TEvent>>::Set(*this);
     }
 
     void AddSubscriber(ISubscriber<TEvent>& subscriber) {
@@ -136,4 +142,4 @@ private:
     std::vector<IPublisher<TEvent>*> publishers{};
 };
 
-#endif
+#endif // __PUBSUB_H__
