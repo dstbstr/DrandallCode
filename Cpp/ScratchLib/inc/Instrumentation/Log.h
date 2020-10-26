@@ -12,8 +12,8 @@
 #define LOG_DEBUG(msg) Log::GetLogStore().AddMessage(DEBUG_CONTEXT, Log::LogEntry(Log::LogLevel::Debug, msg));
 #define LOG_INFO(msg) Log::GetLogStore().AddMessage(DEBUG_CONTEXT, Log::LogEntry(Log::LogLevel::Info, msg));
 #define LOG_WARN(msg) Log::GetLogStore().AddMessage(DEBUG_CONTEXT, Log::LogEntry(Log::LogLevel::Warn, msg));
-#define LOG_ERROR(msg) Log::GetLogStore().AddMessage(DEBUG_CONTEXT_WITH_STACK, Log::LogEntry(Log::LogLevel::Error, msg));
-#define LOG_CRITICAL(msg) Log::GetLogStore().AddMessage(DEBUG_CONTEXT_WITH_STACK, Log::LogEntry(Log::LogLevel::Critical, msg));
+#define LOG_ERROR(msg) Log::GetLogStore().AddMessageImmediate(DEBUG_CONTEXT, Log::LogEntry(Log::LogLevel::Error, msg));
+#define LOG_CRITICAL(msg) Log::GetLogStore().AddMessageImmediate(DEBUG_CONTEXT, Log::LogEntry(Log::LogLevel::Critical, msg));
 
 #else
 #define LOG_VERBOSE(msg)

@@ -8,7 +8,11 @@
 namespace Log {
     void LogStoreEnabled::FlushAll() {
         for(auto& entry: m_Entries) {
-            RaiseEvent(entry);
+            try {
+                RaiseEvent(entry);
+            } catch(...) {
+                // no-op.  Throwing prevents clearing the entries, and other listeners
+            }
         }
         m_Entries.clear();
     }
@@ -28,5 +32,10 @@ namespace Log {
 
     void LogStoreEnabled::AddMessage(const Debug::Context& context, const LogEntry& entry) {
         m_Entries.push_back(LogEvent(context, entry, std::vector<std::string>()));
+    }
+
+    void LogStoreEnabled::AddMessageImmediate(const Debug::Context& context, const LogEntry& entry) {
+        // Essentially here just to allow AssertToException to throw
+        RaiseEvent(LogEvent(context, entry, std::vector<std::string>()));
     }
 } // namespace Log

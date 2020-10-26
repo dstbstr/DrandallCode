@@ -1,3 +1,6 @@
+#ifndef __STRINGUTILITIES_H__
+#define __STRINGUTILITIES_H__
+
 #include "Utilities/LambdaUtils.h"
 
 #include <algorithm>
@@ -10,11 +13,11 @@ namespace StrUtil {
     template<typename T>
     std::string JoinVec(std::string&& delimiter, std::vector<T> const& input) {
         std::stringstream stream;
-        if (!input.empty()) {
+        if(!input.empty()) {
             stream << input[0];
         }
 
-        for (int i = 1; i < input.size(); i++) {
+        for(int i = 1; i < input.size(); i++) {
             stream << delimiter;
             stream << input[i];
         }
@@ -67,3 +70,5 @@ namespace StrUtil {
         return trimStart(trimEnd(s));
     }
 } // namespace StrUtil
+
+#endif // __STRINGUTILITIES_H__
