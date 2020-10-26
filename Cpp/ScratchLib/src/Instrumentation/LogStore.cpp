@@ -11,7 +11,7 @@ namespace Log {
             try {
                 RaiseEvent(entry);
             } catch(...) {
-                // no-op.  Throwing prevents clearing the entries, and other listeners
+                // no-op.  Throwing prevents clearing the entries, and notifying other listeners
             }
         }
         m_Entries.clear();
