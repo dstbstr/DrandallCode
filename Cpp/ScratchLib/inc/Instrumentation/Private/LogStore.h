@@ -20,7 +20,7 @@ namespace Log {
         void FlushAll();
         void Flush(size_t maxEntries);
         void AddMessage(const Debug::Context& context, const LogEntry& entry);
-        void AddMessage(const Debug::ContextWithStack& context, const LogEntry& entry);
+        void AddMessageImmediate(const Debug::Context& context, const LogEntry& entry);
 
     private:
         std::vector<LogEvent> m_Entries;
@@ -31,7 +31,7 @@ namespace Log {
         void FlushAll() {}
         void Flush(size_t) {}
         void AddMessage(const Debug::Context&, const LogEntry&) {}
-        void AddMessage(const Debug::ContextWithStack&, const LogEntry&) {}
+        void AddMessageImmediate(const Debug::Context&, const LogEntry&) {}
     };
 
 #ifndef FINAL
