@@ -27,7 +27,7 @@ public:
 
     virtual void RaiseEvent(const TEventType& event) {
         ISubscriber<TEventType>* current = head;
-        while (current) {
+        while(current) {
             current->Notify(event);
             current = current->next;
         }
@@ -42,9 +42,9 @@ private:
     virtual void RemoveSubscriber(const ISubscriber<TEventType>& subscriber) {
         ISubscriber<TEventType>* current = head;
         ISubscriber<TEventType>* previous = nullptr;
-        while (current != nullptr) {
-            if (current == &subscriber) {
-                if (previous != nullptr) {
+        while(current != nullptr) {
+            if(current == &subscriber) {
+                if(previous != nullptr) {
                     previous->next = current->next;
                 } else {
                     head = head->next;
@@ -99,25 +99,25 @@ public:
     }
 
     void AddSubscriber(ISubscriber<TEvent>& subscriber) {
-        for (IPublisher<TEvent>* publisher : publishers) {
+        for(IPublisher<TEvent>* publisher: publishers) {
             publisher->AddSubscriber(subscriber);
         }
 
         subscribers.push_back(&subscriber);
     }
     void RemoveSubscriber(const ISubscriber<TEvent>& subscriber) {
-        for (IPublisher<TEvent>* publisher : publishers) {
+        for(IPublisher<TEvent>* publisher: publishers) {
             publisher->RemoveSubscriber(subscriber);
         }
 
         auto where = std::find(subscribers.begin(), subscribers.end(), &subscriber);
-        if (where != subscribers.end()) {
+        if(where != subscribers.end()) {
             subscribers.erase(where);
         }
     }
 
     void AddPublisher(IPublisher<TEvent>& publisher) {
-        for (ISubscriber<TEvent>* subscriber : subscribers) {
+        for(ISubscriber<TEvent>* subscriber: subscribers) {
             publisher.AddSubscriber(*subscriber);
         }
 
@@ -126,7 +126,7 @@ public:
 
     void RemovePublisher(const IPublisher<TEvent>& publisher) {
         auto where = std::find(publishers.begin(), publishers.end(), &publisher);
-        if (where != publishers.end()) {
+        if(where != publishers.end()) {
             publishers.erase(where);
         }
     }
