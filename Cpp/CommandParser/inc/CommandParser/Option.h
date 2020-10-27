@@ -7,67 +7,75 @@
 #include <string>
 #include <type_traits>
 
-class BaseOption {};
+template<typename T> struct is_vector : public std::false_type {};
 
-template<class ExpectedType>
-class Option : public BaseOption {
-    constexpr char[] UsageFormat = "%02s | " // short name
-                                   "%07s | " // long name
-                                   "%01s | " // required
-                                   "%01s | " // is flag
-                                   "%s"; // help text
-public:
-    Option(std::string shortName, std::string longName, bool required)
-        : m_ShortName(shortName)
-        , m_LongName(longName)
-        , m_Required(required)
-        , m_IsFlag(isFlag) {}
+template<typename T, typename A>
+struct is_vector<std::vector<T, A>> : public std::true_type {};
 
-    Option(std::string shortName, std::string longName, bool required, std::string helpText)
-        : m_ShortName(shortName)
-        , m_LongName(longName)
-        , m_Required(required)
-        , m_IsFlag(isFlag)
-        , m_HelpText(helpText) {}
+namespace CommandParser {
+        constexpr char UsageFormat[]{ "%2s | " // short name
+                                       "%7s | " // long name
+                                       "%1s | " // required
+                                       "%1s | " // is flag
+                                       "%s"}; // help text
 
-    bool Matches(std::string option) {
-        return m_ShortName == option || m_LongName == option;
-    }
 
-    auto Parse(std::string option, std::string arg) {
-        if constexpr(std::is_same_v<bool, ExpectedType>) {
-            return true;
-        } else if constexpr(std::is_same_v<std::string, ExpectedType>) {
-            return arg;
-        } else if constexpr(std::is_same_v<int, ExpectedType>) {
-            return std::atoi(arg);
-        } else if constexpr(std::is_same_v<std::vector<std::string>>, ExpectedType >) {
-            auto split = StrUtil::Split(arg, ",");
-            return std::vector<std::string>{split};
-        } else if constexpr(std::is_same_v<std::vector<int>, ExpectedType>) {
-            auto split = StrUtil::Split(arg, ",");
-            std::vector<int> result;
-            for(auto&& val: split) {
-                result.push_back(std::atoi(val));
-            }
-            return result;
+    class BaseOption {};
+
+    template<class T>
+    class Option : public BaseOption {
+    public:
+        Option(std::string shortName, std::string longName, bool required)
+            : m_ShortName(shortName)
+            , m_LongName(longName)
+            , m_Required(required) {}
+
+        Option(std::string shortName, std::string longName, bool required, std::string helpText)
+            : m_ShortName(shortName)
+            , m_LongName(longName)
+            , m_Required(required)
+            , m_HelpText(helpText) {}
+
+        bool Matches(std::string option) {
+            return m_ShortName == option || m_LongName == option;
         }
-    }
 
-    std::string ToString() {
-        return StrUtil::Format(UsageFormat, 
-            m_ShortName.length() > 0 ? "-" + m_ShortName : "",
-            m_LongName.length() > 0 ? "--" + m_LongName : "",
-            m_Required ? "X" : "",
-            std::is_same_v<bool, ExpectedType> ? "X", "",
-            m_HelpText);
-    }
+        T Parse(std::string arg) {
+            if constexpr(std::is_same_v<bool, T>) {
+                return true;
+            } else if constexpr(std::is_same_v<std::string, T>) {
+                return arg;
+            } else if constexpr(std::is_same_v<int, T>) {
+                return std::atoi(arg.c_str());
+            } else if constexpr(std::is_same_v<std::vector<std::string>, T >) {
+                auto split = StrUtil::Split(arg, ",");
+                return std::vector<std::string>{split};
+            } else if constexpr(std::is_same_v<std::vector<int,std::allocator<int>>, T>) {
+                auto split = StrUtil::Split(arg, ",");
+                std::vector<int> result;
+                for(auto&& val: split) {
+                    result.push_back(std::atoi(std::string(val).c_str()));
+                }
+                return result;
+            }
+            
+            static_assert(false, "Unknown type");
+        }
 
-private:
-    std::string m_ShortName{""};
-    std::string m_LongName{""};
-    std::string m_HelpText{""};
-    bool m_Required{false};
-};
+        std::string ToString() {
+            return StrUtil::Format(UsageFormat, 
+                m_ShortName.length() > 0 ? "-" + m_ShortName : "",
+                m_LongName.length() > 0 ? "--" + m_LongName : "",
+                m_Required ? "X" : "",
+                std::is_same_v<bool, ExpectedType> ? "X" : "",
+                m_HelpText);
+        }
 
+    private:
+        std::string m_ShortName{""};
+        std::string m_LongName{""};
+        std::string m_HelpText{""};
+        bool m_Required{false};
+    };
+} // namespace CommandParser
 #endif // __OPTION_H__

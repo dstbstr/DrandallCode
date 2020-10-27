@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string>
 
-int main(int argc, char* argv[]) {
+int main(int, char**) {
     // construct an argument parser with argc and argv
     // pass the root directory and the recurse option to a directory navigator
     // fan out the files to find include directives in each file
