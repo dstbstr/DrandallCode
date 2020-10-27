@@ -16,10 +16,21 @@
             "externalConsole": true
         },
         {
-            "name": "(Windows) Run Tests",
+            "name": "(Windows) Run Tests: ScratchLib",
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}/Build/ScratchTest/Debug/ScratchTest.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false
+        },
+        {
+            "name": "(Windows) Run Tests: CommandParser",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/Build/CommandParserTest/Debug/CommandParserTest.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

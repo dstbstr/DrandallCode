@@ -5,6 +5,7 @@
   - code *.code-workspace
   - Extensions (Ctrl+Shift+X)
     - C/C++
+    - C/C++ Helper
     - CMake
     - C++ TestMate
     - Clang Format

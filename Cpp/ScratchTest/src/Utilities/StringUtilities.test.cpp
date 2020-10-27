@@ -194,6 +194,13 @@ TEST(StringJoin, JoinWorksWithDelimiterAndMultipleTypes) {
     ASSERT_STREQ("1 3.14 hello \t -1", result.c_str());
 }
 
+TEST(SplitString, SplitSingleCharacterEntriesWithSingleCharacterDelimiter) {
+    auto result = StrUtil::Split("1,2,3", ",");
+    ASSERT_EQ(3, result.size());
+    ASSERT_EQ(result[0], "1");
+    ASSERT_EQ(result[2], "3");
+}
+
 TEST(SplitString, SplitSingleWordReturnsVectorWithSingleElement) {
     auto result = StrUtil::Split("test", ",");
     ASSERT_EQ(1, result.size());
