@@ -4,14 +4,15 @@
 
 #include <vector>
 
-class OptionCollection {
-public:
-    OptionCollection& Add(Option&& option) {
-        m_Options.push_back(std::move(option))
-    }
+namespace CommandParser {
+    class OptionCollection {
+    public:
+        OptionCollection& Add(BaseOption&& option) {
+            m_Options.push_back(std::move(option));
+        }
 
-private:
-    std::vector<Option> m_Options;
-};
-
+    private:
+        std::vector<BaseOption> m_Options;
+    };
+} // namespace CommandParser
 #endif // __OPTIONCOLLECTION_H__
