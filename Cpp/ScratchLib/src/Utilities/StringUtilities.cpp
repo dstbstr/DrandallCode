@@ -16,7 +16,7 @@ namespace StrUtil {
         std::vector<std::string_view> result;
 
         while((next = input.find(delimiter, last)) != std::string::npos) {
-            if(next - last > delimiter.size()) {
+            if(next - last > 0) {
                 result.push_back(input.substr(last, next - last));
             }
             last = next + delimiter.size();

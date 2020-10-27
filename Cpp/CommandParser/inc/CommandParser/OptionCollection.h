@@ -9,6 +9,7 @@ namespace CommandParser {
     public:
         OptionCollection& Add(BaseOption&& option) {
             m_Options.push_back(std::move(option));
+            return *this;
         }
 
     private:
