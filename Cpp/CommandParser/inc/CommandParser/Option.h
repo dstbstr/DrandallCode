@@ -5,14 +5,8 @@
 #include "Utilities/Format.h"
 #include "Utilities/StringUtilities.h"
 
+#include <regex>
 #include <string>
-#include <type_traits>
-
-template<typename T>
-struct is_vector : public std::false_type {};
-
-template<typename T, typename A>
-struct is_vector<std::vector<T, A>> : public std::true_type {};
 
 namespace CommandParser {
     constexpr char UsageFormat[]{"%2s | " // short name
@@ -23,64 +17,40 @@ namespace CommandParser {
 
     class BaseOption {
     public:
+        inline static const std::string BLANK{"<BLANK>"};
+
         enum class InnerType { INT, STRING, BOOL, VEC_STRING, VEC_INT };
 
-        BaseOption(std::string shortName, std::string longName, bool required) : m_ShortName(shortName), m_LongName(longName), m_Required(required) {}
-
-        BaseOption(std::string shortName, std::string longName, bool required, std::string helpText)
-            : m_ShortName(shortName)
-            , m_LongName(longName)
-            , m_Required(required)
-            , m_HelpText(helpText) {}
-
+        BaseOption(std::string shortName, std::string longName, bool required);
+        BaseOption(std::string shortName, std::string longName, bool required, std::string helpText);
         virtual ~BaseOption() = default;
 
-        bool Matches(std::string option) const {
-            return m_ShortName == option || m_LongName == option;
-        }
+        bool Matches(std::string option) const;
+        bool IsRequired() const;
+        std::string GetShortName() const;
+        std::string GetLongName() const;
 
-        bool IsRequired() const {
-            return m_Required;
-        }
-
-        std::string GetLongName() const {
-            return m_LongName;
-        }
         virtual InnerType GetInnerType() const = 0;
-        virtual void Populate(std::string) {
-            ASSERT_MSG(false, "Called Populate on BaseOption");
-        }
+        virtual void Populate(std::string);
 
-        std::string ToString() {
-            return StrUtil::Format(UsageFormat,
-                                   m_ShortName.length() > 0 ? "-" + m_ShortName : "",
-                                   m_LongName.length() > 0 ? "--" + m_LongName : "",
-                                   m_Required ? "X" : "",
-                                   GetInnerType() == InnerType::BOOL ? "X" : "",
-                                   m_HelpText);
-        }
+        std::string ToString();
 
     private:
         std::string m_ShortName{""};
         std::string m_LongName{""};
         std::string m_HelpText{""};
         bool m_Required{false};
+
+        std::string CleanName(std::string input) const;
+        void ValidateName() const;
     };
 
     class IntOption : public BaseOption {
     public:
         using BaseOption::BaseOption;
-        InnerType GetInnerType() const final {
-            return InnerType::INT;
-        }
-
-        void Populate(std::string input) override {
-            m_Value = std::atoi(input.c_str());
-        }
-
-        int GetValue() const {
-            return m_Value;
-        }
+        InnerType GetInnerType() const final;
+        void Populate(std::string input) override;
+        int GetValue() const;
 
     private:
         int m_Value;
@@ -89,17 +59,9 @@ namespace CommandParser {
     class StringOption : public BaseOption {
     public:
         using BaseOption::BaseOption;
-        InnerType GetInnerType() const final {
-            return InnerType::STRING;
-        }
-
-        void Populate(std::string input) override {
-            m_Value = input;
-        }
-
-        std::string GetValue() const {
-            return m_Value;
-        }
+        InnerType GetInnerType() const final;
+        void Populate(std::string input) override;
+        std::string GetValue() const;
 
     private:
         std::string m_Value;
@@ -108,34 +70,18 @@ namespace CommandParser {
     class BoolOption : public BaseOption {
     public:
         using BaseOption::BaseOption;
-        InnerType GetInnerType() const final {
-            return InnerType::BOOL;
-        }
-
-        void Populate(std::string) override {};
-
-        bool GetValue() const {
-            return true;
-        }
+        InnerType GetInnerType() const final;
+        void Populate(std::string) override;
+        bool GetValue() const;
     };
 
     class VecStringOption : public BaseOption {
     public:
         using BaseOption::BaseOption;
-        InnerType GetInnerType() const final {
-            return InnerType::VEC_STRING;
-        }
+        InnerType GetInnerType() const final;
+        void Populate(std::string input) override;
+        std::vector<std::string> GetValue() const;
 
-        void Populate(std::string input) override {
-            auto split = StrUtil::Split(input, ",");
-            for(auto&& val: split) {
-                m_Value.push_back(std::string(val));
-            }
-        }
-
-        std::vector<std::string> GetValue() const {
-            return m_Value;
-        }
     private:
         std::vector<std::string> m_Value;
     };
@@ -143,20 +89,10 @@ namespace CommandParser {
     class VecIntOption : public BaseOption {
     public:
         using BaseOption::BaseOption;
-        InnerType GetInnerType() const final {
-            return InnerType::VEC_INT;
-        }
+        InnerType GetInnerType() const final;
+        void Populate(std::string input) override;
+        std::vector<int> GetValue() const;
 
-        void Populate(std::string input) override {
-            auto split = StrUtil::Split(input, ",");
-            for(auto&& val: split) {
-                m_Value.push_back(std::atoi(std::string(val).c_str()));
-            }
-        }
-
-        std::vector<int> GetValue() const {
-            return m_Value;
-        }
     private:
         std::vector<int> m_Value;
     };

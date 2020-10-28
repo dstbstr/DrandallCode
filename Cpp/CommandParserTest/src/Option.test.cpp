@@ -4,84 +4,138 @@
 
 using ::testing::HasSubstr;
 
-TEST(OptionToString, IncludesShortNameIfAvailable) {
-    CommandParser::IntOption opt("a", "", false);
-    ASSERT_THAT(opt.ToString(), HasSubstr("-a"));
-}
+namespace CommandParser {
+    TEST(OptionConstruction, AllowsEmptyShortName) {
+        ASSERT_NO_THROW(IntOption opt("", "longName", false));
+    }
 
-TEST(OptionToString, IncludesLongNameIfAvailable) {
-    CommandParser::IntOption opt("", "longName", false);
-    ASSERT_THAT(opt.ToString(), HasSubstr("--longName"));
-}
+    TEST(OptionConstruction, AllowsEmptyLongName) {
+        ASSERT_NO_THROW(IntOption opt("s", "", false));
+    }
 
-TEST(OptionToString, IncludesHelpTextIfAvailable) {
-    CommandParser::IntOption opt("", "", false, "Help Text");
-    ASSERT_THAT(opt.ToString(), HasSubstr("Help Text"));
-}
+    TEST(OptionConstruction, DoesNotAllowEmptyShortAndLongName) {
+        ASSERT_ANY_THROW(IntOption opt("", "", false));
+    }
 
-TEST(OptionToString, IndicatesAnOptionIsRequired) {
-    CommandParser::IntOption opt("", "", true);
-    ASSERT_THAT(opt.ToString(), HasSubstr("X"));
-}
+    TEST(OptionConstruction, AllowsBlankShortName) {
+        ASSERT_NO_THROW(IntOption opt(BaseOption::BLANK, "", false));
+    }
 
-TEST(OptionToString, IndicatesAnOptionIsAFlag) {
-    CommandParser::BoolOption opt("", "", false);
-    ASSERT_THAT(opt.ToString(), HasSubstr("X"));
-}
+    TEST(OptionConstruction, AllowsBlankLongName) {
+        ASSERT_NO_THROW(IntOption opt("", BaseOption::BLANK, false));
+    }
 
-TEST(OptionParse, CanParseAsString) {
-    CommandParser::StringOption opt("", "", false);
-    opt.Populate("test");
+    TEST(OptionConstruction, AllowsShortAndLongToBeBlank) {
+        ASSERT_NO_THROW(IntOption opt(BaseOption::BLANK, BaseOption::BLANK, false));
+    }
 
-    ASSERT_EQ(opt.GetValue(), "test");
-}
+    TEST(OptionConstruction, StripsInvalidCharactersFromShortName) {
+        IntOption opt("-a", "", false);
+        ASSERT_EQ(opt.GetShortName(), "a");
+    }
 
-TEST(OptionParse, CanParseAsInt) {
-    CommandParser::IntOption opt("", "", false);
-    opt.Populate("123");
+    TEST(OptionConstruction, StripsInvalidCharactersFromLongName) {
+        IntOption opt("", "--longName", false);
+        ASSERT_EQ(opt.GetLongName(), "longName");
+    }
 
-    ASSERT_EQ(123, opt.GetValue());
-}
+    TEST(OptionConstruction, RequiresValidCharactersInShortName) {
+        ASSERT_ANY_THROW(IntOption opt("--", "", false));
+    }
 
-TEST(OptionParse, CanParseAsBool) {
-    CommandParser::BoolOption opt("", "", false);
-    ASSERT_TRUE(opt.GetValue());
-}
+    TEST(OptionConstruction, RequiresValidCharactersInLongName) {
+        ASSERT_ANY_THROW(IntOption opt("", "---", false));
+    }
 
-TEST(OptionParse, CanParseAsVectorOfStrings) {
-    CommandParser::VecStringOption opt("", "", false);
-    opt.Populate("1,2,3");
-    auto output = opt.GetValue();
+    TEST(OptionConstruction, TakesTheFirstValidCharacterSetInShortName) {
+        IntOption opt("-a-b-", "", false);
+        ASSERT_EQ(opt.GetShortName(), "a");
+    }
 
-    ASSERT_EQ(3, output.size());
-    ASSERT_EQ(output[0], "1");
-    ASSERT_EQ(output[2], "3");
-}
+    TEST(OptionConstruction, TakesTheFirstValidCharacterSetInLongName) {
+        IntOption opt("", "-abc-def", false);
+        ASSERT_EQ(opt.GetLongName(), "abc");
+    }
 
-TEST(OptionParse, CanParseASingleValueAsVectorOfStrings) {
-    CommandParser::VecStringOption opt("", "", false);
-    opt.Populate("1");
-    auto output = opt.GetValue();
+    TEST(OptionToString, IncludesShortNameIfAvailable) {
+        IntOption opt("a", "", false);
+        ASSERT_THAT(opt.ToString(), HasSubstr("-a"));
+    }
 
-    ASSERT_EQ(1, output.size());
-    ASSERT_EQ(output[0], "1");
-}
+    TEST(OptionToString, IncludesLongNameIfAvailable) {
+        IntOption opt("", "longName", false);
+        ASSERT_THAT(opt.ToString(), HasSubstr("--longName"));
+    }
 
-TEST(OptionParse, CanParseAsVectorOfInts) {
-    CommandParser::VecIntOption opt("", "", false);
-    opt.Populate("1,2,3");
-    auto output = opt.GetValue();
+    TEST(OptionToString, IncludesHelpTextIfAvailable) {
+        IntOption opt("a", "", false, "Help Text");
+        ASSERT_THAT(opt.ToString(), HasSubstr("Help Text"));
+    }
 
-    ASSERT_EQ(3, output.size());
-    ASSERT_EQ(output[0], 1);
-    ASSERT_EQ(output[2], 3);
-}
+    TEST(OptionToString, IndicatesAnOptionIsRequired) {
+        IntOption opt("a", "", true);
+        ASSERT_THAT(opt.ToString(), HasSubstr("X"));
+    }
 
-TEST(OptionParse, CanParseASingleValueAsVectorOfInts) {
-    CommandParser::VecIntOption opt("", "", false);
-    opt.Populate("1");
-    auto output = opt.GetValue();
+    TEST(OptionToString, IndicatesAnOptionIsAFlag) {
+        BoolOption opt("a", "", false);
+        ASSERT_THAT(opt.ToString(), HasSubstr("X"));
+    }
 
-    ASSERT_EQ(1, output.size());
-    ASSERT_EQ(output[0], 1);
-}
+    TEST(OptionParse, CanParseAsString) {
+        StringOption opt("a", "", false);
+        opt.Populate("test");
+
+        ASSERT_EQ(opt.GetValue(), "test");
+    }
+
+    TEST(OptionParse, CanParseAsInt) {
+        IntOption opt("a", "", false);
+        opt.Populate("123");
+
+        ASSERT_EQ(123, opt.GetValue());
+    }
+
+    TEST(OptionParse, CanParseAsBool) {
+        BoolOption opt("a", "", false);
+        ASSERT_TRUE(opt.GetValue());
+    }
+
+    TEST(OptionParse, CanParseAsVectorOfStrings) {
+        VecStringOption opt("a", "", false);
+        opt.Populate("1,2,3");
+        auto output = opt.GetValue();
+
+        ASSERT_EQ(3, output.size());
+        ASSERT_EQ(output[0], "1");
+        ASSERT_EQ(output[2], "3");
+    }
+
+    TEST(OptionParse, CanParseASingleValueAsVectorOfStrings) {
+        VecStringOption opt("a", "", false);
+        opt.Populate("1");
+        auto output = opt.GetValue();
+
+        ASSERT_EQ(1, output.size());
+        ASSERT_EQ(output[0], "1");
+    }
+
+    TEST(OptionParse, CanParseAsVectorOfInts) {
+        VecIntOption opt("a", "", false);
+        opt.Populate("1,2,3");
+        auto output = opt.GetValue();
+
+        ASSERT_EQ(3, output.size());
+        ASSERT_EQ(output[0], 1);
+        ASSERT_EQ(output[2], 3);
+    }
+
+    TEST(OptionParse, CanParseASingleValueAsVectorOfInts) {
+        VecIntOption opt("a", "", false);
+        opt.Populate("1");
+        auto output = opt.GetValue();
+
+        ASSERT_EQ(1, output.size());
+        ASSERT_EQ(output[0], 1);
+    }
+} // namespace CommandParser
