@@ -55,15 +55,17 @@ namespace CommandParser {
     };
 
     TEST_F(RequiredOptionCollectionTest, ParsesLongOptions) {
-        auto result = m_Options.Apply(LongOVPs);
-
-        ASSERT_EQ(result.size(), 3);
+        m_Options.Apply(LongOVPs);
+        ASSERT_TRUE(m_Int.IsPopulated());
+        ASSERT_TRUE(m_Str.IsPopulated());
+        ASSERT_TRUE(m_Bool.IsPopulated());
     }
 
     TEST_F(RequiredOptionCollectionTest, ParsesShortOptions) {
-        auto result = m_Options.Apply(ShortOVPs);
-
-        ASSERT_EQ(result.size(), 3);
+        m_Options.Apply(ShortOVPs);
+        ASSERT_TRUE(m_Int.IsPopulated());
+        ASSERT_TRUE(m_Str.IsPopulated());
+        ASSERT_TRUE(m_Bool.IsPopulated());
     }
 
     TEST_F(RequiredOptionCollectionTest, PrintsUsage) {
@@ -87,20 +89,31 @@ namespace CommandParser {
     }
 
     TEST_F(OptionalOptionCollectionTest, ParsesLongOptions) {
-        auto result = m_Options.Apply(LongOVPs);
-
-        ASSERT_EQ(result.size(), 3);
+        m_Options.Apply(LongOVPs);
+        ASSERT_TRUE(m_Int.IsPopulated());
+        ASSERT_TRUE(m_Str.IsPopulated());
+        ASSERT_TRUE(m_Bool.IsPopulated());
     }
 
     TEST_F(OptionalOptionCollectionTest, ParsesShortOptions) {
-        auto result = m_Options.Apply(ShortOVPs);
-
-        ASSERT_EQ(result.size(), 3);
+        m_Options.Apply(ShortOVPs);
+        ASSERT_TRUE(m_Int.IsPopulated());
+        ASSERT_TRUE(m_Str.IsPopulated());
+        ASSERT_TRUE(m_Bool.IsPopulated());
     }
 
     TEST_F(OptionalOptionCollectionTest, DoesNotThrowIfOptionIsMissing) {
         std::vector<OptionValuePair> args{IntShortOVP, StrShortOVP};
         ASSERT_NO_THROW(m_Options.Apply(args));
+    }
+
+    TEST_F(OptionalOptionCollectionTest, OnlyPopulatesProvidedOptions) {
+        std::vector<OptionValuePair> args{IntShortOVP, StrShortOVP};
+        m_Options.Apply(args);
+
+        ASSERT_TRUE(m_Int.IsPopulated());
+        ASSERT_TRUE(m_Str.IsPopulated());
+        ASSERT_FALSE(m_Bool.IsPopulated());
     }
 
 } // namespace CommandParser

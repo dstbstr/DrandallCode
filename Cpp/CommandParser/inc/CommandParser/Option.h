@@ -10,7 +10,7 @@
 
 namespace CommandParser {
     constexpr char UsageFormat[]{"%2s | " // short name
-                                 "%7s | " // long name
+                                 "%10s | " // long name
                                  "%1s | " // required
                                  "%1s | " // is flag
                                  "%s"}; // help text
@@ -23,6 +23,10 @@ namespace CommandParser {
 
         BaseOption(std::string shortName, std::string longName, bool required);
         BaseOption(std::string shortName, std::string longName, bool required, std::string helpText);
+        // TODO: consider changing these to static factory methods
+        BaseOption(bool required);
+        BaseOption(bool required, std::string helpText);
+
         virtual ~BaseOption() = default;
 
         bool Matches(std::string option) const;
@@ -32,8 +36,12 @@ namespace CommandParser {
 
         virtual InnerType GetInnerType() const = 0;
         virtual void Populate(std::string);
+        bool IsPopulated() const;
 
         std::string ToString();
+
+    protected:
+        bool m_Populated{false};
 
     private:
         std::string m_ShortName{""};

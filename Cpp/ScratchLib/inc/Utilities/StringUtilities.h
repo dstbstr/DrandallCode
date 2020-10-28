@@ -6,8 +6,10 @@
 #include <algorithm>
 #include <cctype>
 #include <locale>
+#include <sstream>
 #include <string>
 #include <vector>
+
 
 namespace StrUtil {
     template<typename T>
