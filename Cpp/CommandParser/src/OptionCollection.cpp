@@ -6,7 +6,7 @@ namespace CommandParser {
     OptionCollection::OptionCollection(std::string description) : m_Description(description) {};
 
     OptionCollection& OptionCollection::Add(BaseOption& option) {
-        m_Options.push_back(std::move(&option));
+        m_Options.push_back(&option);
         return *this;
     }
 
