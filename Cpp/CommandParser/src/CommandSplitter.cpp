@@ -1,7 +1,7 @@
 #include "CommandParser/CommandSplitter.h"
 
 #include "Utilities/StringUtilities.h"
-
+#include "Instrumentation/Assert.h"
 #include <algorithm>
 
 namespace CommandParser {
@@ -15,6 +15,7 @@ namespace CommandParser {
     static bool IsLongOption(std::string);
 
     CommandSplitter::CommandSplitter(int argc, char* argv[]) {
+        ASSERT_MSG(argc > 0, "Received 0 args");
         // First arg is the program name
         for(int i = 1; i < argc; i++) {
             m_Args.push_back(argv[i]);
@@ -33,6 +34,7 @@ namespace CommandParser {
             m_Args.clear();
             m_HasParsed = true;
         }
+        ASSERT_MSG(m_ParsedArgs.size() > 0, "GetNext called without HasMoreArguments call (or after it returned false)");
         auto result = m_ParsedArgs.back();
         m_ParsedArgs.pop_back();
         return result;
