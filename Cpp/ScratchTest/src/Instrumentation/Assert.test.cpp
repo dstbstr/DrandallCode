@@ -1,6 +1,6 @@
 #include "Instrumentation/Assert.h"
 
-#include "AssertToException.h"
+#include "Instrumentation/LogWriter/AssertToException.h"
 #include "TestCommon.h"
 
 #pragma warning(push)

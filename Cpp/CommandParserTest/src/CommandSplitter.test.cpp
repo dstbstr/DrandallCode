@@ -3,6 +3,7 @@
 #include "Macros/PreProcessorOverride.h"
 #include "TestCommon.h"
 #include "Utilities/LambdaUtils.h"
+#include "Instrumentation/LogWriter/AssertToException.h"
 
 #define ARGV_1(str, ...) \
     { (char*)str }
@@ -156,5 +157,18 @@ namespace CommandParser {
         ASSERT_EQ(pairs[0].Name, "t");
         ASSERT_TRUE(pairs[0].HasValue);
         ASSERT_EQ(pairs[0].Value, "val");
+    }
+
+    class CommandSplitterErrorTest : public ::testing::Test {
+        AssertToException ate{};
+    };
+
+    TEST_F(CommandSplitterErrorTest, PassingZeroArgsToConstructorAsserts) {
+        ASSERT_ANY_THROW(CommandSplitter splitter(0, nullptr));
+    }
+
+    TEST_F(CommandSplitterErrorTest, CallingNextWithNoRemainingArgsAsserts) {
+        GET_PAIRS_1("-a");
+        ASSERT_ANY_THROW(splitter.GetNext());
     }
 } // namespace CommandParser
