@@ -5,7 +5,6 @@
 #include <ostream>
 #include <vector>
 
-
 namespace CommandParser {
     class BaseOption;
 
@@ -13,7 +12,7 @@ namespace CommandParser {
     public:
         OptionCollection(std::string description);
         OptionCollection& Add(BaseOption& option);
-        std::vector<BaseOption*> Apply(std::vector<OptionValuePair> pairs);
+        void Apply(std::vector<OptionValuePair> pairs);
         void PrintUsage(std::ostream& target) const;
 
     private:

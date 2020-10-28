@@ -1,8 +1,10 @@
 #include "CommandParser/CommandSplitter.h"
 
-#include "Utilities/StringUtilities.h"
 #include "Instrumentation/Assert.h"
+#include "Utilities/StringUtilities.h"
+
 #include <algorithm>
+
 
 namespace CommandParser {
     static std::string currentArg;
@@ -40,6 +42,14 @@ namespace CommandParser {
         return result;
     }
 
+    std::vector<OptionValuePair> CommandSplitter::GetAll() {
+        if(!m_HasParsed) {
+            ParseOptions(m_Args, m_ParsedArgs);
+            m_Args.clear();
+            m_HasParsed = true;
+        }
+        return m_ParsedArgs;
+    }
     // Private helper functions
 
     static void FlushCurrentArg(std::vector<OptionValuePair>& result) {

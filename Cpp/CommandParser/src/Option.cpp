@@ -14,9 +14,19 @@ namespace CommandParser {
         ValidateName();
     }
 
+    BaseOption::BaseOption(bool required) : m_Required(required) {
+        m_ShortName = "";
+        m_LongName = BaseOption::BLANK;
+    }
+
+    BaseOption::BaseOption(bool required, std::string helpText) : m_Required(required), m_HelpText(helpText) {
+        m_ShortName = "";
+        m_LongName = BaseOption::BLANK;
+    }
+
     bool BaseOption::Matches(std::string option) const {
         if(option == "") {
-            return m_ShortName == BLANK && m_LongName == BLANK;
+            return m_ShortName == BLANK || m_LongName == BLANK;
         }
         return option == m_ShortName || option == m_LongName;
     }
@@ -34,6 +44,10 @@ namespace CommandParser {
     }
     void BaseOption::Populate(std::string) {
         ASSERT_MSG(false, "Called Populate on BaseOption");
+    }
+
+    bool BaseOption::IsPopulated() const {
+        return m_Populated;
     }
 
     std::string BaseOption::ToString() {
@@ -73,6 +87,7 @@ namespace CommandParser {
 
     void IntOption::Populate(std::string input) {
         m_Value = std::atoi(input.c_str());
+        m_Populated = true;
     }
 
     int IntOption::GetValue() const {
@@ -85,6 +100,7 @@ namespace CommandParser {
 
     void StringOption::Populate(std::string input) {
         m_Value = input;
+        m_Populated = true;
     }
 
     std::string StringOption::GetValue() const {
@@ -95,7 +111,9 @@ namespace CommandParser {
         return InnerType::BOOL;
     }
 
-    void BoolOption::Populate(std::string){};
+    void BoolOption::Populate(std::string) {
+        m_Populated = true;
+    };
 
     bool BoolOption::GetValue() const {
         return true;
@@ -109,6 +127,7 @@ namespace CommandParser {
         for(auto&& val: split) {
             m_Value.push_back(std::string(val));
         }
+        m_Populated = true;
     }
 
     std::vector<std::string> VecStringOption::GetValue() const {
@@ -124,6 +143,7 @@ namespace CommandParser {
         for(auto&& val: split) {
             m_Value.push_back(std::atoi(std::string(val).c_str()));
         }
+        m_Populated = true;
     }
 
     std::vector<int> VecIntOption::GetValue() const {

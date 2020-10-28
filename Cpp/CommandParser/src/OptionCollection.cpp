@@ -14,7 +14,7 @@ namespace CommandParser {
     void OptionCollection::PrintUsage(std::ostream& stream) const {
         stream << m_Description << std::endl;
         stream << "Options" << std::endl;
-        stream << "Short Name | Long Name | Required | Flag | Help Text" << std::endl;
+        stream << " S |  LongName | R | F | Help Text" << std::endl;
         stream << "----------------------------------------------------" << std::endl;
 
         for(auto&& option: m_Options) {
@@ -22,26 +22,22 @@ namespace CommandParser {
         }
     }
 
-    std::vector<BaseOption*> OptionCollection::Apply(std::vector<OptionValuePair> pairs) {
-        std::vector<BaseOption*> result;
-
+    void OptionCollection::Apply(std::vector<OptionValuePair> pairs) {
         for(auto&& option: m_Options) {
             bool found = false;
             for(auto&& pair: pairs) {
                 if(option->Matches(pair.Name)) {
                     if(pair.HasValue) {
                         option->Populate(pair.Value);
+                    } else {
+                        option->Populate("");
                     }
-                    result.push_back(option);
                     found = true;
-                    break;
                 }
             }
             if(!found && option->IsRequired()) {
                 throw std::exception(StrUtil::Format("%s option is required, but not provided", option->GetLongName()).c_str());
             }
         }
-
-        return result;
     }
 } // namespace CommandParser
