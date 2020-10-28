@@ -1,9 +1,10 @@
 #include "CommandParser/OptionCollection.h"
+
 #include "CommandParser/Option.h"
 #include "Utilities/Format.h"
 
 namespace CommandParser {
-    OptionCollection::OptionCollection(std::string description) : m_Description(description) {};
+    OptionCollection::OptionCollection(std::string description) : m_Description(description){};
 
     OptionCollection& OptionCollection::Add(BaseOption& option) {
         m_Options.push_back(&option);
@@ -16,7 +17,7 @@ namespace CommandParser {
         stream << "Short Name | Long Name | Required | Flag | Help Text" << std::endl;
         stream << "----------------------------------------------------" << std::endl;
 
-        for(auto&& option : m_Options) {
+        for(auto&& option: m_Options) {
             stream << option->ToString() << std::endl;
         }
     }
