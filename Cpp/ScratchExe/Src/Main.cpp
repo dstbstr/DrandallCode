@@ -4,6 +4,7 @@
 #include "Singers/IBirthdaySinger.h"
 #include "Singers/NaiveSinger.h"
 #include "Utilities/StringUtilities.h"
+#include "FileNameCollector.h"
 
 #include <filesystem>
 #include <iostream>
@@ -36,9 +37,14 @@ int main(int argc, char* argv[]) {
         targets.push_back(std::filesystem::current_path().string());
     }
 
-    std::cout << "Recurse: " << std::boolalpha << recurse << std::endl;
-    std::cout << "Paths: " << StrUtil::JoinVec(", ", targets) << std::endl;
+    FileNameCollector fnc{targets, std::vector<std::string>{".h", ".cpp", ".hpp"}, recurse};
+    auto resolvedFiles = fnc.GetAllFullyQualifiedPaths();
 
+    for(auto&& file : resolvedFiles) {
+        std::cout << file << std::endl;
+    }
+
+    std::cout << "Done";
     std::cin.ignore(1, '\n');
     return 0;
 }
