@@ -1,6 +1,6 @@
 #include "CommandParser/Option.h"
 namespace CommandParser {
-    BaseOption::BaseOption(std::string shortName, std::string longName, bool required) : m_Required(required) {
+    BaseOption::BaseOption(std::string shortName, std::string longName, bool required) : m_Required(required), m_IsRestOption(false) {
         m_ShortName = CleanName(shortName);
         m_LongName = CleanName(longName);
         ValidateName();
@@ -8,18 +8,19 @@ namespace CommandParser {
 
     BaseOption::BaseOption(std::string shortName, std::string longName, bool required, std::string helpText)
         : m_Required(required)
+        , m_IsRestOption(false)
         , m_HelpText(helpText) {
         m_ShortName = CleanName(shortName);
         m_LongName = CleanName(longName);
         ValidateName();
     }
 
-    BaseOption::BaseOption(bool required) : m_Required(required) {
+    BaseOption::BaseOption(bool required) : m_Required(required), m_IsRestOption(true) {
         m_ShortName = "";
         m_LongName = BaseOption::BLANK;
     }
 
-    BaseOption::BaseOption(bool required, std::string helpText) : m_Required(required), m_HelpText(helpText) {
+    BaseOption::BaseOption(bool required, std::string helpText) : m_Required(required), m_IsRestOption(true), m_HelpText(helpText) {
         m_ShortName = "";
         m_LongName = BaseOption::BLANK;
     }
@@ -33,6 +34,10 @@ namespace CommandParser {
 
     bool BaseOption::IsRequired() const {
         return m_Required;
+    }
+
+    bool BaseOption::IsRestOption() const {
+        return m_IsRestOption;
     }
 
     std::string BaseOption::GetShortName() const {

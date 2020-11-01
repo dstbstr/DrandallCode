@@ -116,4 +116,19 @@ namespace CommandParser {
         ASSERT_FALSE(m_Bool.IsPopulated());
     }
 
+    TEST(OptionCollectionTest, ExtractsValuesFromBoolOptions) {
+        BoolOption opt("a", "", false);
+        VecStringOption restOpt(false);
+        OptionValuePair pair("a", "foo");
+        OptionCollection collection("Extracting value from bool option");
+        collection.Add(opt).Add(restOpt);
+
+        collection.Apply(std::vector<OptionValuePair>{pair});
+
+        ASSERT_TRUE(opt.IsPopulated());
+        ASSERT_TRUE(restOpt.IsPopulated());
+        ASSERT_EQ(restOpt.GetValue().size(), 1);
+        ASSERT_EQ(restOpt.GetValue()[0], "foo");
+    }
+
 } // namespace CommandParser
