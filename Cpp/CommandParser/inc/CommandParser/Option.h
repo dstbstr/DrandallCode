@@ -29,6 +29,7 @@ namespace CommandParser {
 
         virtual ~BaseOption() = default;
 
+        bool IsRestOption() const;
         bool Matches(std::string option) const;
         bool IsRequired() const;
         std::string GetShortName() const;
@@ -48,6 +49,7 @@ namespace CommandParser {
         std::string m_LongName{""};
         std::string m_HelpText{""};
         bool m_Required{false};
+        bool m_IsRestOption{false};
 
         std::string CleanName(std::string input) const;
         void ValidateName() const;
