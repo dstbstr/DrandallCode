@@ -1,50 +1,79 @@
-#include "CommandParser/CommandSplitter.h"
-#include "CommandParser/Option.h"
-#include "CommandParser/OptionCollection.h"
-#include "Singers/IBirthdaySinger.h"
-#include "Singers/NaiveSinger.h"
+#include "ArgParse.h"
+#include "FileData.h"
+#include "IncludeCountTask.h"
+#include "Platform/Types.h"
 #include "Utilities/StringUtilities.h"
-#include "FileNameCollector.h"
 
-#include <filesystem>
-#include <iostream>
-#include <string>
+#include <chrono>
+#include <ppltasks.h>
+#include <thread>
+#include <vector>
+
+inline std::chrono::steady_clock::time_point Now() {
+    return std::chrono::high_resolution_clock::now();
+}
+
+long long DiffMicros(std::chrono::steady_clock::time_point mark) {
+    return std::chrono::duration_cast<std::chrono::microseconds>(Now() - mark).count();
+}
+
+long long DiffMillis(std::chrono::steady_clock::time_point mark) {
+    return std::chrono::duration_cast<std::chrono::milliseconds>(Now() - mark).count();
+}
 
 int main(int argc, char* argv[]) {
     // construct an argument parser with argc and argv
     // pass the root directory and the recurse option to a directory navigator
     // fan out the files to find include directives in each file
     // construct including and included maps
-    CommandParser::BoolOption recurseFlag("r", "recurse", false, "Whether or not to search the provided directory/directories recursively");
-    CommandParser::BoolOption helpFlag("h", "help", false, "Prints the usage");
-    CommandParser::VecStringOption filePathOption(false, "File paths and directories");
-    CommandParser::OptionCollection options("Produces a report about the number of includes");
-    options.Add(recurseFlag).Add(helpFlag).Add(filePathOption);
 
-    CommandParser::CommandSplitter splitter(argc, argv);
-    options.Apply(splitter.GetAll());
-    if(helpFlag.IsPopulated()) {
-        options.PrintUsage(std::cout);
+    auto start = Now();
+    ArgParse argParse(argc, argv);
+    std::cout << "Time to parse args: " << DiffMicros(start) << " Microseconds" << std::endl;
+    auto mark = Now();
+    if(!argParse.ShouldParse()) {
         return 0;
     }
 
-    bool recurse = recurseFlag.IsPopulated();
+    auto fileNames = argParse.GetFileNames();
+    std::cout << "Time to gather filenames: " << DiffMicros(mark) << " Microseconds" << std::endl;
+    mark = Now();
 
-    std::vector<std::string> targets;
-    if(filePathOption.IsPopulated()) {
-        targets = filePathOption.GetValue();
-    } else {
-        targets.push_back(std::filesystem::current_path().string());
+    std::vector<IncludeCountTask> jobs;
+    for(auto&& file: fileNames) {
+        jobs.push_back(IncludeCountTask(file));
     }
 
-    FileNameCollector fnc{targets, std::vector<std::string>{".h", ".cpp", ".hpp"}, recurse};
-    auto resolvedFiles = fnc.GetAllFullyQualifiedPaths();
+    std::cout << "Time to construct jobs: " << DiffMicros(mark) << " Microseconds" << std::endl;
+    mark = Now();
 
-    for(auto&& file : resolvedFiles) {
-        std::cout << file << std::endl;
+    // kick off the jobs
+    static const u32 MaxConcurrency = std::thread::hardware_concurrency();
+    std::vector<concurrency::task<FileData>> tasks;
+    std::vector<concurrency::task<FileData>> completedTasks(jobs.size());
+
+    std::cout << "Max concurrency: " << MaxConcurrency << std::endl;
+    while(!jobs.empty()) {
+        for(u32 i = 0; i < MaxConcurrency && !jobs.empty(); i++) {
+            tasks.push_back(jobs.back().CountIncludes());
+            jobs.pop_back();
+        }
+
+        // work through all
+        concurrency::when_all(tasks.begin(), tasks.end());
+        for(auto&& completed: tasks) {
+            completedTasks.push_back(completed);
+        }
+        tasks.clear();
     }
 
-    std::cout << "Done";
+    concurrency::when_all(tasks.begin(), tasks.end());
+
+    std::cout << "Time to run all jobs: " << DiffMillis(mark) << " Milliseconds" << std::endl;
+    mark = Now();
+
+    std::cout << "Done" << std::endl;
+    std::cout << "Total runtime: " << DiffMillis(start) << "ms";
     std::cin.ignore(1, '\n');
     return 0;
 }
