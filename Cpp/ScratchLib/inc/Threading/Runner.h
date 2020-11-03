@@ -1,5 +1,5 @@
-#ifndef __THROTTLEDRUNNER_H__
-#define __THROTTLEDRUNNER_H__
+#ifndef __RUNNER_H__
+#define __RUNNER_H__
 
 #include "Platform/Types.h"
 #include "Threading/IRunnable.h"
@@ -9,10 +9,10 @@
 #include <thread>
 #include <vector>
 
-class ThrottledRunner {
+class Runner {
 public:
-    static ThrottledRunner Get() {
-        static ThrottledRunner runner;
+    static Runner Get() {
+        static Runner runner;
         return runner;
     }
 
@@ -43,7 +43,7 @@ public:
     }
 
 private:
-    ThrottledRunner() = default;
+    Runner() = default;
     const u32 m_MaxConcurrency{std::thread::hardware_concurrency()};
 };
-#endif // __THROTTLEDRUNNER_H__
+#endif // __RUNNER_H__

@@ -5,7 +5,6 @@
 #include "Threading/IRunnable.h"
 
 #include <fstream>
-#include <ppltasks.h>
 #include <regex>
 
 class IncludeCountTask : public IRunnable<FileData> {
