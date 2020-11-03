@@ -11,12 +11,12 @@ namespace Log {
 
         static std::string AsString(Enum level) {
             switch(level) {
-            case Verbose: return "Verbose";
-            case Debug: return "Debug";
-            case Info: return "Info";
-            case Warn: return "Warn";
-            case Error: return "Error";
-            case Critical: return "Critical";
+            case Verbose: return "VERBOSE";
+            case Debug: return "DEBUG";
+            case Info: return "INFO";
+            case Warn: return "WARN";
+            case Error: return "ERROR";
+            case Critical: return "CRITICAL";
             default: return "Unknown";
             }
         }

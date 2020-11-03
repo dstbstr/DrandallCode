@@ -31,7 +31,8 @@ namespace Log {
     }
 
     void LogStoreEnabled::AddMessage(const Debug::Context& context, const LogEntry& entry) {
-        m_Entries.push_back(LogEvent(context, entry, std::vector<std::string>()));
+        // m_Entries.push_back(LogEvent(context, entry, std::vector<std::string>()));
+        RaiseEvent(LogEvent(context, entry, std::vector<std::string>())); // the old implementation is for game loops
     }
 
     void LogStoreEnabled::AddMessageImmediate(const Debug::Context& context, const LogEntry& entry) {
