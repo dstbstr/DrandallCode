@@ -16,16 +16,22 @@
 namespace Log {
     constexpr char DateTimeFormat[]{"%Y/%m/%d %H:%M:%S "};
 
-    constexpr char LogLineFormat[]{
-        "[%07s] " // Level
+    constexpr char InfoLineFormat[]{
+        "[%s] " // Level
         "%s:%d " // File:Line
-        "(%s) - " // Function name
+        "%s\n" // Msg
+    };
+
+    constexpr char ErrorLineFormat[]{
+        "[%7s] " // Level
+        "%s:%d " // File:Line
+        "%(%s) - " // Function name
         "%s\n" // Msg
     };
 
     class StdOutLogWriter : public ILogListener {
     public:
-        StdOutLogWriter(Log::LogFilter filter) : ILogListener(filter) {}
+        StdOutLogWriter(Log::LogFilter filter = Log::LogFilter::MatchAll) : ILogListener(filter) {}
 
         void WriteLog(const LogEvent& event) const override {
             auto entry = event.Entry;
@@ -36,12 +42,22 @@ namespace Log {
                 out = &std::cerr;
             }
 
-            auto ts = std::chrono::system_clock::to_time_t(entry.Timestamp);
-            auto utc = *std::gmtime(&ts);
-            *out << std::put_time(&utc, DateTimeFormat);
+            if(entry.Level >= LogLevel::Error) {
+                auto ts = std::chrono::system_clock::to_time_t(entry.Timestamp);
+                tm utc;
+                _gmtime64_s(&utc, &ts);
 
-            *out << StrUtil::Format(
-                LogLineFormat, LogLevel::AsString(entry.Level), context.FileNameShort, context.LineNumber, context.FunctionName, entry.Message);
+                *out << std::put_time(&utc, DateTimeFormat);
+                *out << StrUtil::Format(
+                    ErrorLineFormat, LogLevel::AsString(entry.Level), context.FileNameShort, context.LineNumber, context.FunctionName, entry.Message);
+                if(!event.StackTrace.empty()) {
+                    for(auto&& line: event.StackTrace) {
+                        *out << "\n\t" << line;
+                    }
+                }
+            } else {
+                *out << StrUtil::Format(InfoLineFormat, LogLevel::AsString(entry.Level), context.FileNameShort, context.LineNumber, entry.Message);
+            }
         }
     };
 
