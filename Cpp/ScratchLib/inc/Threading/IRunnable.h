@@ -5,4 +5,6 @@ template<class ReturnType>
 struct IRunnable {
     virtual ReturnType Execute() = 0;
 };
+
+struct VOID {};
 #endif // __IRUNNABLE_H__

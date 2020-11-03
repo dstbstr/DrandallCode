@@ -5,7 +5,7 @@
 #include "Instrumentation/LogWriter/StdOutLogWriter.h"
 #include "Platform/Types.h"
 #include "Threading/IRunnable.h"
-#include "Threading/ThrottledRunner.h"
+#include "Threading/Runner.h"
 #include "Utilities/StringUtilities.h"
 
 #include <chrono>
@@ -52,7 +52,7 @@ int main(int argc, char* argv[]) {
     mark = Now();
 
     // kick off the jobs
-    auto runner = ThrottledRunner::Get();
+    auto runner = Runner::Get();
     auto result = runner.RunAll<FileData>(jobs);
 
     LOG_INFO(StrUtil::Format("Time to run all jobs: %dms", DiffMillis(mark)));
