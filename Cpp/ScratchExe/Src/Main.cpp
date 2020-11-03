@@ -4,11 +4,11 @@
 #include "Instrumentation/Log.h"
 #include "Instrumentation/LogWriter/StdOutLogWriter.h"
 #include "Platform/Types.h"
+#include "Threading/IRunnable.h"
+#include "Threading/ThrottledRunner.h"
 #include "Utilities/StringUtilities.h"
 
 #include <chrono>
-#include <ppltasks.h>
-#include <thread>
 #include <vector>
 
 inline std::chrono::steady_clock::time_point Now() {
@@ -43,35 +43,17 @@ int main(int argc, char* argv[]) {
     LOG_INFO(StrUtil::Format("Time to gather filenames: %d Microseconds", DiffMicros(mark)));
     mark = Now();
 
-    std::vector<IncludeCountTask> jobs;
+    std::vector<std::unique_ptr<IRunnable<FileData>>> jobs;
     for(auto&& file: fileNames) {
-        jobs.push_back(IncludeCountTask(file));
+        jobs.push_back(std::move(std::make_unique<IncludeCountTask>(file)));
     }
 
     LOG_INFO(StrUtil::Format("Time to construct jobs: %d Microseconds", DiffMicros(mark)));
     mark = Now();
 
     // kick off the jobs
-    static const u32 MaxConcurrency = std::thread::hardware_concurrency();
-    std::vector<concurrency::task<FileData>> tasks;
-    std::vector<concurrency::task<FileData>> completedTasks(jobs.size());
-
-    LOG_INFO(StrUtil::Format("Max concurrency: %d", MaxConcurrency));
-    while(!jobs.empty()) {
-        for(u32 i = 0; i < MaxConcurrency && !jobs.empty(); i++) {
-            tasks.push_back(jobs.back().CountIncludes());
-            jobs.pop_back();
-        }
-
-        // work through all
-        concurrency::when_all(tasks.begin(), tasks.end());
-        for(auto&& completed: tasks) {
-            completedTasks.push_back(completed);
-        }
-        tasks.clear();
-    }
-
-    concurrency::when_all(tasks.begin(), tasks.end());
+    auto runner = ThrottledRunner::Get();
+    auto result = runner.RunAll<FileData>(jobs);
 
     LOG_INFO(StrUtil::Format("Time to run all jobs: %dms", DiffMillis(mark)));
     mark = Now();
