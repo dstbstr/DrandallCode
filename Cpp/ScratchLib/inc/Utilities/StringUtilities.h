@@ -8,10 +8,25 @@
 #include <locale>
 #include <sstream>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
-
 namespace StrUtil {
+    template<typename T>
+    std::string JoinVec(std::string&& delimiter, std::vector<T>&& input) {
+        std::stringstream stream;
+        if(!input.empty()) {
+            stream << input[0];
+        }
+
+        for(int i = 1; i < input.size(); i++) {
+            stream << delimiter;
+            stream << input[i];
+        }
+
+        return stream.str();
+    }
+
     template<typename T>
     std::string JoinVec(std::string&& delimiter, std::vector<T> const& input) {
         std::stringstream stream;

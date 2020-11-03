@@ -5,7 +5,6 @@
 
 #include <algorithm>
 
-
 namespace CommandParser {
     static std::string currentArg;
     // private forward declarations
@@ -23,6 +22,8 @@ namespace CommandParser {
             m_Args.push_back(argv[i]);
         }
     }
+
+    CommandSplitter::CommandSplitter(std::vector<std::string> args) : m_Args(args) {}
 
     bool CommandSplitter::HasMoreArguments() const {
         return !(m_ParsedArgs.empty() && m_Args.empty());

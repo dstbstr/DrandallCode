@@ -70,7 +70,6 @@ namespace CommandParser {
         }
         static std::regex cleanRegex(R"(\w+)");
         std::smatch match;
-        std::regex_match(input, match, cleanRegex);
         if(!std::regex_search(input, match, cleanRegex)) {
             throw std::exception(("Invalid option name " + input).c_str());
         }

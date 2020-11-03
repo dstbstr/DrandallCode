@@ -10,7 +10,12 @@
             "request": "launch",
             "program": "${workspaceFolder}/Build/ScratchExe/Debug/ScratchExe.exe",
             "args": [
-                "-r"
+                "-r",
+                "CommandParser",
+                "CommandParserTest",
+                "ScratchExe",
+                "ScratchLib",
+                "ScratchTest"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
