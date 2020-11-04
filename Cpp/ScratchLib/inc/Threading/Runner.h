@@ -4,6 +4,7 @@
 #include "Platform/Types.h"
 #include "Threading/IRunnable.h"
 
+#include <algorithm>
 #include <memory>
 #include <ppltasks.h>
 #include <thread>
@@ -44,6 +45,6 @@ public:
 
 private:
     Runner() = default;
-    const u32 m_MaxConcurrency{std::thread::hardware_concurrency()};
+    const u32 m_MaxConcurrency{std::min(u32(1), std::thread::hardware_concurrency())};
 };
 #endif // __RUNNER_H__
