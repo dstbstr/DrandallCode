@@ -6,10 +6,12 @@
 #include "Platform/Types.h"
 #include "Threading/IRunnable.h"
 #include "Threading/Runner.h"
+#include "Utilities/ScopedTimer.h"
 #include "Utilities/StringUtilities.h"
 
 #include <chrono>
 #include <vector>
+
 
 inline std::chrono::steady_clock::time_point Now() {
     return std::chrono::high_resolution_clock::now();
@@ -30,35 +32,33 @@ int main(int argc, char* argv[]) {
     // pass the root directory and the recurse option to a directory navigator
     // fan out the files to find include directives in each file
     // construct including and included maps
-
-    auto start = Now();
+    ScopedTimer executionTimer("Total Runtime");
     ArgParse argParse(argc, argv);
-    LOG_INFO(StrUtil::Format("Time to parse args: %d Microseconds", DiffMicros(start)));
-    auto mark = Now();
     if(!argParse.ShouldParse()) {
         return 0;
     }
 
-    auto fileNames = argParse.GetFileNames();
-    LOG_INFO(StrUtil::Format("Time to gather filenames: %d Microseconds", DiffMicros(mark)));
-    mark = Now();
-
-    std::vector<std::unique_ptr<IRunnable<FileData>>> jobs;
-    for(auto&& file: fileNames) {
-        jobs.push_back(std::move(std::make_unique<IncludeCountTask>(file)));
+    std::vector<std::string> fileNames;
+    {
+        ScopedTimer timer("Gather filenames");
+        fileNames = argParse.GetFileNames();
     }
 
-    LOG_INFO(StrUtil::Format("Time to construct jobs: %d Microseconds", DiffMicros(mark)));
-    mark = Now();
+    std::vector<std::unique_ptr<IRunnable<FileData>>> jobs;
+    {
+        ScopedTimer timer("Construct jobs");
+        for(auto&& file: fileNames) {
+            jobs.push_back(std::move(std::make_unique<IncludeCountTask>(file)));
+        }
+    }
 
-    // kick off the jobs
     auto runner = Runner::Get();
-    auto result = runner.RunAll<FileData>(jobs);
+    std::vector<FileData> result;
+    {
+        ScopedTimer timer("Run all jobs");
+        result = runner.RunAll(jobs);
+    }
 
-    LOG_INFO(StrUtil::Format("Time to run all jobs: %dms", DiffMillis(mark)));
-    mark = Now();
-
-    LOG_INFO(StrUtil::Format("Total runtime: %dms", DiffMillis(start)));
     std::cin.ignore(1, '\n');
     return 0;
 }

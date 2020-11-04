@@ -4,82 +4,82 @@
 
 TEST(TrimStart, RemovesSpaceFromStart) {
     std::string test = " test";
-    ASSERT_EQ(StrUtil::trimStart(test), "test");
+    ASSERT_EQ(StrUtil::TrimStart(test), "test");
 }
 
 TEST(TrimStart, RemovesMultipleSpacesFromStart) {
     std::string test = "   test";
-    ASSERT_EQ(StrUtil::trimStart(test), "test");
+    ASSERT_EQ(StrUtil::TrimStart(test), "test");
 }
 
 TEST(TrimStart, DoesNotRemoveSpacesFromEnd) {
     std::string test = "test   ";
-    ASSERT_EQ(StrUtil::trimStart(test), test);
+    ASSERT_EQ(StrUtil::TrimStart(test), test);
 }
 
 TEST(TrimStart, DoesNotModifyTheInputString) {
     std::string test = "  test";
-    ASSERT_NE(StrUtil::trimStart(test), test);
+    ASSERT_NE(StrUtil::TrimStart(test), test);
 }
 
 TEST(TrimStart, CanClearAnEntireString) {
     std::string test = "   ";
-    ASSERT_EQ(StrUtil::trimStart(test), "");
+    ASSERT_EQ(StrUtil::TrimStart(test), "");
 }
 
 TEST(TrimStart, WorksWithEmptyInput) {
     std::string test = "";
-    ASSERT_EQ(StrUtil::trimStart(test), "");
+    ASSERT_EQ(StrUtil::TrimStart(test), "");
 }
 
 TEST(TrimEnd, RemovesSpaceFromEnd) {
     std::string test = "test ";
-    ASSERT_EQ(StrUtil::trimEnd(test), "test");
+    ASSERT_EQ(StrUtil::TrimEnd(test), "test");
 }
 
 TEST(TrimEnd, RemovesMultiplesSpacesFromEnd) {
     std::string test = "test   ";
-    ASSERT_EQ(StrUtil::trimEnd(test), "test");
+    ASSERT_EQ(StrUtil::TrimEnd(test), "test");
 }
 
 TEST(TrimEnd, DoesNotRemoveSpacesFromStart) {
     std::string test = "  test";
-    ASSERT_EQ(StrUtil::trimEnd(test), test);
+    ASSERT_EQ(StrUtil::TrimEnd(test), test);
 }
 
 TEST(TrimEnd, DoesNotModifyTheInputString) {
     std::string test = "test  ";
-    ASSERT_NE(StrUtil::trimEnd(test), test);
+    ASSERT_NE(StrUtil::TrimEnd(test), test);
 }
 
 TEST(TrimEnd, CanClearAnEntireString) {
     std::string test = "   ";
-    ASSERT_EQ(StrUtil::trimEnd(test), "");
+    ASSERT_EQ(StrUtil::TrimEnd(test), "");
 }
 
 TEST(TrimEnd, WorksWithEmptyInput) {
     std::string test = "";
-    ASSERT_EQ(StrUtil::trimEnd(test), "");
+    ASSERT_EQ(StrUtil::TrimEnd(test), "");
 }
 
 TEST(Trim, TrimsFromStartAndEnd) {
     std::string test = "  test  ";
-    ASSERT_EQ(StrUtil::trim(test), "test");
+    ASSERT_EQ(StrUtil::Trim(test), "test");
 }
 
 TEST(Trim, DoesNotModifyInputString) {
     std::string test = "  test  ";
-    ASSERT_NE(StrUtil::trim(test), test);
+    ASSERT_NE(StrUtil::Trim(test), test);
 }
 
 TEST(Trim, CanClearAnEntireString) {
     std::string test = "   ";
-    ASSERT_EQ(StrUtil::trim(test), "");
+    ASSERT_EQ(StrUtil::Trim(test), "");
 }
 
 TEST(Trim, WorksWithEmptyInput) {
     std::string test = "";
-    ASSERT_EQ(StrUtil::trim(test), "");
+    ASSERT_EQ(StrUtil::Trim(test), "");
 }
 
 TEST(EqualsIgnoreCase, ExactMatchReturnsTrue) {

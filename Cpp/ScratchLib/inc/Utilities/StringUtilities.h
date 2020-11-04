@@ -73,18 +73,18 @@ namespace StrUtil {
 
     bool EqualsIgnoreCase(std::string_view lhs, std::string_view rhs);
 
-    static inline std::string trimStart(std::string s) {
+    static inline std::string TrimStart(std::string s) {
         s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) { return !std::isspace(ch); }));
         return s;
     }
 
-    static inline std::string trimEnd(std::string s) {
+    static inline std::string TrimEnd(std::string s) {
         s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) { return !std::isspace(ch); }).base(), s.end());
         return s;
     }
 
-    static inline std::string trim(std::string s) {
-        return trimStart(trimEnd(s));
+    static inline std::string Trim(std::string s) {
+        return TrimStart(TrimEnd(s));
     }
 } // namespace StrUtil
 
