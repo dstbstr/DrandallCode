@@ -10,5 +10,5 @@ std::string TernarySinger::Sing(std::string name) {
             song += "Happy birthday dear " + name + ".  ";
     }
     
-    return StrUtil::trim(song);
+    return StrUtil::Trim(song);
 }
