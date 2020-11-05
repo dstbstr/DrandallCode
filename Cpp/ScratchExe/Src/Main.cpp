@@ -1,29 +1,13 @@
 #include "ArgParse.h"
 #include "FileData.h"
 #include "IncludeCountTask.h"
-#include "Instrumentation/Log.h"
 #include "Instrumentation/LogWriter/StdOutLogWriter.h"
-#include "Platform/Types.h"
 #include "Threading/IRunnable.h"
 #include "Threading/Runner.h"
 #include "Utilities/ScopedTimer.h"
 #include "Utilities/StringUtilities.h"
 
-#include <chrono>
 #include <vector>
-
-
-inline std::chrono::steady_clock::time_point Now() {
-    return std::chrono::high_resolution_clock::now();
-}
-
-long long DiffMicros(std::chrono::steady_clock::time_point mark) {
-    return std::chrono::duration_cast<std::chrono::microseconds>(Now() - mark).count();
-}
-
-long long DiffMillis(std::chrono::steady_clock::time_point mark) {
-    return std::chrono::duration_cast<std::chrono::milliseconds>(Now() - mark).count();
-}
 
 Log::StdOutLogWriter logWriter{};
 

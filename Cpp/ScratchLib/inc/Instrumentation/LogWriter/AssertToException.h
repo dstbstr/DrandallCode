@@ -4,14 +4,16 @@
 #include "Instrumentation/LogEvent.h"
 #include "Instrumentation/LogFilter.h"
 #include "Instrumentation/LogWriter/ILogListener.h"
+#include "Utilities/Require.h"
 #include "Utilities/StringUtilities.h"
+
 
 class AssertToException : public Log::ILogListener {
 public:
     AssertToException() : ILogListener(Log::LogFilter().SetLogLevel(Log::LogLevel::Error)) {}
 
     void WriteLog(const LogEvent& event) const override {
-        throw std::exception(event.Entry.Message.c_str());
+        Require::False(true, event.Entry.Message);
     }
 };
 #endif // __ASSERTTOEXCEPTION_H__

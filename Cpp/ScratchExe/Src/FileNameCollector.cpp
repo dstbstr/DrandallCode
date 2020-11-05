@@ -1,6 +1,9 @@
 #include "FileNameCollector.h"
 
+#include "Utilities/Require.h"
+
 #include <iostream>
+
 namespace {
     void RecursePath(const std::filesystem::path& path,
                      const std::unordered_set<std::string>& extensions,
@@ -16,17 +19,11 @@ namespace {
 } // namespace
 
 FileNameCollector::FileNameCollector(std::vector<std::string> inputs, std::vector<std::string> extensions, bool recurse) : m_Recurse(recurse) {
-    if(inputs.empty()) {
-        throw new std::exception("Expected to receive at least one file path");
-    } else {
-        m_Inputs.insert(inputs.begin(), inputs.end());
-    }
+    Require::NotEmpty(inputs, "Expected to receive at least one file path");
+    Require::NotEmpty(extensions, "Expected at least one extension");
 
-    if(extensions.empty()) {
-        throw new std::exception("Expected at least one extension");
-    } else {
-        m_Extensions.insert(extensions.begin(), extensions.end());
-    }
+    m_Inputs.insert(inputs.begin(), inputs.end());
+    m_Extensions.insert(extensions.begin(), extensions.end());
 }
 
 std::vector<std::string> FileNameCollector::GetAllFullyQualifiedPaths() {
