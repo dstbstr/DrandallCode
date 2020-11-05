@@ -2,6 +2,7 @@
 
 #include "CommandParser/Option.h"
 #include "Utilities/Format.h"
+#include "Utilities/Require.h"
 
 #include <unordered_set>
 
@@ -10,11 +11,8 @@ namespace CommandParser {
 
     OptionCollection& OptionCollection::Add(BaseOption& option) {
         if(option.IsRestOption()) {
-            if(m_RestOption) {
-                throw std::exception("Received multiple options which match rest args");
-            } else {
-                m_RestOption = &option;
-            }
+            Require::Null(m_RestOption, "Received multiple options which match rest args");
+            m_RestOption = &option;
         } else {
             m_Options.push_back(&option);
         }
@@ -26,12 +24,8 @@ namespace CommandParser {
         std::unordered_set<std::string> longNames;
 
         for(auto&& option: m_Options) {
-            if(shortNames.insert(option->GetShortName()).second == false) {
-                throw std::exception(StrUtil::Format("Duplicate short option detected: %s", option->GetShortName()).c_str());
-            }
-            if(longNames.insert(option->GetLongName()).second == false) {
-                throw std::exception(StrUtil::Format("Duplicate long option detected: %s", option->GetLongName()).c_str());
-            }
+            Require::False(shortNames.insert(option->GetShortName()).second, "Duplicate short name: " + option->GetShortName());
+            Require::False(longNames.insert(option->GetLongName()).second, "Duplicate long name: " + option->GetLongName());
         }
     }
     void OptionCollection::PrintUsage(std::ostream& stream) const {
@@ -73,9 +67,7 @@ namespace CommandParser {
                     restParams.push_back(OptionValuePair("", optionToAdd));
                 }
             }
-            if(!found && option->IsRequired()) {
-                throw std::exception(StrUtil::Format("%s option is required, but not provided", option->GetLongName()).c_str());
-            }
+            Require::True(found || !option->IsRequired(), option->GetLongName() + " option is required, but was not provided");
         }
 
         if(m_RestOption) {

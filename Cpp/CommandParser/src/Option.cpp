@@ -1,4 +1,7 @@
 #include "CommandParser/Option.h"
+
+#include "Utilities/Require.h"
+
 namespace CommandParser {
     BaseOption::BaseOption(std::string shortName, std::string longName, bool required) : m_Required(required), m_IsRestOption(false) {
         m_ShortName = CleanName(shortName);
@@ -70,19 +73,13 @@ namespace CommandParser {
         }
         static std::regex cleanRegex(R"(\w+)");
         std::smatch match;
-        if(!std::regex_search(input, match, cleanRegex)) {
-            throw std::exception(("Invalid option name " + input).c_str());
-        }
+        Require::True(std::regex_search(input, match, cleanRegex), "Invalid option name " + input);
         return match[0];
     }
 
     void BaseOption::ValidateName() const {
-        if(m_ShortName == "" && m_LongName == "") {
-            throw std::exception("Must provide at least identifier.  To use blank, use BaseOption::BLANK");
-        }
-        if(m_ShortName.length() > 1 && m_ShortName != BaseOption::BLANK) {
-            throw std::exception("Short name must be a single character");
-        }
+        Require::False(m_ShortName == "" && m_LongName == "", "Must provide at least one identifier.  To use blank, use BaseOption::BLANK");
+        Require::False(m_ShortName.length() > 1 && m_ShortName != BaseOption::BLANK, "Short name must be a single character");
     }
 
     BaseOption::InnerType IntOption::GetInnerType() const {
