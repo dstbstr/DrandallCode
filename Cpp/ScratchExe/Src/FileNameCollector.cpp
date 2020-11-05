@@ -2,7 +2,9 @@
 
 #include <iostream>
 namespace {
-    void RecursePath(const std::filesystem::path& path, const std::unordered_set<std::string>& extensions, std::vector<std::filesystem::path>& resolvedPaths) {
+    void RecursePath(const std::filesystem::path& path,
+                     const std::unordered_set<std::string>& extensions,
+                     std::vector<std::filesystem::path>& resolvedPaths) {
         using namespace std::filesystem;
 
         for(auto&& it: recursive_directory_iterator(path)) {
@@ -50,5 +52,5 @@ std::vector<std::string> FileNameCollector::GetAllFullyQualifiedPaths() {
         dedupe.insert(path.string());
     }
 
-    return std::vector<std::string> {dedupe.begin(), dedupe.end()};
+    return std::vector<std::string>{dedupe.begin(), dedupe.end()};
 }
