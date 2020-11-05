@@ -4,6 +4,9 @@
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
 
+#include <exception>
+
+
 using ::testing::_;
 using ::testing::A;
 using ::testing::An;

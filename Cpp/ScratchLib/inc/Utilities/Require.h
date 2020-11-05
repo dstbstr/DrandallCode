@@ -48,26 +48,28 @@ namespace Require {
         Null(ptr, "Expected pointer to be null, but was not");
     }
 
-    inline void NotEmpty(const std::string& str, std::string message) {
-        if(str.empty()) {
+    template<class T>
+    inline void Empty(const T& t, std::string message) {
+        if(!t.empty()) {
             throw std::runtime_error(message);
         }
     }
 
     template<class T>
-    inline void NotEmpty(const std::vector<T>& vec, std::string message) {
-        if(vec.empty()) {
+    inline void Empty(const T& t) {
+        Empty(t, "Received a filled object, expected empty");
+    }
+
+    template<class T>
+    inline void NotEmpty(const T& t, std::string message) {
+        if(t.empty()) {
             throw std::runtime_error(message);
         }
     }
 
     template<class T>
-    inline void NotEmpty(const std::vector<T>& vec) {
-        NotEmpty(vec, "Received unexpected empty vector");
-    }
-
-    inline void NotEmpty(const std::string& str) {
-        NotEmpty(str, "Received unexpected blank string");
+    inline void NotEmpty(const T& t) {
+        NotEmpty(t, "Received unexpected empty object");
     }
 
     inline void NotJustWhitespace(const std::string& str, std::string message) {
