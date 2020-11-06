@@ -30,7 +30,7 @@ endif()
 set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(ScratchLib)
-add_subdirectory(ScratchExe)
+add_subdirectory(IncludeCounter)
 add_subdirectory(ScratchTest)
 add_subdirectory(CommandParser)
 add_subdirectory(CommandParserTest)
