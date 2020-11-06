@@ -4,15 +4,23 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "generateWindows",
+            "label": "GenerateWindowsDebug",
             "type": "shell",
             "options": {
                 "cwd": "${workspaceRoot}/Build"
             },
-            "command": "cmake -G 'Visual Studio 15 2017 Win64' -DCMAKE_BUILD_TYPE=Debug .."
+            "command": "cmake -G 'Visual Studio 15 2017 Win64' .."
         },
         {
-            "label": "generateNix",
+            "label": "GenerateWindowsRelease",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/Build"
+            },
+            "command": "cmake -G 'Visual Studio 15 2017 Win64' .."
+        },
+        {
+            "label": "GenerateNixDebug",
             "type": "shell",
             "options": {
                 "cwd": "${workspaceRoot}/Build"
@@ -20,14 +28,22 @@
             "command": "cmake -G 'Unix Makefiles' -DCMAKE_BUILD_TYPE=Debug .."
         },
         {
-            "label": "buildWindows",
+            "label": "GenerateNixRelease",
             "type": "shell",
-            "command": "cmake --build .",
+            "options": {
+                "cwd": "${workspaceRoot}/Build"
+            },
+            "command": "cmake -G 'Unix Makefiles' -DCMAKE_BUILD_TYPE=Release .."
+        },
+        {
+            "label": "buildWindowsDebug",
+            "type": "shell",
+            "command": "cmake --config Debug --build .",
             "options": {
                 "cwd": "${workspaceRoot}/Build"
             },
             "dependsOn": [
-                "generateWindows"
+                "GenerateWindowsDebug"
             ],
             "group": {
                 "kind": "build",
@@ -36,14 +52,39 @@
             "problemMatcher": []
         },
         {
-            "label": "buildNix",
+            "label": "buildNixDebug",
             "type": "shell",
             "command": "cmake --build .",
             "options": {
                 "cwd": "${workspaceRoot}/Build"
             },
             "dependsOn": [
-                "generateNix"
+                "GenerateNixDebug"
+            ],
+            "group": "build"
+        },
+        {
+            "label": "buildWindowsRelease",
+            "type": "shell",
+            "command": "cmake --config Release --build .",
+            "options": {
+                "cwd": "${workspaceRoot}/Build"
+            },
+            "dependsOn": [
+                "GenerateWindowsRelease"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "buildNixRelease",
+            "type": "shell",
+            "command": "cmake --build .",
+            "options": {
+                "cwd": "${workspaceRoot}/Build"
+            },
+            "dependsOn": [
+                "GenerateNixRelease"
             ],
             "group": "build"
         }
