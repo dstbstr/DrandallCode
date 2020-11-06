@@ -14,9 +14,9 @@ FetchContent_MakeAvailable(googletest)
 
 
 #########################
-# ScratchTest
+# CoreTest
 #########################
-project(ScratchTest)
+project(CoreTest)
 
 set(SOURCE src/Main.cpp)
 
@@ -24,7 +24,7 @@ add_executable(${PROJECT_NAME} ${SOURCE})
 
 target_link_libraries(${PROJECT_NAME} gtest)
 target_link_libraries(${PROJECT_NAME} gmock)
-target_link_libraries(${PROJECT_NAME} ScratchLib)
+target_link_libraries(${PROJECT_NAME} Core)
 
 file(GLOB_RECURSE sources CONFIGURE_DEPENDS "src/*.cpp")
 target_include_directories(${PROJECT_NAME} PRIVATE inc)
