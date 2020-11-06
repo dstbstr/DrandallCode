@@ -15,7 +15,7 @@
                 "CommandParser",
                 "CommandParserTest",
                 "IncludeCounter",
-                "ScratchLib",
+                "Core",
                 "ScratchTest"
             ],
             "stopAtEntry": false,
@@ -24,7 +24,7 @@
             "externalConsole": true
         },
         {
-            "name": "(Windows) Run Tests: ScratchLib",
+            "name": "(Windows) Run Tests: Core",
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}/Build/ScratchTest/Debug/ScratchTest.exe",

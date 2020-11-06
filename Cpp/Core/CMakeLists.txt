@@ -1,4 +1,4 @@
-project(ScratchLib)
+project(Core)
 
 add_library(${PROJECT_NAME})
 
