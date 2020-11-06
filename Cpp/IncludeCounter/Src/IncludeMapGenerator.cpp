@@ -39,15 +39,14 @@ static void RecurseIncludes(FileData& file,
                     dependencyChain.push_back(file.FileName);
                     Require::False(circularDependency,
                                    StrUtil::Format("Circular dependency detected! %s", StrUtil::JoinVec(" -> ", dependencyChain)));
-                } else {
-                    break;
                 }
+            } else {
+                currentPaths.insert(file.FileName);
+                RecurseIncludes(*knownIncludes[fileName], resolved, knownIncludes, currentPaths, failOnCircularDependencies);
+                includeCount += resolved[fileName];
+                knownIncludes[fileName]->IncludedByCount++; // TODO: This only tracks direct includes, not transitive includes
+                currentPaths.erase(file.FileName);
             }
-            currentPaths.insert(file.FileName);
-            RecurseIncludes(*knownIncludes[fileName], resolved, knownIncludes, currentPaths, failOnCircularDependencies);
-            includeCount += resolved[fileName];
-            knownIncludes[fileName]->IncludedByCount++; // TODO: This only tracks direct includes, not transitive includes
-            currentPaths.erase(file.FileName);
         }
     }
 
