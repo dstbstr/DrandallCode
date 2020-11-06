@@ -21,6 +21,12 @@ if (NOT CONFIGURED_ONCE)
         CACHE STRING "Flags used by the compiler during all build types." FORCE)
 endif()
 
+if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+    add_definitions(-DDEBUG)
+else()
+    add_definitions(-DRELEASE)
+endif()
+
 set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(ScratchLib)

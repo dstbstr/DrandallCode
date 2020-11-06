@@ -2,6 +2,7 @@
 
 #include "Instrumentation/Assert.h"
 #include "Utilities/StringUtilities.h"
+#include "Platform/Types.h"
 
 #include <algorithm>
 
@@ -108,7 +109,7 @@ namespace CommandParser {
     }
 
     static void SplitShortOption(std::string arg, std::vector<OptionValuePair>& result) {
-        for(int i = 1; i < arg.length(); i++) {
+        for(u32 i = 1; i < arg.length(); i++) {
             result.push_back(OptionValuePair(std::string{arg[i]}));
         }
     }

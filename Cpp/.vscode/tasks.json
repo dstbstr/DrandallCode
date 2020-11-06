@@ -4,20 +4,36 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "GenerateWindowsDebug",
+            "label": "GenerateWindowsDebug2017",
             "type": "shell",
             "options": {
                 "cwd": "${workspaceRoot}/Build"
             },
-            "command": "cmake -G 'Visual Studio 15 2017 Win64' .."
+            "command": "cmake -G 'Visual Studio 15 2017 Win64' -DCMAKE_BUILD_TYPE=Debug .."
         },
         {
-            "label": "GenerateWindowsRelease",
+            "label": "GenerateWindowsDebug2019",
             "type": "shell",
             "options": {
                 "cwd": "${workspaceRoot}/Build"
             },
-            "command": "cmake -G 'Visual Studio 15 2017 Win64' .."
+            "command": "cmake -G 'Visual Studio 16 2019' -DCMAKE_BUILD_TYPE=Debug .."
+        },
+        {
+            "label": "GenerateWindowsRelease2017",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/Build"
+            },
+            "command": "cmake -G 'Visual Studio 15 2017 Win64' -DCMAKE_BUILD_TYPE=Release .."
+        },
+        {
+            "label": "GenerateWindowsRelease2019",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/Build"
+            },
+            "command": "cmake -G 'Visual Studio 16 2019' -DCMAKE_BUILD_TYPE=Release .."
         },
         {
             "label": "GenerateNixDebug",
@@ -36,14 +52,27 @@
             "command": "cmake -G 'Unix Makefiles' -DCMAKE_BUILD_TYPE=Release .."
         },
         {
-            "label": "buildWindowsDebug",
+            "label": "buildWindowsDebug2017",
             "type": "shell",
-            "command": "cmake --config Debug --build .",
+            "command": "cmake --build . --config Debug",
             "options": {
                 "cwd": "${workspaceRoot}/Build"
             },
             "dependsOn": [
-                "GenerateWindowsDebug"
+                "GenerateWindowsDebug2017"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "buildWindowsDebug2019",
+            "type": "shell",
+            "command": "cmake --build . --config Debug ",
+            "options": {
+                "cwd": "${workspaceRoot}/Build"
+            },
+            "dependsOn": [
+                "GenerateWindowsDebug2019"
             ],
             "group": {
                 "kind": "build",
@@ -64,14 +93,27 @@
             "group": "build"
         },
         {
-            "label": "buildWindowsRelease",
+            "label": "buildWindowsRelease2017",
             "type": "shell",
-            "command": "cmake --config Release --build .",
+            "command": "cmake --build . --config Release ",
             "options": {
                 "cwd": "${workspaceRoot}/Build"
             },
             "dependsOn": [
-                "GenerateWindowsRelease"
+                "GenerateWindowsRelease2017"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "buildWindowsRelease2019",
+            "type": "shell",
+            "command": "cmake --build . --config Release ",
+            "options": {
+                "cwd": "${workspaceRoot}/Build"
+            },
+            "dependsOn": [
+                "GenerateWindowsRelease2019"
             ],
             "group": "build",
             "problemMatcher": []

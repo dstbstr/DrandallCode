@@ -2,6 +2,7 @@
 #define __STRINGUTILITIES_H__
 
 #include "Utilities/LambdaUtils.h"
+#include "Platform/Types.h"
 
 #include <algorithm>
 #include <cctype>
@@ -19,7 +20,7 @@ namespace StrUtil {
             stream << input[0];
         }
 
-        for(int i = 1; i < input.size(); i++) {
+        for(u32 i = 1; i < input.size(); i++) {
             stream << delimiter;
             stream << input[i];
         }
@@ -34,7 +35,7 @@ namespace StrUtil {
             stream << input[0];
         }
 
-        for(int i = 1; i < input.size(); i++) {
+        for(u32 i = 1; i < input.size(); i++) {
             stream << delimiter;
             stream << input[i];
         }
