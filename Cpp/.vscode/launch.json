@@ -5,16 +5,16 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(Windows) ScratchExe",
+            "name": "(Windows) IncludeCounter",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/Build/ScratchExe/Debug/ScratchExe.exe",
+            "program": "${workspaceFolder}/Build/IncludeCounter/Debug/IncludeCounter.exe",
             "args": [
                 "-r",
                 "--desc",
                 "CommandParser",
                 "CommandParserTest",
-                "ScratchExe",
+                "IncludeCounter",
                 "ScratchLib",
                 "ScratchTest"
             ],
@@ -46,10 +46,10 @@
             "externalConsole": false
         },
         {
-            "name": "(Nix) ScratchExe",
+            "name": "(Nix) IncludeCounter",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/Build/ScratchExe/Debug/ScratchExe",
+            "program": "${workspaceFolder}/Build/IncludeCounter/Debug/IncludeCounter",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
