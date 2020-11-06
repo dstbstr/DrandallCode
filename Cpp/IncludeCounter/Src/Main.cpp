@@ -15,6 +15,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <filesystem>
 
 template<class T>
 struct IRunnable;
@@ -32,6 +33,7 @@ int main(int argc, char* argv[]) {
         if(!argParse.ShouldParse()) {
             return 0;
         }
+        auto sortOrder = ResultGenerator::GetSortOrder((u8)argParse.GetSortOrderIndex()); //validate this early
 
         std::vector<std::string> fileNames = argParse.GetFileNames();
 
@@ -44,11 +46,12 @@ int main(int argc, char* argv[]) {
 
         IncludeMapGenerator(files).Generate();
         if(argParse.GetTargetFile().empty()) {
-            ResultGenerator(files).PrintResultToStream(std::cout, ResultGenerator::DEPENDENCIES, argParse.IsDescending());
+            ResultGenerator(files).PrintResultToStream(std::cout, sortOrder, argParse.IsDescending());
         } else {
             auto path = std::filesystem::path(argParse.GetTargetFile());
+            std::filesystem::remove(path); //clear out old results
             auto stream = std::ofstream(path);
-            ResultGenerator(files).PrintResultToStream(stream, ResultGenerator::DEPENDENCIES, argParse.IsDescending());
+            ResultGenerator(files).PrintResultToStream(stream, sortOrder, argParse.IsDescending());
         }
         return 0;
     } catch(std::exception& err) {

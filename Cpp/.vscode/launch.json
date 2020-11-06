@@ -12,6 +12,8 @@
             "args": [
                 "-r",
                 "--desc",
+                "-s",
+                "1",
                 "CommandParser",
                 "CommandParserTest",
                 "IncludeCounter",

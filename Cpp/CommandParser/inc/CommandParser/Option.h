@@ -39,6 +39,7 @@ namespace CommandParser {
         virtual void Populate(std::string);
         bool IsPopulated() const;
 
+        void UpdateHelpText(std::string helpText);
         std::string ToString();
 
     protected:

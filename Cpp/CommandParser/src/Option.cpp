@@ -58,6 +58,10 @@ namespace CommandParser {
         return m_Populated;
     }
 
+    void BaseOption::UpdateHelpText(std::string helpText) {
+        m_HelpText = helpText;
+    }
+
     std::string BaseOption::ToString() {
         return StrUtil::Format(UsageFormat,
                                m_ShortName.length() > 0 ? "-" + m_ShortName : "",
