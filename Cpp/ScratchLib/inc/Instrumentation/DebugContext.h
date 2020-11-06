@@ -2,6 +2,7 @@
 #define DEBUGCONTEXT_H
 
 #include "Platform/Types.h"
+#include "Utilities/PathUtilities.h"
 
 #include <string>
 #include <thread>
@@ -26,11 +27,7 @@ namespace Debug {
                 FunctionName = name.substr(classSeparatorIndex + 2);
             }
 
-            if(FileName.find('\\') != std::string::npos) {
-                FileNameShort = FileName.substr(FileName.find_last_of('\\') + 1);
-            } else {
-                FileNameShort = FileName.substr(FileName.find_last_of('/') + 1);
-            }
+            FileNameShort = PathUtils::GetFileName(FileName);
         }
 
         std::string FileName;

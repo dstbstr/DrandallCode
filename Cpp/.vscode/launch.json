@@ -11,6 +11,7 @@
             "program": "${workspaceFolder}/Build/ScratchExe/Debug/ScratchExe.exe",
             "args": [
                 "-r",
+                "--desc",
                 "CommandParser",
                 "CommandParserTest",
                 "ScratchExe",

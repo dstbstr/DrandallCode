@@ -3,6 +3,7 @@
 
 #include "FileData.h"
 #include "Threading/IRunnable.h"
+#include "Utilities/PathUtilities.h"
 
 #include <fstream>
 #include <regex>
@@ -14,7 +15,7 @@ public:
     FileData Execute() {
         FileData result;
         result.FilePath = m_FilePath;
-        result.FileName = ExtractFileName();
+        result.FileName = PathUtils::GetFileName(m_FilePath);
 
         std::ifstream stream(m_FilePath, std::ifstream::in);
         if(!stream.is_open()) {
@@ -36,17 +37,6 @@ public:
 
 private:
     std::string m_FilePath;
-
-    std::string ExtractFileName() {
-        auto lastSeparator = m_FilePath.find_last_of('/');
-        if(lastSeparator < 0) {
-            lastSeparator = m_FilePath.find_last_of('\\');
-        }
-        if(lastSeparator < 0) {
-            return m_FilePath;
-        }
-        return m_FilePath.substr(lastSeparator + 1);
-    }
 };
 
 #endif // __INCLUDECOUNTTASK_H__
