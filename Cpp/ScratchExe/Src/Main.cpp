@@ -43,7 +43,13 @@ int main(int argc, char* argv[]) {
         std::vector<FileData> files = Runner::Get().RunAll(jobs);
 
         IncludeMapGenerator(files).Generate();
-        ResultGenerator(files).PrintResultToStream(std::cout, ResultGenerator::DEPENDENCIES, argParse.IsDescending());
+        if(argParse.GetTargetFile().empty()) {
+            ResultGenerator(files).PrintResultToStream(std::cout, ResultGenerator::DEPENDENCIES, argParse.IsDescending());
+        } else {
+            auto path = std::filesystem::path(argParse.GetTargetFile());
+            auto stream = std::ofstream(path);
+            ResultGenerator(files).PrintResultToStream(stream, ResultGenerator::DEPENDENCIES, argParse.IsDescending());
+        }
         return 0;
     } catch(std::exception& err) {
         std::cerr << err.what() << std::endl;
