@@ -11,7 +11,8 @@ public:
     std::string FileName;
     std::string FilePath;
     std::unordered_set<std::string> IncludeFiles;
-    u64 TotalIncludeCount;
+    u64 TotalIncludeCount{0};
+    u64 IncludedByCount{0};
 };
 
 #endif // __FILEDATA_H__
