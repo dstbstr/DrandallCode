@@ -4,11 +4,20 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "PrepareFoldersWindows",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}"
+            },
+            "command": "if(-not(test-path Build/VS/2017)) {mkdir Build/VS/2017}; if(-not(test-path Build/VS/2019)) {mkdir Build/VS/2019}; if(-not(test-path bin)) {mkdir bin}"
+        },
+        {
             "label": "GenerateWindowsDebug2017",
             "type": "shell",
             "options": {
                 "cwd": "${workspaceRoot}/Build/VS/2017"
             },
+            "dependsOn": "PrepareFoldersWindows",
             "command": "cmake -G 'Visual Studio 15 2017 Win64' -DCMAKE_BUILD_TYPE=Debug ../../.."
         },
         {
@@ -17,6 +26,7 @@
             "options": {
                 "cwd": "${workspaceRoot}/Build/VS/2019"
             },
+            "dependsOn": "PrepareFoldersWindows",
             "command": "cmake -G 'Visual Studio 16 2019' -DCMAKE_BUILD_TYPE=Debug ../../.."
         },
         {
@@ -25,6 +35,7 @@
             "options": {
                 "cwd": "${workspaceRoot}/Build/VS/2017"
             },
+            "dependsOn": "PrepareFoldersWindows",
             "command": "cmake -G 'Visual Studio 15 2017 Win64' -DCMAKE_BUILD_TYPE=Release ../../.."
         },
         {
@@ -33,6 +44,7 @@
             "options": {
                 "cwd": "${workspaceRoot}/Build/VS/2019"
             },
+            "dependsOn": "PrepareFoldersWindows",
             "command": "cmake -G 'Visual Studio 16 2019' -DCMAKE_BUILD_TYPE=Release ../../.."
         },
         {
