@@ -10,6 +10,8 @@
 #include <unordered_map>
 #include <unordered_set>
 
+static std::vector<std::string> CircDepPath {};
+
 static void RecurseIncludes(FileData& file,
                             std::unordered_map<std::string, std::unordered_set<std::string>>& resolved,
                             std::unordered_map<std::string, FileData*>& knownIncludes,
@@ -34,17 +36,17 @@ static void RecurseIncludes(FileData& file,
             bool circularDependency = currentPaths.find(file.FileName) != currentPaths.end();
             if(circularDependency) {
                 if(failOnCircularDependencies) {
-                    // TODO: unordered_set (naturally) doesn't preserve order.  Potentially keep the order in a vector
-                    std::vector<std::string> dependencyChain{currentPaths.begin(), currentPaths.end()};
-                    dependencyChain.push_back(file.FileName);
+                    CircDepPath.push_back(file.FileName);
                     Require::False(circularDependency,
-                                   StrUtil::Format("Circular dependency detected! %s", StrUtil::JoinVec(" -> ", dependencyChain)));
+                                   StrUtil::Format("Circular dependency detected! %s", StrUtil::JoinVec(" -> ", CircDepPath)));
                 }
             } else {
                 currentPaths.insert(file.FileName);
+                CircDepPath.push_back(file.FileName);
                 RecurseIncludes(*knownIncludes[fileName], resolved, knownIncludes, currentPaths, failOnCircularDependencies);
                 allDependencies.insert(resolved[fileName].begin(), resolved[fileName].end());
                 currentPaths.erase(file.FileName);
+                CircDepPath.pop_back();
             }
         }
     }
