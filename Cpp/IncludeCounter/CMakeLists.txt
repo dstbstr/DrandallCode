@@ -2,6 +2,7 @@ project(IncludeCounter)
 
 add_executable(${PROJECT_NAME})
 target_link_libraries(${PROJECT_NAME} Core)
+target_link_libraries(${PROJECT_NAME} IncludeCounterLib)
 target_link_libraries(${PROJECT_NAME} CommandParser)
 
 file(GLOB_RECURSE sources CONFIGURE_DEPENDS "src/*.cpp")

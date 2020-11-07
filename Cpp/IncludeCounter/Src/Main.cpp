@@ -1,9 +1,9 @@
 #include "ArgParse.h"
-#include "FileData.h"
 #include "IncludeCountTask.h"
-#include "IncludeMapGenerator.h"
+#include "IncludeCounter/FileData.h"
+#include "IncludeCounter/IncludeMapGenerator.h"
+#include "IncludeCounter/ResultGenerator.h"
 #include "Instrumentation/LogWriter/StdOutLogWriter.h"
-#include "ResultGenerator.h"
 
 //#include "Threading/IRunnable.h"
 #include "Threading/Runner.h"
@@ -12,15 +12,17 @@
 
 //#include "Utilities/StringUtilities.h"
 
+#include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
-#include <filesystem>
 
 template<class T>
 struct IRunnable;
 
 Log::StdOutLogWriter logWriter{};
+using namespace IncludeCounter;
 
 int main(int argc, char* argv[]) {
     // construct an argument parser with argc and argv
@@ -33,7 +35,7 @@ int main(int argc, char* argv[]) {
         if(!argParse.ShouldParse()) {
             return 0;
         }
-        auto sortOrder = ResultGenerator::GetSortOrder((u8)argParse.GetSortOrderIndex()); //validate this early
+        auto sortOrder = ResultGenerator::GetSortOrder((u8)argParse.GetSortOrderIndex()); // validate this early
 
         std::vector<std::string> fileNames = argParse.GetFileNames();
 
@@ -49,7 +51,7 @@ int main(int argc, char* argv[]) {
             ResultGenerator(files).PrintResultToStream(std::cout, sortOrder, argParse.IsDescending());
         } else {
             auto path = std::filesystem::path(argParse.GetTargetFile());
-            std::filesystem::remove(path); //clear out old results
+            std::filesystem::remove(path); // clear out old results
             auto stream = std::ofstream(path);
             ResultGenerator(files).PrintResultToStream(stream, sortOrder, argParse.IsDescending());
         }
