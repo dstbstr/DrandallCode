@@ -32,9 +32,10 @@ endif()
 set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(Core)
-add_subdirectory(CoreTest)
-add_subdirectory(IncludeCounter)
 add_subdirectory(CommandParser)
+add_subdirectory(IncludeCounterLib)
+add_subdirectory(IncludeCounter)
+add_subdirectory(CoreTest)
 add_subdirectory(CommandParserTest)
 
 set(CONFIGURED_ONCE TRUE CACHE INTERNAL
