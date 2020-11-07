@@ -11,25 +11,25 @@
 #include <unordered_set>
 
 static void RecurseIncludes(FileData& file,
-                            std::unordered_map<std::string, u64>& resolved,
+                            std::unordered_map<std::string, std::unordered_set<std::string>>& resolved,
                             std::unordered_map<std::string, FileData*>& knownIncludes,
                             std::unordered_set<std::string>& currentPaths,
                             bool failOnCircularDependencies) {
     if(resolved.find(file.FileName) != resolved.end()) {
-        file.TotalIncludeCount = resolved[file.FileName];
+        //I shouldn't have to do this, right?
+        //file.TotalIncludeCount = resolved[file.FileName];
         return;
     }
 
-    auto includeCount = file.IncludeFiles.size();
+    std::unordered_set<std::string> allDependencies{file.IncludeFiles};
+
     for(auto&& include: file.IncludeFiles) {
         auto fileName = PathUtils::GetFileName(include);
         if(resolved.find(fileName) != resolved.end()) {
-            includeCount += resolved[fileName];
-            if(knownIncludes.find(fileName) != knownIncludes.end()) {
-                knownIncludes[fileName]->IncludedByCount++;
-            }
+            auto dependencies = resolved[fileName];
+            allDependencies.insert(dependencies.begin(), dependencies.end());
         } else if(knownIncludes.find(fileName) == knownIncludes.end()) {
-            resolved[fileName] = 0; // Only care about files we can resolve.  System files can count for 0 for this purpose
+            resolved[fileName] = std::unordered_set<std::string>{}; // Assume all system dependencies have no transitive dependencies
         } else {
             bool circularDependency = currentPaths.find(file.FileName) != currentPaths.end();
             if(circularDependency) {
@@ -43,20 +43,25 @@ static void RecurseIncludes(FileData& file,
             } else {
                 currentPaths.insert(file.FileName);
                 RecurseIncludes(*knownIncludes[fileName], resolved, knownIncludes, currentPaths, failOnCircularDependencies);
-                includeCount += resolved[fileName];
-                knownIncludes[fileName]->IncludedByCount++; // TODO: This only tracks direct includes, not transitive includes
+                allDependencies.insert(resolved[fileName].begin(), resolved[fileName].end());
                 currentPaths.erase(file.FileName);
             }
         }
     }
 
-    file.TotalIncludeCount = includeCount;
-    resolved[file.FileName] = includeCount;
+    file.TotalIncludeCount = allDependencies.size();
+    for(auto&& dependency : allDependencies) {
+        if(knownIncludes.find(dependency) != knownIncludes.end()) {
+            knownIncludes[dependency]->IncludedByCount++;
+        }
+    }
+
+    resolved[file.FileName] = allDependencies;
 }
 
 void IncludeMapGenerator::Generate() {
     ScopedTimer timer("IncludeMapGenerator::Generate");
-    std::unordered_map<std::string, u64> resolved;
+    std::unordered_map<std::string, std::unordered_set<std::string>> resolved;
     std::unordered_map<std::string, FileData*> knownIncludes;
     std::unordered_set<std::string> currentPaths;
 
