@@ -4,4 +4,5 @@
 !*.*
 
 **/Build/*
+**/bin/*
 **/c_cpp_properties.json
