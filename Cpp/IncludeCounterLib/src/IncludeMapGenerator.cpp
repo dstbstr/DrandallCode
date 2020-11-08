@@ -19,8 +19,6 @@ namespace IncludeCounter {
                                 std::unordered_set<std::string>& currentPaths,
                                 bool failOnCircularDependencies) {
         if(resolved.find(file.FileName) != resolved.end()) {
-            // I shouldn't have to do this, right?
-            // file.TotalIncludeCount = resolved[file.FileName];
             return;
         }
 
