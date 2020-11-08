@@ -37,6 +37,7 @@ add_subdirectory(IncludeCounterLib)
 add_subdirectory(IncludeCounter)
 add_subdirectory(CoreTest)
 add_subdirectory(CommandParserTest)
+add_subdirectory(IncludeCounterTest)
 
 set(CONFIGURED_ONCE TRUE CACHE INTERNAL
     "A flag showing that CMake has configured at least once.")
