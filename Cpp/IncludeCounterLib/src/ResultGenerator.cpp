@@ -1,6 +1,6 @@
 #include "IncludeCounter/ResultGenerator.h"
 
-#include "IncludeCounter/FileData.h"
+#include "IncludeCounter/Data/FileData.h"
 #include "Instrumentation/Assert.h"
 #include "Utilities/Format.h"
 #include "Utilities/Require.h"

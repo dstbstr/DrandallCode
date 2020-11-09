@@ -1,6 +1,6 @@
 #include "ArgParse.h"
 #include "IncludeCountTask.h"
-#include "IncludeCounter/FileData.h"
+#include "IncludeCounter/Data/FileData.h"
 #include "IncludeCounter/IncludeMapGenerator.h"
 #include "IncludeCounter/ResultGenerator.h"
 #include "Instrumentation/LogWriter/StdOutLogWriter.h"

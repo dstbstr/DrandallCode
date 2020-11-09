@@ -1,7 +1,7 @@
 #ifndef __INCLUDECOUNTTASK_H__
 #define __INCLUDECOUNTTASK_H__
 
-#include "IncludeCounter/FileData.h"
+#include "IncludeCounter/Data/FileData.h"
 #include "Threading/IRunnable.h"
 
 namespace IncludeCounter {
