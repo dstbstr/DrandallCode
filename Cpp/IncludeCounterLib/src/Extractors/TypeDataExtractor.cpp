@@ -7,7 +7,7 @@ namespace IncludeCounter {
                 line;
                 return false;
             }
-            TypeData Extract(std::ifstream& stream) {
+            TypeData Extract(std::istream& stream) {
                 TypeData result;
                 stream;
                 return result;

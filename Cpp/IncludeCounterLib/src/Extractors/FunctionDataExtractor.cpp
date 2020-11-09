@@ -8,9 +8,9 @@ namespace IncludeCounter {
                 return false;
             }
 
-            FunctionData Extract(const std::string& line) {
+            FunctionData Extract(std::istream& stream) {
                 FunctionData result;
-                line;
+                stream;
                 return result;
             }
 

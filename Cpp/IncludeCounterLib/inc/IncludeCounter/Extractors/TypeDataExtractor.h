@@ -3,15 +3,16 @@
 
 #include "IncludeCounter/Data/TypeData.h"
 
+#include <iostream>
 #include <string>
-#include <fstream>
+
 
 namespace IncludeCounter {
     namespace Extractors {
         namespace TypeDataExtractor {
             bool IsAType(const std::string& line);
-            TypeData Extract(std::ifstream& stream);
-        }
+            TypeData Extract(std::istream& stream);
+        } // namespace TypeDataExtractor
     } // namespace Extractors
 } // namespace IncludeCounter
 #endif // __TYPEDATAEXTRACTOR_H__

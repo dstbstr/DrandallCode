@@ -1,13 +1,14 @@
 #ifndef __FUNCTIONDATA_H__
 #define __FUNCTIONDATA_H__
 
+#include "IncludeCounter/Data/Visibility.h"
 #include "Platform/Types.h"
 
 #include <string>
 
+
 namespace IncludeCounter {
     struct FunctionData {
-        enum Visibility {PRIVATE, PROTECTED, PUBLIC};
         std::string ClassName;
         std::string FunctionName;
         Visibility Visibility;
@@ -18,6 +19,6 @@ namespace IncludeCounter {
         bool IsVirtual;
         bool IsStatic;
     };
-}
+} // namespace IncludeCounter
 
 #endif // __FUNCTIONDATA_H__
