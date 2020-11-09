@@ -1,16 +1,12 @@
 #include "ArgParse.h"
-#include "IncludeCountTask.h"
+//#include "IncludeCountTask.h"
 #include "IncludeCounter/Data/FileData.h"
+#include "IncludeCounter/Extractors/FileDataExtractor.h"
 #include "IncludeCounter/IncludeMapGenerator.h"
 #include "IncludeCounter/ResultGenerator.h"
 #include "Instrumentation/LogWriter/StdOutLogWriter.h"
-
-//#include "Threading/IRunnable.h"
 #include "Threading/Runner.h"
-#include "Utilities/Format.h"
 #include "Utilities/ScopedTimer.h"
-
-//#include "Utilities/StringUtilities.h"
 
 #include <filesystem>
 #include <fstream>
@@ -25,10 +21,6 @@ Log::StdOutLogWriter logWriter{};
 using namespace IncludeCounter;
 
 int main(int argc, char* argv[]) {
-    // construct an argument parser with argc and argv
-    // pass the root directory and the recurse option to a directory navigator
-    // fan out the files to find include directives in each file
-    // construct including and included maps
     ScopedTimer executionTimer("Total Runtime");
     try {
         ArgParse argParse(argc, argv);
@@ -41,7 +33,7 @@ int main(int argc, char* argv[]) {
 
         std::vector<std::unique_ptr<IRunnable<FileData>>> jobs;
         for(auto&& file: fileNames) {
-            jobs.push_back(std::move(std::make_unique<IncludeCountTask>(file)));
+            jobs.push_back(std::move(std::make_unique<Extractors::FileDataExtractor>(file)));
         }
 
         std::vector<FileData> files = Runner::Get().RunAll(jobs);

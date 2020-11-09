@@ -3,14 +3,14 @@
 
 #include "IncludeCounter/Data/FunctionData.h"
 
+#include <iostream>
 #include <string>
-
 
 namespace IncludeCounter {
     namespace Extractors {
         namespace FunctionDataExtractor {
             bool IsLineAFunction(const std::string& line);
-            FunctionData Extract(const std::string& line);
+            FunctionData Extract(std::istream& stream);
         } // namespace FunctionDataExtractor
     } // namespace Extractors
 } // namespace IncludeCounter

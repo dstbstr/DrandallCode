@@ -1,16 +1,23 @@
 #include "IncludeCounter/Extractors/FileDataExtractor.h"
-#include "IncludeCounter/Extractors/TypeDataExtractor.h"
+
+#include "IncludeCounter/Data/Visibility.h"
+#include "IncludeCounter/Extractors/CommentExtractor.h"
 #include "IncludeCounter/Extractors/FunctionDataExtractor.h"
+#include "IncludeCounter/Extractors/TypeDataExtractor.h"
 #include "Utilities/PathUtilities.h"
 #include "Utilities/StringUtilities.h"
 
 #include <fstream>
 #include <regex>
 
+namespace {
+    static std::regex IncludeRegex("^#include [\"<]([^\">]+)[\">]$");
+    static std::regex VisibilityRegex("^((private)|(public)|(protected)):");
+
+} // namespace
+
 namespace IncludeCounter {
     namespace Extractors {
-        static std::regex IncludeRegex("^#include [\"<]([^\">]+)[\">]$");
-        static std::regex SingleLineCommentRegex("^//");
 
         FileData FileDataExtractor::Execute() {
             FileData result;
@@ -24,22 +31,33 @@ namespace IncludeCounter {
 
             std::string line;
             std::smatch match;
+            bool isHeader = m_FilePath[m_FilePath.length() - 1] == 'h';
+            bool isInBlockComment = false;
 
+            u64 nonBlankLines = 0;
             while(std::getline(stream, line)) {
+                CommentExtractor::StripComments(line, isInBlockComment);
                 auto trimmed = StrUtil::Trim(line);
-                if(trimmed == "" || std::regex_match(trimmed, SingleLineCommentRegex)) {
+                if(trimmed == "") { // do not check isInBlockComment here.  Line may end with a block comment, but start with code
                     continue;
                 }
+                nonBlankLines++;
                 if(std::regex_search(trimmed, match, IncludeRegex)) {
                     result.IncludeFiles.insert(match[1]);
-                } else if(FunctionDataExtractor::IsLineAFunction(trimmed)) {
-                    result.FreeFunctions.push_back(FunctionDataExtractor::Extract(trimmed));
+                }
+                if(!isHeader) {
+                    continue;
+                }
+
+                if(FunctionDataExtractor::IsLineAFunction(trimmed)) {
+                    result.FreeFunctions.push_back(FunctionDataExtractor::Extract(stream));
                 } else if(TypeDataExtractor::IsAType(trimmed)) {
                     result.Types.push_back(TypeDataExtractor::Extract(stream));
                 }
             }
 
+            result.LineCount = nonBlankLines;
             return result;
         }
-    } // namespace Executors
+    } // namespace Extractors
 } // namespace IncludeCounter
