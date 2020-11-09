@@ -1,7 +1,7 @@
 #ifndef __INCLUDEMAPGENERATOR_H__
 #define __INCLUDEMAPGENERATOR_H__
 
-#include "IncludeCounter/FileData.h"
+#include "IncludeCounter/Data/FileData.h"
 
 #include <vector>
 

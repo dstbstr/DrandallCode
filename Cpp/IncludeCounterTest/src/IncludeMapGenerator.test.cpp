@@ -1,6 +1,6 @@
 #include "IncludeCounter/IncludeMapGenerator.h"
 
-#include "IncludeCounter/FileData.h"
+#include "IncludeCounter/Data/FileData.h"
 #include "TestCommon.h"
 #include "Utilities/Require.h"
 
