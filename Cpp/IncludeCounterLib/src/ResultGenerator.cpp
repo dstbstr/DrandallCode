@@ -7,6 +7,7 @@
 
 #include <algorithm>
 
+// TODO: put fully qualified path at the end
 constexpr char LineFormat[]{"%32s | %19u | %20u | %5u"};
 constexpr char LineHeading[]{"           File Name             | Direct Dependencies |  Total Dependencies  |  Included By Count "};
 
@@ -50,4 +51,4 @@ namespace IncludeCounter {
                          << std::endl;
         }
     }
-} // namespace IncludeCounterLib
+} // namespace IncludeCounter

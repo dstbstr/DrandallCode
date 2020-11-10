@@ -1,8 +1,9 @@
 #ifndef __TYPEDATA_H__
 #define __TYPEDATA_H__
 
-#include "Platform/Types.h"
 #include "IncludeCounter/Data/FunctionData.h"
+#include "IncludeCounter/Data/TypeKeyword.h"
+#include "Platform/Types.h"
 
 #include <string>
 #include <vector>
@@ -12,15 +13,14 @@ namespace IncludeCounter {
         std::string ClassName;
         std::string FileName;
 
-        bool IsClass; //if not a class, then it's a struct
-        bool HasParent;
-        std::vector<FunctionData> PublicFunctions;
-        std::vector<FunctionData> ProtectedFunctions;
-        std::vector<FunctionData> PrivateFunctions;
+        TypeKeyword TypeKind;
+        bool HasBaseClass;
+        std::vector<FunctionData> Functions;
+        std::vector<TypeData> InnerTypes;
 
         u16 PrivateDataMemberCount;
         u16 ProtectedDataMemberCount;
         u16 PublicDataMemberCount;
     };
-}
+} // namespace IncludeCounter
 #endif // __TYPEDATA_H__

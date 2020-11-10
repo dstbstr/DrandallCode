@@ -11,10 +11,10 @@
 #include <regex>
 
 namespace {
-    static std::regex IncludeRegex("^#include [\"<]([^\">]+)[\">]$");
-    static std::regex VisibilityRegex("^((private)|(public)|(protected)):");
-
+    std::regex IncludeRegex("^#include [\"<]([^\">]+)[\">]$");
 } // namespace
+
+// TODO: Add functionality for global variables?
 
 namespace IncludeCounter {
     namespace Extractors {
@@ -49,10 +49,12 @@ namespace IncludeCounter {
                     continue;
                 }
 
-                if(FunctionDataExtractor::IsLineAFunction(trimmed)) {
-                    result.FreeFunctions.push_back(FunctionDataExtractor::Extract(stream));
-                } else if(TypeDataExtractor::IsAType(trimmed)) {
-                    result.Types.push_back(TypeDataExtractor::Extract(stream));
+                // it seems a lot easier to determine if the line is a type than if it's a function
+                if(TypeDataExtractor::IsAType(trimmed)) {
+                    auto type = TypeDataExtractor::Extract(trimmed, result.FileName, stream);
+                    result.Types.push_back(type);
+                } else if(FunctionDataExtractor::IsLineAFunction(trimmed)) {
+                    result.FreeFunctions.push_back(FunctionDataExtractor::Extract(stream, Visibility::PUBLIC));
                 }
             }
 
