@@ -14,13 +14,14 @@ namespace IncludeCounter {
         std::string FileName;
 
         TypeKeyword TypeKind;
-        bool HasBaseClass;
+        bool HasBaseClass{false};
+        bool IsTemplated{false};
         std::vector<FunctionData> Functions;
         std::vector<TypeData> InnerTypes;
 
-        u16 PrivateDataMemberCount;
-        u16 ProtectedDataMemberCount;
-        u16 PublicDataMemberCount;
+        u16 PrivateDataMemberCount{0};
+        u16 ProtectedDataMemberCount{0};
+        u16 PublicDataMemberCount{0};
     };
 } // namespace IncludeCounter
 #endif // __TYPEDATA_H__
