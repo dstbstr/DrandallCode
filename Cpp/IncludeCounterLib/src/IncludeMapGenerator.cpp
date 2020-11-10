@@ -54,6 +54,7 @@ namespace IncludeCounter {
         for(auto&& dependency: allDependencies) {
             if(knownIncludes.find(dependency) != knownIncludes.end()) {
                 knownIncludes[dependency]->IncludedByCount++;
+                file.TotalLineCount += knownIncludes[dependency]->LineCount;
             }
         }
 
@@ -74,4 +75,4 @@ namespace IncludeCounter {
             RecurseIncludes(file, resolved, knownIncludes, currentPaths, m_FailOnCircularDependencies);
         }
     }
-} // namespace IncludeCounterLib
+} // namespace IncludeCounter

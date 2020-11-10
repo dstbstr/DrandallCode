@@ -6,12 +6,11 @@
 #include <iostream>
 #include <string>
 
-
 namespace IncludeCounter {
     namespace Extractors {
         namespace TypeDataExtractor {
             bool IsAType(const std::string& line);
-            TypeData Extract(std::istream& stream);
+            TypeData Extract(const std::string& initialLine, const std::string& fileName, std::istream& stream);
         } // namespace TypeDataExtractor
     } // namespace Extractors
 } // namespace IncludeCounter

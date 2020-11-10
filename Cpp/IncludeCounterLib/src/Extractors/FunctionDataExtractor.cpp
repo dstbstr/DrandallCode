@@ -8,8 +8,9 @@ namespace IncludeCounter {
                 return false;
             }
 
-            FunctionData Extract(std::istream& stream) {
+            FunctionData Extract(std::istream& stream, Visibility visibility) {
                 FunctionData result;
+                result.Visibility = visibility;
                 stream;
                 return result;
             }
