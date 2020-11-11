@@ -2,7 +2,7 @@
 
 #include "CommandParser/CommandSplitter.h"
 #include "IncludeCounter/FileNameCollector.h"
-#include "IncludeCounter/ResultGenerator.h"
+#include "IncludeCounter/IncludeReport.h"
 #include "Utilities/ScopedTimer.h"
 #include "Utilities/StringUtilities.h"
 
@@ -10,7 +10,7 @@
 
 namespace IncludeCounter {
     ArgParse::ArgParse(int argc, char* argv[]) {
-        auto sortingOptions = ResultGenerator::GetSortOrderStrings();
+        auto sortingOptions = IncludeReport::GetSortOrderStrings();
         std::stringstream sortHelpLine;
         sortHelpLine << "Order to sort results by.  " << StrUtil::JoinVec(" ", sortingOptions);
 

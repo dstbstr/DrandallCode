@@ -11,13 +11,13 @@ namespace IncludeCounter {
         std::string ClassName;
         std::string FunctionName;
         Visibility Visibility;
-        u8 Airity;
-        u8 DefaultParameterCount;
-        bool IsAbstract;
-        bool IsConst;
-        bool IsVirtual;
-        bool IsStatic;
-        bool IsTemplated;
+        u8 Airity{0};
+        u8 DefaultParameterCount{0};
+        bool IsAbstract{false};
+        bool IsConst{false};
+        bool IsVirtual{false};
+        bool IsStatic{false};
+        bool IsTemplated{false};
     };
 } // namespace IncludeCounter
 
