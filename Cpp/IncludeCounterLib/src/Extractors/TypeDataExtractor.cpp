@@ -108,8 +108,8 @@ namespace IncludeCounter {
                             nestingDepth--;
                         }
                         result.InnerTypes.push_back(TypeDataExtractor::Extract(trimmed, fileName, stream));
-                    } else if(FunctionDataExtractor::IsLineAFunction(trimmed)) {
-                        result.Functions.push_back(FunctionDataExtractor::Extract(stream, currentVisibility));
+                    } else if(FunctionDataExtractor::IsAFunction(trimmed)) {
+                        result.Functions.push_back(FunctionDataExtractor::Extract(trimmed, stream, result.ClassName, currentVisibility));
                     } else if(trimmed[trimmed.length() - 1] == ';') {
                         // can we assume that this is a member variable?  What else is left?
                         switch(currentVisibility) {

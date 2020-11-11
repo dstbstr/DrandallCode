@@ -6,7 +6,6 @@
 
 #include <string>
 
-
 namespace IncludeCounter {
     struct FunctionData {
         std::string ClassName;
@@ -18,6 +17,7 @@ namespace IncludeCounter {
         bool IsConst;
         bool IsVirtual;
         bool IsStatic;
+        bool IsTemplated;
     };
 } // namespace IncludeCounter
 

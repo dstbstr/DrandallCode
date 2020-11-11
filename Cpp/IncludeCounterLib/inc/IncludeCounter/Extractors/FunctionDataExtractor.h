@@ -9,8 +9,8 @@
 namespace IncludeCounter {
     namespace Extractors {
         namespace FunctionDataExtractor {
-            bool IsLineAFunction(const std::string& line);
-            FunctionData Extract(std::istream& stream, Visibility visibility);
+            bool IsAFunction(const std::string& line);
+            FunctionData Extract(std::string line, std::istream& stream, std::string className, Visibility visibility);
         } // namespace FunctionDataExtractor
     } // namespace Extractors
 } // namespace IncludeCounter

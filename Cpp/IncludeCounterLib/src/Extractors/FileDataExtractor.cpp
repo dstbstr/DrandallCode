@@ -53,8 +53,8 @@ namespace IncludeCounter {
                 if(TypeDataExtractor::IsAType(trimmed)) {
                     auto type = TypeDataExtractor::Extract(trimmed, result.FileName, stream);
                     result.Types.push_back(type);
-                } else if(FunctionDataExtractor::IsLineAFunction(trimmed)) {
-                    result.FreeFunctions.push_back(FunctionDataExtractor::Extract(stream, Visibility::PUBLIC));
+                } else if(FunctionDataExtractor::IsAFunction(trimmed)) {
+                    result.FreeFunctions.push_back(FunctionDataExtractor::Extract(trimmed, stream, "", Visibility::PUBLIC));
                 }
             }
 
