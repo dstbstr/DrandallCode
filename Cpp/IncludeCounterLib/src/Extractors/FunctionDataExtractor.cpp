@@ -1,20 +1,22 @@
 #include "IncludeCounter/Extractors/FunctionDataExtractor.h"
 
+#include "IncludeCounter/Extractors/CommentExtractor.h"
 #include "Utilities/Require.h"
 
 #include <regex>
 
 namespace {
+    std::regex TemplateRegex("<[^>]+>");
     std::regex FunctionRegex("^" // start of string
                              "(template<[^>]*>\\s*)?" // optional template
                              "(virtual *)?(static *)?(const *)?\\s*" // function prefixes and return type modifiers
-                             "[\\w&\\*:\\[\\]]+\\s+" // return type with potential qualifification or reference
-                             "([\\w:]+)" // Function name
+                             "[\\w&\\*:\\[\\]<>]+\\s+" // return type with potential qualifification or reference
+                             "([\\w:]+)\\s*" // Function name
                              "\\(" // Start of parameters
                              "([^\\)]*)" // parameters
-                             "\\)\\s*" // end of parameters
+                             "\\)?\\s*" // optional end of parameters (may split parameters on multiple lines)
                              "(const *)?(final *)?(override *)?\\s*" // optional function modifiers
-                             "(\\s*=\\s*0)?" // optional pure virtual indicator
+                             "(\\s*=\\s*0)?\\s*" // optional pure virtual indicator
                              ";?"); // optional declaration (instead of definition)
 
     /*
@@ -29,11 +31,12 @@ namespace {
     match[9] = override
     match[10] = abstract
      */
-    IncludeCounter::FunctionData GetFunctionData(std::string line, std::smatch match, std::string className, IncludeCounter::Visibility visibility) {
+    IncludeCounter::FunctionData GetFunctionData(std::smatch match, std::string className, IncludeCounter::Visibility visibility) {
         IncludeCounter::FunctionData result;
         result.ClassName = className;
         result.Visibility = visibility;
         result.IsTemplated = match[1].length() > 0;
+        result.IsVirtual = match[2].length() > 0;
         result.IsStatic = match[3].length() > 0;
         result.FunctionName = match[5];
         result.IsConst = match[7].length() > 0;
@@ -44,12 +47,37 @@ namespace {
             result.Airity = 0;
             result.DefaultParameterCount = 0;
         } else {
-            result.Airity = std::count(parameters.begin(), parameters.end(), ',');
-            // TODO: remove commas from template parameters
-            // std::unordered_map<std::string, int> - remove one
-            // std::unordered_set<std::string> - don't remove one
+            parameters = std::regex_replace(parameters, TemplateRegex, "");
+            result.Airity = (u8)std::count(parameters.begin(), parameters.end(), ',') + 1;
+            result.DefaultParameterCount = (u8)std::count(parameters.begin(), parameters.end(), '=');
+        }
 
-            result.DefaultParameterCount = std::count(parameters.begin(), parameters.end(), '=');
+        return result;
+    }
+
+    std::string JoinFunctionLine(std::string line, std::istream& stream) {
+        using namespace IncludeCounter::Extractors;
+
+        std::string result = StrUtil::Trim(line);
+        bool isInCommentBlock = false;
+        CommentExtractor::StripComments(result, isInCommentBlock);
+        auto lastChar = result[result.length() - 1];
+        if(lastChar == ';') {
+            return result;
+        }
+
+        auto nestingDepth = std::count(result.begin(), result.end(), '{');
+        nestingDepth -= std::count(result.begin(), result.end(), '}');
+        if(lastChar == '}') {
+            return result;
+        }
+
+        std::string nextLine;
+        while(lastChar != ';' && lastChar != '{' && std::getline(stream, nextLine)) {
+            auto trimmed = StrUtil::TrimStart(nextLine);
+            CommentExtractor::StripComments(trimmed, isInCommentBlock);
+            result += trimmed;
+            lastChar = result[result.length() - 1];
         }
 
         return result;
@@ -64,11 +92,12 @@ namespace IncludeCounter {
             }
 
             FunctionData Extract(std::string line, std::istream& stream, std::string className, Visibility visibility) {
+                auto combinedLine = JoinFunctionLine(line, stream);
                 std::smatch match;
-                Require::True(std::regex_search(line, match, FunctionRegex), "Failed to parse type.  Was IsAFunction run?");
-                auto result = GetFunctionData(line, match, className, visibility);
+                Require::True(std::regex_search(combinedLine, match, FunctionRegex), "Failed to parse type.  Was IsAFunction run?");
+                auto result = GetFunctionData(match, className, visibility);
 
-                auto trimmed = StrUtil::Trim(line.substr(match[0].length()));
+                auto trimmed = StrUtil::Trim(combinedLine.substr(match[0].length()));
                 auto nestingDepth = std::count(trimmed.begin(), trimmed.end(), '{');
                 nestingDepth -= std::count(trimmed.begin(), trimmed.end(), '}');
 

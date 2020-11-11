@@ -1,4 +1,4 @@
-#include "IncludeCounter/ResultGenerator.h"
+#include "IncludeCounter/IncludeReport.h"
 
 #include "IncludeCounter/Data/FileData.h"
 #include "Instrumentation/Assert.h"
@@ -8,23 +8,23 @@
 #include <algorithm>
 
 // TODO: put fully qualified path at the end
-constexpr char LineFormat[]{"%32s | %19u | %20u | %5u"};
-constexpr char LineHeading[]{"           File Name             | Direct Dependencies |  Total Dependencies  |  Included By Count "};
+constexpr char LineFormat[]{"%19u | %20u | %22u | %s\n"};
+constexpr char LineHeading[]{"Direct Dependencies |  Total Dependencies  |  Included By Count | File"};
 
 namespace IncludeCounter {
-    ResultGenerator::SortOrder ResultGenerator::GetSortOrder(u8 index) {
+    IncludeReport::SortOrder IncludeReport::GetSortOrder(u8 index) {
         Require::True(index < SortOrder::_COUNT, StrUtil::Format("Invalid index %u.  Values are between 0 and %u", index, SortOrder::_COUNT - 1));
         return static_cast<SortOrder>(index);
     }
 
-    std::vector<std::string> ResultGenerator::GetSortOrderStrings() {
+    std::vector<std::string> IncludeReport::GetSortOrderStrings() {
         return {StrUtil::Format("%u FileName", SortOrder::FILE_NAME),
                 StrUtil::Format("%u Direct Dependencies", SortOrder::DIRECT_DEPENDENCIES),
                 StrUtil::Format("%u Total Dependencies", SortOrder::TOTAL_DEPENDENCIES),
                 StrUtil::Format("%u Included By", SortOrder::BLAST_RADIUS)};
     }
 
-    void ResultGenerator::PrintResultToStream(std::ostream& targetStream, SortOrder sortBy, bool descending) const {
+    void IncludeReport::PrintResultToStream(std::ostream& targetStream, SortOrder sortBy, bool descending) const {
         std::vector<FileData> working = m_Results; // make a copy, don't change the original
         switch(sortBy) {
         case SortOrder::FILE_NAME:
@@ -47,8 +47,7 @@ namespace IncludeCounter {
         }
         targetStream << LineHeading << std::endl;
         for(auto&& row: working) {
-            targetStream << StrUtil::Format(LineFormat, row.FileName, row.IncludeFiles.size(), row.TotalIncludeCount, row.IncludedByCount)
-                         << std::endl;
+            targetStream << StrUtil::Format(LineFormat, row.IncludeFiles.size(), row.TotalIncludeCount, row.IncludedByCount, row.FilePath);
         }
     }
 } // namespace IncludeCounter
