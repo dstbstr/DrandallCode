@@ -23,6 +23,14 @@ int CDummyamp::isitme (CDummyamp &param)
   else return false;
 }
 
+
+class CDummyOpOverload {
+public:
+  bool operator==(const CDummyOpOverload& other) {
+    return &other == this;
+  }
+};
+
 int main ()
 {
   CDummystar a;
@@ -33,6 +41,11 @@ int main ()
   CDummyamp* d = &c;
   if ( d->isitme(c) )
     cout << "yes, &c is d\n";
+
+    CDummyOpOverload e;
+    CDummyOpOverload f = e;
+    if( e == f )
+      cout << "yes, e and f are equal";
+
   return 0;
 }
-
