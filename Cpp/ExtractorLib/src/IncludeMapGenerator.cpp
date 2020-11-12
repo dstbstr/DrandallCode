@@ -22,10 +22,11 @@ namespace Extractor {
             return;
         }
 
-        std::unordered_set<std::string> allDependencies{file.IncludeFiles};
+        std::unordered_set<std::string> allDependencies;
 
         for(auto&& include: file.IncludeFiles) {
             auto fileName = PathUtils::GetFileName(include);
+            allDependencies.insert(fileName);
             if(resolved.find(fileName) != resolved.end()) {
                 auto dependencies = resolved[fileName];
                 allDependencies.insert(dependencies.begin(), dependencies.end());
