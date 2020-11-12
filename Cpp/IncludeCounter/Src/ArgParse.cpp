@@ -1,8 +1,8 @@
 #include "ArgParse.h"
 
 #include "CommandParser/CommandSplitter.h"
-#include "IncludeCounter/FileNameCollector.h"
-#include "IncludeCounter/IncludeReport.h"
+#include "Extractor/Workers/FileNameCollector.h"
+#include "IncludeReport.h"
 #include "Utilities/ScopedTimer.h"
 #include "Utilities/StringUtilities.h"
 
@@ -38,7 +38,7 @@ namespace IncludeCounter {
             targets.push_back(std::filesystem::current_path().string());
         }
 
-        FileNameCollector fnc{targets, std::vector<std::string>{".h", ".cpp", ".hpp"}, m_RecurseFlag.IsPopulated()};
+        Extractor::FileNameCollector fnc{targets, std::vector<std::string>{".h", ".cpp", ".hpp"}, m_RecurseFlag.IsPopulated()};
         return fnc.GetAllFullyQualifiedPaths();
     }
 } // namespace IncludeCounter
