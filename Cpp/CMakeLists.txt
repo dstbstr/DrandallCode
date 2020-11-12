@@ -33,11 +33,11 @@ set(CMAKE_CXX_STANDARD 17)
 
 add_subdirectory(Core)
 add_subdirectory(CommandParser)
-add_subdirectory(IncludeCounterLib)
+add_subdirectory(ExtractorLib)
 add_subdirectory(IncludeCounter)
 add_subdirectory(CoreTest)
 add_subdirectory(CommandParserTest)
-add_subdirectory(IncludeCounterTest)
+add_subdirectory(ExtractorLibTest)
 
 set(CONFIGURED_ONCE TRUE CACHE INTERNAL
     "A flag showing that CMake has configured at least once.")

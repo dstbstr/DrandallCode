@@ -73,10 +73,7 @@
             "dependsOn": [
                 "GenerateWindowsDebug2017"
             ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
+            "group": "build",
             "problemMatcher": []
         },
         {
@@ -89,7 +86,10 @@
             "dependsOn": [
                 "GenerateWindowsDebug2019"
             ],
-            "group": "build",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
             "problemMatcher": []
         },
         {
