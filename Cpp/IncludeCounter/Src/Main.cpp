@@ -28,8 +28,6 @@ int main(int argc, char* argv[]) {
         if(!argParse.ShouldParse()) {
             return 0;
         }
-        auto sortOrder = IncludeReport::GetSortOrder((u8)argParse.GetSortOrderIndex()); // validate this early
-
         std::vector<std::string> fileNames = argParse.GetFileNames();
 
         ExtractorSettings settings;
@@ -43,13 +41,15 @@ int main(int argc, char* argv[]) {
 
         std::vector<FileData> files = Runner::Get().RunAll(jobs);
         IncludeMapGenerator(files).Generate();
+        IncludeReport report(files);
+
         if(argParse.GetTargetFile().empty()) {
-            IncludeReport(files).PrintResultToStream(std::cout, sortOrder, argParse.IsDescending());
+            report.PrintResultToStream(std::cout);
         } else {
             auto path = std::filesystem::path(argParse.GetTargetFile());
             std::filesystem::remove(path); // clear out old results
             auto stream = std::ofstream(path);
-            IncludeReport(files).PrintResultToStream(stream, sortOrder, argParse.IsDescending());
+            report.PrintResultToStream(stream);
         }
         return 0;
     } catch(std::exception& err) {

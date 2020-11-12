@@ -1,28 +1,29 @@
 #ifndef __INCLUDEREPORT_H__
 #define __INCLUDEREPORT_H__
 
+#include "Extractor/Data/FileData.h"
 #include "Platform/Types.h"
 
 #include <ostream>
 #include <vector>
 
-namespace Extractor {
-    struct FileData;
-}
-
 namespace IncludeCounter {
 
     class IncludeReport {
     public:
-        enum SortOrder : u8 { FILE_NAME, DIRECT_DEPENDENCIES, TOTAL_DEPENDENCIES, BLAST_RADIUS, _COUNT };
-        static SortOrder GetSortOrder(u8 index);
-        static std::vector<std::string> GetSortOrderStrings();
-
-        IncludeReport(const std::vector<Extractor::FileData>& results) : m_Results(results) {}
-        void PrintResultToStream(std::ostream& targetStream, SortOrder sortBy = SortOrder::DIRECT_DEPENDENCIES, bool descending = false) const;
+        IncludeReport(const std::vector<Extractor::FileData>& results);
+        void PrintResultToStream(std::ostream& targetStream) const;
 
     private:
-        const std::vector<Extractor::FileData>& m_Results;
+        struct ReportLine {
+            ReportLine(Extractor::FileData data);
+            std::string ToString() const;
+            Extractor::FileData Data;
+            u64 CouplingImpact;
+            u64 SizeImpact;
+        };
+
+        std::vector<ReportLine> m_Lines;
     };
 } // namespace IncludeCounter
 #endif // __INCLUDEREPORT_H__

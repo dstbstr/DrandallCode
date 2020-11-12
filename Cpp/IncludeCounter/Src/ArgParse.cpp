@@ -10,13 +10,7 @@
 
 namespace IncludeCounter {
     ArgParse::ArgParse(int argc, char* argv[]) {
-        auto sortingOptions = IncludeReport::GetSortOrderStrings();
-        std::stringstream sortHelpLine;
-        sortHelpLine << "Order to sort results by.  " << StrUtil::JoinVec(" ", sortingOptions);
-
-        m_SortOption.UpdateHelpText(sortHelpLine.str());
-
-        m_Options.Add(m_RecurseFlag).Add(m_HelpFlag).Add(m_FilePathOption).Add(m_OutFile).Add(m_SortOption).Add(m_Descending);
+        m_Options.Add(m_RecurseFlag).Add(m_HelpFlag).Add(m_FilePathOption).Add(m_OutFile).Add(m_Descending);
         CommandParser::CommandSplitter splitter(argc, argv);
         m_Options.Apply(splitter.GetAll());
     }
