@@ -34,7 +34,10 @@ set(CMAKE_CXX_STANDARD 17)
 add_subdirectory(Core)
 add_subdirectory(CommandParser)
 add_subdirectory(ExtractorLib)
+
 add_subdirectory(IncludeCounter)
+add_subdirectory(TypeCounter)
+
 add_subdirectory(CoreTest)
 add_subdirectory(CommandParserTest)
 add_subdirectory(ExtractorLibTest)

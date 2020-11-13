@@ -1,16 +1,15 @@
-#include "ArgParse.h"
+#include "TypeArgParse.h"
 
 #include "CommandParser/CommandSplitter.h"
 #include "Extractor/Workers/FileNameCollector.h"
-#include "IncludeReport.h"
 #include "Utilities/ScopedTimer.h"
 #include "Utilities/StringUtilities.h"
 
 #include <iostream>
 
-namespace IncludeCounter {
+namespace TypeCounter {
     ArgParse::ArgParse(int argc, char* argv[]) {
-        m_Options.Add(m_RecurseFlag).Add(m_HelpFlag).Add(m_FilePathOption).Add(m_OutFile).Add(m_Descending);
+        m_Options.Add(m_RecurseFlag).Add(m_HelpFlag).Add(m_FilePathOption).Add(m_OutFile).Add(m_FunctionFlag);
         CommandParser::CommandSplitter splitter(argc, argv);
         m_Options.Apply(splitter.GetAll());
     }
@@ -32,7 +31,7 @@ namespace IncludeCounter {
             targets.push_back(std::filesystem::current_path().string());
         }
 
-        Extractor::FileNameCollector fnc{targets, std::vector<std::string>{".h", ".cpp", ".hpp"}, m_RecurseFlag.IsPopulated()};
+        Extractor::FileNameCollector fnc{targets, std::vector<std::string>{".h"}, m_RecurseFlag.IsPopulated()};
         return fnc.GetAllFullyQualifiedPaths();
     }
-} // namespace IncludeCounter
+} // namespace TypeCounter
