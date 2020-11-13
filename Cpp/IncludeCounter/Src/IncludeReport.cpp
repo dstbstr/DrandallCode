@@ -36,8 +36,6 @@ namespace IncludeCounter {
     }
 
     void IncludeReport::PrintResultToStream(std::ostream& targetStream) const {
-        using Extractor::FileData;
-
         targetStream << LineHeading << std::endl;
         for(auto&& line: m_Lines) {
             targetStream << line.ToString();

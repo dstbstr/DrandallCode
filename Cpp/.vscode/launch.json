@@ -11,14 +11,27 @@
             "program": "${workspaceFolder}/bin/Debug/IncludeCounter.exe",
             "args": [
                 "-r",
-                "--desc",
-                "-s",
-                "2",
                 "CommandParser",
-                "CommandParserTest",
                 "IncludeCounter",
-                "Core",
-                "ScratchTest"
+                "TypeCounter",
+                "Core"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true
+        },
+        {
+            "name": "(Windows) TypeCounter",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/bin/Debug/TypeCounter.exe",
+            "args": [
+                "-r",
+                "CommandParser",
+                "IncludeCounter",
+                "TypeCounter",
+                "Core"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
