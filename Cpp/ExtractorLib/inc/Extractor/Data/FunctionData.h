@@ -16,6 +16,7 @@ namespace Extractor {
         bool IsAbstract{false};
         bool IsConst{false};
         bool IsVirtual{false};
+        bool IsInline{false};
         bool IsStatic{false};
         bool IsTemplated{false};
     };

@@ -123,6 +123,34 @@ namespace Extractor {
         ASSERT_TRUE(Run("template<> void Foo()"));
     }
 
+    TEST_F(IsFunctionTest, InlineFunction) {
+        ASSERT_TRUE(Run("inline void Foo()"));
+    }
+
+    TEST_F(IsFunctionTest, UnderscoreInlineFunction) {
+        ASSERT_TRUE(Run("__inline void Foo()"));
+    }
+
+    TEST_F(IsFunctionTest, ForceInlineFunction) {
+        ASSERT_TRUE(Run("__forceinline void Foo()"));
+    }
+
+    TEST_F(IsFunctionTest, StaticInlineFunction) {
+        ASSERT_TRUE(Run("static inline void Foo()"));
+    }
+
+    TEST_F(IsFunctionTest, InlineStaticFunction) {
+        ASSERT_TRUE(Run("inline static void Foo()"));
+    }
+
+    TEST_F(IsFunctionTest, VirtualInlineFunction) {
+        ASSERT_TRUE(Run("virtual inline void Foo()"));
+    }
+
+    TEST_F(IsFunctionTest, InlineVirtualFunction) {
+        ASSERT_TRUE(Run("inline virtual void Foo()"));
+    }
+
     TEST_F(IsFunctionTest, ComplexFunction) {
         // The following isn't a valid definition, but exercises about every available option
         ASSERT_TRUE(Run("template<class T, class U> virtual static const Foo::Bar<Baz>& One::Two(const std::pair<int, int>& arg1, int arg2 = 3 "
@@ -217,12 +245,38 @@ namespace Extractor {
         ASSERT_FALSE(result.IsAbstract);
     }
 
+    TEST_F(ExtractFunctionTest, InlineFunctionIsInline) {
+        auto result = Run("inline void Foo();");
+        ASSERT_TRUE(result.IsInline);
+    }
+
+    TEST_F(ExtractFunctionTest, NonInlineFunctionIsNotInline) {
+        auto result = Run("void Foo();");
+        ASSERT_FALSE(result.IsInline);
+    }
+
+    TEST_F(ExtractFunctionTest, ForceInlineFunctionIsInline) {
+        auto result = Run("__forceinline void Foo();");
+        ASSERT_TRUE(result.IsInline);
+    }
+
     TEST_F(ExtractFunctionTest, CanExtractMultipleProperties) {
-        auto result = Run("template<class T> virtual static void Foo() const final override = 0;");
+        auto result = Run("template<class T> virtual inline static void Foo() const final override = 0;");
         ASSERT_TRUE(result.IsTemplated);
         ASSERT_TRUE(result.IsVirtual);
         ASSERT_TRUE(result.IsStatic);
         ASSERT_TRUE(result.IsConst);
+        ASSERT_TRUE(result.IsInline);
+        ASSERT_TRUE(result.IsAbstract);
+    }
+
+    TEST_F(ExtractFunctionTest, CanExtractMultiplePropertiesInAnotherOrder) {
+        auto result = Run("template<class T> static virtual inline void Foo() final override const = 0;");
+        ASSERT_TRUE(result.IsTemplated);
+        ASSERT_TRUE(result.IsVirtual);
+        ASSERT_TRUE(result.IsStatic);
+        ASSERT_TRUE(result.IsConst);
+        ASSERT_TRUE(result.IsInline);
         ASSERT_TRUE(result.IsAbstract);
     }
 

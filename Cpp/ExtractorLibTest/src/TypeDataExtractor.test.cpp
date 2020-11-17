@@ -7,60 +7,85 @@ namespace Extractor {
 
     class IsATypeTest : public ::testing::Test {
     protected:
-        std::vector<std::string> m_TemplatePrefixes{"template<class T>", "template<>", ""};
-        std::vector<std::string> m_Types{"struct", "class", "enum", "union"};
-        std::string m_TypeName = "Foo";
-        std::vector<std::string> m_Scopes{"public", "private", "protected", ""};
-        std::vector<std::string> m_BaseClasses{"Bar", "::Bar", "Bar::Baz", "::Bar::baz"};
-        std::vector<std::string> m_InheritenceModifiers{"virtual", ""};
-        std::vector<std::string> m_TypeEndings{"", "{", "{}", "{};", "{int i;};"};
-        std::vector<std::string> m_NonTypeEndings{";"};
+        bool Run(std::string line) {
+            return TypeDataExtractor::IsAType(line);
+        }
     };
 
-    TEST_F(IsATypeTest, TypesReturnTrue) {
-        for(auto&& templatePrefix: m_TemplatePrefixes) {
-            for(auto&& type: m_Types) {
-                for(auto&& typeEnding: m_TypeEndings) {
-                    auto line = StrUtil::Trim(StrUtil::Join(" ", templatePrefix, type, m_TypeName, typeEnding));
-                    ASSERT_TRUE(TypeDataExtractor::IsAType(line)) << line;
-                }
-
-                for(auto&& scope: m_Scopes) {
-                    for(auto&& baseClass: m_BaseClasses) {
-                        for(auto&& inheritenceModifier: m_InheritenceModifiers) {
-                            for(auto&& typeEnding: m_TypeEndings) {
-                                auto line = StrUtil::Trim(
-                                    StrUtil::Join(" ", templatePrefix, type, m_TypeName, ":", scope, inheritenceModifier, baseClass, typeEnding));
-                                ASSERT_TRUE(TypeDataExtractor::IsAType(line)) << line;
-                            }
-                        }
-                    }
-                }
-            }
-        }
+    TEST_F(IsATypeTest, ClassIsAType) {
+        ASSERT_TRUE(Run("class Foo"));
     }
 
-    TEST_F(IsATypeTest, NonTypesReturnFalse) {
-        for(auto&& templatePrefix: m_TemplatePrefixes) {
-            for(auto&& type: m_Types) {
-                for(auto&& typeEnding: m_NonTypeEndings) {
-                    auto line = StrUtil::Trim(StrUtil::Join(" ", templatePrefix, type, typeEnding));
-                    ASSERT_FALSE(TypeDataExtractor::IsAType(line)) << line;
-                }
+    TEST_F(IsATypeTest, StructIsAType) {
+        ASSERT_TRUE(Run("struct Foo"));
+    }
 
-                for(auto&& scope: m_Scopes) {
-                    for(auto&& baseClass: m_BaseClasses) {
-                        for(auto&& inheritenceModifier: m_InheritenceModifiers) {
-                            for(auto&& typeEnding: m_NonTypeEndings) {
-                                auto line =
-                                    StrUtil::Trim(StrUtil::Join(" ", templatePrefix, type, ":", scope, baseClass, inheritenceModifier, typeEnding));
-                                ASSERT_FALSE(TypeDataExtractor::IsAType(line)) << line;
-                            }
-                        }
-                    }
-                }
-            }
-        }
+    TEST_F(IsATypeTest, EnumIsAType) {
+        ASSERT_TRUE(Run("enum Foo"));
+    }
+
+    TEST_F(IsATypeTest, UnionIsAType) {
+        ASSERT_TRUE(Run("union Foo"));
+    }
+
+    TEST_F(IsATypeTest, OpenParenOnType) {
+        ASSERT_TRUE(Run("class Foo{"));
+    }
+
+    TEST_F(IsATypeTest, OpenCloseParenOnType) {
+        ASSERT_TRUE(Run("class Foo{}"));
+    }
+
+    TEST_F(IsATypeTest, OpenCloseParenSemiOnType) {
+        ASSERT_TRUE(Run("class Foo{};"));
+    }
+
+    TEST_F(IsATypeTest, SingleLineClass) {
+        ASSERT_TRUE(Run("class Foo{int i;};"));
+    }
+
+    TEST_F(IsATypeTest, TemplateClass) {
+        ASSERT_TRUE(Run("template<class T> class Foo"));
+    }
+
+    TEST_F(IsATypeTest, TemplateSpecializationClass) {
+        ASSERT_TRUE(Run("template<> class Foo"));
+    }
+
+    TEST_F(IsATypeTest, DefaultBaseClass) {
+        ASSERT_TRUE(Run("class Foo : Bar"));
+    }
+
+    TEST_F(IsATypeTest, PublicBaseClass) {
+        ASSERT_TRUE(Run("class Foo : public Bar"));
+    }
+
+    TEST_F(IsATypeTest, ProtectedBaseClass) {
+        ASSERT_TRUE(Run("class Foo : protected Bar"));
+    }
+
+    TEST_F(IsATypeTest, PrivateBaseClass) {
+        ASSERT_TRUE(Run("class Foo : private Bar"));
+    }
+
+    TEST_F(IsATypeTest, GlobalScopeBaseClass) {
+        ASSERT_TRUE(Run("class Foo : ::Bar"));
+    }
+
+    TEST_F(IsATypeTest, QualifiedBaseClass) {
+        ASSERT_TRUE(Run("class Foo : Bar::Baz"));
+    }
+
+    TEST_F(IsATypeTest, GlobalQualifiedBaseClass) {
+        ASSERT_TRUE(Run("class Foo : ::Bar::Baz"));
+    }
+
+    TEST_F(IsATypeTest, VirtualInheritence) {
+        ASSERT_TRUE(Run("class Foo : virtual Bar"));
+    }
+
+    TEST_F(IsATypeTest, ForwardDeclarationIsNotAType) {
+        ASSERT_FALSE(Run("class Foo;"));
     }
 
     class ExtractTypeTest : public ::testing::Test {

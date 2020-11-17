@@ -9,40 +9,51 @@ namespace {
     std::regex TemplateRegex("<[^>]+>");
     std::regex FunctionRegex("^" // start of string
                              "(template<[^>]*>\\s*)?" // optional template
-                             "(virtual *)?(static *)?(const *)?\\s*" // function prefixes and return type modifiers
+                             "(((virtual *)|((__(force)?)?inline *)|(static *))*)?" // function prefixes
+                             "(const *)?\\s*" // return type const
                              "[\\w&\\*:\\[\\]<>]+\\s+" // return type with potential qualifification or reference
                              "([\\w:]+)\\s*" // Function name
                              "\\(" // Start of parameters
                              "([^\\)]*)" // parameters
                              "\\)?\\s*" // optional end of parameters (may split parameters on multiple lines)
-                             "(const *)?(final *)?(override *)?\\s*" // optional function modifiers
+                             "(((const *)|(final *)|(override *))*)?\\s*" // optional function modifiers
                              "(\\s*=\\s*0)?\\s*" // optional pure virtual indicator
                              ";?"); // optional declaration (instead of definition)
+    std::regex VirtualRegex("virtual");
+    std::regex InlineRegex("(__(force)?)?inline");
+    std::regex StaticRegex("static");
 
-    /*
-    match[1] = template
-    match[2] = virtual
-    match[3] = static
-    match[4] = const return type
-    match[5] = function name
-    match[6] = arguments
-    match[7] = const function
-    match[8] = final
-    match[9] = override
-    match[10] = abstract
-     */
+    std::regex ConstRegex("const");
+
+    constexpr size_t TemplateIndex = 1;
+    constexpr size_t PrefixIndex = 2;
+    constexpr size_t FunctionNameIndex = 10;
+    constexpr size_t ArgIndex = 11;
+    constexpr size_t PostfixIndex = 12;
+    constexpr size_t AbstractIndex = 17;
+
     Extractor::FunctionData GetFunctionData(std::smatch match, std::string className, Extractor::Visibility visibility) {
         Extractor::FunctionData result;
         result.ClassName = className;
         result.Visibility = visibility;
-        result.IsTemplated = match[1].length() > 0;
-        result.IsVirtual = match[2].length() > 0;
-        result.IsStatic = match[3].length() > 0;
-        result.FunctionName = match[5];
-        result.IsConst = match[7].length() > 0;
-        result.IsAbstract = match[10].length() > 0;
 
-        auto parameters = match[6].str();
+        result.IsTemplated = match[TemplateIndex].length() > 0;
+
+        if(match[PrefixIndex].length() > 0) {
+            auto prefixes = match[PrefixIndex].str();
+            result.IsVirtual = std::regex_search(prefixes, VirtualRegex);
+            result.IsInline = std::regex_search(prefixes, InlineRegex);
+            result.IsStatic = std::regex_search(prefixes, StaticRegex);
+        }
+        result.FunctionName = match[FunctionNameIndex];
+
+        if(match[PostfixIndex].length() > 0) {
+            auto postfixes = match[PostfixIndex].str();
+            result.IsConst = std::regex_search(postfixes, ConstRegex);
+        }
+        result.IsAbstract = match[AbstractIndex].length() > 0;
+
+        auto parameters = match[ArgIndex].str();
         if(parameters.empty()) {
             result.Airity = 0;
             result.DefaultParameterCount = 0;

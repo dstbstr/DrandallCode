@@ -18,24 +18,20 @@ namespace {
                          "\\s*[\\w:]+)?" // base class name
                          "\\s*((\\{[^\\}]*\\}?;?)|$)"); // can't end with a semicolon (may not have curly brace based on style)
 
-    /* Matches
-     [0] = Full string
-     [1] = template
-     [2] = type
-     [7] = class name
-     [8] = base class
-     [9] = scope of inheritence
-    [13] = Is inheritence virtual
-    [14] = body
-    */
+    constexpr size_t TemplateIndex = 1;
+    constexpr size_t TypeIndex = 2;
+    constexpr size_t NameIndex = 7;
+    constexpr size_t BaseClassIndex = 8;
+    constexpr size_t InheritenceScopeIndex = 9;
+
     Extractor::TypeData GetTypeData(std::smatch match, std::string fileName) {
         Extractor::TypeData result;
-        result.ClassName = match[7];
+        result.ClassName = match[NameIndex];
         result.FileName = fileName;
-        result.HasBaseClass = match[8].length() > 0 || match[9].length() > 0;
-        result.IsTemplated = match[1].length() > 0;
+        result.HasBaseClass = match[BaseClassIndex].length() > 0 || match[InheritenceScopeIndex].length() > 0;
+        result.IsTemplated = match[TemplateIndex].length() > 0;
 
-        auto typeStr = match[2];
+        auto typeStr = match[TypeIndex];
         if(typeStr == "class") {
             result.TypeKind = Extractor::TypeKeyword::CLASS;
         } else if(typeStr == "struct") {
