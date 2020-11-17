@@ -169,6 +169,10 @@ namespace Extractor {
         ASSERT_FALSE(Run("int i = b();"));
     }
 
+    TEST_F(IsFunctionTest, ConstructorInitializerIsNotAFunction) {
+        ASSERT_FALSE(Run("    : m_Files(files)"));
+    }
+
     class ExtractFunctionTest : public ::testing::Test {
     protected:
         FunctionData Run(std::string line) {

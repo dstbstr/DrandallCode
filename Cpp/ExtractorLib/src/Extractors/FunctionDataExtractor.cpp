@@ -9,14 +9,14 @@ namespace {
     std::regex TemplateRegex("<[^>]+>");
     std::regex FunctionRegex("^" // start of string
                              "(template<[^>]*>\\s*)?" // optional template
-                             "(((virtual *)|((__(force)?)?inline *)|(static *))*)?" // function prefixes
-                             "(const *)?\\s*" // return type const
+                             "((?:(?:virtual *)|(?:(?:__(force)?)?inline *)|(?:static *))*)?" // function prefixes
+                             "(?:const *)?" // return type const
                              "[\\w&\\*:\\[\\]<>]+\\s+" // return type with potential qualifification or reference
                              "([\\w:]+)\\s*" // Function name
                              "\\(" // Start of parameters
                              "([^\\)]*)" // parameters
                              "\\)?\\s*" // optional end of parameters (may split parameters on multiple lines)
-                             "(((const *)|(final *)|(override *))*)?\\s*" // optional function modifiers
+                             "((?:(?:const *)|(?:final *)|(?:override *))*)?\\s*" // optional function modifiers
                              "(\\s*=\\s*0)?\\s*" // optional pure virtual indicator
                              ";?"); // optional declaration (instead of definition)
     std::regex VirtualRegex("virtual");
@@ -27,10 +27,10 @@ namespace {
 
     constexpr size_t TemplateIndex = 1;
     constexpr size_t PrefixIndex = 2;
-    constexpr size_t FunctionNameIndex = 10;
-    constexpr size_t ArgIndex = 11;
-    constexpr size_t PostfixIndex = 12;
-    constexpr size_t AbstractIndex = 17;
+    constexpr size_t FunctionNameIndex = 4;
+    constexpr size_t ArgIndex = 5;
+    constexpr size_t PostfixIndex = 6;
+    constexpr size_t AbstractIndex = 7;
 
     Extractor::FunctionData GetFunctionData(std::smatch match, std::string className, Extractor::Visibility visibility) {
         Extractor::FunctionData result;

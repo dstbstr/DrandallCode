@@ -6,34 +6,24 @@
 
 #include <algorithm>
 
-constexpr char LineFormat[]{"%s,%s,%s,%u,%s,%s,%s,%s,%s,%u\n"};
-constexpr char LineHeading[]{"Function Name,Class Name,Visibility,Airity,Const,Static,Virtual,Abstract,Templated,Default Parameters"};
+constexpr char LineFormat[]{"%s,%s,%s,%u,%s,%s,%s,%s,%s,%s,%u\n"};
+constexpr char LineHeading[]{"Class Name,Function Name,Visibility,Airity,Const,Static,Inline,Virtual,Abstract,Templated,Default Parameters"};
 
 namespace TypeCounter {
-    FunctionReport::ReportLine::ReportLine(Extractor::FunctionData data) : Data(data) {
-        Data.Airity;
-        Data.ClassName;
-        Data.DefaultParameterCount;
-        Data.FunctionName;
-        Data.IsAbstract;
-        Data.IsConst;
-        Data.IsStatic;
-        Data.IsTemplated;
-        Data.IsVirtual;
-        Data.Visibility;
-    }
+    FunctionReport::ReportLine::ReportLine(Extractor::FunctionData data) : Data(data) {}
 
     std::string FunctionReport::ReportLine::ToString() const {
         return StrUtil::Format(LineFormat,
-                               Data.FunctionName,
                                Data.ClassName,
+                               Data.FunctionName,
                                Extractor::ToString(Data.Visibility),
                                Data.Airity,
-                               Data.IsConst ? "true" : "false",
-                               Data.IsStatic ? "true" : "false",
-                               Data.IsVirtual ? "true" : "false",
-                               Data.IsAbstract ? "true" : "false",
-                               Data.IsTemplated ? "true" : "false",
+                               Data.IsConst ? "x" : "",
+                               Data.IsStatic ? "x" : "",
+                               Data.IsInline ? "x" : "",
+                               Data.IsVirtual ? "x" : "",
+                               Data.IsAbstract ? "x" : "",
+                               Data.IsTemplated ? "x" : "",
                                Data.DefaultParameterCount);
     }
 

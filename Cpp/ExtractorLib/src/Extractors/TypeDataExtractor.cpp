@@ -10,19 +10,19 @@
 
 namespace {
     std::regex TypeRegex("^(template<[^>]*> *)?" // optionally start with a template
-                         "((class)|(enum)|(struct)|(union))" // keyword
+                         "((?:class)|(?:enum)|(?:struct)|(?:union))" // keyword
                          "\\s+(\\w+)\\s*" // identifier
                          "(:\\s*" // optional base class
-                         "((public)|(protected)|(private))?\\s*" // optional scope of inheritence
-                         "(virtual)?" // optional virtual inheritence
+                         "((?:public)|(?:protected)|(?:private))?\\s*" // optional scope of inheritence
+                         "(?:virtual)?" // optional virtual inheritence
                          "\\s*[\\w:]+)?" // base class name
                          "\\s*((\\{[^\\}]*\\}?;?)|$)"); // can't end with a semicolon (may not have curly brace based on style)
 
     constexpr size_t TemplateIndex = 1;
     constexpr size_t TypeIndex = 2;
-    constexpr size_t NameIndex = 7;
-    constexpr size_t BaseClassIndex = 8;
-    constexpr size_t InheritenceScopeIndex = 9;
+    constexpr size_t NameIndex = 3;
+    constexpr size_t BaseClassIndex = 4;
+    constexpr size_t InheritenceScopeIndex = 5;
 
     Extractor::TypeData GetTypeData(std::smatch match, std::string fileName) {
         Extractor::TypeData result;
