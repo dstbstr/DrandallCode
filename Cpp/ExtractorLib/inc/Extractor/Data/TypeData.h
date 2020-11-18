@@ -2,6 +2,7 @@
 #define __TYPEDATA_H__
 
 #include "Extractor/Data/FunctionData.h"
+#include "Extractor/Data/SpecialFunctionData.h"
 #include "Extractor/Data/TypeKeyword.h"
 #include "Platform/Types.h"
 
@@ -18,6 +19,7 @@ namespace Extractor {
         bool HasBaseClass{false};
         bool IsTemplated{false};
         std::vector<FunctionData> Functions;
+        std::vector<SpecialFunctionData> SpecialFunctions;
         std::vector<TypeData> InnerTypes;
 
         u16 PrivateDataMemberCount{0};

@@ -188,7 +188,7 @@ namespace Extractor {
     class ExtractFunctionTest : public ::testing::Test {
     protected:
         FunctionData Run(std::string line) {
-            return FunctionDataExtractor::Extract(line, ss, m_Namespace, m_ClassName, m_Visibility);
+            return FunctionDataExtractor::ExtractFunction(line, ss, m_Namespace, m_ClassName, m_Visibility);
         }
 
         std::stringstream ss;
