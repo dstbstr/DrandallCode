@@ -6,6 +6,8 @@
 #include <regex>
 
 namespace {
+    std::regex SpecialFunctionRegex("^(virtual *)?(~ *)?([\\w:]+)\\(([^\\)]*)\\)? *=? *(default)?(delete)?");
+
     std::regex FunctionRegex("^" // start of string
                              "(template<[^>]*>\\s*)?" // optional template
                              "((?:(?:virtual *)|(?:(?:__(force)?)?inline *)|(?:static *))*)?" // function prefixes
@@ -68,6 +70,32 @@ namespace {
         return result;
     }
 
+    // ^(virtual *)?(~ *)?([\\w:]+)\\(([^\\)]*)\\)? *=? *(default)?(delete)?
+
+    Extractor::SpecialFunctionData
+    GetSpecialFunctionData(std::smatch match, const std::string& ns, const std::string& className, Extractor::Visibility visibility) {
+        Extractor::SpecialFunctionData result;
+        result.Namespace = ns;
+        result.ClassName = className;
+        result.Visibility = visibility;
+        result.IsVirtual = match[1].length() > 0;
+        result.Kind = match[2].length() > 0 ? Extractor::SpecialFunctionType::DESTRUCTOR : Extractor::SpecialFunctionType::CONSTRUCTOR;
+        result.IsDefaulted = match[5].length() > 0;
+        result.IsDeleted = match[6].length() > 0;
+
+        auto parameters = match[4].str();
+        if(parameters.empty()) {
+            result.Airity = 0;
+            result.DefaultParameterCount = 0;
+        } else {
+            parameters = std::regex_replace(parameters, TemplateRegex, "");
+            result.Airity = (u8)std::count(parameters.begin(), parameters.end(), ',') + 1;
+            result.DefaultParameterCount = (u8)std::count(parameters.begin(), parameters.end(), '=');
+        }
+        
+        return result;
+    }
+
     std::string JoinFunctionLine(std::string line, std::istream& stream) {
         using namespace Extractor;
 
@@ -75,13 +103,7 @@ namespace {
         bool isInCommentBlock = false;
         CommentExtractor::StripComments(result, isInCommentBlock);
         auto lastChar = result[result.length() - 1];
-        if(lastChar == ';') {
-            return result;
-        }
-
-        auto nestingDepth = std::count(result.begin(), result.end(), '{');
-        nestingDepth -= std::count(result.begin(), result.end(), '}');
-        if(lastChar == '}') {
+        if(lastChar == ';' || lastChar == '}') {
             return result;
         }
 
@@ -95,6 +117,19 @@ namespace {
 
         return result;
     }
+
+    void SkipBody(std::string line, std::istream& stream) {
+        auto trimmed = StrUtil::Trim(line);
+        auto nestingDepth = std::count(trimmed.begin(), trimmed.end(), '{');
+        nestingDepth -= std::count(trimmed.begin(), trimmed.end(), '}');
+
+        std::string nextLine;
+        while(nestingDepth > 0 && std::getline(stream, nextLine)) {
+            trimmed = StrUtil::Trim(nextLine);
+            nestingDepth += std::count(trimmed.begin(), trimmed.end(), '{');
+            nestingDepth -= std::count(trimmed.begin(), trimmed.end(), '}');
+        }
+    }
 } // namespace
 
 namespace Extractor {
@@ -103,23 +138,36 @@ namespace Extractor {
             return std::regex_search(line, FunctionRegex);
         }
 
-        FunctionData Extract(std::string line, std::istream& stream, const std::string& ns, const std::string& className, Visibility visibility) {
+        bool IsSpecialFunction(const std::string& line, const std::string& className) {
+            std::smatch match;
+            if(std::regex_search(line, match, SpecialFunctionRegex)) {
+                return match[3] == className;
+            }
+            return false;
+        }
+
+        FunctionData
+        ExtractFunction(std::string line, std::istream& stream, const std::string& ns, const std::string& className, Visibility visibility) {
             auto combinedLine = JoinFunctionLine(line, stream);
             std::smatch match;
-            Require::True(std::regex_search(combinedLine, match, FunctionRegex), "Failed to parse type.  Was IsAFunction run?");
+            Require::True(std::regex_search(combinedLine, match, FunctionRegex), "Failed to parse function.  Was IsAFunction run?");
             auto result = GetFunctionData(match, ns, className, visibility);
 
-            auto trimmed = StrUtil::Trim(combinedLine.substr(match[0].length()));
-            auto nestingDepth = std::count(trimmed.begin(), trimmed.end(), '{');
-            nestingDepth -= std::count(trimmed.begin(), trimmed.end(), '}');
-
-            std::string nextLine;
-            while(nestingDepth > 0 && std::getline(stream, nextLine)) {
-                trimmed = StrUtil::Trim(nextLine);
-                nestingDepth += std::count(trimmed.begin(), trimmed.end(), '{');
-                nestingDepth -= std::count(trimmed.begin(), trimmed.end(), '}');
-            }
+            SkipBody(combinedLine.substr(match[0].length()), stream);
             return result;
         }
+
+        SpecialFunctionData
+        ExtractSpecialFunction(std::string line, std::istream& stream, const std::string& ns, const std::string& className, Visibility visibility) {
+            auto combinedLine = JoinFunctionLine(line, stream);
+            std::smatch match;
+            Require::True(std::regex_search(combinedLine, match, SpecialFunctionRegex),
+                          "Failed to parse special function.  Was IsSpecialFunction run?");
+            auto result = GetSpecialFunctionData(match, ns, className, visibility);
+            
+            SkipBody(combinedLine.substr(match[0].length()), stream);
+            return result;
+        }
+
     } // namespace FunctionDataExtractor
 } // namespace Extractor

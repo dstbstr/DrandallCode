@@ -69,7 +69,7 @@ namespace Extractor {
                 result.Types.push_back(type);
             } else if(m_Settings.ExtractFunctions && FunctionDataExtractor::IsAFunction(trimmed)) {
                 result.FreeFunctions.push_back(
-                    FunctionDataExtractor::Extract(trimmed, stream, namespaceExtractor.GetNamespace(), "", Visibility::PUBLIC));
+                    FunctionDataExtractor::ExtractFunction(trimmed, stream, namespaceExtractor.GetNamespace(), "", Visibility::PUBLIC));
             } else if(std::regex_search(trimmed, CloseBlockRegex)) {
                 auto closeBraces = std::count(trimmed.begin(), trimmed.end(), '}');
                 for(int i = 0; i < closeBraces; i++) {

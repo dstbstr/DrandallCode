@@ -105,7 +105,9 @@ namespace Extractor {
                     }
                     result.InnerTypes.push_back(TypeDataExtractor::Extract(trimmed, fileName, ns, stream));
                 } else if(FunctionDataExtractor::IsAFunction(trimmed)) {
-                    result.Functions.push_back(FunctionDataExtractor::Extract(trimmed, stream, ns, result.ClassName, currentVisibility));
+                    result.Functions.push_back(FunctionDataExtractor::ExtractFunction(trimmed, stream, ns, result.ClassName, currentVisibility));
+                } else if(FunctionDataExtractor::IsSpecialFunction(line, result.ClassName)) {
+                    result.SpecialFunctions.push_back(FunctionDataExtractor::ExtractSpecialFunction(line, stream, ns, result.ClassName, currentVisibility));
                 } else if(trimmed[trimmed.length() - 1] == ';') {
                     // can we assume that this is a member variable?  What else is left?
                     switch(currentVisibility) {
