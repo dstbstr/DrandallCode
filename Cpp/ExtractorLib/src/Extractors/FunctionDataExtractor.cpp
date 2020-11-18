@@ -6,14 +6,14 @@
 #include <regex>
 
 namespace {
-    std::regex SpecialFunctionRegex("^(virtual *)?(~ *)?([\\w:]+)\\(([^\\)]*)\\)? *=? *(default)?(delete)?");
+    std::regex SpecialFunctionRegex("^(?:template *<[^>]*> *)?(virtual *)?([\\w:<>~]+)\\(([^\\)]*)\\)? *=? *(default)?(delete)?");
 
     std::regex FunctionRegex("^" // start of string
-                             "(template<[^>]*>\\s*)?" // optional template
+                             "(template *<[^>]*>\\s*)?" // optional template
                              "((?:(?:virtual *)|(?:(?:__(force)?)?inline *)|(?:static *))*)?" // function prefixes
                              "(?:const *)?" // return type const
                              "[\\w\\[\\]&\\*:<>]+[&\\*\\w\\]>]\\s+" // return type with potential qualifification or reference
-                             "([\\w:]+)\\s*" // Function name
+                             "([\\w:<>]+)\\s*" // Function name
                              "\\(" // Start of parameters
                              "([^\\)]*)" // parameters
                              "\\)?\\s*" // optional end of parameters (may split parameters on multiple lines)
@@ -34,8 +34,7 @@ namespace {
     constexpr size_t PostfixIndex = 6;
     constexpr size_t AbstractIndex = 7;
 
-    Extractor::FunctionData
-    GetFunctionData(std::smatch match, const std::string& ns, const std::string& className, Extractor::Visibility visibility) {
+    Extractor::FunctionData GetFunctionData(std::smatch match, const std::string& ns, const std::string& className, Extractor::Visibility visibility) {
         Extractor::FunctionData result;
         result.Namespace = ns;
         result.ClassName = className;
@@ -70,20 +69,23 @@ namespace {
         return result;
     }
 
-    // ^(virtual *)?(~ *)?([\\w:]+)\\(([^\\)]*)\\)? *=? *(default)?(delete)?
+    // ^(?:template *<[^>]*> *)?(virtual *)?([\\w:<>]+)\\(([^\\)]*)\\)? *=? *(default)?(delete)?
 
-    Extractor::SpecialFunctionData
-    GetSpecialFunctionData(std::smatch match, const std::string& ns, const std::string& className, Extractor::Visibility visibility) {
+    Extractor::SpecialFunctionData GetSpecialFunctionData(std::smatch match, const std::string& ns, Extractor::Visibility visibility) {
         Extractor::SpecialFunctionData result;
         result.Namespace = ns;
-        result.ClassName = className;
+
+        auto className = match[2].str();
+        auto split = StrUtil::Split(className, "::");
+        result.ClassName = split[split.size() - 1];
+
         result.Visibility = visibility;
         result.IsVirtual = match[1].length() > 0;
-        result.Kind = match[2].length() > 0 ? Extractor::SpecialFunctionType::DESTRUCTOR : Extractor::SpecialFunctionType::CONSTRUCTOR;
-        result.IsDefaulted = match[5].length() > 0;
-        result.IsDeleted = match[6].length() > 0;
+        result.Kind = std::find(className.begin(), className.end(), '~') == className.end() ? Extractor::SpecialFunctionType::CONSTRUCTOR : Extractor::SpecialFunctionType::DESTRUCTOR;
+        result.IsDefaulted = match[4].length() > 0;
+        result.IsDeleted = match[5].length() > 0;
 
-        auto parameters = match[4].str();
+        auto parameters = match[3].str();
         if(parameters.empty()) {
             result.Airity = 0;
             result.DefaultParameterCount = 0;
@@ -92,7 +94,7 @@ namespace {
             result.Airity = (u8)std::count(parameters.begin(), parameters.end(), ',') + 1;
             result.DefaultParameterCount = (u8)std::count(parameters.begin(), parameters.end(), '=');
         }
-        
+
         return result;
     }
 
@@ -138,16 +140,11 @@ namespace Extractor {
             return std::regex_search(line, FunctionRegex);
         }
 
-        bool IsSpecialFunction(const std::string& line, const std::string& className) {
-            std::smatch match;
-            if(std::regex_search(line, match, SpecialFunctionRegex)) {
-                return match[3] == className;
-            }
-            return false;
+        bool IsSpecialFunction(const std::string& line) {
+            return std::regex_search(line, SpecialFunctionRegex);
         }
 
-        FunctionData
-        ExtractFunction(std::string line, std::istream& stream, const std::string& ns, const std::string& className, Visibility visibility) {
+        FunctionData ExtractFunction(std::string line, std::istream& stream, const std::string& ns, const std::string& className, Visibility visibility) {
             auto combinedLine = JoinFunctionLine(line, stream);
             std::smatch match;
             Require::True(std::regex_search(combinedLine, match, FunctionRegex), "Failed to parse function.  Was IsAFunction run?");
@@ -157,14 +154,12 @@ namespace Extractor {
             return result;
         }
 
-        SpecialFunctionData
-        ExtractSpecialFunction(std::string line, std::istream& stream, const std::string& ns, const std::string& className, Visibility visibility) {
+        SpecialFunctionData ExtractSpecialFunction(std::string line, std::istream& stream, const std::string& ns, Visibility visibility) {
             auto combinedLine = JoinFunctionLine(line, stream);
             std::smatch match;
-            Require::True(std::regex_search(combinedLine, match, SpecialFunctionRegex),
-                          "Failed to parse special function.  Was IsSpecialFunction run?");
-            auto result = GetSpecialFunctionData(match, ns, className, visibility);
-            
+            Require::True(std::regex_search(combinedLine, match, SpecialFunctionRegex), "Failed to parse special function.  Was IsSpecialFunction run?");
+            auto result = GetSpecialFunctionData(match, ns, visibility);
+
             SkipBody(combinedLine.substr(match[0].length()), stream);
             return result;
         }

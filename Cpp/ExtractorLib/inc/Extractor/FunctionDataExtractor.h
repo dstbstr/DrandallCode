@@ -10,9 +10,9 @@
 namespace Extractor {
     namespace FunctionDataExtractor {
         bool IsAFunction(const std::string& line);
-        bool IsSpecialFunction(const std::string& line, const std::string& classname);
+        bool IsSpecialFunction(const std::string& line);
         FunctionData ExtractFunction(std::string line, std::istream& stream, const std::string& ns, const std::string& className, Visibility visibility);
-        SpecialFunctionData ExtractSpecialFunction(std::string line, std::istream& stream, const std::string& ns, const std::string& className, Visibility visibility);
+        SpecialFunctionData ExtractSpecialFunction(std::string line, std::istream& stream, const std::string& ns, Visibility visibility);
     } // namespace FunctionDataExtractor
 } // namespace Extractor
 #endif // __FUNCTIONDATAEXTRACTOR_H__

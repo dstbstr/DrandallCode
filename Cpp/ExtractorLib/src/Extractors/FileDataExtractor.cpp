@@ -5,6 +5,8 @@
 #include "Extractor/FunctionDataExtractor.h"
 #include "Extractor/NamespaceExtractor.h"
 #include "Extractor/TypeDataExtractor.h"
+#include "Instrumentation/Log.h"
+#include "Utilities/Format.h"
 #include "Utilities/PathUtilities.h"
 #include "Utilities/StringUtilities.h"
 
@@ -39,6 +41,7 @@ namespace Extractor {
         NamespaceExtractor namespaceExtractor;
 
         u64 nonBlankLines = 0;
+        u64 ignoredLines = 0;
         while(std::getline(stream, line)) {
             CommentExtractor::StripComments(line, isInBlockComment);
             auto trimmed = StrUtil::Trim(line);
@@ -46,8 +49,11 @@ namespace Extractor {
                 continue;
             }
             nonBlankLines++;
-            if(m_Settings.CountIncludes && std::regex_search(trimmed, match, IncludeRegex)) {
-                result.IncludeFiles.insert(match[1]);
+            if(std::regex_search(trimmed, match, IncludeRegex)) {
+                if(m_Settings.CountIncludes) {
+                    result.IncludeFiles.insert(match[1]);
+                }
+                continue;
             }
             if(!isHeader || (!m_Settings.ExtractTypes && !m_Settings.ExtractFunctions)) {
                 continue;
@@ -68,13 +74,24 @@ namespace Extractor {
                 auto type = TypeDataExtractor::Extract(trimmed, result.FileName, namespaceExtractor.GetNamespace(), stream);
                 result.Types.push_back(type);
             } else if(m_Settings.ExtractFunctions && FunctionDataExtractor::IsAFunction(trimmed)) {
-                result.FreeFunctions.push_back(
-                    FunctionDataExtractor::ExtractFunction(trimmed, stream, namespaceExtractor.GetNamespace(), "", Visibility::PUBLIC));
+                auto functionData = FunctionDataExtractor::ExtractFunction(trimmed, stream, namespaceExtractor.GetNamespace(), "", Visibility::PUBLIC);
+                if(!functionData.IsTemplated) {
+                    // template definitions have to be defined in the header file
+                    // we're potentially removing free template functions though :/
+                    result.FreeFunctions.push_back(functionData);
+                }
+            } else if(m_Settings.ExtractFunctions && FunctionDataExtractor::IsSpecialFunction(trimmed)) {
+                // inline constructor, should have already been declared, just need to skip through it
+                FunctionDataExtractor::ExtractSpecialFunction(trimmed, stream, "", Visibility::PUBLIC);
             } else if(std::regex_search(trimmed, CloseBlockRegex)) {
                 auto closeBraces = std::count(trimmed.begin(), trimmed.end(), '}');
                 for(int i = 0; i < closeBraces; i++) {
-                    namespaceExtractor.PopNamespace();
+                    try {
+                        namespaceExtractor.PopNamespace();
+                    } catch(std::exception e) { LOG_WARN(StrUtil::Format("Failed to pop namespace.  File %s, NonBlankLine %u", result.FileName, nonBlankLines)); }
                 }
+            } else {
+                ignoredLines++; // just for debugging
             }
         }
 
