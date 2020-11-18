@@ -6,12 +6,11 @@
 #include <regex>
 
 namespace {
-    std::regex TemplateRegex("<[^>]+>");
     std::regex FunctionRegex("^" // start of string
                              "(template<[^>]*>\\s*)?" // optional template
                              "((?:(?:virtual *)|(?:(?:__(force)?)?inline *)|(?:static *))*)?" // function prefixes
                              "(?:const *)?" // return type const
-                             "[\\w&\\*:\\[\\]<>]+\\s+" // return type with potential qualifification or reference
+                             "[\\w\\[\\]&\\*:<>]+[&\\*\\w\\]>]\\s+" // return type with potential qualifification or reference
                              "([\\w:]+)\\s*" // Function name
                              "\\(" // Start of parameters
                              "([^\\)]*)" // parameters
@@ -19,6 +18,7 @@ namespace {
                              "((?:(?:const *)|(?:final *)|(?:override *))*)?\\s*" // optional function modifiers
                              "(\\s*=\\s*0)?\\s*" // optional pure virtual indicator
                              ";?"); // optional declaration (instead of definition)
+    std::regex TemplateRegex("<[^>]+>");
     std::regex VirtualRegex("virtual");
     std::regex InlineRegex("(__(force)?)?inline");
     std::regex StaticRegex("static");
@@ -32,8 +32,10 @@ namespace {
     constexpr size_t PostfixIndex = 6;
     constexpr size_t AbstractIndex = 7;
 
-    Extractor::FunctionData GetFunctionData(std::smatch match, std::string className, Extractor::Visibility visibility) {
+    Extractor::FunctionData
+    GetFunctionData(std::smatch match, const std::string& ns, const std::string& className, Extractor::Visibility visibility) {
         Extractor::FunctionData result;
+        result.Namespace = ns;
         result.ClassName = className;
         result.Visibility = visibility;
 
@@ -101,11 +103,11 @@ namespace Extractor {
             return std::regex_search(line, FunctionRegex);
         }
 
-        FunctionData Extract(std::string line, std::istream& stream, std::string className, Visibility visibility) {
+        FunctionData Extract(std::string line, std::istream& stream, const std::string& ns, const std::string& className, Visibility visibility) {
             auto combinedLine = JoinFunctionLine(line, stream);
             std::smatch match;
             Require::True(std::regex_search(combinedLine, match, FunctionRegex), "Failed to parse type.  Was IsAFunction run?");
-            auto result = GetFunctionData(match, className, visibility);
+            auto result = GetFunctionData(match, ns, className, visibility);
 
             auto trimmed = StrUtil::Trim(combinedLine.substr(match[0].length()));
             auto nestingDepth = std::count(trimmed.begin(), trimmed.end(), '{');

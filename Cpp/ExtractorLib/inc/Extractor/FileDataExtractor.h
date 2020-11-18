@@ -8,7 +8,7 @@
 namespace Extractor {
     class FileDataExtractor : public IRunnable<FileData> {
     public:
-        explicit FileDataExtractor(std::string filePath, ExtractorSettings settings) : m_FilePath(filePath), m_Settings(settings) {}
+        FileDataExtractor(std::string filePath, ExtractorSettings settings) : m_FilePath(filePath), m_Settings(settings) {}
         FileDataExtractor(const FileDataExtractor&) = delete;
         FileDataExtractor& operator=(const FileDataExtractor&) = delete;
 

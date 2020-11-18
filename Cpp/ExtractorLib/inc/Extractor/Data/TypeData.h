@@ -10,6 +10,7 @@
 
 namespace Extractor {
     struct TypeData {
+        std::string Namespace;
         std::string ClassName;
         std::string FileName;
 

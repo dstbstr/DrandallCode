@@ -29,6 +29,7 @@
             "args": [
                 "-r",
                 "CommandParser",
+                "ExtractorLib",
                 "IncludeCounter",
                 "TypeCounter",
                 "Core"

@@ -80,6 +80,10 @@ namespace Extractor {
         ASSERT_TRUE(Run("class Foo : ::Bar::Baz"));
     }
 
+    TEST_F(IsATypeTest, TemplatedBaseClass) {
+        ASSERT_TRUE(Run("class Foo : Bar<Baz>"));
+    }
+
     TEST_F(IsATypeTest, VirtualInheritence) {
         ASSERT_TRUE(Run("class Foo : virtual Bar"));
     }
@@ -92,9 +96,10 @@ namespace Extractor {
     protected:
         std::stringstream ss;
         std::string m_FileName{"Test.h"};
+        std::string m_Namespace{"Testing"};
 
         TypeData Run(std::string firstLine) {
-            return TypeDataExtractor::Extract(firstLine, m_FileName, ss);
+            return TypeDataExtractor::Extract(firstLine, m_FileName, m_Namespace, ss);
         }
     };
 
@@ -106,6 +111,11 @@ namespace Extractor {
     TEST_F(ExtractTypeTest, PopulatesFileName) {
         auto result = Run("class Foo");
         ASSERT_EQ(result.FileName, m_FileName);
+    }
+
+    TEST_F(ExtractTypeTest, PopulatesNamespace) {
+        auto result = Run("class Foo");
+        ASSERT_EQ(result.Namespace, m_Namespace);
     }
 
     TEST_F(ExtractTypeTest, RecognizesClassType) {
@@ -130,6 +140,11 @@ namespace Extractor {
 
     TEST_F(ExtractTypeTest, CanExtractBaseClass) {
         auto result = Run("class Foo : Baz");
+        ASSERT_TRUE(result.HasBaseClass);
+    }
+
+    TEST_F(ExtractTypeTest, CanExtractTemplatedBaseClass) {
+        auto result = Run("class Foo : Bar<Baz>");
         ASSERT_TRUE(result.HasBaseClass);
     }
 
