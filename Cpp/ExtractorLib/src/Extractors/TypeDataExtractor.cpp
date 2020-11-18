@@ -9,7 +9,7 @@
 #include <regex>
 
 namespace {
-    std::regex TypeRegex("^(template<[^>]*> *)?" // optionally start with a template
+    std::regex TypeRegex("^(template *<[^>]*> *)?" // optionally start with a template
                          "((?:class)|(?:enum)|(?:struct)|(?:union))" // keyword
                          "\\s+(\\w+)\\s*" // identifier
                          "(:\\s*" // optional base class
@@ -99,15 +99,14 @@ namespace Extractor {
 
                 if(TypeDataExtractor::IsAType(trimmed)) {
                     // if using Egyptian braces, need to remove the open curly from above
-                    if(std::find(trimmed.begin(), trimmed.end(), '{') != trimmed.end() &&
-                       std::find(trimmed.begin(), trimmed.end(), '}') == trimmed.end()) {
+                    if(std::find(trimmed.begin(), trimmed.end(), '{') != trimmed.end() && std::find(trimmed.begin(), trimmed.end(), '}') == trimmed.end()) {
                         nestingDepth--;
                     }
                     result.InnerTypes.push_back(TypeDataExtractor::Extract(trimmed, fileName, ns, stream));
                 } else if(FunctionDataExtractor::IsAFunction(trimmed)) {
                     result.Functions.push_back(FunctionDataExtractor::ExtractFunction(trimmed, stream, ns, result.ClassName, currentVisibility));
-                } else if(FunctionDataExtractor::IsSpecialFunction(line, result.ClassName)) {
-                    result.SpecialFunctions.push_back(FunctionDataExtractor::ExtractSpecialFunction(line, stream, ns, result.ClassName, currentVisibility));
+                } else if(FunctionDataExtractor::IsSpecialFunction(line)) {
+                    result.SpecialFunctions.push_back(FunctionDataExtractor::ExtractSpecialFunction(line, stream, ns, currentVisibility));
                 } else if(trimmed[trimmed.length() - 1] == ';') {
                     // can we assume that this is a member variable?  What else is left?
                     switch(currentVisibility) {

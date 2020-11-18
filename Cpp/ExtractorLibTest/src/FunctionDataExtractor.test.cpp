@@ -135,6 +135,10 @@ namespace Extractor {
         ASSERT_TRUE(Run("template<> void Foo()"));
     }
 
+    TEST_F(IsFunctionTest, TemplateDefinition) {
+        ASSERT_TRUE(Run("template <class T> void Foo<T>::Bar()"));
+    }
+
     TEST_F(IsFunctionTest, InlineFunction) {
         ASSERT_TRUE(Run("inline void Foo()"));
     }
