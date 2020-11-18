@@ -3,6 +3,7 @@
 #include "Extractor/CommentExtractor.h"
 #include "Extractor/Data/Visibility.h"
 #include "Extractor/FunctionDataExtractor.h"
+#include "Extractor/NamespaceExtractor.h"
 #include "Extractor/TypeDataExtractor.h"
 #include "Utilities/PathUtilities.h"
 #include "Utilities/StringUtilities.h"
@@ -10,10 +11,10 @@
 #include <fstream>
 #include <regex>
 
-
 namespace {
     std::regex IncludeRegex("^#include [\"<]([^\">]+)[\">]$");
     std::regex TemplateRegex("^template<[^>]*>$");
+    std::regex CloseBlockRegex("^[\\} ]+$");
 } // namespace
 
 // TODO: Add functionality for global variables?
@@ -35,6 +36,7 @@ namespace Extractor {
         std::smatch match;
         bool isHeader = m_FilePath[m_FilePath.length() - 1] == 'h';
         bool isInBlockComment = false;
+        NamespaceExtractor namespaceExtractor;
 
         u64 nonBlankLines = 0;
         while(std::getline(stream, line)) {
@@ -59,11 +61,20 @@ namespace Extractor {
                 trimmed += StrUtil::Trim(line);
             }
 
+            if(namespaceExtractor.IsNamespace(trimmed)) {
+                namespaceExtractor.ExtractNamespace(trimmed);
+            }
             if(m_Settings.ExtractTypes && TypeDataExtractor::IsAType(trimmed)) {
-                auto type = TypeDataExtractor::Extract(trimmed, result.FileName, stream);
+                auto type = TypeDataExtractor::Extract(trimmed, result.FileName, namespaceExtractor.GetNamespace(), stream);
                 result.Types.push_back(type);
             } else if(m_Settings.ExtractFunctions && FunctionDataExtractor::IsAFunction(trimmed)) {
-                result.FreeFunctions.push_back(FunctionDataExtractor::Extract(trimmed, stream, "", Visibility::PUBLIC));
+                result.FreeFunctions.push_back(
+                    FunctionDataExtractor::Extract(trimmed, stream, namespaceExtractor.GetNamespace(), "", Visibility::PUBLIC));
+            } else if(std::regex_search(trimmed, CloseBlockRegex)) {
+                auto closeBraces = std::count(trimmed.begin(), trimmed.end(), '}');
+                for(int i = 0; i < closeBraces; i++) {
+                    namespaceExtractor.PopNamespace();
+                }
             }
         }
 

@@ -15,7 +15,7 @@ namespace {
                          "(:\\s*" // optional base class
                          "((?:public)|(?:protected)|(?:private))?\\s*" // optional scope of inheritence
                          "(?:virtual)?" // optional virtual inheritence
-                         "\\s*[\\w:]+)?" // base class name
+                         "\\s*[\\w:<>]+)?" // base class name
                          "\\s*((\\{[^\\}]*\\}?;?)|$)"); // can't end with a semicolon (may not have curly brace based on style)
 
     constexpr size_t TemplateIndex = 1;
@@ -56,10 +56,11 @@ namespace Extractor {
 
         // Should extract a type (class, struct, union, enum) from the provided stream (and initial line)
         // Would almost certainly break with something like class Foo{struct Bar{union Baz{};};}; (in a single line)
-        TypeData Extract(const std::string& initialLine, const std::string& fileName, std::istream& stream) {
+        TypeData Extract(const std::string& initialLine, const std::string& fileName, const std::string& ns, std::istream& stream) {
             std::smatch match;
             Require::True(std::regex_search(initialLine, match, TypeRegex), "Failed to parse type.  Was IsAType run?");
             auto result = GetTypeData(match, fileName);
+            result.Namespace = ns;
 
             if(std::find(initialLine.begin(), initialLine.end(), '}') != initialLine.end()) {
                 // single line declaration
@@ -102,9 +103,9 @@ namespace Extractor {
                        std::find(trimmed.begin(), trimmed.end(), '}') == trimmed.end()) {
                         nestingDepth--;
                     }
-                    result.InnerTypes.push_back(TypeDataExtractor::Extract(trimmed, fileName, stream));
+                    result.InnerTypes.push_back(TypeDataExtractor::Extract(trimmed, fileName, ns, stream));
                 } else if(FunctionDataExtractor::IsAFunction(trimmed)) {
-                    result.Functions.push_back(FunctionDataExtractor::Extract(trimmed, stream, result.ClassName, currentVisibility));
+                    result.Functions.push_back(FunctionDataExtractor::Extract(trimmed, stream, ns, result.ClassName, currentVisibility));
                 } else if(trimmed[trimmed.length() - 1] == ';') {
                     // can we assume that this is a member variable?  What else is left?
                     switch(currentVisibility) {

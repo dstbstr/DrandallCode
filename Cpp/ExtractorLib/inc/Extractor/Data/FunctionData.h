@@ -8,6 +8,7 @@
 
 namespace Extractor {
     struct FunctionData {
+        std::string Namespace;
         std::string ClassName;
         std::string FunctionName;
         Visibility Visibility;

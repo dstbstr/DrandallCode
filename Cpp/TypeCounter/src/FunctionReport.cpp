@@ -6,14 +6,16 @@
 
 #include <algorithm>
 
-constexpr char LineFormat[]{"%s,%s,%s,%u,%s,%s,%s,%s,%s,%s,%u\n"};
-constexpr char LineHeading[]{"Class Name,Function Name,Visibility,Airity,Const,Static,Inline,Virtual,Abstract,Templated,Default Parameters"};
+constexpr char LineFormat[]{"%s,%s,%s,%s,%u,%s,%s,%s,%s,%s,%s,%u\n"};
+constexpr char LineHeading[]{
+    "Namespace,Class Name,Function Name,Visibility,Airity,Const,Static,Inline,Virtual,Abstract,Templated,Default Parameters"};
 
 namespace TypeCounter {
     FunctionReport::ReportLine::ReportLine(Extractor::FunctionData data) : Data(data) {}
 
     std::string FunctionReport::ReportLine::ToString() const {
         return StrUtil::Format(LineFormat,
+                               Data.Namespace,
                                Data.ClassName,
                                Data.FunctionName,
                                Extractor::ToString(Data.Visibility),

@@ -6,9 +6,9 @@
 
 #include <algorithm>
 
-constexpr char LineFormat[]{"%s,%s,%s,%u,%u,%u,%u,%u,%u,%u\n"};
+constexpr char LineFormat[]{"%s,%s,%s,%s,%u,%u,%u,%u,%u,%u,%u\n"};
 constexpr char LineHeading[]{
-    "File Name,Type Name,Type,Public Data,Protected Data,Private Data,Public Methods,Protected Methods,Private Methods,Inner Types"};
+    "File Name,Namespace,Type Name,Type,Public Data,Protected Data,Private Data,Public Methods,Protected Methods,Private Methods,Inner Types"};
 
 namespace TypeCounter {
     TypeReport::ReportLine::ReportLine(Extractor::TypeData data) : Data(data) {
@@ -26,6 +26,7 @@ namespace TypeCounter {
     std::string TypeReport::ReportLine::ToString() const {
         return StrUtil::Format(LineFormat,
                                Data.FileName,
+                               Data.Namespace,
                                Data.ClassName,
                                Extractor::ToString(Data.TypeKind),
                                Data.PublicDataMemberCount,

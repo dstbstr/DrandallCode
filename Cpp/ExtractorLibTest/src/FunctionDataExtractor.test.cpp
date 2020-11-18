@@ -43,12 +43,24 @@ namespace Extractor {
         ASSERT_TRUE(Run("Bar::Baz Foo()"));
     }
 
+    TEST_F(IsFunctionTest, FunctionWithGlobalQualifiedTypeReturn) {
+        ASSERT_TRUE(Run("::Bar Foo()"));
+    }
+
     TEST_F(IsFunctionTest, FunctionWithTemplateReturn) {
         ASSERT_TRUE(Run("std::vector<int> Foo()"));
     }
 
     TEST_F(IsFunctionTest, FunctionWithArrayReturn) {
         ASSERT_TRUE(Run("int[] Foo()"));
+    }
+
+    TEST_F(IsFunctionTest, FunctionWithMultiDimensionalArrayReturn) {
+        ASSERT_TRUE(Run("int[][] Foo()"));
+    }
+
+    TEST_F(IsFunctionTest, FunctionWithPointerInReturnType) {
+        ASSERT_TRUE(Run("std::vector<int*> Foo()"));
     }
 
     TEST_F(IsFunctionTest, FunctionWithConstReturnValue) {
@@ -170,17 +182,18 @@ namespace Extractor {
     }
 
     TEST_F(IsFunctionTest, ConstructorInitializerIsNotAFunction) {
-        ASSERT_FALSE(Run("    : m_Files(files)"));
+        ASSERT_FALSE(Run(": m_Files(files)"));
     }
 
     class ExtractFunctionTest : public ::testing::Test {
     protected:
         FunctionData Run(std::string line) {
-            return FunctionDataExtractor::Extract(line, ss, m_ClassName, m_Visibility);
+            return FunctionDataExtractor::Extract(line, ss, m_Namespace, m_ClassName, m_Visibility);
         }
 
         std::stringstream ss;
         std::string m_ClassName{"className"};
+        std::string m_Namespace{"Testing"};
         Visibility m_Visibility{Visibility::PUBLIC};
     };
 
@@ -192,6 +205,11 @@ namespace Extractor {
     TEST_F(ExtractFunctionTest, SetsTheClassName) {
         auto result = Run("void Foo()");
         ASSERT_EQ(result.ClassName, m_ClassName);
+    }
+
+    TEST_F(ExtractFunctionTest, SetsTheNamespace) {
+        auto result = Run("void Foo()");
+        ASSERT_EQ(result.Namespace, m_Namespace);
     }
 
     TEST_F(ExtractFunctionTest, SetsTheVisibility) {
