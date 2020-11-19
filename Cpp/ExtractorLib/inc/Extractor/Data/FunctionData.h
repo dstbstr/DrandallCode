@@ -14,6 +14,7 @@ namespace Extractor {
         Visibility Visibility;
         u8 Airity{0};
         u8 DefaultParameterCount{0};
+        u64 LineCount{0};
         bool IsAbstract{false};
         bool IsConst{false};
         bool IsVirtual{false};

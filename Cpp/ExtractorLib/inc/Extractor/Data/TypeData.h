@@ -22,6 +22,7 @@ namespace Extractor {
         std::vector<SpecialFunctionData> SpecialFunctions;
         std::vector<TypeData> InnerTypes;
 
+        u64 LineCount{0};
         u16 PrivateDataMemberCount{0};
         u16 ProtectedDataMemberCount{0};
         u16 PublicDataMemberCount{0};

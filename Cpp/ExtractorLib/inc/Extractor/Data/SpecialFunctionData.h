@@ -12,6 +12,7 @@ namespace Extractor {
         Visibility Visibility;
         SpecialFunctionType Kind;
 
+        u64 LineCount{0};
         u8 Airity{0};
         u8 DefaultParameterCount{0};
 
