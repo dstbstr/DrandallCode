@@ -199,4 +199,31 @@ namespace Extractor {
         ASSERT_EQ(result.Airity, 2);
     }
 
+    TEST_F(ExtractSpecialFunctionTest, AtLeastOneLine) {
+        auto result = Run();
+        ASSERT_EQ(result.LineCount, 1);
+    }
+
+    TEST_F(ExtractSpecialFunctionTest, CountsEverythingBeforeCurliesAsOneLine) {
+        ss << R"(
+            : m_Int(3)
+            , m_Bool(false)
+
+            {}
+        )";
+
+        auto result = Run();
+        ASSERT_EQ(result.LineCount, 1);
+    }
+
+    TEST_F(ExtractSpecialFunctionTest, CountsLinesInBody) {
+        ss << R"({
+            int i = 0;
+
+            i++;
+        })";
+
+        auto result = Run();
+        ASSERT_EQ(result.LineCount, 5);
+    }
 } // namespace Extractor

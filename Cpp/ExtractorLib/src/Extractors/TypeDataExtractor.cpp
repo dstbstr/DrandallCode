@@ -61,6 +61,7 @@ namespace Extractor {
             Require::True(std::regex_search(initialLine, match, TypeRegex), "Failed to parse type.  Was IsAType run?");
             auto result = GetTypeData(match, fileName);
             result.Namespace = ns;
+            result.LineCount = 1;
 
             if(std::find(initialLine.begin(), initialLine.end(), '}') != initialLine.end()) {
                 // single line declaration
@@ -74,6 +75,7 @@ namespace Extractor {
             }
             bool isInBlockComment = false;
             u64 nestingDepth = std::count(initialLine.begin(), initialLine.end(), '{');
+            u64 lineCount = 0;
             std::string line;
             while(std::getline(stream, line)) {
                 CommentExtractor::StripComments(line, isInBlockComment);
@@ -82,6 +84,7 @@ namespace Extractor {
                     continue;
                 }
 
+                lineCount++;
                 nestingDepth += std::count(trimmed.begin(), trimmed.end(), '{');
                 nestingDepth -= std::count(trimmed.begin(), trimmed.end(), '}');
                 if(nestingDepth <= 0) {
@@ -102,11 +105,17 @@ namespace Extractor {
                     if(std::find(trimmed.begin(), trimmed.end(), '{') != trimmed.end() && std::find(trimmed.begin(), trimmed.end(), '}') == trimmed.end()) {
                         nestingDepth--;
                     }
-                    result.InnerTypes.push_back(TypeDataExtractor::Extract(trimmed, fileName, ns, stream));
+                    auto innerType = TypeDataExtractor::Extract(trimmed, fileName, ns, stream);
+                    result.InnerTypes.push_back(innerType);
+                    lineCount += innerType.LineCount - 1;
                 } else if(FunctionDataExtractor::IsAFunction(trimmed)) {
-                    result.Functions.push_back(FunctionDataExtractor::ExtractFunction(trimmed, stream, ns, result.ClassName, currentVisibility));
+                    auto function = FunctionDataExtractor::ExtractFunction(trimmed, stream, ns, result.ClassName, currentVisibility);
+                    result.Functions.push_back(function);
+                    lineCount += function.LineCount - 1;
                 } else if(FunctionDataExtractor::IsSpecialFunction(line)) {
-                    result.SpecialFunctions.push_back(FunctionDataExtractor::ExtractSpecialFunction(line, stream, ns, currentVisibility));
+                    auto function = FunctionDataExtractor::ExtractSpecialFunction(line, stream, ns, currentVisibility);
+                    result.SpecialFunctions.push_back(function);
+                    lineCount += function.LineCount - 1;
                 } else if(trimmed[trimmed.length() - 1] == ';') {
                     // can we assume that this is a member variable?  What else is left?
                     switch(currentVisibility) {
@@ -117,6 +126,7 @@ namespace Extractor {
                 }
             }
 
+            result.LineCount += lineCount;
             return result;
         }
 

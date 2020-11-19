@@ -262,4 +262,50 @@ namespace Extractor {
         Run("class Foo");
         ASSERT_EQ(ss.str(), original);
     }
+
+    TEST_F(ExtractTypeTest, AtLeastOneNonBlankLine) {
+        auto result = Run("class Foo{};");
+        ASSERT_EQ(result.LineCount, 1);
+    }
+
+    TEST_F(ExtractTypeTest, CountsNonBlankLines) {
+        ss << R"({
+            int a;
+
+
+            int b;
+        };)";
+        auto result = Run("class Foo");
+
+        ASSERT_EQ(result.LineCount, 5);
+    }
+
+    TEST_F(ExtractTypeTest, CountsLinesFromFunctions) {
+        ss << R"({
+            protected: bool Func() {
+                return true;
+            }
+
+            void Method() {
+                i++;
+            }
+        })";
+
+        auto result = Run("class Foo");
+        ASSERT_EQ(result.LineCount, 9);
+    }
+
+    TEST_F(ExtractTypeTest, CountsLinesFromInnerTypes) {
+        ss << R"({
+            public:
+            enum Stuff {
+                ONE,
+                TWO,
+                THREE
+            };
+        })";
+
+        auto result = Run("class Foo");
+        ASSERT_EQ(result.LineCount, 9);
+    }
 } // namespace Extractor

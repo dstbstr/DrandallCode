@@ -407,4 +407,22 @@ namespace Extractor {
         ASSERT_EQ(result.Airity, 2);
     }
 
+    TEST_F(ExtractFunctionTest, CountsNonBlankLinesInBody) {
+        ss << R"({
+            int a = 0;
+            
+            a++;
+            return true;
+            }
+        )";
+        auto result = Run("bool Foo()");
+
+        ASSERT_EQ(result.LineCount, 6);
+    }
+
+    TEST_F(ExtractFunctionTest, AtLeastOneNonBlankLine) {
+        auto result = Run("bool Foo();");
+
+        ASSERT_EQ(result.LineCount, 1);
+    }
 } // namespace Extractor

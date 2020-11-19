@@ -121,17 +121,20 @@ namespace {
         return result;
     }
 
-    void SkipBody(std::string line, std::istream& stream) {
+    u64 CountLinesInBody(std::string line, std::istream& stream) {
         auto trimmed = StrUtil::Trim(line);
         auto nestingDepth = std::count(trimmed.begin(), trimmed.end(), '{');
         nestingDepth -= std::count(trimmed.begin(), trimmed.end(), '}');
-
+        u64 lineCount = 0;
         std::string nextLine;
         while(nestingDepth > 0 && std::getline(stream, nextLine)) {
+            lineCount++;
             trimmed = StrUtil::Trim(nextLine);
             nestingDepth += std::count(trimmed.begin(), trimmed.end(), '{');
             nestingDepth -= std::count(trimmed.begin(), trimmed.end(), '}');
         }
+
+        return lineCount;
     }
 } // namespace
 
@@ -151,7 +154,8 @@ namespace Extractor {
             Require::True(std::regex_search(combinedLine, match, FunctionRegex), "Failed to parse function.  Was IsAFunction run?");
             auto result = GetFunctionData(match, ns, className, visibility);
 
-            SkipBody(combinedLine.substr(match[0].length()), stream);
+            u64 bodyLineCount = CountLinesInBody(combinedLine.substr(match[0].length()), stream);
+            result.LineCount = bodyLineCount + 1;
             return result;
         }
 
@@ -161,7 +165,8 @@ namespace Extractor {
             Require::True(std::regex_search(combinedLine, match, SpecialFunctionRegex), "Failed to parse special function.  Was IsSpecialFunction run?");
             auto result = GetSpecialFunctionData(match, ns, visibility);
 
-            SkipBody(combinedLine.substr(match[0].length()), stream);
+            u64 bodyLineCount = CountLinesInBody(combinedLine.substr(match[0].length()), stream);
+            result.LineCount = bodyLineCount + 1;
             return result;
         }
 
