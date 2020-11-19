@@ -67,6 +67,14 @@ namespace Extractor {
         ASSERT_TRUE(Run("const int& Foo()"));
     }
 
+    TEST_F(IsFunctionTest, FunctionWithPointerToConst) {
+        ASSERT_TRUE(Run("int const * Foo()"));
+    }
+
+    TEST_F(IsFunctionTest, FunctionWithConstPointerReturnValue) {
+        ASSERT_TRUE(Run("int* const Foo()"));
+    }
+
     TEST_F(IsFunctionTest, StaticFunction) {
         ASSERT_TRUE(Run("static void Foo()"));
     }
