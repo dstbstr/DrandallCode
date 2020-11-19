@@ -13,6 +13,7 @@ namespace {
                              "((?:(?:virtual *)|(?:(?:__(force)?)?inline *)|(?:static *))*)?" // function prefixes
                              "(?:const *)?" // return type const
                              "[\\w\\[\\]&\\*:<>]+[&\\*\\w\\]>]\\s+" // return type with potential qualifification or reference
+                             "(?: *const *)?[\\*&]?\\s*" // support RTL const
                              "([\\w:<>]+)\\s*" // Function name
                              "\\(" // Start of parameters
                              "([^\\)]*)" // parameters
