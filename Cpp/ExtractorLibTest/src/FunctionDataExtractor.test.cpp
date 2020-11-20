@@ -4,197 +4,192 @@
 #include "Utilities/StringUtilities.h"
 
 namespace Extractor {
-    class IsFunctionTest : public ::testing::Test {
-    protected:
-        bool Run(std::string line) {
-            return FunctionDataExtractor::IsAFunction(line);
-        }
-    };
+    using FunctionDataExtractor::IsAFunction;
 
-    TEST_F(IsFunctionTest, SimpleFunctionDeclaration) {
-        ASSERT_TRUE(Run("void Foo();"));
+    TEST(IsFunctionTest, SimpleFunctionDeclaration) {
+        ASSERT_TRUE(IsAFunction("void Foo();"));
     }
 
-    TEST_F(IsFunctionTest, SimpleFunctionDefinition) {
-        ASSERT_TRUE(Run("void Foo() {return;}"));
+    TEST(IsFunctionTest, SimpleFunctionDefinition) {
+        ASSERT_TRUE(IsAFunction("void Foo() {return;}"));
     }
 
-    TEST_F(IsFunctionTest, FunctionWithReturnValueDeclaration) {
-        ASSERT_TRUE(Run("int Foo();"));
+    TEST(IsFunctionTest, FunctionWithReturnValueDeclaration) {
+        ASSERT_TRUE(IsAFunction("int Foo();"));
     }
 
-    TEST_F(IsFunctionTest, FunctionWithReturnValueDefinition) {
-        ASSERT_TRUE(Run("int Foo() { return 4; }"));
+    TEST(IsFunctionTest, FunctionWithReturnValueDefinition) {
+        ASSERT_TRUE(IsAFunction("int Foo() { return 4; }"));
     }
 
-    TEST_F(IsFunctionTest, FunctionWithArgsOnSeparateLine) {
-        ASSERT_TRUE(Run("void Foo("));
+    TEST(IsFunctionTest, FunctionWithArgsOnSeparateLine) {
+        ASSERT_TRUE(IsAFunction("void Foo("));
     }
 
-    TEST_F(IsFunctionTest, FunctionWithReferenceReturn) {
-        ASSERT_TRUE(Run("int& Foo()"));
+    TEST(IsFunctionTest, FunctionWithReferenceReturn) {
+        ASSERT_TRUE(IsAFunction("int& Foo()"));
     }
 
-    TEST_F(IsFunctionTest, FunctionWithPointerReturn) {
-        ASSERT_TRUE(Run("int* Foo()"));
+    TEST(IsFunctionTest, FunctionWithPointerReturn) {
+        ASSERT_TRUE(IsAFunction("int* Foo()"));
     }
 
-    TEST_F(IsFunctionTest, FunctionWithNamespaceReturn) {
-        ASSERT_TRUE(Run("Bar::Baz Foo()"));
+    TEST(IsFunctionTest, FunctionWithNamespaceReturn) {
+        ASSERT_TRUE(IsAFunction("Bar::Baz Foo()"));
     }
 
-    TEST_F(IsFunctionTest, FunctionWithGlobalQualifiedTypeReturn) {
-        ASSERT_TRUE(Run("::Bar Foo()"));
+    TEST(IsFunctionTest, FunctionWithGlobalQualifiedTypeReturn) {
+        ASSERT_TRUE(IsAFunction("::Bar Foo()"));
     }
 
-    TEST_F(IsFunctionTest, FunctionWithTemplateReturn) {
-        ASSERT_TRUE(Run("std::vector<int> Foo()"));
+    TEST(IsFunctionTest, FunctionWithTemplateReturn) {
+        ASSERT_TRUE(IsAFunction("std::vector<int> Foo()"));
     }
 
-    TEST_F(IsFunctionTest, FunctionWithArrayReturn) {
-        ASSERT_TRUE(Run("int[] Foo()"));
+    TEST(IsFunctionTest, FunctionWithArrayReturn) {
+        ASSERT_TRUE(IsAFunction("int[] Foo()"));
     }
 
-    TEST_F(IsFunctionTest, FunctionWithMultiDimensionalArrayReturn) {
-        ASSERT_TRUE(Run("int[][] Foo()"));
+    TEST(IsFunctionTest, FunctionWithMultiDimensionalArrayReturn) {
+        ASSERT_TRUE(IsAFunction("int[][] Foo()"));
     }
 
-    TEST_F(IsFunctionTest, FunctionWithPointerInReturnType) {
-        ASSERT_TRUE(Run("std::vector<int*> Foo()"));
+    TEST(IsFunctionTest, FunctionWithPointerInReturnType) {
+        ASSERT_TRUE(IsAFunction("std::vector<int*> Foo()"));
     }
 
-    TEST_F(IsFunctionTest, FunctionWithConstReturnValue) {
-        ASSERT_TRUE(Run("const int& Foo()"));
+    TEST(IsFunctionTest, FunctionWithConstReturnValue) {
+        ASSERT_TRUE(IsAFunction("const int& Foo()"));
     }
 
-    TEST_F(IsFunctionTest, FunctionWithPointerToConst) {
-        ASSERT_TRUE(Run("int const * Foo()"));
+    TEST(IsFunctionTest, FunctionWithPointerToConst) {
+        ASSERT_TRUE(IsAFunction("int const * Foo()"));
     }
 
-    TEST_F(IsFunctionTest, FunctionWithConstPointerReturnValue) {
-        ASSERT_TRUE(Run("int* const Foo()"));
+    TEST(IsFunctionTest, FunctionWithConstPointerReturnValue) {
+        ASSERT_TRUE(IsAFunction("int* const Foo()"));
     }
 
-    TEST_F(IsFunctionTest, StaticFunction) {
-        ASSERT_TRUE(Run("static void Foo()"));
+    TEST(IsFunctionTest, StaticFunction) {
+        ASSERT_TRUE(IsAFunction("static void Foo()"));
     }
 
-    TEST_F(IsFunctionTest, VirtualFunction) {
-        ASSERT_TRUE(Run("virtual void Foo()"));
+    TEST(IsFunctionTest, VirtualFunction) {
+        ASSERT_TRUE(IsAFunction("virtual void Foo()"));
     }
 
-    TEST_F(IsFunctionTest, AbstractFunction) {
-        ASSERT_TRUE(Run("virtual void Foo() = 0;"));
+    TEST(IsFunctionTest, AbstractFunction) {
+        ASSERT_TRUE(IsAFunction("virtual void Foo() = 0;"));
     }
 
-    TEST_F(IsFunctionTest, OverrideFunction) {
-        ASSERT_TRUE(Run("void Foo() override"));
+    TEST(IsFunctionTest, OverrideFunction) {
+        ASSERT_TRUE(IsAFunction("void Foo() override"));
     }
 
-    TEST_F(IsFunctionTest, FinalFunction) {
-        ASSERT_TRUE(Run("void Foo() final"));
+    TEST(IsFunctionTest, FinalFunction) {
+        ASSERT_TRUE(IsAFunction("void Foo() final"));
     }
 
-    TEST_F(IsFunctionTest, SingleArgFunction) {
-        ASSERT_TRUE(Run("void Foo(int a)"));
+    TEST(IsFunctionTest, SingleArgFunction) {
+        ASSERT_TRUE(IsAFunction("void Foo(int a)"));
     }
 
-    TEST_F(IsFunctionTest, SingleQualifiedArgFunction) {
-        ASSERT_TRUE(Run("void Foo(std::string a)"));
+    TEST(IsFunctionTest, SingleQualifiedArgFunction) {
+        ASSERT_TRUE(IsAFunction("void Foo(std::string a)"));
     }
 
-    TEST_F(IsFunctionTest, SingleTemplatedArgFunction) {
-        ASSERT_TRUE(Run("void Foo(std::vector<int> a"));
+    TEST(IsFunctionTest, SingleTemplatedArgFunction) {
+        ASSERT_TRUE(IsAFunction("void Foo(std::vector<int> a"));
     }
 
-    TEST_F(IsFunctionTest, SingleMultiTemplateArgFunction) {
-        ASSERT_TRUE(Run("void Foo(std::unordered_map<int, int> a)"));
+    TEST(IsFunctionTest, SingleMultiTemplateArgFunction) {
+        ASSERT_TRUE(IsAFunction("void Foo(std::unordered_map<int, int> a)"));
     }
 
-    TEST_F(IsFunctionTest, SinglePointerArgFunction) {
-        ASSERT_TRUE(Run("void Foo(int* a)"));
+    TEST(IsFunctionTest, SinglePointerArgFunction) {
+        ASSERT_TRUE(IsAFunction("void Foo(int* a)"));
     }
 
-    TEST_F(IsFunctionTest, SingleReferenceArgFunction) {
-        ASSERT_TRUE(Run("void Foo(int& a)"));
+    TEST(IsFunctionTest, SingleReferenceArgFunction) {
+        ASSERT_TRUE(IsAFunction("void Foo(int& a)"));
     }
 
-    TEST_F(IsFunctionTest, SingleArrayArgFunction) {
-        ASSERT_TRUE(Run("void Foo(int[] a)"));
+    TEST(IsFunctionTest, SingleArrayArgFunction) {
+        ASSERT_TRUE(IsAFunction("void Foo(int[] a)"));
     }
 
-    TEST_F(IsFunctionTest, MultipleArgFunction) {
-        ASSERT_TRUE(Run("void Foo(int a, int b"));
+    TEST(IsFunctionTest, MultipleArgFunction) {
+        ASSERT_TRUE(IsAFunction("void Foo(int a, int b"));
     }
 
-    TEST_F(IsFunctionTest, DefaultParameterFunction) {
-        ASSERT_TRUE(Run("void Foo(int a = 3)"));
+    TEST(IsFunctionTest, DefaultParameterFunction) {
+        ASSERT_TRUE(IsAFunction("void Foo(int a = 3)"));
     }
 
-    TEST_F(IsFunctionTest, ArgsWithParensFunction) {
-        ASSERT_TRUE(Run("void Foo(int a = Bar())"));
+    TEST(IsFunctionTest, ArgsWithParensFunction) {
+        ASSERT_TRUE(IsAFunction("void Foo(int a = Bar())"));
     }
 
-    TEST_F(IsFunctionTest, TemplatedFunction) {
-        ASSERT_TRUE(Run("template<class T> void Foo()"));
+    TEST(IsFunctionTest, TemplatedFunction) {
+        ASSERT_TRUE(IsAFunction("template<class T> void Foo()"));
     }
 
-    TEST_F(IsFunctionTest, TemplateSpecializationFunction) {
-        ASSERT_TRUE(Run("template<> void Foo()"));
+    TEST(IsFunctionTest, TemplateSpecializationFunction) {
+        ASSERT_TRUE(IsAFunction("template<> void Foo()"));
     }
 
-    TEST_F(IsFunctionTest, TemplateDefinition) {
-        ASSERT_TRUE(Run("template <class T> void Foo<T>::Bar()"));
+    TEST(IsFunctionTest, TemplateDefinition) {
+        ASSERT_TRUE(IsAFunction("template <class T> void Foo<T>::Bar()"));
     }
 
-    TEST_F(IsFunctionTest, InlineFunction) {
-        ASSERT_TRUE(Run("inline void Foo()"));
+    TEST(IsFunctionTest, InlineFunction) {
+        ASSERT_TRUE(IsAFunction("inline void Foo()"));
     }
 
-    TEST_F(IsFunctionTest, UnderscoreInlineFunction) {
-        ASSERT_TRUE(Run("__inline void Foo()"));
+    TEST(IsFunctionTest, UnderscoreInlineFunction) {
+        ASSERT_TRUE(IsAFunction("__inline void Foo()"));
     }
 
-    TEST_F(IsFunctionTest, ForceInlineFunction) {
-        ASSERT_TRUE(Run("__forceinline void Foo()"));
+    TEST(IsFunctionTest, ForceInlineFunction) {
+        ASSERT_TRUE(IsAFunction("__forceinline void Foo()"));
     }
 
-    TEST_F(IsFunctionTest, StaticInlineFunction) {
-        ASSERT_TRUE(Run("static inline void Foo()"));
+    TEST(IsFunctionTest, StaticInlineFunction) {
+        ASSERT_TRUE(IsAFunction("static inline void Foo()"));
     }
 
-    TEST_F(IsFunctionTest, InlineStaticFunction) {
-        ASSERT_TRUE(Run("inline static void Foo()"));
+    TEST(IsFunctionTest, InlineStaticFunction) {
+        ASSERT_TRUE(IsAFunction("inline static void Foo()"));
     }
 
-    TEST_F(IsFunctionTest, VirtualInlineFunction) {
-        ASSERT_TRUE(Run("virtual inline void Foo()"));
+    TEST(IsFunctionTest, VirtualInlineFunction) {
+        ASSERT_TRUE(IsAFunction("virtual inline void Foo()"));
     }
 
-    TEST_F(IsFunctionTest, InlineVirtualFunction) {
-        ASSERT_TRUE(Run("inline virtual void Foo()"));
+    TEST(IsFunctionTest, InlineVirtualFunction) {
+        ASSERT_TRUE(IsAFunction("inline virtual void Foo()"));
     }
 
-    TEST_F(IsFunctionTest, ComplexFunction) {
+    TEST(IsFunctionTest, ComplexFunction) {
         // The following isn't a valid definition, but exercises about every available option
-        ASSERT_TRUE(Run("template<class T, class U> virtual static const Foo::Bar<Baz>& One::Two(const std::pair<int, int>& arg1, int arg2 = 3 "
-                        "const final override = 0"));
+        ASSERT_TRUE(IsAFunction("template<class T, class U> virtual static const Foo::Bar<Baz>& One::Two(const std::pair<int, int>& arg1, int arg2 = 3 "
+                                "const final override = 0"));
     }
 
-    TEST_F(IsFunctionTest, StatementIsNotAFunction) {
-        ASSERT_FALSE(Run("int i =0;"));
+    TEST(IsNotAFunctionTest, Statement) {
+        ASSERT_FALSE(IsAFunction("int i =0;"));
     }
 
-    TEST_F(IsFunctionTest, VariableDeclarationIsNotAFunction) {
-        ASSERT_FALSE(Run("int i;"));
+    TEST(IsNotAFunctionTest, VariableDeclaration) {
+        ASSERT_FALSE(IsAFunction("int i;"));
     }
 
-    TEST_F(IsFunctionTest, FunctionCallIsNotAFunction) {
-        ASSERT_FALSE(Run("int i = b();"));
+    TEST(IsNotAFunctionTest, FunctionCall) {
+        ASSERT_FALSE(IsAFunction("int i = b();"));
     }
 
-    TEST_F(IsFunctionTest, ConstructorInitializerIsNotAFunction) {
-        ASSERT_FALSE(Run(": m_Files(files)"));
+    TEST(IsNotAFunctionTest, ConstructorInitializer) {
+        ASSERT_FALSE(IsAFunction(": m_Files(files)"));
     }
 
     class ExtractFunctionTest : public ::testing::Test {

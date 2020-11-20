@@ -116,6 +116,10 @@ namespace Extractor {
                     auto function = FunctionDataExtractor::ExtractSpecialFunction(line, stream, ns, currentVisibility);
                     result.SpecialFunctions.push_back(function);
                     lineCount += function.LineCount - 1;
+                } else if(FunctionDataExtractor::IsOperatorOverload(line)) {
+                    auto function = FunctionDataExtractor::ExtractOperatorOverload(line, stream, ns, result.ClassName, currentVisibility);
+                    result.OperatorOverloads.push_back(function);
+                    lineCount += function.LineCount - 1;
                 } else if(trimmed[trimmed.length() - 1] == ';') {
                     // can we assume that this is a member variable?  What else is left?
                     switch(currentVisibility) {
