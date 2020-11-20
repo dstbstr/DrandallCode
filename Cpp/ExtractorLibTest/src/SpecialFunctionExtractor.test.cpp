@@ -3,77 +3,70 @@
 #include "Utilities/StringUtilities.h"
 
 namespace Extractor {
-    class IsSpecialFunctionTest : public ::testing::Test {
-    protected:
-        bool Run(std::string line) {
-            return FunctionDataExtractor::IsSpecialFunction(line);
-        }
-    };
+    using FunctionDataExtractor::IsSpecialFunction;
 
-    TEST_F(IsSpecialFunctionTest, BasicConstructorDeclaration) {
-        ASSERT_TRUE(Run("Foo();"));
+    TEST(IsSpecialFunctionTest, BasicConstructorDeclaration) {
+        ASSERT_TRUE(IsSpecialFunction("Foo();"));
     }
 
-    TEST_F(IsSpecialFunctionTest, BasicConstuctorDefinition) {
-        ASSERT_TRUE(Run("Foo() {}"));
+    TEST(IsSpecialFunctionTest, BasicConstuctorDefinition) {
+        ASSERT_TRUE(IsSpecialFunction("Foo() {}"));
     }
 
-    TEST_F(IsSpecialFunctionTest, VirtualConstructor) {
-        ASSERT_TRUE(Run("virtual Foo()"));
+    TEST(IsSpecialFunctionTest, VirtualConstructor) {
+        ASSERT_TRUE(IsSpecialFunction("virtual Foo()"));
     }
 
-    TEST_F(IsSpecialFunctionTest, ConstructorWithSplitArgs) {
-        ASSERT_TRUE(Run("Foo("));
+    TEST(IsSpecialFunctionTest, ConstructorWithSplitArgs) {
+        ASSERT_TRUE(IsSpecialFunction("Foo("));
     }
 
-    TEST_F(IsSpecialFunctionTest, ConstructorWithArgs) {
-        ASSERT_TRUE(Run("Foo(int a, int b);"));
+    TEST(IsSpecialFunctionTest, ConstructorWithArgs) {
+        ASSERT_TRUE(IsSpecialFunction("Foo(int a, int b);"));
     }
 
-    TEST_F(IsSpecialFunctionTest, DefaultConstructor) {
-        ASSERT_TRUE(Run("Foo() = default;"));
+    TEST(IsSpecialFunctionTest, DefaultConstructor) {
+        ASSERT_TRUE(IsSpecialFunction("Foo() = default;"));
     }
 
-    TEST_F(IsSpecialFunctionTest, DeletedConstructor) {
-        ASSERT_TRUE(Run("Foo() = delete;"));
+    TEST(IsSpecialFunctionTest, DeletedConstructor) {
+        ASSERT_TRUE(IsSpecialFunction("Foo() = delete;"));
     }
 
-    TEST_F(IsSpecialFunctionTest, BasicDestructorDeclaration) {
-        ASSERT_TRUE(Run("~Foo();"));
+    TEST(IsSpecialFunctionTest, BasicDestructorDeclaration) {
+        ASSERT_TRUE(IsSpecialFunction("~Foo();"));
     }
 
-    TEST_F(IsSpecialFunctionTest, BasicDestructorDefinition) {
-        ASSERT_TRUE(Run("~Foo() {}"));
+    TEST(IsSpecialFunctionTest, BasicDestructorDefinition) {
+        ASSERT_TRUE(IsSpecialFunction("~Foo() {}"));
     }
 
-    TEST_F(IsSpecialFunctionTest, VirtualDestructor) {
-        ASSERT_TRUE(Run("virtual ~Foo()"));
+    TEST(IsSpecialFunctionTest, VirtualDestructor) {
+        ASSERT_TRUE(IsSpecialFunction("virtual ~Foo()"));
     }
 
-    TEST_F(IsSpecialFunctionTest, InlineTemplateDefinitionIsSpecial) {
-        ASSERT_TRUE(Run("template <typename T> Foo<T>::Foo()"));
+    TEST(IsSpecialFunctionTest, InlineTemplateDefinitionIsSpecial) {
+        ASSERT_TRUE(IsSpecialFunction("template <typename T> Foo<T>::Foo()"));
     }
 
-    TEST_F(IsSpecialFunctionTest, InlineTemplateQualifiedDestructorIsSpecial) {
-        ASSERT_TRUE(Run("template <typename T> Foo<T>::~Foo()"));
+    TEST(IsSpecialFunctionTest, InlineTemplateQualifiedDestructorIsSpecial) {
+        ASSERT_TRUE(IsSpecialFunction("template <typename T> Foo<T>::~Foo()"));
     }
 
-    TEST_F(IsSpecialFunctionTest, StaticConstructorNotSpecial) {
-        ASSERT_FALSE(Run("Foo CreateClass();"));
+    TEST(IsSpecialFunctionTest, ExplicitConstructor) {
+        ASSERT_TRUE(IsSpecialFunction("explicit Foo(int i);"));
+    }
+
+    TEST(IsSpecialFunctionTest, StaticConstructorNotSpecial) {
+        ASSERT_FALSE(IsSpecialFunction("Foo CreateClass();"));
     }
 
     class ExtractSpecialFunctionTest : public ::testing::Test {
     protected:
-        SpecialFunctionData RunLine(std::string line) {
+        SpecialFunctionData Extract() {
+            std::string line;
+            std::getline(ss, line);
             return FunctionDataExtractor::ExtractSpecialFunction(line, ss, m_Namespace, m_Visibility);
-        }
-
-        SpecialFunctionData RunArgs(std::string args) {
-            return FunctionDataExtractor::ExtractSpecialFunction("Foo(" + args + ")", ss, m_Namespace, m_Visibility);
-        }
-
-        SpecialFunctionData Run() {
-            return FunctionDataExtractor::ExtractSpecialFunction("Foo()", ss, m_Namespace, m_Visibility);
         }
 
         std::stringstream ss;
@@ -82,105 +75,131 @@ namespace Extractor {
     };
 
     TEST_F(ExtractSpecialFunctionTest, PopulatesClassName) {
-        auto result = RunLine("Foo();");
+        ss << "Foo();";
+        auto result = Extract();
         ASSERT_EQ(result.ClassName, "Foo");
     }
 
     TEST_F(ExtractSpecialFunctionTest, PopulatesNamespace) {
-        auto result = Run();
+        ss << "Foo();";
+        auto result = Extract();
         ASSERT_EQ(result.Namespace, m_Namespace);
     }
 
     TEST_F(ExtractSpecialFunctionTest, PopulatesVisibility) {
-        auto result = Run();
+        ss << "Foo();";
+        auto result = Extract();
         ASSERT_EQ(result.Visibility, m_Visibility);
     }
 
     TEST_F(ExtractSpecialFunctionTest, RecognizesVirtual) {
-        auto result = RunLine("virtual Foo();");
+        ss << "virtual Foo();";
+        auto result = Extract();
         ASSERT_TRUE(result.IsVirtual);
     }
 
     TEST_F(ExtractSpecialFunctionTest, NonVirtualIsNotCalledVirtual) {
-        auto result = Run();
+        ss << "Foo();";
+        auto result = Extract();
         ASSERT_FALSE(result.IsVirtual);
     }
 
+    TEST_F(ExtractSpecialFunctionTest, ExplicitConstructorIsExplicit) {
+        ss << "explicit Foo();";
+        auto result = Extract();
+        ASSERT_TRUE(result.IsExplicit);
+    }
+
+    TEST_F(ExtractSpecialFunctionTest, NonExplicitConstructorIsNotExplicit) {
+        ss << "Foo();";
+        auto result = Extract();
+        ASSERT_FALSE(result.IsExplicit);
+    }
+
     TEST_F(ExtractSpecialFunctionTest, SingleArgHasAirityOfOne) {
-        auto result = RunArgs("int a");
+        ss << "Foo(int a);";
+        auto result = Extract();
         ASSERT_EQ(result.Airity, 1);
     }
 
     TEST_F(ExtractSpecialFunctionTest, ZeroArgsHasAirityOfZero) {
-        auto result = Run();
+        ss << "Foo();";
+        auto result = Extract();
         ASSERT_EQ(result.Airity, 0);
     }
 
     TEST_F(ExtractSpecialFunctionTest, TwoArgsHasAirityOfTwo) {
-        auto result = RunArgs("int a, int b");
+        ss << "Foo(int a, int b);";
+        auto result = Extract();
         ASSERT_EQ(result.Airity, 2);
     }
 
     TEST_F(ExtractSpecialFunctionTest, SingleArgWithMultiTemplateHasAirityOfOne) {
-        auto result = RunArgs("std::pair<int, int> p");
+        ss << "Foo(std::pair<int, int> p);";
+        auto result = Extract();
         ASSERT_EQ(result.Airity, 1);
     }
 
     TEST_F(ExtractSpecialFunctionTest, SingleArgWithTemplateHasAirityOfOne) {
-        auto result = RunArgs("std::vector<int> v");
+        ss << "Foo(std::vector<int> v);";
+        auto result = Extract();
         ASSERT_EQ(result.Airity, 1);
     }
 
     TEST_F(ExtractSpecialFunctionTest, NoDefaultArgsHasDefaultArgCountOfZero) {
-        auto result = Run();
+        ss << "Foo();";
+        auto result = Extract();
         ASSERT_EQ(result.DefaultParameterCount, 0);
     }
 
     TEST_F(ExtractSpecialFunctionTest, SingleDefaultArgHasDefaultArgCountOfOne) {
-        auto result = RunArgs("int a = 3");
+        ss << "Foo(int a = 3);";
+        auto result = Extract();
         ASSERT_EQ(result.DefaultParameterCount, 1);
     }
 
     TEST_F(ExtractSpecialFunctionTest, RemovesFunctionBodyFromStream) {
-        ss << R"({
+        ss << R"(Foo()
+            {
                 return true;
             })";
 
-        Run();
+        Extract();
         std::string line;
         ASSERT_FALSE(std::getline(ss, line)) << line;
     }
 
     TEST_F(ExtractSpecialFunctionTest, RemovesFunctionBodyFromStreamWithEgyptionBraces) {
-        ss << R"(
+        ss << R"(Foo() {
                 return true;
             })";
 
-        RunLine("Foo() {");
+        Extract();
         std::string line;
         ASSERT_FALSE(std::getline(ss, line));
     }
 
     TEST_F(ExtractSpecialFunctionTest, DoesNotAlterOriginalStream) {
-        ss << R"({
+        ss << R"(Foo() {
                 return true;
             })";
         std::string original = ss.str();
-        Run();
+        Extract();
         ASSERT_EQ(ss.str(), original);
     }
 
     TEST_F(ExtractSpecialFunctionTest, DoesNotRemoveLinesIfDefinitionIsOnASingleLine) {
-        ss << "Testing";
-        RunLine("Foo() {}");
+        ss << R"(Foo() {}
+        Testing;)";
+        Extract();
 
         std::string line;
         ASSERT_TRUE(std::getline(ss, line));
-        ASSERT_EQ(line, "Testing");
+        ASSERT_EQ(StrUtil::Trim(line), "Testing;");
     }
 
     TEST_F(ExtractSpecialFunctionTest, CombinesMultipleParameterLines) {
-        ss << R"(
+        ss << R"(Foo(
                 int a,
                 int b
                 )
@@ -188,42 +207,44 @@ namespace Extractor {
                     return true;
                 })";
 
-        auto result = RunLine("Foo(");
+        auto result = Extract();
         std::string line;
         ASSERT_FALSE(std::getline(ss, line));
         ASSERT_EQ(result.Airity, 2);
     }
 
     TEST_F(ExtractSpecialFunctionTest, RemovesCommentsFromParameters) {
-        auto result = RunLine("Foo(int a /*1, 3, or 5*/, int b /*2, 4, or 6*/);");
+        ss << "Foo(int a /*1, 3, or 5*/, int b /* = 2 */);";
+        auto result = Extract();
         ASSERT_EQ(result.Airity, 2);
     }
 
     TEST_F(ExtractSpecialFunctionTest, AtLeastOneLine) {
-        auto result = Run();
+        ss << "Foo();";
+        auto result = Extract();
         ASSERT_EQ(result.LineCount, 1);
     }
 
     TEST_F(ExtractSpecialFunctionTest, CountsEverythingBeforeCurliesAsOneLine) {
-        ss << R"(
+        ss << R"(Foo()
             : m_Int(3)
             , m_Bool(false)
 
             {}
         )";
 
-        auto result = Run();
+        auto result = Extract();
         ASSERT_EQ(result.LineCount, 1);
     }
 
     TEST_F(ExtractSpecialFunctionTest, CountsLinesInBody) {
-        ss << R"({
+        ss << R"(Foo() {
             int i = 0;
 
             i++;
         })";
 
-        auto result = Run();
+        auto result = Extract();
         ASSERT_EQ(result.LineCount, 5);
     }
 } // namespace Extractor

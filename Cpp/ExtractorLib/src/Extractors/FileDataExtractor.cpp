@@ -73,6 +73,7 @@ namespace Extractor {
             if(m_Settings.ExtractTypes && TypeDataExtractor::IsAType(trimmed)) {
                 auto type = TypeDataExtractor::Extract(trimmed, result.FileName, namespaceExtractor.GetNamespace(), stream);
                 result.Types.push_back(type);
+                nonBlankLines += type.LineCount - 1;
             } else if(m_Settings.ExtractFunctions && FunctionDataExtractor::IsAFunction(trimmed)) {
                 auto functionData = FunctionDataExtractor::ExtractFunction(trimmed, stream, namespaceExtractor.GetNamespace(), "", Visibility::PUBLIC);
                 if(!functionData.IsTemplated) {
@@ -80,9 +81,15 @@ namespace Extractor {
                     // we're potentially removing free template functions though :/
                     result.FreeFunctions.push_back(functionData);
                 }
+                nonBlankLines += functionData.LineCount - 1;
             } else if(m_Settings.ExtractFunctions && FunctionDataExtractor::IsSpecialFunction(trimmed)) {
                 // inline constructor, should have already been declared, just need to skip through it
-                FunctionDataExtractor::ExtractSpecialFunction(trimmed, stream, "", Visibility::PUBLIC);
+                auto function = FunctionDataExtractor::ExtractSpecialFunction(trimmed, stream, "", Visibility::PUBLIC);
+                nonBlankLines += function.LineCount - 1;
+            } else if(m_Settings.ExtractFunctions && FunctionDataExtractor::IsOperatorOverload(trimmed)) {
+                auto function = FunctionDataExtractor::ExtractOperatorOverload(trimmed, stream, namespaceExtractor.GetNamespace(), "", Visibility::PUBLIC);
+                result.FreeOperatorOverloads.push_back(function);
+                nonBlankLines += function.LineCount - 1;
             } else if(std::regex_search(trimmed, CloseBlockRegex)) {
                 auto closeBraces = std::count(trimmed.begin(), trimmed.end(), '}');
                 for(int i = 0; i < closeBraces; i++) {
