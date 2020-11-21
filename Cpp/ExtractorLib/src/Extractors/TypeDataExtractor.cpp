@@ -3,6 +3,7 @@
 #include "Extractor/CommentExtractor.h"
 #include "Extractor/FunctionDataExtractor.h"
 #include "Extractor/VisibilityExtractor.h"
+#include "Extractor/Private/LineFetcher.h"
 #include "Utilities/Require.h"
 #include "Utilities/StringUtilities.h"
 
@@ -73,43 +74,36 @@ namespace Extractor {
             if(result.TypeKind == TypeKeyword::CLASS) {
                 currentVisibility = Visibility::PRIVATE;
             }
-            bool isInBlockComment = false;
             u64 nestingDepth = std::count(initialLine.begin(), initialLine.end(), '{');
             u64 lineCount = 0;
             std::string line;
-            while(std::getline(stream, line)) {
-                CommentExtractor::StripComments(line, isInBlockComment);
-                auto trimmed = StrUtil::Trim(line);
-                if(trimmed == "") {
-                    continue;
-                }
-
+            while(LineFetcher::GetNextLine(stream, line)) {
                 lineCount++;
-                nestingDepth += std::count(trimmed.begin(), trimmed.end(), '{');
-                nestingDepth -= std::count(trimmed.begin(), trimmed.end(), '}');
+                nestingDepth += std::count(line.begin(), line.end(), '{');
+                nestingDepth -= std::count(line.begin(), line.end(), '}');
                 if(nestingDepth <= 0) {
                     // TODO: If this is the first line, remove the class bits
                     break; // Yay, we found the closing curly
                 }
 
-                if(VisibilityExtractor::HasVisibility(trimmed)) {
-                    currentVisibility = VisibilityExtractor::ExtractVisibility(trimmed);
-                    trimmed = StrUtil::Trim(trimmed);
-                    if(trimmed == "") {
+                if(VisibilityExtractor::HasVisibility(line)) {
+                    currentVisibility = VisibilityExtractor::ExtractVisibility(line);
+                    line = StrUtil::Trim(line);
+                    if(line == "") {
                         continue;
                     }
                 }
 
-                if(TypeDataExtractor::IsAType(trimmed)) {
+                if(TypeDataExtractor::IsAType(line)) {
                     // if using Egyptian braces, need to remove the open curly from above
-                    if(std::find(trimmed.begin(), trimmed.end(), '{') != trimmed.end() && std::find(trimmed.begin(), trimmed.end(), '}') == trimmed.end()) {
+                    if(std::find(line.begin(), line.end(), '{') != line.end() && std::find(line.begin(), line.end(), '}') == line.end()) {
                         nestingDepth--;
                     }
-                    auto innerType = TypeDataExtractor::Extract(trimmed, fileName, ns, stream);
+                    auto innerType = TypeDataExtractor::Extract(line, fileName, ns, stream);
                     result.InnerTypes.push_back(innerType);
                     lineCount += innerType.LineCount - 1;
-                } else if(FunctionDataExtractor::IsAFunction(trimmed)) {
-                    auto function = FunctionDataExtractor::ExtractFunction(trimmed, stream, ns, result.ClassName, currentVisibility);
+                } else if(FunctionDataExtractor::IsAFunction(line)) {
+                    auto function = FunctionDataExtractor::ExtractFunction(line, stream, ns, result.ClassName, currentVisibility);
                     result.Functions.push_back(function);
                     lineCount += function.LineCount - 1;
                 } else if(FunctionDataExtractor::IsSpecialFunction(line)) {
@@ -120,7 +114,7 @@ namespace Extractor {
                     auto function = FunctionDataExtractor::ExtractOperatorOverload(line, stream, ns, result.ClassName, currentVisibility);
                     result.OperatorOverloads.push_back(function);
                     lineCount += function.LineCount - 1;
-                } else if(trimmed[trimmed.length() - 1] == ';') {
+                } else if(line[line.length() - 1] == ';') {
                     // can we assume that this is a member variable?  What else is left?
                     switch(currentVisibility) {
                     case Visibility::PUBLIC: result.PublicDataMemberCount++; break;

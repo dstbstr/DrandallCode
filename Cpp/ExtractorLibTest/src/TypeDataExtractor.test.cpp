@@ -326,6 +326,14 @@ namespace Extractor {
         })";
 
         auto result = Extract();
-        ASSERT_EQ(result.LineCount, 9);
+        ASSERT_EQ(result.LineCount, 5);
+        /*
+        translates to:
+        class Foo { //1
+            public: enum Stuff { //2
+                ONE, TWO, THREE }; //3
+            }; //4
+        } //5
+        */
     }
 } // namespace Extractor
