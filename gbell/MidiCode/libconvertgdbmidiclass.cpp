@@ -12,6 +12,20 @@
 #include "libmidiclass.h"
 #define HDRSIZ 8
 
+//in general, I think this file could be broken into a few different responsibilities
+//  - Warning/Errors
+//  - Parsing the command line arguments
+//  - Reading the data from a file (deserialization)
+//  - Writing the data to a file (serialization)
+//  - Notes
+//  - Tracks
+//  - Key Signatures
+//  - etc.
+//I think it would be an interesting challenge to abstract away platform specific things (like unistd, arpa/inet, and strings.h) so that I could
+//compile it on my machine.  Then if you're interested, we could introduce you to automated testing by getting some of these methods tested.
+//Also, I think that this file will get smaller if you start working with strings. :)
+
+//would consider moving these to a separate file
 void
 error(const char *str)
 
@@ -32,7 +46,7 @@ void
 warning(const char *str)
 
 {
-    perror(str);
+    perror(str); //it seems odd to me that error uses fprintf, fatal uses perror, and warning uses perror.  Should this be fprintf?
 }
 
 void
@@ -68,9 +82,19 @@ parsekey(char *arg,keysig &keystr,track *tp)
     int dp = 0;
     int type = 1;
 
+    //you may consider grouping these conditions together
+    //if(!strcmp(arg,"Cb") || !strcmp(arg,"cb")) {
+    //  keystr.fltstrp = htons(-7)/256;
+    //  keystr.majmin = arg[0] < 'a' ? 0 : htons(1)/256;
+    //}
+
+    // If I understadn correctly, the htons is changing it for endian sake.
+    // Not sure if that's because you're sending it over to the device,
+    // but you may consider pulling that into something which serializes/sends messages
+    // rather than in the key signature
     if (!strcmp(arg,"Cb")) {
         keystr.fltshrp = htons(-7)/256;
-        keystr.majmin = 0;
+        keystr.majmin = 0; //is this supposed to essentially be a bool?
     }
     if (!strcmp(arg,"Fb")) {
         keystr.fltshrp = htons(-6)/256;
@@ -130,7 +154,7 @@ parsekey(char *arg,keysig &keystr,track *tp)
     }
     if (!strcmp(arg,"ab")) {
         keystr.fltshrp = htons(-7)/256;
-        keystr.majmin = htons(1)/256;
+        keystr.majmin = htons(1)/256; //you may consider turning this into a constant.  static char MinorKey = htons(1)/256;
     }
     if (!strcmp(arg,"db")) {
         keystr.fltshrp = htons(-6)/256;
@@ -191,6 +215,8 @@ parsekey(char *arg,keysig &keystr,track *tp)
     trkfill(tp,&dp,1,&keystr,5,type);
 }
 
+//if I'm reading this method correctly, I might call it 'split'
+//you can see an example C++ implementation in my StringUtilities file
 int
 parselin(char *line,char parsechr,char *&arg1,char *&arg2)
 
@@ -588,7 +614,7 @@ parselen(char *arg,track *tp)
 }
 
 void
-parsestuff(char *arg,track *tp,void (*parse)(char *,track *,int))
+parsestuff(char *arg,track *tp,void (*parse)(char *,track *,int)) //great descriptive name here. :)
 
 {
     int notelen;
