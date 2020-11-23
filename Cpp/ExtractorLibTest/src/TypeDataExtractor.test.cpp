@@ -328,4 +328,13 @@ namespace Extractor {
         auto result = Extract();
         ASSERT_EQ(result.LineCount, 9);
     }
+
+    TEST_F(ExtractTypeTest, ExtractsInterfaces) {
+        ss << R"(interface IUserInterface
+        : public UserInterfaceAudioPlayback
+        , public Core::ISystemDependency
+        , public UIInputHandler
+        {
+        };)";
+    }
 } // namespace Extractor

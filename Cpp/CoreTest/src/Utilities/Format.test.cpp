@@ -25,3 +25,12 @@ TEST(Format, WorksWithStdStrings) {
 
     ASSERT_EQ(result, myString);
 }
+
+TEST(Format, WorksWithConstStdStringRefs) {
+    std::string myString = "test";
+    const std::string& myRef = myString;
+
+    auto result = StrUtil::Format("%s", myRef);
+
+    ASSERT_EQ(result, myString);
+}

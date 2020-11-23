@@ -10,7 +10,7 @@
 
 namespace {
     std::regex TypeRegex("^(template *<[^>]*> *)?" // optionally start with a template
-                         "((?:class)|(?:enum)|(?:struct)|(?:union))" // keyword
+                         "((?:class)|(?:enum)|(?:struct)|(?:union)|(?:interface))" // keyword
                          "\\s+(\\w+)\\s*" // identifier
                          "(:\\s*" // optional base class
                          "((?:public)|(?:protected)|(?:private))?\\s*" // optional scope of inheritence
@@ -34,7 +34,7 @@ namespace {
         auto typeStr = match[TypeIndex];
         if(typeStr == "class") {
             result.TypeKind = Extractor::TypeKeyword::CLASS;
-        } else if(typeStr == "struct") {
+        } else if(typeStr == "struct" || typeStr == "interface") {
             result.TypeKind = Extractor::TypeKeyword::STRUCT;
         } else if(typeStr == "union") {
             result.TypeKind = Extractor::TypeKeyword::UNION;
