@@ -8,6 +8,7 @@
 #include <errno.h>
 #include <arpa/inet.h>
 #include <strings.h>
+#include <ctype.h>
 #include "midiclass.h"
 #include "libmidiclass.h"
 #define HDRSIZ 8
@@ -82,136 +83,75 @@ parsekey(char *arg,keysig &keystr,track *tp)
     int dp = 0;
     int type = 1;
 
-    //you may consider grouping these conditions together
-    //if(!strcmp(arg,"Cb") || !strcmp(arg,"cb")) {
-    //  keystr.fltstrp = htons(-7)/256;
-    //  keystr.majmin = arg[0] < 'a' ? 0 : htons(1)/256;
-    //}
+    if (!strcmp(arg,"Cb"))
+        keystr.fltshrp = -7;
+    if (!strcmp(arg,"Fb"))
+        keystr.fltshrp = -6;
+    if (!strcmp(arg,"Db"))
+        keystr.fltshrp = -5;
+    if (!strcmp(arg,"Ab")) 
+        keystr.fltshrp = -4;
+    if (!strcmp(arg,"Eb"))
+        keystr.fltshrp = -3;
+    if (!strcmp(arg,"Bb"))
+        keystr.fltshrp = -2;
+    if (!strcmp(arg,"F"))
+        keystr.fltshrp = -1;
+    if (!strcmp(arg,"C"))
+        keystr.fltshrp = 0;
+    if (!strcmp(arg,"G"))
+        keystr.fltshrp = 1;
+    if (!strcmp(arg,"D"))
+        keystr.fltshrp = 2;
+    if (!strcmp(arg,"A"))
+        keystr.fltshrp = 3;
+    if (!strcmp(arg,"E"))
+        keystr.fltshrp = 4;
+    if (!strcmp(arg,"B"))
+        keystr.fltshrp = 5;
+    if (!strcmp(arg,"F#"))
+        keystr.fltshrp = 6;
+    if (!strcmp(arg,"C#"))
+        keystr.fltshrp = 7;
+    if (!strcmp(arg,"ab"))
+        keystr.fltshrp = -7;
+    if (!strcmp(arg,"db"))
+        keystr.fltshrp = -6;
+    if (!strcmp(arg,"bb"))
+        keystr.fltshrp = -5;
+    if (!strcmp(arg,"f"))
+        keystr.fltshrp = -4;
+    if (!strcmp(arg,"c"))
+        keystr.fltshrp = -3;
+    if (!strcmp(arg,"g"))
+        keystr.fltshrp = -2;
+    if (!strcmp(arg,"d"))
+        keystr.fltshrp = -1;
+    if (!strcmp(arg,"a"))
+        keystr.fltshrp = 0;
+    if (!strcmp(arg,"e"))
+        keystr.fltshrp = 1;
+    if (!strcmp(arg,"b"))
+        keystr.fltshrp = 2;
+    if (!strcmp(arg,"f#"))
+        keystr.fltshrp = 3;
+    if (!strcmp(arg,"c#"))
+        keystr.fltshrp = 4;
+    if (!strcmp(arg,"g#"))
+        keystr.fltshrp = 5;
+    if (!strcmp(arg,"d#"))
+        keystr.fltshrp = 6;
+    if (!strcmp(arg,"a#"))
+        keystr.fltshrp = 7;
 
-    // If I understadn correctly, the htons is changing it for endian sake.
-    // Not sure if that's because you're sending it over to the device,
-    // but you may consider pulling that into something which serializes/sends messages
-    // rather than in the key signature
-    if (!strcmp(arg,"Cb")) {
-        keystr.fltshrp = htons(-7)/256;
-        keystr.majmin = 0; //is this supposed to essentially be a bool?
-    }
-    if (!strcmp(arg,"Fb")) {
-        keystr.fltshrp = htons(-6)/256;
+    if (isupper(arg[0]))
         keystr.majmin = 0;
-    }
-    if (!strcmp(arg,"Db")) {
-        keystr.fltshrp = htons(-5)/256;
-        keystr.majmin = 0;
-    }
-    if (!strcmp(arg,"Ab")) {
-        keystr.fltshrp = htons(-4)/256;
-        keystr.majmin = 0;
-    }
-    if (!strcmp(arg,"Eb")) {
-        keystr.fltshrp = htons(-3)/256;
-        keystr.majmin = 0;
-    }
-    if (!strcmp(arg,"Bb")) {
-        keystr.fltshrp = htons(-2)/256;
-        keystr.majmin = 0;
-    }
-    if (!strcmp(arg,"F")) {
-        keystr.fltshrp = htons(-1)/256;
-        keystr.majmin = 0;
-    }
-    if (!strcmp(arg,"C")) {
-        keystr.fltshrp = 0;
-        keystr.majmin = 0;
-    }
-    if (!strcmp(arg,"G")) {
-        keystr.fltshrp = htons(1)/256;
-        keystr.majmin = 0;
-    }
-    if (!strcmp(arg,"D")) {
-        keystr.fltshrp = htons(2)/256;
-        keystr.majmin = 0;
-    }
-    if (!strcmp(arg,"A")) {
-        keystr.fltshrp = htons(3)/256;
-        keystr.majmin = 0;
-    }
-    if (!strcmp(arg,"E")) {
-        keystr.fltshrp = htons(4)/256;
-        keystr.majmin = 0;
-    }
-    if (!strcmp(arg,"B")) {
-        keystr.fltshrp = htons(5)/256;
-        keystr.majmin = 0;
-    }
-    if (!strcmp(arg,"F#")) {
-        keystr.fltshrp = htons(6)/256;
-        keystr.majmin = 0;
-    }
-    if (!strcmp(arg,"C#")) {
-        keystr.fltshrp = htons(7)/256;
-        keystr.majmin = 0;
-    }
-    if (!strcmp(arg,"ab")) {
-        keystr.fltshrp = htons(-7)/256;
-        keystr.majmin = htons(1)/256; //you may consider turning this into a constant.  static char MinorKey = htons(1)/256;
-    }
-    if (!strcmp(arg,"db")) {
-        keystr.fltshrp = htons(-6)/256;
-        keystr.majmin = htons(1)/256;
-    }
-    if (!strcmp(arg,"bb")) {
-        keystr.fltshrp = htons(-5)/256;
-        keystr.majmin = htons(1)/256;
-    }
-    if (!strcmp(arg,"f")) {
-        keystr.fltshrp = htons(-4)/256;
-        keystr.majmin = htons(1)/256;
-    }
-    if (!strcmp(arg,"c")) {
-        keystr.fltshrp = htons(-3)/256;
-        keystr.majmin = htons(1)/256;
-    }
-    if (!strcmp(arg,"g")) {
-        keystr.fltshrp = htons(-2)/256;
-        keystr.majmin = htons(1)/256;
-    }
-    if (!strcmp(arg,"d")) {
-        keystr.fltshrp = htons(-1)/256;
-        keystr.majmin = htons(1)/256;
-    }
-    if (!strcmp(arg,"a")) {
-        keystr.fltshrp = 0;
-        keystr.majmin = htons(1)/256;
-    }
-    if (!strcmp(arg,"e")) {
-        keystr.fltshrp = htons(1)/256;
-        keystr.majmin = htons(1)/256;
-    }
-    if (!strcmp(arg,"b")) {
-        keystr.fltshrp = htons(2)/256;
-        keystr.majmin = htons(1)/256;
-    }
-    if (!strcmp(arg,"f#")) {
-        keystr.fltshrp = htons(3)/256;
-        keystr.majmin = htons(1)/256;
-    }
-    if (!strcmp(arg,"c#")) {
-        keystr.fltshrp = htons(4)/256;
-        keystr.majmin = htons(1)/256;
-    }
-    if (!strcmp(arg,"g#")) {
-        keystr.fltshrp = htons(5)/256;
-        keystr.majmin = htons(1)/256;
-    }
-    if (!strcmp(arg,"d#")) {
-        keystr.fltshrp = htons(6)/256;
-        keystr.majmin = htons(1)/256;
-    }
-    if (!strcmp(arg,"a#")) {
-        keystr.fltshrp = htons(7)/256;
-        keystr.majmin = htons(1)/256;
-    }
+    else
+        keystr.majmin = 1;
+
+    keystr.fltshrp = htons(keystr.fltshrp)/256;
+    keystr.majmin = htons(keystr.majmin)/256;
+
     trkfill(tp,&dp,1,&keystr,5,type);
 }
 
