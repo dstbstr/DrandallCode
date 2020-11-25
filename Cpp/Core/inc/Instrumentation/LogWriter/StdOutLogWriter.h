@@ -8,9 +8,8 @@
 #include "Instrumentation/LogLevel.h"
 #include "Instrumentation/LogWriter/ILogListener.h"
 #include "Utilities/Format.h"
+#include "Utilities/TimeUtils.h"
 
-#include <chrono>
-#include <iomanip>
 #include <iostream>
 
 namespace Log {
@@ -43,16 +42,11 @@ namespace Log {
             }
 
             if(entry.Level >= LogLevel::Error) {
-                auto ts = std::chrono::system_clock::to_time_t(entry.Timestamp);
-                tm utc;
-                _gmtime64_s(&utc, &ts);
-
-                *out << std::put_time(&utc, DateTimeFormat);
+                *out << TimeUtils::DateTimeToString(entry.Timestamp);
                 *out << StrUtil::Format(ErrorLineFormat, LogLevel::AsString(entry.Level), context.FileNameShort, context.LineNumber, context.FunctionName, entry.Message);
                 if(!event.StackTrace.empty()) {
-                    for(auto&& line: event.StackTrace) {
-                        *out << "\n\t" << line;
-                    }
+                    *out << "\n\t";
+                    *out << StrUtil::JoinVec("\n\t", event.StackTrace);
                 }
             } else {
                 *out << StrUtil::Format(InfoLineFormat, LogLevel::AsString(entry.Level), context.FileNameShort, context.LineNumber, entry.Message);

@@ -3,7 +3,7 @@
 
 #include "Instrumentation/Log.h"
 #include "Utilities/Format.h"
-#include "Utilities/StringUtilities.h"
+#include "Utilities/StringUtils.h"
 
 #include <chrono>
 

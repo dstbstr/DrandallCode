@@ -1,8 +1,13 @@
 #include "Extractor/Private/LineFetcher.h"
+
 #include "Extractor/CommentExtractor.h"
-#include "Utilities/StringUtilities.h"
+#include "Utilities/StringUtils.h"
+
+#include <regex>
 
 namespace {
+    std::regex MultiSpaceRegex("\\s+");
+
     bool AppendNextNonBlankLine(std::istream& stream, std::string& outLine) {
         std::string nextLine;
         bool isInBlockComment = false;
@@ -11,6 +16,7 @@ namespace {
                 return false;
             }
             Extractor::CommentExtractor::StripComments(nextLine, isInBlockComment);
+            nextLine = std::regex_replace(nextLine, MultiSpaceRegex, " "); // remove weird multi-line spacing things
             nextLine = StrUtil::Trim(nextLine);
             outLine += nextLine;
         } while(isInBlockComment || nextLine.empty());
@@ -20,12 +26,9 @@ namespace {
 
     bool IsLineComplete(const std::string& line) {
         auto lastChar = line[line.length() - 1];
-        return line[0] == '#' ||
-            lastChar == ';' ||
-            lastChar == '}' ||
-            lastChar == '{';
+        return line[0] == '#' || lastChar == ';' || lastChar == '}' || lastChar == '{';
     }
-}
+} // namespace
 
 namespace Extractor {
     namespace LineFetcher {
@@ -45,7 +48,7 @@ namespace Extractor {
         }
 
         bool GetNextLine(std::istream& stream, std::string& outString) {
-            outString = ""; //clear string before starting
+            outString = ""; // clear string before starting
             if(!AppendNextNonBlankLine(stream, outString)) {
                 return false;
             }
@@ -58,5 +61,5 @@ namespace Extractor {
 
             return true;
         }
-    }
-}
+    } // namespace LineFetcher
+} // namespace Extractor

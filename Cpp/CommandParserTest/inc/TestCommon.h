@@ -6,11 +6,11 @@
 
 #include <exception>
 
-
 using ::testing::_;
 using ::testing::A;
 using ::testing::An;
 using ::testing::EndsWith;
+using ::testing::HasSubstr;
 using ::testing::Matches;
 using ::testing::Not;
 using ::testing::StartsWith;
@@ -20,7 +20,9 @@ using ::testing::StartsWith;
     try {                                                                                        \
         code;                                                                                    \
         FAIL() << #code << "did not throw any exceptions";                                       \
-    } catch(const exceptionType&) { exceptionToSave = std::current_exception(); } catch(...) {   \
+    } catch(const exceptionType&) {                                                              \
+        exceptionToSave = std::current_exception();                                              \
+    } catch(...) {                                                                               \
         FAIL() << #code << "Threw an exception of the wrong type.  Expected " << #exceptionType; \
     }                                                                                            \
     try {                                                                                        \

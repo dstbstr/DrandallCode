@@ -3,13 +3,13 @@
 #include "CommandParser/CommandSplitter.h"
 #include "Extractor/Workers/FileNameCollector.h"
 #include "Utilities/ScopedTimer.h"
-#include "Utilities/StringUtilities.h"
+#include "Utilities/StringUtils.h"
 
 #include <iostream>
 
 namespace TypeCounter {
     ArgParse::ArgParse(int argc, char* argv[]) {
-        m_Options.Add(m_RecurseFlag).Add(m_HelpFlag).Add(m_FilePathOption).Add(m_OutFile).Add(m_FunctionFlag);
+        m_Options.Add(m_RecurseFlag).Add(m_HelpFlag).Add(m_FilePathOption).Add(m_OutFile).Add(m_FunctionFlag).Add(m_TypeFlag);
         CommandParser::CommandSplitter splitter(argc, argv);
         m_Options.Apply(splitter.GetAll());
     }

@@ -1,7 +1,7 @@
 #ifndef __REQUIRE_H__
 #define __REQUIRE_H__
 
-#include "Utilities/StringUtilities.h"
+#include "Utilities/StringUtils.h"
 
 #include <stdexcept>
 #include <string>

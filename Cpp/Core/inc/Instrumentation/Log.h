@@ -5,7 +5,7 @@
 #include "Instrumentation/LogEntry.h"
 #include "Instrumentation/LogLevel.h"
 #include "Instrumentation/Private/LogStore.h"
-#include "Utilities/StringUtilities.h"
+#include "Utilities/StringUtils.h"
 
 #ifndef FINAL
 #define LOG_VERBOSE(msg) Log::GetLogStore().AddMessage(DEBUG_CONTEXT, Log::LogEntry(Log::LogLevel::Verbose, msg));

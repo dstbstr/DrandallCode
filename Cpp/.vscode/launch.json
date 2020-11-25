@@ -44,7 +44,9 @@
             "type": "cppvsdbg",
             "request": "launch",
             "program": "${workspaceFolder}/bin/Debug/GBellMidi.exe",
-            "args": ["${workspaceFolder}/GbellMidi/row.gdb"],
+            "args": [
+                "${workspaceFolder}/GbellMidi/passiton.gdb"
+            ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
