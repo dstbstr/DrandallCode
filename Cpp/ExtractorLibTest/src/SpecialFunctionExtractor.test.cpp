@@ -17,6 +17,21 @@ namespace Extractor {
         ASSERT_TRUE(IsSpecialFunction("virtual Foo()"));
     }
 
+    TEST(IsSpecialFunctionTest, ClassWhichStartsWithUnderscore) {
+        ASSERT_TRUE(IsSpecialFunction("_Foo();"));
+    }
+    TEST(IsSpecialFunctionTest, ClassWhichEndsWithUnderscore) {
+        ASSERT_TRUE(IsSpecialFunction("Foo_();"));
+    }
+
+    TEST(IsSpecialFunctionTest, ClassWhichEndsWithCapitalLetter) {
+        ASSERT_TRUE(IsSpecialFunction("FooA();"));
+    }
+
+    TEST(IsSpecialFunctionTest, ClassWhichStartsWithMultipleCapitalLetters) {
+        ASSERT_TRUE(IsSpecialFunction("CFoo();"));
+    }
+
     TEST(IsSpecialFunctionTest, ConstructorWithSplitArgs) {
         ASSERT_TRUE(IsSpecialFunction("Foo("));
     }
@@ -59,6 +74,14 @@ namespace Extractor {
 
     TEST(IsSpecialFunctionTest, StaticConstructorNotSpecial) {
         ASSERT_FALSE(IsSpecialFunction("Foo CreateClass();"));
+    }
+
+    TEST(IsSpecialFunctionTest, StaticAssertNotSpecial) {
+        ASSERT_FALSE(IsSpecialFunction("static_assert(i < 25);"));
+    }
+
+    TEST(IsSpecialFunctionTest, MacroIsNotSpecial) {
+        ASSERT_FALSE(IsSpecialFunction("ASSERT_FALSE(i < 25);"));
     }
 
     class ExtractSpecialFunctionTest : public ::testing::Test {

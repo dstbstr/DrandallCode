@@ -8,17 +8,18 @@
 #include <regex>
 
 namespace {
-    std::regex SpecialFunctionRegex("^(?:template *<[^>]*> *)?(virtual *)?(explicit *)?([\\w:<>~]+)\\(([^\\)]*)\\)? *=? *(default)?(delete)?");
+    std::regex SpecialFunctionRegex("^(?:template *<[^>]*> *)?(virtual *)?(explicit *)?(~?_*[A-Z]+[a-z][\\w:<>~]+)\\(([^\\)]*)\\)? *=? *(default)?(delete)?");
     std::regex OperatorOverloadRegex("^(explicit +)?(friend +)?(inline +)?" // optional specifier
                                      "(?:const *)?(?:.+)? *" // optional return type
                                      "operator *" // required operator keyword
-                                     "(.+) *" // specific operator being overloaded
+                                     "(.+?) *" // specific operator being overloaded
                                      "\\(([^\\)]*)\\) *" // parameters
                                      "(?:const *)?"); // optional const
 
     std::regex FunctionRegex("^" // start of string
                              "(template *<[^>]*>\\s*)?" // optional template
                              "((?:(?:virtual *)|(?:(?:__(force)?)?inline *)|(?:static *))*)?" // function prefixes
+                             "(?:[\\w\\(\\)]+? *)?" // optional declspec
                              "(?:const *)?" // return type const
                              "[\\w\\[\\]&\\*:<>]+[&\\*\\w\\]>]\\s+" // return type with potential qualifification or reference
                              "(?: *const *)?[\\*&]?\\s*" // support RTL const
@@ -34,6 +35,7 @@ namespace {
     std::regex VirtualRegex("virtual");
     std::regex InlineRegex("(__(force)?)?inline");
     std::regex StaticRegex("static");
+    std::regex StaticAssertRegex("^static_assert");
 
     std::regex ConstRegex("const");
 
@@ -194,7 +196,7 @@ namespace Extractor {
 
         bool IsSpecialFunction(const std::string& line) {
             try {
-                return std::regex_search(line, SpecialFunctionRegex);
+                return std::regex_search(line, SpecialFunctionRegex) && !std::regex_search(line, StaticAssertRegex);
             } catch(...) {
                 LOG_ERROR(StrUtil::Format("Failed to determine if line is a special function: %s", line));
                 return false;

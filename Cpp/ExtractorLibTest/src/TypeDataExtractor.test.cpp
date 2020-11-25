@@ -83,6 +83,14 @@ namespace Extractor {
         ASSERT_TRUE(IsAType("class Foo : virtual Bar"));
     }
 
+    TEST(IsATypeTest, WithDeclSpec) {
+        ASSERT_TRUE(IsAType("class __declspec(dllexport) Foo"));
+    }
+
+    TEST(IsATypeTest, WithMacroDeclSpec) {
+        ASSERT_TRUE(IsAType("class DLL_EXPORT Foo"));
+    }
+
     TEST(IsATypeTest, ForwardDeclarationIsNotAType) {
         ASSERT_FALSE(IsAType("class Foo;"));
     }
