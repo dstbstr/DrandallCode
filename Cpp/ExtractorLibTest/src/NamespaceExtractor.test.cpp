@@ -113,4 +113,16 @@ namespace Extractor {
 
         ASSERT_EQ(m_Extractor.GetNamespace(), "");
     }
+
+    TEST_F(GetNamespaceTest, CanPopNestedCurlies) {
+        std::string ns = "namespace One {";
+        m_Extractor.ExtractNamespace(ns);
+        m_Extractor.PushNestedCurly();
+
+        ASSERT_EQ(m_Extractor.GetNamespace(), "One");
+        m_Extractor.PopNamespace();
+        ASSERT_EQ(m_Extractor.GetNamespace(), "One");
+        m_Extractor.PopNamespace();
+        ASSERT_EQ(m_Extractor.GetNamespace(), "");
+    }
 } // namespace Extractor

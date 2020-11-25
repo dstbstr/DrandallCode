@@ -29,9 +29,17 @@ namespace Extractor {
         }
     }
 
+    void NamespaceExtractor::PushNestedCurly() {
+        m_NestedCurlyCount++;
+    }
+
     void NamespaceExtractor::PopNamespace() {
-        Require::NotEmpty(m_Namespace, "Popped empty namespace");
-        m_Namespace.pop_back();
+        if(m_NestedCurlyCount > 0) {
+            m_NestedCurlyCount--;
+        } else {
+            Require::NotEmpty(m_Namespace, "Popped empty namespace");
+            m_Namespace.pop_back();
+        }
     }
 
     std::string NamespaceExtractor::GetNamespace() const {
