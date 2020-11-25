@@ -3,8 +3,8 @@
 #include "Extractor/Data/Visibility.h"
 #include "Extractor/FunctionDataExtractor.h"
 #include "Extractor/NamespaceExtractor.h"
-#include "Extractor/TypeDataExtractor.h"
 #include "Extractor/Private/LineFetcher.h"
+#include "Extractor/TypeDataExtractor.h"
 #include "Instrumentation/Log.h"
 #include "Utilities/Format.h"
 #include "Utilities/PathUtilities.h"
@@ -12,6 +12,7 @@
 
 #include <fstream>
 #include <regex>
+
 
 namespace {
     std::regex IncludeRegex("^#include [\"<]([^\">]+)[\">]$");
@@ -38,7 +39,6 @@ namespace Extractor {
         NamespaceExtractor namespaceExtractor;
 
         u64 nonBlankLines = 0;
-        u64 ignoredLines = 0;
         while(LineFetcher::GetNextLine(stream, line)) {
             nonBlankLines++;
             if(std::regex_search(line, match, IncludeRegex)) {
@@ -82,7 +82,11 @@ namespace Extractor {
                     }
                 }
             } else {
-                ignoredLines++; // just for debugging
+                // If we couldn't figure out what this thing is, but it contains a curly, need to let the namespace extractor know about it
+                // It's probably a function like macro
+                if(line.find('{') != line.npos) {
+                    namespaceExtractor.PushNestedCurly();
+                }
             }
         }
 

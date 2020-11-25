@@ -23,9 +23,9 @@ namespace Log {
     };
 
     constexpr char ErrorLineFormat[]{
-        "[%7s] " // Level
+        "[%8s] " // Level
         "%s:%d " // File:Line
-        "%(%s) - " // Function name
+        "(%s) - " // Function name
         "%s\n" // Msg
     };
 
@@ -48,8 +48,7 @@ namespace Log {
                 _gmtime64_s(&utc, &ts);
 
                 *out << std::put_time(&utc, DateTimeFormat);
-                *out << StrUtil::Format(
-                    ErrorLineFormat, LogLevel::AsString(entry.Level), context.FileNameShort, context.LineNumber, context.FunctionName, entry.Message);
+                *out << StrUtil::Format(ErrorLineFormat, LogLevel::AsString(entry.Level), context.FileNameShort, context.LineNumber, context.FunctionName, entry.Message);
                 if(!event.StackTrace.empty()) {
                     for(auto&& line: event.StackTrace) {
                         *out << "\n\t" << line;
