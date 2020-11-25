@@ -194,6 +194,12 @@ namespace Extractor {
         ASSERT_EQ(result.Operator, "++");
     }
 
+    TEST_F(ExtractOperatorOverloadTest, ExtractsTheOperatorWithArguments) {
+        ss << "X& operator+(const X& rhs) const";
+        auto result = Extract();
+        ASSERT_EQ(result.Operator, "+");
+    }
+
     TEST_F(ExtractOperatorOverloadTest, ExtractsOperatorCast) {
         ss << "explicit operator bool() const";
         auto result = Extract();

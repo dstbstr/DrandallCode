@@ -9,11 +9,11 @@
 
 #include <regex>
 
-
 namespace {
     std::regex TypeRegex("^(template *<[^>]*> *)?" // optionally start with a template
-                         "((?:class)|(?:enum)|(?:struct)|(?:union)|(?:interface))" // keyword
-                         "\\s+(\\w+)\\s*" // identifier
+                         "((?:class)|(?:enum)|(?:struct)|(?:union)|(?:interface))\\s+" // keyword
+                         "(?:[\\w\\(\\)]+? )? *" // optional declspec
+                         "(\\w+)\\s*" // identifier
                          "(:\\s*" // optional base class
                          "((?:public)|(?:protected)|(?:private))?\\s*" // optional scope of inheritence
                          "(?:virtual)?" // optional virtual inheritence
