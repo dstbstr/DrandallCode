@@ -2,20 +2,20 @@
 #define DEBUGCONTEXT_H
 
 #include "Platform/Types.h"
-#include "Utilities/PathUtilities.h"
+#include "Utilities/PathUtils.h"
 
 #include <string>
 #include <thread>
 
+#ifdef MSVC
 #define DEBUG_CONTEXT Debug::Context(__FILE__, __LINE__, __FUNCSIG__, std::this_thread::get_id())
+#else
+#define DEBUG_CONTEXT Debug::Context(__FILE__, __LINE__, __PRETTY_FUNCTION__, std::this_thread::get_id())
+#endif
 
 namespace Debug {
     struct Context {
-        Context(std::string fileName, u32 lineNumber, std::string functionSignature, std::thread::id threadId)
-            : FileName(fileName)
-            , LineNumber(lineNumber)
-            , FunctionSignature(functionSignature)
-            , ThreadId(threadId) {
+        Context(std::string fileName, u32 lineNumber, std::string functionSignature, std::thread::id threadId) : FileName(fileName), LineNumber(lineNumber), FunctionSignature(functionSignature), ThreadId(threadId) {
             auto name = FunctionSignature.substr(FunctionSignature.find(' ') + 1); // strip return type
             name = name.substr(name.find(' ') + 1); // strip out cdecl
 
