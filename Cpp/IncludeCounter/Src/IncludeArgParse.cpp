@@ -3,7 +3,7 @@
 #include "CommandParser/CommandSplitter.h"
 #include "Extractor/Workers/FileNameCollector.h"
 #include "Utilities/ScopedTimer.h"
-#include "Utilities/StringUtilities.h"
+#include "Utilities/StringUtils.h"
 
 #include <iostream>
 

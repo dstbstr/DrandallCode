@@ -87,8 +87,8 @@ namespace Extractor {
         {};;;
         */
        ;)";
-       auto line = Run();
-       ASSERT_EQ(line, "int Foo;");
+        auto line = Run();
+        ASSERT_EQ(line, "int Foo;");
     }
 
     TEST_F(LineFetcherTest, ClearsResultStringBetweenLines) {
@@ -98,5 +98,16 @@ namespace Extractor {
         ASSERT_EQ(line, "int a;");
         line = Run();
         ASSERT_EQ(line, "int b;");
+    }
+
+    TEST_F(LineFetcherTest, CondensesGroupsOfSpaces) {
+        ss << R"(Foo(int i, int j, int k)
+        : m_I(i)
+        , m_J(j)
+        , m_K(k) {
+        })";
+
+        auto line = Run();
+        ASSERT_EQ(line, "Foo(int i, int j, int k) : m_I(i) , m_J(j) , m_K(k) {");
     }
 } // namespace Extractor

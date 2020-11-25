@@ -3,7 +3,7 @@
 
 #include "Instrumentation/Assert.h"
 #include "Utilities/Format.h"
-#include "Utilities/StringUtilities.h"
+#include "Utilities/StringUtils.h"
 
 #include <regex>
 #include <string>

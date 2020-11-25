@@ -1,4 +1,4 @@
-#include "Utilities/StringUtilities.h"
+#include "Utilities/StringUtils.h"
 
 namespace StrUtil {
 

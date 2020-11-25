@@ -2,12 +2,13 @@
 
 #include "Extractor/CommentExtractor.h"
 #include "Extractor/FunctionDataExtractor.h"
-#include "Extractor/VisibilityExtractor.h"
 #include "Extractor/Private/LineFetcher.h"
+#include "Extractor/VisibilityExtractor.h"
 #include "Utilities/Require.h"
-#include "Utilities/StringUtilities.h"
+#include "Utilities/StringUtils.h"
 
 #include <regex>
+
 
 namespace {
     std::regex TypeRegex("^(template *<[^>]*> *)?" // optionally start with a template

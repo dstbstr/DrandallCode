@@ -1,10 +1,11 @@
 #include "CommandParser/CommandSplitter.h"
 
 #include "Instrumentation/Assert.h"
-#include "Utilities/StringUtilities.h"
 #include "Platform/Types.h"
+#include "Utilities/StringUtils.h"
 
 #include <algorithm>
+
 
 namespace CommandParser {
     static std::string currentArg;

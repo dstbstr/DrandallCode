@@ -7,12 +7,11 @@
 #include "Extractor/TypeDataExtractor.h"
 #include "Instrumentation/Log.h"
 #include "Utilities/Format.h"
-#include "Utilities/PathUtilities.h"
-#include "Utilities/StringUtilities.h"
+#include "Utilities/PathUtils.h"
+#include "Utilities/StringUtils.h"
 
 #include <fstream>
 #include <regex>
-
 
 namespace {
     std::regex IncludeRegex("^#include [\"<]([^\">]+)[\">]$");

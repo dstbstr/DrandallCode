@@ -1,3 +1,4 @@
+#include "CombinedReport.h"
 #include "Extractor/Data/FileData.h"
 #include "Extractor/ExtractorSettings.h"
 #include "Extractor/FileDataExtractor.h"
@@ -8,6 +9,7 @@
 #include "TypeArgParse.h"
 #include "TypeReport.h"
 #include "Utilities/ScopedTimer.h"
+#include "Utilities/TimeUtils.h"
 
 #include <filesystem>
 #include <fstream>
@@ -43,20 +45,30 @@ int main(int argc, char* argv[]) {
         std::vector<FileData> files = Runner::Get().RunAll(jobs);
 
         std::unique_ptr<IReport> report;
+        std::vector<std::pair<std::unique_ptr<IReport>, std::string>> reports;
+        reports.push_back(std::make_pair(std::make_unique<CombinedReport>(files), "Combined"));
+
         if(argParse.RunFunctionReport()) {
-            report = std::make_unique<FunctionReport>(files);
-        } else {
-            report = std::make_unique<TypeReport>(files);
+            reports.push_back(std::make_pair(std::make_unique<FunctionReport>(files), "Function"));
+        }
+        if(argParse.RunTypeReport()) {
+            reports.push_back(std::make_pair(std::make_unique<TypeReport>(files), "Types"));
         }
 
-        if(argParse.GetTargetFile().empty()) {
-            report->PrintResultToStream(std::cout);
+        std::string filePrefix;
+        if(argParse.GetTargetFile() == "") {
+            filePrefix = TimeUtils::TodayNowToString("%Y_%m_%d_%H_%M_%S");
         } else {
-            auto path = std::filesystem::path(argParse.GetTargetFile());
-            std::filesystem::remove(path); // clear out old results
-            auto stream = std::ofstream(path);
-            report->PrintResultToStream(stream);
+            filePrefix = argParse.GetTargetFile();
         }
+
+        for(auto&& reportPair: reports) {
+            auto path = std::filesystem::path(filePrefix + "_" + reportPair.second + ".csv"); // todo: get the suffix from the report
+            std::filesystem::remove(path); // clear out any old results
+            auto stream = std::ofstream(path);
+            reportPair.first->PrintResultToStream(stream);
+        }
+
         return 0;
     } catch(std::exception& err) {
         std::cerr << err.what() << std::endl;

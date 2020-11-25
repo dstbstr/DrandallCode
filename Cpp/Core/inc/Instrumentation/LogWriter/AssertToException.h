@@ -5,8 +5,7 @@
 #include "Instrumentation/LogFilter.h"
 #include "Instrumentation/LogWriter/ILogListener.h"
 #include "Utilities/Require.h"
-#include "Utilities/StringUtilities.h"
-
+#include "Utilities/StringUtils.h"
 
 class AssertToException : public Log::ILogListener {
 public:

@@ -1,6 +1,6 @@
 #include "Extractor/FunctionDataExtractor.h"
 #include "TestCommon.h"
-#include "Utilities/StringUtilities.h"
+#include "Utilities/StringUtils.h"
 
 namespace Extractor {
     using FunctionDataExtractor::IsSpecialFunction;

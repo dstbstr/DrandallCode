@@ -2,7 +2,7 @@
 
 #include "Instrumentation/DebugContext.h"
 #include "Instrumentation/LogEntry.h"
-#include "Utilities/StringUtilities.h"
+#include "Utilities/StringUtils.h"
 
 namespace Log {
     const LogFilter LogFilter::MatchAll = {};

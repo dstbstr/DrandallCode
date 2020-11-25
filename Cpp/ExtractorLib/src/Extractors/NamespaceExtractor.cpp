@@ -1,7 +1,7 @@
 #include "Extractor/NamespaceExtractor.h"
 
 #include "Utilities/Require.h"
-#include "Utilities/StringUtilities.h"
+#include "Utilities/StringUtils.h"
 
 #include <regex>
 

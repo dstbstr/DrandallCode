@@ -1,10 +1,10 @@
 #include "Extractor/Workers/IncludeMapGenerator.h"
 
 #include "Platform/Types.h"
-#include "Utilities/PathUtilities.h"
+#include "Utilities/PathUtils.h"
 #include "Utilities/Require.h"
 #include "Utilities/ScopedTimer.h"
-#include "Utilities/StringUtilities.h"
+#include "Utilities/StringUtils.h"
 
 #include <string>
 #include <unordered_map>
@@ -37,8 +37,7 @@ namespace Extractor {
                 if(circularDependency) {
                     if(failOnCircularDependencies) {
                         CircDepPath.push_back(file.FileName);
-                        Require::False(circularDependency,
-                                       StrUtil::Format("Circular dependency detected! %s", StrUtil::JoinVec(" -> ", CircDepPath)));
+                        Require::False(circularDependency, StrUtil::Format("Circular dependency detected! %s", StrUtil::JoinVec(" -> ", CircDepPath)));
                     }
                 } else {
                     currentPaths.insert(file.FileName);
