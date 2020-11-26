@@ -27,7 +27,7 @@ namespace {
                              "\\(" // Start of parameters
                              "([^\\)]*)" // parameters
                              "\\)?\\s*" // optional end of parameters (may split parameters on multiple lines)
-                             "((?:(?:const *)|(?:final *)|(?:override *))*)?\\s*" // optional function modifiers
+                             "((?:const *|final *|override *)+)?\\s*" // optional function modifiers
                              "(\\s*=\\s*0)?\\s*" // optional pure virtual indicator
                              ";?"); // optional declaration (instead of definition)
 

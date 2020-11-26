@@ -4,21 +4,24 @@
 #include "Extractor/FunctionDataExtractor.h"
 #include "Extractor/Private/LineFetcher.h"
 #include "Extractor/VisibilityExtractor.h"
+#include "Instrumentation/Log.h"
+#include "Utilities/Format.h"
 #include "Utilities/Require.h"
 #include "Utilities/StringUtils.h"
 
 #include <regex>
 
 namespace {
-    std::regex TypeRegex("^(template *<[^>]*> *)?" // optionally start with a template
-                         "((?:class)|(?:enum)|(?:struct)|(?:union)|(?:interface))\\s+" // keyword
+    std::regex SimpleCheck("\\b(?:(?:class|enum|struct|union|interface))\\b.+(?:\\};|[^;])$");
+    std::regex TypeRegex("^(template.+ *)?" // optionally start with a template
+                         "((?:class|enum|struct|union|interface))\\s+" // keyword
                          "(?:[\\w\\(\\)]+? )? *" // optional declspec
                          "(\\w+)\\s*" // identifier
-                         "(:\\s*" // optional base class
-                         "((?:public)|(?:protected)|(?:private))?\\s*" // optional scope of inheritence
-                         "(?:virtual)?" // optional virtual inheritence
-                         "\\s*[\\w:<>]+)?" // base class name
-                         "\\s*((\\{[^\\}]*\\}?;?)|$)"); // can't end with a semicolon (may not have curly brace based on style)
+                         ":?((?:\\s*,?" // optional base class
+                         "((?:public|protected|private|virtual))*\\s*" // optional scope of inheritence
+                         "[\\w:<>]+)+)?" // base class name
+                         "\\s*(?:\\{[^\\}]*\\}?;?|$)"); // can't end with a semicolon (may not have curly brace based on style)
+    //".*?(?:$|\\};|[^;])$"); // can't end with a semicolon unless it's preceded by a close curly
 
     constexpr size_t TemplateIndex = 1;
     constexpr size_t TypeIndex = 2;
@@ -53,7 +56,14 @@ namespace {
 namespace Extractor {
     namespace TypeDataExtractor {
         bool IsAType(const std::string& line) {
-            return std::regex_search(line, TypeRegex);
+            try {
+                // return std::regex_search(line, SimpleCheck);
+
+                return std::regex_search(line, TypeRegex);
+            } catch(std::exception& ex) {
+                LOG_WARN(StrUtil::Format("Failed to determine if line is a type: %s.  Error: %s", line, ex.what()));
+                return false;
+            }
         }
 
         // Should extract a type (class, struct, union, enum) from the provided stream (and initial line)

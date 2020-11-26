@@ -75,6 +75,10 @@ namespace Extractor {
         ASSERT_TRUE(IsAType("class Foo : ::Bar::Baz"));
     }
 
+    TEST(IsATypeTest, MultipleInheritence) {
+        ASSERT_TRUE(IsAType("class Foo : public Bar, protected Baz"));
+    }
+
     TEST(IsATypeTest, TemplatedBaseClass) {
         ASSERT_TRUE(IsAType("class Foo : Bar<Baz>"));
     }
@@ -87,6 +91,10 @@ namespace Extractor {
         ASSERT_TRUE(IsAType("class __declspec(dllexport) Foo"));
     }
 
+    TEST(IsATypeTest, TemplateWithNestedTemplateDefaultParameters) {
+        // not making this up, this came from a real code base
+        ASSERT_TRUE(IsAType("template<typename DataType, typename ValidationPolicy = Range<DataType>, u32 BitCount = MinMax<DataType>::NumBits, bool ServerOwned = false> class SyncedInt : public SyncedVar {"));
+    }
     TEST(IsATypeTest, WithMacroDeclSpec) {
         ASSERT_TRUE(IsAType("class DLL_EXPORT Foo"));
     }
