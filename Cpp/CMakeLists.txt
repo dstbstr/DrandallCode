@@ -6,7 +6,8 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR
     "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    set(warnings "-Wall -Wextra -Werror")
+    #set(warnings "-Wall -Wextra -Werror")
+    set(warnings "")
     if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
         add_definitions(-DGNU)
     else()
