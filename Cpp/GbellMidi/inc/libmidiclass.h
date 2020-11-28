@@ -14,6 +14,7 @@ class mthd_hdr
     public:
         unsigned short numtrks;
         unsigned short division;
+        mthd_hdr();
 };
 
 class mtrk_hdr
@@ -21,6 +22,7 @@ class mtrk_hdr
     public:
         char id[4];
         unsigned int length;
+        mtrk_hdr();
 };
 
 struct track
@@ -41,6 +43,8 @@ class eot
     unsigned char stat;
     unsigned char eotm;
     unsigned char eots;
+    public:
+        eot();
 };
 
 class tsig
@@ -54,6 +58,8 @@ class tsig
     private:
         char cc;
         char bb;
+    public:
+        tsig();
 };
 
 class tmpo
@@ -63,6 +69,7 @@ class tmpo
     char msgbytes;
     public:
         char buf[3];
+        tmpo(); 
 };
 
 class keysig
@@ -73,6 +80,7 @@ class keysig
     public:
         unsigned char fltshrp;
         char majmin; 
+        keysig();
 };
 
 class notemsg
@@ -91,6 +99,7 @@ class susmsg
         char sus;
     public:
         char onoff;
+        susmsg();
 };
 
 class chgprog
