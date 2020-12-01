@@ -16,7 +16,7 @@ namespace {
     constexpr char SpecialFunctionFormat[]{",%s,%s,%s,%s,%u,"
                                            "%s,,,,,,,,"
                                            "%s,,%u,%u,"
-                                           ",,%s,,,%s,,,%s,%s\n"};
+                                           ",,%s,,,%s,,,,%s,%s\n"};
     constexpr char OpOverloadFormat[]{",%s,%s,%s,%s,%u,"
                                       "%s,,,,,,,,"
                                       "%s,,%u,,"

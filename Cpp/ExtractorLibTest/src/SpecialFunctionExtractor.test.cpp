@@ -139,6 +139,29 @@ namespace Extractor {
         ASSERT_FALSE(result.IsExplicit);
     }
 
+    TEST_F(ExtractSpecialFunctionTest, DeletedConstructorIsDeleted) {
+        ss << "Foo() = delete;";
+        auto result = Extract();
+        ASSERT_TRUE(result.IsDeleted);
+    }
+
+    TEST_F(ExtractSpecialFunctionTest, NonDeletedConstructorIsNotDeleted) {
+        ss << "Foo();";
+        auto result = Extract();
+        ASSERT_FALSE(result.IsDeleted);
+    }
+
+    TEST_F(ExtractSpecialFunctionTest, DefaultConstructorIsDefault) {
+        ss << "Foo() = default;";
+        auto result = Extract();
+        ASSERT_TRUE(result.IsDefaulted);
+    }
+
+    TEST_F(ExtractSpecialFunctionTest, NonDefaultConstructorIsNotDefaulted) {
+        ss << "Foo();";
+        auto result = Extract();
+        ASSERT_FALSE(result.IsDefaulted);
+    }
     TEST_F(ExtractSpecialFunctionTest, SingleArgHasAirityOfOne) {
         ss << "Foo(int a);";
         auto result = Extract();

@@ -7,6 +7,7 @@
 #include "Instrumentation/Log.h"
 #include "Utilities/Format.h"
 #include "Utilities/Require.h"
+#include "Utilities/ScopedTimer.h"
 #include "Utilities/StringUtils.h"
 
 #include <regex>
@@ -53,6 +54,7 @@ namespace {
 namespace Extractor {
     namespace TypeDataExtractor {
         bool IsAType(const std::string& line) {
+            // ScopedTimer timer("IsAType: " + line, ScopedTimer::TimeUnit::SECOND);
             try {
                 return std::regex_search(line, TypeRegex);
             } catch(std::exception& ex) {
@@ -64,6 +66,7 @@ namespace Extractor {
         // Should extract a type (class, struct, union, enum) from the provided stream (and initial line)
         // Would almost certainly break with something like class Foo{struct Bar{union Baz{};};}; (in a single line)
         TypeData Extract(const std::string& initialLine, const std::string& fileName, const std::string& ns, std::istream& stream) {
+            // ScopedTimer timer("ExtractType: " + initialLine, ScopedTimer::TimeUnit::SECOND);
             std::smatch match;
             Require::True(std::regex_search(initialLine, match, TypeRegex), "Failed to parse type.  Was IsAType run?");
             auto result = GetTypeData(match, fileName);
