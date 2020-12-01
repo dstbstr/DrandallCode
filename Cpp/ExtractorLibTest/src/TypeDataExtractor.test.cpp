@@ -99,8 +99,24 @@ namespace Extractor {
         ASSERT_TRUE(IsAType("class DLL_EXPORT Foo"));
     }
 
+    TEST(IsATypeTest, ClassNameWithTemplateArgs) {
+        ASSERT_TRUE(IsAType("template<class T> class Foo<T, false>"));
+    }
+
+    TEST(IsATypeTest, ClassWithAttribute) {
+        ASSERT_TRUE(IsAType("class [[nodiscard]] Foo"));
+    }
+
     TEST(IsATypeTest, ForwardDeclarationIsNotAType) {
         ASSERT_FALSE(IsAType("class Foo;"));
+    }
+
+    TEST(IsATypeTest, ForwardDeclarationWithTemplateIsNotAType) {
+        ASSERT_FALSE(IsAType("template<class Foo> class Bar;"));
+    }
+
+    TEST(IsATypeTest, TemplateFunctionIsNotAType) {
+        ASSERT_FALSE(IsAType("template<class Foo> void RunAll() {"));
     }
 
     class ExtractTypeTest : public ::testing::Test {

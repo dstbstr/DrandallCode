@@ -178,6 +178,10 @@ namespace Extractor {
         ASSERT_TRUE(IsAFunction("DLL_EXPORT void Foo()"));
     }
 
+    TEST(IsFunctionTest, FunctionWithAttribute) {
+        ASSERT_TRUE(IsAFunction("[[nodiscard]] int foo()"));
+    }
+
     TEST(IsFunctionTest, ComplexFunction) {
         // The following isn't a valid definition, but exercises about every available option
         ASSERT_TRUE(IsAFunction("template<class T, class U> virtual static const Foo::Bar<Baz>& One::Two(const std::pair<int, int>& arg1, int arg2 = 3 "

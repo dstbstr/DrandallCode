@@ -19,7 +19,7 @@ namespace {
     std::regex FunctionRegex("^" // start of string
                              "(template *<[^>]*>\\s*)?" // optional template
                              "((?:(?:virtual *)|(?:(?:__(force)?)?inline *)|(?:static *))*)?" // function prefixes
-                             "(?:[\\w\\(\\)]+? *)?" // optional declspec
+                             "(?:[\\w\\(\\)\\[\\]]+? *){0,3}" // optional declspec or attributes
                              "(?:const *)?" // return type const
                              "[\\w\\[\\]&\\*:<>]+[&\\*\\w\\]>]\\s+" // return type with potential qualifification or reference
                              "(?: *const *)?[\\*&]?\\s*" // support RTL const

@@ -17,6 +17,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     #set(warnings "/W4 /WX /EHsc")
     set(warnings "/W1 /EHsc")
     add_definitions(-DMSVC)
+    #add_definitions(-D_REGEX_MAX_COMPLEXITY_COUNT=0) #remove max regex complexity, not sure if this would work outside of MSVC
 endif()
 if (NOT CONFIGURED_ONCE)
     set(CMAKE_CXX_FLAGS "${warnings}"

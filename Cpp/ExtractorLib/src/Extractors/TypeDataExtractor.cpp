@@ -12,16 +12,13 @@
 #include <regex>
 
 namespace {
-    std::regex SimpleCheck("\\b(?:(?:class|enum|struct|union|interface))\\b.+(?:\\};|[^;])$");
-    std::regex TypeRegex("^(template.+ *)?" // optionally start with a template
-                         "((?:class|enum|struct|union|interface))\\s+" // keyword
-                         "(?:[\\w\\(\\)]+? )? *" // optional declspec
-                         "(\\w+)\\s*" // identifier
-                         ":?((?:\\s*,?" // optional base class
-                         "((?:public|protected|private|virtual))*\\s*" // optional scope of inheritence
-                         "[\\w:<>]+)+)?" // base class name
-                         "\\s*(?:\\{[^\\}]*\\}?;?|$)"); // can't end with a semicolon (may not have curly brace based on style)
-    //".*?(?:$|\\};|[^;])$"); // can't end with a semicolon unless it's preceded by a close curly
+    std::regex TypeRegex("^" // start of the string
+                         "(template.+?> ?)?" // optionally start with a template
+                         "(class|enum|struct|union|interface) " // required type
+                         "(?:[\\w\\(\\)\\[\\]]+ ){0,3}" // optional declspec (macro or not) or attributes
+                         "([\\w<>]+) ?" // required identifier
+                         ":?( ?,?((?:public|protected|private|virtual) ?)? [\\w:<>]+){0,10} ?" // up to 5 base classes (the {0,10} is to avoid using * which causes infinite matches)
+                         "(?:\\{[^}]*\\}?;?|$)"); // Can't end with a semicolon unless it's preceeded by a close curly
 
     constexpr size_t TemplateIndex = 1;
     constexpr size_t TypeIndex = 2;
@@ -57,8 +54,6 @@ namespace Extractor {
     namespace TypeDataExtractor {
         bool IsAType(const std::string& line) {
             try {
-                // return std::regex_search(line, SimpleCheck);
-
                 return std::regex_search(line, TypeRegex);
             } catch(std::exception& ex) {
                 LOG_WARN(StrUtil::Format("Failed to determine if line is a type: %s.  Error: %s", line, ex.what()));
