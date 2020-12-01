@@ -8,6 +8,7 @@
 #include "Instrumentation/Log.h"
 #include "Utilities/Format.h"
 #include "Utilities/PathUtils.h"
+#include "Utilities/ScopedTimer.h"
 #include "Utilities/StringUtils.h"
 
 #include <fstream>
@@ -37,6 +38,7 @@ namespace Extractor {
         bool isHeader = m_FilePath[m_FilePath.length() - 1] == 'h';
         NamespaceExtractor namespaceExtractor;
 
+        ScopedTimer timer(result.FileName + " Extract File", ScopedTimer::TimeUnit::MINUTE);
         u64 nonBlankLines = 0;
         while(LineFetcher::GetNextLine(stream, line)) {
             nonBlankLines++;

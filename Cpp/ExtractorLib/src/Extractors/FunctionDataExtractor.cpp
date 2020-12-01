@@ -4,6 +4,7 @@
 #include "Instrumentation/Log.h"
 #include "Utilities/Format.h"
 #include "Utilities/Require.h"
+#include "Utilities/ScopedTimer.h"
 
 #include <regex>
 
@@ -17,18 +18,18 @@ namespace {
                                      "(?:const *)?"); // optional const
 
     std::regex FunctionRegex("^" // start of string
-                             "(template *<[^>]*>\\s*)?" // optional template
-                             "((?:(?:virtual *)|(?:(?:__(force)?)?inline *)|(?:static *))*)?" // function prefixes
+                             "(template.+> ?)?" // optional template
+                             "((?:(?:virtual ?)|(?:(?:__(force)?)?inline ?)|(?:static ?))*)?" // function prefixes
                              "(?:[\\w\\(\\)\\[\\]]+? *){0,3}" // optional declspec or attributes
-                             "(?:const *)?" // return type const
-                             "[\\w\\[\\]&\\*:<>]+[&\\*\\w\\]>]\\s+" // return type with potential qualifification or reference
-                             "(?: *const *)?[\\*&]?\\s*" // support RTL const
-                             "([\\w:<>]+)\\s*" // Function name
+                             "(?:const ?)?" // return type const
+                             "[\\w\\[\\]&\\*:<>]+[&\\*\\w\\]>] " // return type with potential qualifification or reference
+                             "(?: ?const ?)?[\\*&]? ?" // support RTL const
+                             "([\\w:<>]+) ?" // Function name
                              "\\(" // Start of parameters
                              "([^\\)]*)" // parameters
-                             "\\)?\\s*" // optional end of parameters (may split parameters on multiple lines)
-                             "((?:const *|final *|override *)+)?\\s*" // optional function modifiers
-                             "(\\s*=\\s*0)?\\s*" // optional pure virtual indicator
+                             "\\)? ?" // optional end of parameters (may split parameters on multiple lines)
+                             "((?:const ?|final ?|override ?){0,3})? ?" // optional function modifiers
+                             "( ?= ?0)? ?" // optional pure virtual indicator
                              ";?"); // optional declaration (instead of definition)
 
     std::regex TemplateRegex("<[^>]+>");
@@ -186,6 +187,7 @@ namespace {
 namespace Extractor {
     namespace FunctionDataExtractor {
         bool IsAFunction(const std::string& line) {
+            // ScopedTimer timer("IsAFunction: " + line, ScopedTimer::TimeUnit::SECOND);
             try {
                 return std::regex_search(line, FunctionRegex);
             } catch(...) {
@@ -195,6 +197,7 @@ namespace Extractor {
         }
 
         bool IsSpecialFunction(const std::string& line) {
+            // ScopedTimer timer("IsSpecialFunction: " + line, ScopedTimer::TimeUnit::SECOND);
             try {
                 return std::regex_search(line, SpecialFunctionRegex) && !std::regex_search(line, StaticAssertRegex);
             } catch(...) {
@@ -204,6 +207,7 @@ namespace Extractor {
         }
 
         bool IsOperatorOverload(const std::string& line) {
+            // ScopedTimer timer("IsOperatorOverload: " + line, ScopedTimer::TimeUnit::SECOND);
             try {
                 return std::regex_search(line, OperatorOverloadRegex);
             } catch(...) {
@@ -213,6 +217,7 @@ namespace Extractor {
         }
 
         FunctionData ExtractFunction(const std::string& line, std::istream& stream, const std::string& ns, const std::string& className, Visibility visibility) {
+            // ScopedTimer timer("ExtractFunction: " + line, ScopedTimer::TimeUnit::SECOND);
             try {
                 auto combinedLine = JoinFunctionLine(line, stream);
                 std::smatch match;
@@ -229,6 +234,7 @@ namespace Extractor {
         }
 
         SpecialFunctionData ExtractSpecialFunction(const std::string& line, std::istream& stream, const std::string& ns, Visibility visibility) {
+            // ScopedTimer timer("ExtractSpecialFunction: " + line, ScopedTimer::TimeUnit::SECOND);
             try {
                 auto combinedLine = JoinFunctionLine(line, stream);
                 std::smatch match;
@@ -245,6 +251,7 @@ namespace Extractor {
         }
 
         OperatorOverloadData ExtractOperatorOverload(const std::string& line, std::istream& stream, const std::string& ns, const std::string& className, Visibility visibility) {
+            // ScopedTimer timer("ExtractOperatorOverload: " + line, ScopedTimer::TimeUnit::SECOND);
             try {
                 auto combinedLine = JoinFunctionLine(line, stream);
                 std::smatch match;
