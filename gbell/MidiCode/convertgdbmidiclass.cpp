@@ -15,8 +15,8 @@ int
 main(int argc,char *argv[])
 {
     FILE *fp;
-    char *buf = NULL;
-    size_t linesz = 0;
+    char buf[1024];
+    int linesz = 1024;
     char *arg1;
     char *arg2;
     int fd;
@@ -25,7 +25,7 @@ main(int argc,char *argv[])
     int trck = 0;
 
     checkargs(fp,fd,argc,argv);
-    while (getline(&buf,&linesz,fp) != EOF) {
+    while (fgets(buf,linesz,fp) != NULL) {
         char *cp = buf;
         if ((trck = preparselin(cp)) == -1)
             ;
@@ -36,7 +36,6 @@ main(int argc,char *argv[])
             continue;
         dofuncs(trck,arg1,arg2);
     }
-    free(buf);
     if (preparse)
         newendtrk(mh,end,tp);
     else
