@@ -1,12 +1,13 @@
-#include <winsock.h>
+#ifndef __WINDOWSPLATFORM_H__
+#define __WINDOWSPLATFORM_H__
 
-#include <share.h>
+#ifdef MSVC
 #include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <io.h>
 #include <iostream>
-
-char* index(char* str, char toFind);
-char* rindex(char* str, char toFind);
-int getline(char** pline_buf, size_t* pn, FILE * fin);
+#include <share.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <winsock.h>
+#endif
+#endif // __WINDOWSPLATFORM_H__
