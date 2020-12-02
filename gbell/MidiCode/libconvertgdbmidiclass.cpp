@@ -165,7 +165,7 @@ parselin(char *line,char parsechr,char *&arg1,char *&arg2)
     char *iptr;
 
     cp=line;
-    if ((iptr=index(cp,parsechr)) == NULL)
+    if ((iptr=strchr(cp,parsechr)) == NULL)
         return(-1);
     arg2 = (iptr + 1);
     *iptr = '\0';
@@ -203,7 +203,7 @@ void
 parsetim(char *arg,tsig &ts,track *tp)
 
 {
-    char *cp = index(arg,'/');
+    char *cp = strchr(arg,'/');
     int len;
     unsigned char timbuf[4] = {'\0','\0','\0','\0'};
     int type = 2;
@@ -505,7 +505,7 @@ parselen(char *arg,track *tp)
     char *cp2;
 
     for (cp=arg;cp != NULL;) {
-        if ((cp2 = index(cp,'+')) == NULL)
+        if ((cp2 = strchr(cp,'+')) == NULL)
             len = atoi(cp);
         else {
             *cp2++ = '\0';
@@ -564,10 +564,10 @@ parsestuff(char *arg,track *tp,void (*parse)(char *,track *,int)) //great descri
 
     cp = cp2;
     while (*cp != '\0') {
-        cp2 = index(cp,',');
+        cp2 = strchr(cp,',');
         if (cp2 == NULL) {
             char tmpstr[100];
-            sprintf(tmpstr,"index: %d comma expected",trk);
+            sprintf(tmpstr,"strchr: %d comma expected",trk);
             error(tmpstr);
         }
         *cp2 = '\0';
@@ -575,10 +575,10 @@ parsestuff(char *arg,track *tp,void (*parse)(char *,track *,int)) //great descri
 
         notelen = parselen(cp,tp);
         cp = cp2;
-        cp2 = index(cp,';');
+        cp2 = strchr(cp,';');
         if (cp2 == NULL) {
             char tmpstr[100];
-            sprintf(tmpstr,"index: %d semi-colon expected",trk);
+            sprintf(tmpstr,"strchr: %d semi-colon expected",trk);
             error(tmpstr);
         }
         *cp2 = '\0';
@@ -691,7 +691,7 @@ parsevel(char *arg,track *tp)
             return(0);
         if (*arg == 0)
             return(0);
-        if ((cp = index(arg,'+')) != NULL)
+        if ((cp = strchr(arg,'+')) != NULL)
             *cp++ = '\0';
         if (!strcmp(arg,"ppp"))
             vel = 18;
@@ -825,7 +825,7 @@ checkargs(FILE *&fp,int &fd,int argc,char *argv[])
         if (strlen(argv[1]) > 1020)
             fatal("filnam too long");
         memcpy(name,argv[1],strlen(argv[1]));
-        cp = (rindex(name,'.')+1);
+        cp = (strrchr(name,'.')+1);
         *cp++ = 'm';
         *cp++ = 'i';
         *cp++ = 'd';
@@ -874,14 +874,14 @@ int preparselin(char *&buf)
 
     if (*cp != 'M')
         return(-1);
-    if ((cp2 = index(++cp,':')) == NULL)
+    if ((cp2 = strchr(++cp,':')) == NULL)
         return(-1);
     *cp2++ = '\0';
     mnum = atoi(cp);
     cp = cp2;
     if (*cp != 'T')
         return(-1);
-    if ((cp2 = index(++cp,':')) == NULL)
+    if ((cp2 = strchr(++cp,':')) == NULL)
         return(-1);
     *cp2++ = '\0';
     tnum = atoi(cp);
