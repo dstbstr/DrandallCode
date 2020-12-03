@@ -14,12 +14,15 @@
 
 namespace {
     std::regex TypeRegex("^" // start of the string
-                         "(template.+?> ?)?" // optionally start with a template
+                         "(template[\\w <>=,:]+?> ?)?" // optionally start with a template
                          "(class|enum|struct|union|interface) " // required type
                          "(?:[\\w\\(\\)\\[\\]]+ ){0,3}" // optional declspec (macro or not) or attributes
                          "([\\w<>]+) ?" // required identifier
                          ":?( ?,?((?:public|protected|private|virtual) ?)? [\\w:<>]+){0,10} ?" // up to 5 base classes (the {0,10} is to avoid using * which causes infinite matches)
-                         "(?:\\{[^}]*\\}?;?|$)"); // Can't end with a semicolon unless it's preceeded by a close curly
+                         "(?:\\{[^}]*\\}?;?|$)", // Can't end with a semicolon unless it's preceeded by a close curly
+                         std::regex_constants::optimize);
+
+    std::regex SimpleTypeRegex("(?:class|enum|struct|union|interface).+(?:\\{|\\};)$");
 
     constexpr size_t TemplateIndex = 1;
     constexpr size_t TypeIndex = 2;
@@ -53,10 +56,13 @@ namespace {
 
 namespace Extractor {
     namespace TypeDataExtractor {
-        bool IsAType(const std::string& line) {
+        bool IsAType(const std::string& line, std::smatch& outMatch) {
             // ScopedTimer timer("IsAType: " + line, ScopedTimer::TimeUnit::SECOND);
             try {
-                return std::regex_search(line, TypeRegex);
+                if(!std::regex_search(line, SimpleTypeRegex)) {
+                    return false;
+                }
+                return std::regex_search(line, outMatch, TypeRegex);
             } catch(std::exception& ex) {
                 LOG_WARN(StrUtil::Format("Failed to determine if line is a type: %s.  Error: %s", line, ex.what()));
                 return false;
@@ -65,15 +71,13 @@ namespace Extractor {
 
         // Should extract a type (class, struct, union, enum) from the provided stream (and initial line)
         // Would almost certainly break with something like class Foo{struct Bar{union Baz{};};}; (in a single line)
-        TypeData Extract(const std::string& initialLine, const std::string& fileName, const std::string& ns, std::istream& stream) {
+        TypeData Extract(const std::smatch& match, const std::string& fileName, const std::string& ns, std::istream& stream) {
             // ScopedTimer timer("ExtractType: " + initialLine, ScopedTimer::TimeUnit::SECOND);
-            std::smatch match;
-            Require::True(std::regex_search(initialLine, match, TypeRegex), "Failed to parse type.  Was IsAType run?");
             auto result = GetTypeData(match, fileName);
             result.Namespace = ns;
             result.LineCount = 1;
-
-            if(std::find(initialLine.begin(), initialLine.end(), '}') != initialLine.end()) {
+            auto initialLine = match[0].str();
+            if(initialLine.find('}') != initialLine.npos) {
                 // single line declaration
                 // TODO: should probably find members
                 return result;
@@ -86,6 +90,8 @@ namespace Extractor {
             u64 nestingDepth = std::count(initialLine.begin(), initialLine.end(), '{');
             u64 lineCount = 0;
             std::string line;
+            std::smatch nextMatch;
+
             while(LineFetcher::GetNextLine(stream, line)) {
                 lineCount++;
                 nestingDepth += std::count(line.begin(), line.end(), '{');
@@ -103,24 +109,24 @@ namespace Extractor {
                     }
                 }
 
-                if(TypeDataExtractor::IsAType(line)) {
+                if(TypeDataExtractor::IsAType(line, nextMatch)) {
                     // if using Egyptian braces, need to remove the open curly from above
                     if(std::find(line.begin(), line.end(), '{') != line.end() && std::find(line.begin(), line.end(), '}') == line.end()) {
                         nestingDepth--;
                     }
-                    auto innerType = TypeDataExtractor::Extract(line, fileName, ns, stream);
+                    auto innerType = TypeDataExtractor::Extract(nextMatch, fileName, ns, stream);
                     result.InnerTypes.push_back(innerType);
                     lineCount += innerType.LineCount - 1;
-                } else if(FunctionDataExtractor::IsAFunction(line)) {
-                    auto function = FunctionDataExtractor::ExtractFunction(line, stream, ns, result.ClassName, currentVisibility);
+                } else if(FunctionDataExtractor::IsAFunction(line, nextMatch)) {
+                    auto function = FunctionDataExtractor::ExtractFunction(line, nextMatch, stream, ns, result.ClassName, currentVisibility);
                     result.Functions.push_back(function);
                     lineCount += function.LineCount - 1;
-                } else if(FunctionDataExtractor::IsSpecialFunction(line)) {
-                    auto function = FunctionDataExtractor::ExtractSpecialFunction(line, stream, ns, currentVisibility);
+                } else if(FunctionDataExtractor::IsSpecialFunction(line, nextMatch)) {
+                    auto function = FunctionDataExtractor::ExtractSpecialFunction(line, nextMatch, stream, ns, currentVisibility);
                     result.SpecialFunctions.push_back(function);
                     lineCount += function.LineCount - 1;
-                } else if(FunctionDataExtractor::IsOperatorOverload(line)) {
-                    auto function = FunctionDataExtractor::ExtractOperatorOverload(line, stream, ns, result.ClassName, currentVisibility);
+                } else if(FunctionDataExtractor::IsOperatorOverload(line, nextMatch)) {
+                    auto function = FunctionDataExtractor::ExtractOperatorOverload(line, nextMatch, stream, ns, result.ClassName, currentVisibility);
                     result.OperatorOverloads.push_back(function);
                     lineCount += function.LineCount - 1;
                 } else if(line[line.length() - 1] == ';') {

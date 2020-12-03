@@ -1,95 +1,119 @@
 #include "Extractor/FunctionDataExtractor.h"
+#include "Extractor/Private/LineFetcher.h"
 #include "TestCommon.h"
 #include "Utilities/StringUtils.h"
+
 
 namespace Extractor {
     using FunctionDataExtractor::IsSpecialFunction;
 
     TEST(IsSpecialFunctionTest, BasicConstructorDeclaration) {
-        ASSERT_TRUE(IsSpecialFunction("Foo();"));
+        std::smatch match;
+        ASSERT_TRUE(IsSpecialFunction("Foo();", match));
     }
 
     TEST(IsSpecialFunctionTest, BasicConstuctorDefinition) {
-        ASSERT_TRUE(IsSpecialFunction("Foo() {}"));
+        std::smatch match;
+        ASSERT_TRUE(IsSpecialFunction("Foo() {}", match));
     }
 
     TEST(IsSpecialFunctionTest, VirtualConstructor) {
-        ASSERT_TRUE(IsSpecialFunction("virtual Foo()"));
+        std::smatch match;
+        ASSERT_TRUE(IsSpecialFunction("virtual Foo()", match));
     }
 
     TEST(IsSpecialFunctionTest, ClassWhichStartsWithUnderscore) {
-        ASSERT_TRUE(IsSpecialFunction("_Foo();"));
+        std::smatch match;
+        ASSERT_TRUE(IsSpecialFunction("_Foo();", match));
     }
     TEST(IsSpecialFunctionTest, ClassWhichEndsWithUnderscore) {
-        ASSERT_TRUE(IsSpecialFunction("Foo_();"));
+        std::smatch match;
+        ASSERT_TRUE(IsSpecialFunction("Foo_();", match));
     }
 
     TEST(IsSpecialFunctionTest, ClassWhichEndsWithCapitalLetter) {
-        ASSERT_TRUE(IsSpecialFunction("FooA();"));
+        std::smatch match;
+        ASSERT_TRUE(IsSpecialFunction("FooA();", match));
     }
 
     TEST(IsSpecialFunctionTest, ClassWhichStartsWithMultipleCapitalLetters) {
-        ASSERT_TRUE(IsSpecialFunction("CFoo();"));
+        std::smatch match;
+        ASSERT_TRUE(IsSpecialFunction("CFoo();", match));
     }
 
     TEST(IsSpecialFunctionTest, ConstructorWithSplitArgs) {
-        ASSERT_TRUE(IsSpecialFunction("Foo("));
+        std::smatch match;
+        ASSERT_TRUE(IsSpecialFunction("Foo(", match));
     }
 
     TEST(IsSpecialFunctionTest, ConstructorWithArgs) {
-        ASSERT_TRUE(IsSpecialFunction("Foo(int a, int b);"));
+        std::smatch match;
+        ASSERT_TRUE(IsSpecialFunction("Foo(int a, int b);", match));
     }
 
     TEST(IsSpecialFunctionTest, DefaultConstructor) {
-        ASSERT_TRUE(IsSpecialFunction("Foo() = default;"));
+        std::smatch match;
+        ASSERT_TRUE(IsSpecialFunction("Foo() = default;", match));
     }
 
     TEST(IsSpecialFunctionTest, DeletedConstructor) {
-        ASSERT_TRUE(IsSpecialFunction("Foo() = delete;"));
+        std::smatch match;
+        ASSERT_TRUE(IsSpecialFunction("Foo() = delete;", match));
     }
 
     TEST(IsSpecialFunctionTest, BasicDestructorDeclaration) {
-        ASSERT_TRUE(IsSpecialFunction("~Foo();"));
+        std::smatch match;
+        ASSERT_TRUE(IsSpecialFunction("~Foo();", match));
     }
 
     TEST(IsSpecialFunctionTest, BasicDestructorDefinition) {
-        ASSERT_TRUE(IsSpecialFunction("~Foo() {}"));
+        std::smatch match;
+        ASSERT_TRUE(IsSpecialFunction("~Foo() {}", match));
     }
 
     TEST(IsSpecialFunctionTest, VirtualDestructor) {
-        ASSERT_TRUE(IsSpecialFunction("virtual ~Foo()"));
+        std::smatch match;
+        ASSERT_TRUE(IsSpecialFunction("virtual ~Foo()", match));
     }
 
     TEST(IsSpecialFunctionTest, InlineTemplateDefinitionIsSpecial) {
-        ASSERT_TRUE(IsSpecialFunction("template <typename T> Foo<T>::Foo()"));
+        std::smatch match;
+        ASSERT_TRUE(IsSpecialFunction("template <typename T> Foo<T>::Foo()", match));
     }
 
     TEST(IsSpecialFunctionTest, InlineTemplateQualifiedDestructorIsSpecial) {
-        ASSERT_TRUE(IsSpecialFunction("template <typename T> Foo<T>::~Foo()"));
+        std::smatch match;
+        ASSERT_TRUE(IsSpecialFunction("template <typename T> Foo<T>::~Foo()", match));
     }
 
     TEST(IsSpecialFunctionTest, ExplicitConstructor) {
-        ASSERT_TRUE(IsSpecialFunction("explicit Foo(int i);"));
+        std::smatch match;
+        ASSERT_TRUE(IsSpecialFunction("explicit Foo(int i);", match));
     }
 
     TEST(IsSpecialFunctionTest, StaticConstructorNotSpecial) {
-        ASSERT_FALSE(IsSpecialFunction("Foo CreateClass();"));
+        std::smatch match;
+        ASSERT_FALSE(IsSpecialFunction("Foo CreateClass();", match));
     }
 
     TEST(IsSpecialFunctionTest, StaticAssertNotSpecial) {
-        ASSERT_FALSE(IsSpecialFunction("static_assert(i < 25);"));
+        std::smatch match;
+        ASSERT_FALSE(IsSpecialFunction("static_assert(i < 25);", match));
     }
 
     TEST(IsSpecialFunctionTest, MacroIsNotSpecial) {
-        ASSERT_FALSE(IsSpecialFunction("ASSERT_FALSE(i < 25);"));
+        std::smatch match;
+        ASSERT_FALSE(IsSpecialFunction("ASSERT_FALSE(i < 25);", match));
     }
 
     class ExtractSpecialFunctionTest : public ::testing::Test {
     protected:
         SpecialFunctionData Extract() {
             std::string line;
-            std::getline(ss, line);
-            return FunctionDataExtractor::ExtractSpecialFunction(line, ss, m_Namespace, m_Visibility);
+            LineFetcher::GetNextLine(ss, line);
+            std::smatch match;
+            IsSpecialFunction(line, match);
+            return FunctionDataExtractor::ExtractSpecialFunction(line, match, ss, m_Namespace, m_Visibility);
         }
 
         std::stringstream ss;

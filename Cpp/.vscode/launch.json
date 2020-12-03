@@ -45,7 +45,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/bin/Debug/GBellMidi.exe",
             "args": [
-                "${workspaceFolder}/GbellMidi/passiton.gdb"
+                "${workspaceFolder}/GbellMidi/row.gdb"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

@@ -6,17 +6,17 @@ namespace {
 
     constexpr char FileLineFormat[]{"%s,%s,,%s,,%u,,,,,,,,,,,,,,,,,,,,\n"};
     constexpr char TypeLineFormat[]{",%s,%s,%s,%s,%u,"
-                                    "%s,%u,%u,%u,%u,%u,%u,%u"
+                                    "%s,%u,%u,%u,%u,%u,%u,%u,"
                                     ",,,,"
                                     "%s,%s,,,,,,,,,\n"};
     constexpr char FunctionLineFormat[]{",%s,%s,%s,%s,%u,"
                                         "%s,,,,,,,,"
                                         "%s,%s,%u,%u,"
-                                        ",%s,%s,%s,%s,%s,%s,,,\n"};
+                                        ",%s,%s,%s,%s,,%s,%s,,,\n"};
     constexpr char SpecialFunctionFormat[]{",%s,%s,%s,%s,%u,"
                                            "%s,,,,,,,,"
                                            "%s,,%u,%u,"
-                                           ",,%s,,,%s,,,,%s,%s\n"};
+                                           ",,%s,,%s,,,,,%s,%s\n"};
     constexpr char OpOverloadFormat[]{",%s,%s,%s,%s,%u,"
                                       "%s,,,,,,,,"
                                       "%s,,%u,,"

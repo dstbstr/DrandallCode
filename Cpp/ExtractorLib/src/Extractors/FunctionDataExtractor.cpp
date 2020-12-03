@@ -9,28 +9,32 @@
 #include <regex>
 
 namespace {
-    std::regex SpecialFunctionRegex("^(?:template *<[^>]*> *)?(virtual *)?(explicit *)?(~?_*[A-Z]+[a-z][\\w:<>~]+)\\(([^\\)]*)\\)? *=? *(default)?(delete)?");
+    std::regex SpecialFunctionRegex("^(?:template[\\w <>=,:]+?> ?)?(virtual )?(explicit )?(~?_*[A-Z]+[a-z][\\w:<>~]+)\\(([^\\)]*)\\)? *=? *(default)?(delete)?", std::regex_constants::optimize);
     std::regex OperatorOverloadRegex("^(explicit +)?(friend +)?(inline +)?" // optional specifier
                                      "(?:const *)?(?:.+)? *" // optional return type
                                      "operator *" // required operator keyword
                                      "(.+?) *" // specific operator being overloaded
                                      "\\(([^\\)]*)\\) *" // parameters
-                                     "(?:const *)?"); // optional const
+                                     "(?:const *)?", // optional const
+                                     std::regex_constants::optimize);
+    std::regex SimpleOperatorRegex("(?:operator)");
 
     std::regex FunctionRegex("^" // start of string
-                             "(template.+> ?)?" // optional template
-                             "((?:(?:virtual ?)|(?:(?:__(force)?)?inline ?)|(?:static ?))*)?" // function prefixes
-                             "(?:[\\w\\(\\)\\[\\]]+? *){0,3}" // optional declspec or attributes
-                             "(?:const ?)?" // return type const
-                             "[\\w\\[\\]&\\*:<>]+[&\\*\\w\\]>] " // return type with potential qualifification or reference
-                             "(?: ?const ?)?[\\*&]? ?" // support RTL const
+                             "(template[\\w <>=,:]+?> ?)?" // optional template
+                             "((?:virtual |_?_?(?:force)?inline |static )+)?" // function prefixes
+                             "(?:[\\w\\(\\)\\[\\]:<>]+? ?){0,3}" // optional declspec or attributes
+                             "(?:const )?" // return type const
+                             "[\\w\\[\\]&\\*:<>]{0,3}[&\\*\\w\\]>] " // return type with potential qualifification or reference
+                             "(?: ?const )?[\\*&]? ?" // support RTL const
                              "([\\w:<>]+) ?" // Function name
                              "\\(" // Start of parameters
-                             "([^\\)]*)" // parameters
-                             "\\)? ?" // optional end of parameters (may split parameters on multiple lines)
+                             "([^\\)]*?)" // parameters
+                             "\\) ?" // end of parameters
                              "((?:const ?|final ?|override ?){0,3})? ?" // optional function modifiers
                              "( ?= ?0)? ?" // optional pure virtual indicator
-                             ";?"); // optional declaration (instead of definition)
+                             ";?", // optional declaration (instead of definition)
+                             std::regex_constants::optimize);
+    std::regex SimpleFunctionRegex("\\(");
 
     std::regex TemplateRegex("<[^>]+>");
     std::regex VirtualRegex("virtual");
@@ -42,14 +46,10 @@ namespace {
 
     constexpr size_t TemplateIndex = 1;
     constexpr size_t PrefixIndex = 2;
-    constexpr size_t FunctionNameIndex = 4;
-    constexpr size_t ArgIndex = 5;
-    constexpr size_t PostfixIndex = 6;
-    constexpr size_t AbstractIndex = 7;
-
-    class Foo {
-        explicit Foo();
-    };
+    constexpr size_t FunctionNameIndex = 3;
+    constexpr size_t ArgIndex = 4;
+    constexpr size_t PostfixIndex = 5;
+    constexpr size_t AbstractIndex = 6;
 
     Extractor::FunctionData GetFunctionData(std::smatch match, const std::string& ns, const std::string& className, Extractor::Visibility visibility) {
         Extractor::FunctionData result;
@@ -145,28 +145,6 @@ namespace {
         return result;
     }
 
-    std::string JoinFunctionLine(std::string line, std::istream& stream) {
-        using namespace Extractor;
-
-        std::string result = StrUtil::Trim(line);
-        bool isInCommentBlock = false;
-        CommentExtractor::StripComments(result, isInCommentBlock);
-        auto lastChar = result[result.length() - 1];
-        if(lastChar == ';' || lastChar == '}') {
-            return result;
-        }
-
-        std::string nextLine;
-        while(lastChar != ';' && lastChar != '{' && std::getline(stream, nextLine)) {
-            auto trimmed = StrUtil::TrimStart(nextLine);
-            CommentExtractor::StripComments(trimmed, isInCommentBlock);
-            result += trimmed;
-            lastChar = result[result.length() - 1];
-        }
-
-        return result;
-    }
-
     u64 CountLinesInBody(std::string line, std::istream& stream) {
         auto trimmed = StrUtil::Trim(line);
         auto nestingDepth = std::count(trimmed.begin(), trimmed.end(), '{');
@@ -186,85 +164,70 @@ namespace {
 
 namespace Extractor {
     namespace FunctionDataExtractor {
-        bool IsAFunction(const std::string& line) {
+        bool IsAFunction(const std::string& line, std::smatch& outMatch) {
             // ScopedTimer timer("IsAFunction: " + line, ScopedTimer::TimeUnit::SECOND);
             try {
-                return std::regex_search(line, FunctionRegex);
+                if(!std::regex_search(line, SimpleFunctionRegex)) {
+                    return false;
+                }
+                return std::regex_search(line, outMatch, FunctionRegex);
             } catch(...) {
                 LOG_ERROR(StrUtil::Format("Failed to determine if line is a function: %s", line));
                 return false;
             }
         }
 
-        bool IsSpecialFunction(const std::string& line) {
+        bool IsSpecialFunction(const std::string& line, std::smatch& outMatch) {
             // ScopedTimer timer("IsSpecialFunction: " + line, ScopedTimer::TimeUnit::SECOND);
             try {
-                return std::regex_search(line, SpecialFunctionRegex) && !std::regex_search(line, StaticAssertRegex);
+                if(!std::regex_search(line, SimpleFunctionRegex)) {
+                    return false;
+                }
+                return std::regex_search(line, outMatch, SpecialFunctionRegex) && !std::regex_search(line, StaticAssertRegex);
             } catch(...) {
                 LOG_ERROR(StrUtil::Format("Failed to determine if line is a special function: %s", line));
                 return false;
             }
         }
 
-        bool IsOperatorOverload(const std::string& line) {
+        bool IsOperatorOverload(const std::string& line, std::smatch& outMatch) {
             // ScopedTimer timer("IsOperatorOverload: " + line, ScopedTimer::TimeUnit::SECOND);
             try {
-                return std::regex_search(line, OperatorOverloadRegex);
+                if(!std::regex_search(line, SimpleOperatorRegex)) {
+                    return false;
+                }
+                return std::regex_search(line, outMatch, OperatorOverloadRegex);
             } catch(...) {
                 LOG_ERROR(StrUtil::Format("Failed to determine if line is an operation overload: %s", line));
                 return false;
             }
         }
 
-        FunctionData ExtractFunction(const std::string& line, std::istream& stream, const std::string& ns, const std::string& className, Visibility visibility) {
+        FunctionData ExtractFunction(const std::string& line, const std::smatch& match, std::istream& stream, const std::string& ns, const std::string& className, Visibility visibility) {
             // ScopedTimer timer("ExtractFunction: " + line, ScopedTimer::TimeUnit::SECOND);
-            try {
-                auto combinedLine = JoinFunctionLine(line, stream);
-                std::smatch match;
-                Require::True(std::regex_search(combinedLine, match, FunctionRegex), "Failed to parse function.  Was IsAFunction run?");
-                auto result = GetFunctionData(match, ns, className, visibility);
+            auto result = GetFunctionData(match, ns, className, visibility);
 
-                u64 bodyLineCount = CountLinesInBody(combinedLine.substr(match[0].length()), stream);
-                result.LineCount = bodyLineCount + 1;
-                return result;
-            } catch(...) {
-                LOG_ERROR(StrUtil::Format("Failed to extract function from line: %s", line));
-                return FunctionData();
-            }
+            u64 bodyLineCount = CountLinesInBody(line.substr(match[0].length()), stream);
+            result.LineCount = bodyLineCount + 1;
+            return result;
         }
 
-        SpecialFunctionData ExtractSpecialFunction(const std::string& line, std::istream& stream, const std::string& ns, Visibility visibility) {
+        SpecialFunctionData ExtractSpecialFunction(const std::string& line, const std::smatch& match, std::istream& stream, const std::string& ns, Visibility visibility) {
             // ScopedTimer timer("ExtractSpecialFunction: " + line, ScopedTimer::TimeUnit::SECOND);
-            try {
-                auto combinedLine = JoinFunctionLine(line, stream);
-                std::smatch match;
-                Require::True(std::regex_search(combinedLine, match, SpecialFunctionRegex), "Failed to parse special function.  Was IsSpecialFunction run?");
-                auto result = GetSpecialFunctionData(match, ns, visibility);
+            auto result = GetSpecialFunctionData(match, ns, visibility);
 
-                u64 bodyLineCount = CountLinesInBody(combinedLine.substr(match[0].length()), stream);
-                result.LineCount = bodyLineCount + 1;
-                return result;
-            } catch(...) {
-                LOG_ERROR(StrUtil::Format("Failed to extract special function from line: %s", line));
-                return SpecialFunctionData();
-            }
+            u64 bodyLineCount = CountLinesInBody(line.substr(match[0].length()), stream);
+            result.LineCount = bodyLineCount + 1;
+            return result;
         }
 
-        OperatorOverloadData ExtractOperatorOverload(const std::string& line, std::istream& stream, const std::string& ns, const std::string& className, Visibility visibility) {
+        OperatorOverloadData ExtractOperatorOverload(const std::string& line, const std::smatch& match, std::istream& stream, const std::string& ns, const std::string& className, Visibility visibility) {
             // ScopedTimer timer("ExtractOperatorOverload: " + line, ScopedTimer::TimeUnit::SECOND);
-            try {
-                auto combinedLine = JoinFunctionLine(line, stream);
-                std::smatch match;
-                Require::True(std::regex_search(combinedLine, match, OperatorOverloadRegex), "Failed to parse operator overload.  Was IsOperatorOverload run?");
-                auto result = GetOperatorOverload(match, ns, className, visibility);
+            auto result = GetOperatorOverload(match, ns, className, visibility);
 
-                u64 bodyLineCount = CountLinesInBody(combinedLine.substr(match[0].length()), stream);
-                result.LineCount = bodyLineCount + 1;
-                return result;
-            } catch(...) {
-                LOG_ERROR(StrUtil::Format("Failed to extract operator overload from line: %s", line));
-                return OperatorOverloadData();
-            }
+            u64 bodyLineCount = CountLinesInBody(line.substr(match[0].length()), stream);
+            result.LineCount = bodyLineCount + 1;
+            return result;
         }
 
     } // namespace FunctionDataExtractor
