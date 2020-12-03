@@ -1,8 +1,10 @@
-#include "TestCommon.h"
-#include "Threading/IRunnable.h"
 #include "Threading/Runner.h"
 
+#include "TestCommon.h"
+#include "Threading/IRunnable.h"
+
 #include <memory>
+
 
 using JobList = std::vector<std::unique_ptr<IRunnable<int>>>;
 using VoidJobList = std::vector<std::unique_ptr<IRunnable<VOID>>>;
@@ -49,14 +51,14 @@ TEST(ThrottledRunnerTest, WorksWithASingleEntry) {
 
 TEST(ThrottledRunnerTest, WorksWithLargeNumberOfEntries) {
     JobList jobs;
-    for(int i = 0; i < 500; i++) {
+    for(int i = 0; i < 5000; i++) {
         jobs.push_back(std::move(std::make_unique<ExampleRunnable>(i)));
     }
 
     auto result = Runner::Get().RunAll(jobs);
 
     ASSERT_FALSE(result.empty());
-    ASSERT_EQ(result.size(), 500);
+    ASSERT_EQ(result.size(), 5000);
 }
 
 TEST(ThrottledRunnerTest, WorksWithVoidReturns) {

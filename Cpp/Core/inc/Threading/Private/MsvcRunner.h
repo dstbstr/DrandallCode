@@ -44,22 +44,16 @@ public:
                 tasks.push_back(task);
             }
 
-            concurrency::when_all(tasks.begin(), tasks.end());
+            concurrency::when_all(tasks.begin(), tasks.end()).wait();
             for(auto&& completed: tasks) {
                 result.push_back(completed.get());
             }
+            
             tasks.clear();
             jobs.clear();
         }
 
         return result;
-    }
-
-    template<class ReturnType>
-    std::vector<ReturnType> RunAll2(std::vector<std::unique_ptr<IRunnable<ReturnType>>>& runnables) {
-        ScopedTimer timer("Runner::RunAll2");
-        std::vector<ReturnType> result;
-        result.reserve(runnables.size());
     }
 
 private:
