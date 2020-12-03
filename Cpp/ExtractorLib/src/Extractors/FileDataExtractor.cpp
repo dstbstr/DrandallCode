@@ -55,22 +55,22 @@ namespace Extractor {
             if(namespaceExtractor.IsNamespace(line)) {
                 namespaceExtractor.ExtractNamespace(line);
             }
-            if(m_Settings.ExtractTypes && TypeDataExtractor::IsAType(line)) {
-                auto type = TypeDataExtractor::Extract(line, result.FileName, namespaceExtractor.GetNamespace(), stream);
+            if(m_Settings.ExtractTypes && TypeDataExtractor::IsAType(line, match)) {
+                auto type = TypeDataExtractor::Extract(match, result.FileName, namespaceExtractor.GetNamespace(), stream);
                 result.Types.push_back(type);
                 nonBlankLines += type.LineCount - 1;
-            } else if(m_Settings.ExtractFunctions && FunctionDataExtractor::IsAFunction(line)) {
-                auto functionData = FunctionDataExtractor::ExtractFunction(line, stream, namespaceExtractor.GetNamespace(), "", Visibility::PUBLIC);
+            } else if(m_Settings.ExtractFunctions && FunctionDataExtractor::IsAFunction(line, match)) {
+                auto functionData = FunctionDataExtractor::ExtractFunction(line, match, stream, namespaceExtractor.GetNamespace(), "", Visibility::PUBLIC);
                 if(functionData.ClassName.empty()) {
                     result.FreeFunctions.push_back(functionData);
                 }
                 nonBlankLines += functionData.LineCount - 1;
-            } else if(m_Settings.ExtractFunctions && FunctionDataExtractor::IsSpecialFunction(line)) {
+            } else if(m_Settings.ExtractFunctions && FunctionDataExtractor::IsSpecialFunction(line, match)) {
                 // inline constructor, should have already been declared, just need to skip through it
-                auto function = FunctionDataExtractor::ExtractSpecialFunction(line, stream, "", Visibility::PUBLIC);
+                auto function = FunctionDataExtractor::ExtractSpecialFunction(line, match, stream, "", Visibility::PUBLIC);
                 nonBlankLines += function.LineCount - 1;
-            } else if(m_Settings.ExtractFunctions && FunctionDataExtractor::IsOperatorOverload(line)) {
-                auto function = FunctionDataExtractor::ExtractOperatorOverload(line, stream, namespaceExtractor.GetNamespace(), "", Visibility::PUBLIC);
+            } else if(m_Settings.ExtractFunctions && FunctionDataExtractor::IsOperatorOverload(line, match)) {
+                auto function = FunctionDataExtractor::ExtractOperatorOverload(line, match, stream, namespaceExtractor.GetNamespace(), "", Visibility::PUBLIC);
                 result.FreeOperatorOverloads.push_back(function);
                 nonBlankLines += function.LineCount - 1;
             } else if(std::regex_search(line, CloseBlockRegex)) {

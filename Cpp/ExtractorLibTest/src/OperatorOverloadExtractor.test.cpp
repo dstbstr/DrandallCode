@@ -6,118 +6,143 @@ namespace Extractor {
     using FunctionDataExtractor::IsOperatorOverload;
 
     TEST(IsOperatorOverload, AssignmentOperator) {
-        ASSERT_TRUE(IsOperatorOverload("X& X::operator=(X rhs)"));
+        std::smatch match;
+        ASSERT_TRUE(IsOperatorOverload("X& X::operator=(X rhs)", match));
     }
     TEST(IsOperatorOverload, LeftShiftOperator) {
-        ASSERT_TRUE(IsOperatorOverload("std::ostream& operator<<(std::ostream& os, const T& obj)"));
+        std::smatch match;
+        ASSERT_TRUE(IsOperatorOverload("std::ostream& operator<<(std::ostream& os, const T& obj)", match));
     }
     TEST(IsOperatorOverload, RightShiftOperator) {
-        ASSERT_TRUE(IsOperatorOverload("std::istream& operator>>(std::istream& is, T& obj)"));
+        std::smatch match;
+        ASSERT_TRUE(IsOperatorOverload("std::istream& operator>>(std::istream& is, T& obj)", match));
     }
     TEST(IsOperatorOverload, FunctionCallOperator) {
-        ASSERT_TRUE(IsOperatorOverload("int operator()(const std::string& y)"));
+        std::smatch match;
+        ASSERT_TRUE(IsOperatorOverload("int operator()(const std::string& y)", match));
     }
     TEST(IsOperatorOverload, EqualityOperator) {
-        ASSERT_TRUE(IsOperatorOverload("inline bool operator==(const X& lhs, const X& rhs)"));
-        ASSERT_TRUE(IsOperatorOverload("bool operator==(const X& rhs) const"));
+        std::smatch match;
+        ASSERT_TRUE(IsOperatorOverload("inline bool operator==(const X& lhs, const X& rhs)", match));
+        ASSERT_TRUE(IsOperatorOverload("bool operator==(const X& rhs) const", match));
     }
     TEST(IsOperatorOverload, InequalityOperator) {
-        ASSERT_TRUE(IsOperatorOverload("inline bool operator!=(const X& lhs, const X& rhs)"));
-        ASSERT_TRUE(IsOperatorOverload("bool operator!=(const X& rhs) const"));
+        std::smatch match;
+        ASSERT_TRUE(IsOperatorOverload("inline bool operator!=(const X& lhs, const X& rhs)", match));
+        ASSERT_TRUE(IsOperatorOverload("bool operator!=(const X& rhs) const", match));
     }
     TEST(IsOperatorOverload, LessThanOperator) {
-        ASSERT_TRUE(IsOperatorOverload("inline bool operator<(const X& lhs, const X& rhs)"));
-        ASSERT_TRUE(IsOperatorOverload("bool operator<(const X& rhs) const"));
+        std::smatch match;
+        ASSERT_TRUE(IsOperatorOverload("inline bool operator<(const X& lhs, const X& rhs)", match));
+        ASSERT_TRUE(IsOperatorOverload("bool operator<(const X& rhs) const", match));
     }
     TEST(IsOperatorOverload, GreaterThanOperator) {
-        ASSERT_TRUE(IsOperatorOverload("inline bool operator>(const X& lhs, const X& rhs)"));
-        ASSERT_TRUE(IsOperatorOverload("bool operator>(const X& rhs) const"));
+        std::smatch match;
+        ASSERT_TRUE(IsOperatorOverload("inline bool operator>(const X& lhs, const X& rhs)", match));
+        ASSERT_TRUE(IsOperatorOverload("bool operator>(const X& rhs) const", match));
     }
     TEST(IsOperatorOverload, LessOrEqualOperator) {
-        ASSERT_TRUE(IsOperatorOverload("inline bool operator<=(const X& lhs, const X& rhs)"));
-        ASSERT_TRUE(IsOperatorOverload("bool operator<=(const X& rhs) const"));
+        std::smatch match;
+        ASSERT_TRUE(IsOperatorOverload("inline bool operator<=(const X& lhs, const X& rhs)", match));
+        ASSERT_TRUE(IsOperatorOverload("bool operator<=(const X& rhs) const", match));
     }
     TEST(IsOperatorOverload, GreaterOrEqualOperator) {
-        ASSERT_TRUE(IsOperatorOverload("inline bool operator>=(const X& lhs, const X& rhs)"));
-        ASSERT_TRUE(IsOperatorOverload("bool operator>=(const X& rhs) const"));
+        std::smatch match;
+        ASSERT_TRUE(IsOperatorOverload("inline bool operator>=(const X& lhs, const X& rhs)", match));
+        ASSERT_TRUE(IsOperatorOverload("bool operator>=(const X& rhs) const", match));
     }
     TEST(IsOperatorOverload, OrOperator) {
-        ASSERT_TRUE(IsOperatorOverload("inline bool operator||(const X& lhs, const X& rhs)"));
-        ASSERT_TRUE(IsOperatorOverload("bool operator||(const X& rhs) const"));
+        std::smatch match;
+        ASSERT_TRUE(IsOperatorOverload("inline bool operator||(const X& lhs, const X& rhs)", match));
+        ASSERT_TRUE(IsOperatorOverload("bool operator||(const X& rhs) const", match));
     }
     TEST(IsOperatorOverload, AndOperator) {
-        ASSERT_TRUE(IsOperatorOverload("inline bool operator&&(const X& lhs, const X& rhs)"));
-        ASSERT_TRUE(IsOperatorOverload("bool operator&&(const X& rhs) const"));
+        std::smatch match;
+        ASSERT_TRUE(IsOperatorOverload("inline bool operator&&(const X& lhs, const X& rhs)", match));
+        ASSERT_TRUE(IsOperatorOverload("bool operator&&(const X& rhs) const", match));
     }
     TEST(IsOperatorOverload, PrefixOperators) {
-        ASSERT_TRUE(IsOperatorOverload("X& operator++()"));
-        ASSERT_TRUE(IsOperatorOverload("X& operator--()"));
+        std::smatch match;
+        ASSERT_TRUE(IsOperatorOverload("X& operator++()", match));
+        ASSERT_TRUE(IsOperatorOverload("X& operator--()", match));
     }
     TEST(IsOperatorOverload, PostfixOperators) {
-        ASSERT_TRUE(IsOperatorOverload("X& operator++(int)"));
-        ASSERT_TRUE(IsOperatorOverload("X& operator--(int)"));
+        std::smatch match;
+        ASSERT_TRUE(IsOperatorOverload("X& operator++(int)", match));
+        ASSERT_TRUE(IsOperatorOverload("X& operator--(int)", match));
     }
     TEST(IsOperatorOverload, UnaryPrefixOperators) {
-        ASSERT_TRUE(IsOperatorOverload("X& operator-()"));
-        ASSERT_TRUE(IsOperatorOverload("inline X operator-(X& x)"));
-        ASSERT_TRUE(IsOperatorOverload("X& operator+()"));
-        ASSERT_TRUE(IsOperatorOverload("inline X operator+(X& x)"));
-        ASSERT_TRUE(IsOperatorOverload("X& operator!()"));
-        ASSERT_TRUE(IsOperatorOverload("inline X operator!(X& x)"));
-        ASSERT_TRUE(IsOperatorOverload("X& operator~()"));
-        ASSERT_TRUE(IsOperatorOverload("inline X operator~(X& x)"));
-        ASSERT_TRUE(IsOperatorOverload("X& operator|()"));
-        ASSERT_TRUE(IsOperatorOverload("inline X operator|(X& x)"));
+        std::smatch match;
+        ASSERT_TRUE(IsOperatorOverload("X& operator-()", match));
+        ASSERT_TRUE(IsOperatorOverload("inline X operator-(X& x)", match));
+        ASSERT_TRUE(IsOperatorOverload("X& operator+()", match));
+        ASSERT_TRUE(IsOperatorOverload("inline X operator+(X& x)", match));
+        ASSERT_TRUE(IsOperatorOverload("X& operator!()", match));
+        ASSERT_TRUE(IsOperatorOverload("inline X operator!(X& x)", match));
+        ASSERT_TRUE(IsOperatorOverload("X& operator~()", match));
+        ASSERT_TRUE(IsOperatorOverload("inline X operator~(X& x)", match));
+        ASSERT_TRUE(IsOperatorOverload("X& operator|()", match));
+        ASSERT_TRUE(IsOperatorOverload("inline X operator|(X& x)", match));
     }
 
     TEST(IsOperatorOverload, ThreeCharacterOperators) {
-        ASSERT_TRUE(IsOperatorOverload("X& operator<<=(X& rhs)"));
-        ASSERT_TRUE(IsOperatorOverload("inline X& operator<<=(X& lhs, const X& rhs)"));
+        std::smatch match;
+        ASSERT_TRUE(IsOperatorOverload("X& operator<<=(X& rhs)", match));
+        ASSERT_TRUE(IsOperatorOverload("inline X& operator<<=(X& lhs, const X& rhs)", match));
     }
 
     TEST(IsOperatorOverload, ArraySubscriptOperator) {
-        ASSERT_TRUE(IsOperatorOverload("X& operator[](int index)"));
-        ASSERT_TRUE(IsOperatorOverload("X operator[](int index) const"));
+        std::smatch match;
+        ASSERT_TRUE(IsOperatorOverload("X& operator[](int index)", match));
+        ASSERT_TRUE(IsOperatorOverload("X operator[](int index) const", match));
     }
 
     TEST(IsOperatorOverload, PointerLikeOperators) {
-        ASSERT_TRUE(IsOperatorOverload("X& operator*()"));
-        ASSERT_TRUE(IsOperatorOverload("const X& operator*() const"));
-        ASSERT_TRUE(IsOperatorOverload("X* operator->();"));
-        ASSERT_TRUE(IsOperatorOverload("const X* operator->() const;"));
+        std::smatch match;
+        ASSERT_TRUE(IsOperatorOverload("X& operator*()", match));
+        ASSERT_TRUE(IsOperatorOverload("const X& operator*() const", match));
+        ASSERT_TRUE(IsOperatorOverload("X* operator->();", match));
+        ASSERT_TRUE(IsOperatorOverload("const X* operator->() const;", match));
     }
 
     TEST(IsOperatorOverload, NewOperators) {
-        ASSERT_TRUE(IsOperatorOverload("void* operator new();"));
-        ASSERT_TRUE(IsOperatorOverload("void* operator new(std::size_t);"));
-        ASSERT_TRUE(IsOperatorOverload("void* operator new(std::size_t, void*p);"));
-        ASSERT_TRUE(IsOperatorOverload("void * operator new[](std::size_t, void* p);"));
+        std::smatch match;
+        ASSERT_TRUE(IsOperatorOverload("void* operator new();", match));
+        ASSERT_TRUE(IsOperatorOverload("void* operator new(std::size_t);", match));
+        ASSERT_TRUE(IsOperatorOverload("void* operator new(std::size_t, void*p);", match));
+        ASSERT_TRUE(IsOperatorOverload("void * operator new[](std::size_t, void* p);", match));
     }
 
     TEST(IsOperatorOverload, DeleteOperators) {
-        ASSERT_TRUE(IsOperatorOverload("void operator delete(void* p, void*)"));
-        ASSERT_TRUE(IsOperatorOverload("void operator delete[](void* p, void*);"));
+        std::smatch match;
+        ASSERT_TRUE(IsOperatorOverload("void operator delete(void* p, void*)", match));
+        ASSERT_TRUE(IsOperatorOverload("void operator delete[](void* p, void*);", match));
     }
 
     TEST(IsOperatorOverload, ExplicitOperator) {
-        ASSERT_TRUE(IsOperatorOverload("explicit operator const char*() const"));
-        ASSERT_TRUE(IsOperatorOverload("explicit operator bool() const"));
+        std::smatch match;
+        ASSERT_TRUE(IsOperatorOverload("explicit operator const char*() const", match));
+        ASSERT_TRUE(IsOperatorOverload("explicit operator bool() const", match));
     }
 
     TEST(IsOperatorOverload, FriendOperator) {
-        ASSERT_TRUE(IsOperatorOverload("friend bool operator<(const X& rhs);"));
+        std::smatch match;
+        ASSERT_TRUE(IsOperatorOverload("friend bool operator<(const X& rhs);", match));
     }
 
     TEST(IsOperatorOverload, SpaceBeforeOperator) {
-        ASSERT_TRUE(IsOperatorOverload("bool operator <(const X& rhs);"));
+        std::smatch match;
+        ASSERT_TRUE(IsOperatorOverload("bool operator <(const X& rhs);", match));
     }
 
     TEST(IsOperatorOverload, SpaceAfterOperator) {
-        ASSERT_TRUE(IsOperatorOverload("bool operator< (const X& rhs);"));
+        std::smatch match;
+        ASSERT_TRUE(IsOperatorOverload("bool operator< (const X& rhs);", match));
     }
 
     TEST(IsNotOperatorOverload, ClassOperator) {
-        ASSERT_FALSE(IsOperatorOverload("class operator {"));
+        std::smatch match;
+        ASSERT_FALSE(IsOperatorOverload("class operator {", match));
     }
 
     class ExtractOperatorOverloadTest : public ::testing::Test {
@@ -125,7 +150,9 @@ namespace Extractor {
         OperatorOverloadData Extract() {
             std::string line;
             std::getline(ss, line);
-            return FunctionDataExtractor::ExtractOperatorOverload(line, ss, m_Namespace, m_ClassName, m_Visibility);
+            std::smatch match;
+            IsOperatorOverload(line, match);
+            return FunctionDataExtractor::ExtractOperatorOverload(line, match, ss, m_Namespace, m_ClassName, m_Visibility);
         }
 
         std::stringstream ss;

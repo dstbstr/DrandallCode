@@ -28,7 +28,7 @@ public:
         result.reserve(runnables.size());
 
         auto initialSize = runnables.size();
-        LOG_INFO(StrUtil::Format("Received %d jobs to run", initialSize));
+        LOG_INFO(StrUtil::Format("Received %d jobs to run over %u tasks", initialSize, m_MaxConcurrency));
         int lastPercentPrinted = -1;
         while(!runnables.empty()) {
             auto percentComplete = 100 - static_cast<int>(std::floor(100 * runnables.size() / initialSize));
@@ -55,8 +55,15 @@ public:
         return result;
     }
 
+    template<class ReturnType>
+    std::vector<ReturnType> RunAll2(std::vector<std::unique_ptr<IRunnable<ReturnType>>>& runnables) {
+        ScopedTimer timer("Runner::RunAll2");
+        std::vector<ReturnType> result;
+        result.reserve(runnables.size());
+    }
+
 private:
     MsvcRunner() = default;
-    const u32 m_MaxConcurrency{std::min(u32(1), std::thread::hardware_concurrency())};
+    const u32 m_MaxConcurrency{std::max(u32(1), std::thread::hardware_concurrency())};
 };
 #endif // __MSVCRUNNER_H__

@@ -1,5 +1,6 @@
 #include "Extractor/TypeDataExtractor.h"
 
+#include "Extractor/Private/LineFetcher.h"
 #include "TestCommon.h"
 #include "Utilities/StringUtils.h"
 
@@ -8,115 +9,148 @@ namespace Extractor {
     using TypeDataExtractor::IsAType;
 
     TEST(IsATypeTest, ClassIsAType) {
-        ASSERT_TRUE(IsAType("class Foo"));
+        std::smatch match;
+        ASSERT_TRUE(IsAType("class Foo {", match));
     }
 
     TEST(IsATypeTest, StructIsAType) {
-        ASSERT_TRUE(IsAType("struct Foo"));
+        std::smatch match;
+        ASSERT_TRUE(IsAType("struct Foo {", match));
     }
 
     TEST(IsATypeTest, EnumIsAType) {
-        ASSERT_TRUE(IsAType("enum Foo"));
+        std::smatch match;
+        ASSERT_TRUE(IsAType("enum Foo {", match));
     }
 
     TEST(IsATypeTest, UnionIsAType) {
-        ASSERT_TRUE(IsAType("union Foo"));
+        std::smatch match;
+        ASSERT_TRUE(IsAType("union Foo {", match));
+    }
+
+    TEST(IsATypeTest, InterfaceIsAType) {
+        std::smatch match;
+        ASSERT_TRUE(IsAType("interface Foo {", match));
     }
 
     TEST(IsATypeTest, OpenParenOnType) {
-        ASSERT_TRUE(IsAType("class Foo{"));
+        std::smatch match;
+        ASSERT_TRUE(IsAType("class Foo{", match));
     }
 
-    TEST(IsATypeTest, OpenCloseParenOnType) {
-        ASSERT_TRUE(IsAType("class Foo{}"));
+    TEST(IsATypeTest, OpenCloseCurlyOnType) {
+        std::smatch match;
+        ASSERT_TRUE(IsAType("class Foo{};", match));
     }
 
-    TEST(IsATypeTest, OpenCloseParenSemiOnType) {
-        ASSERT_TRUE(IsAType("class Foo{};"));
+    TEST(IsATypeTest, OpenCloseCurlySemiOnType) {
+        std::smatch match;
+        ASSERT_TRUE(IsAType("class Foo{};", match));
     }
 
     TEST(IsATypeTest, SingleLineClass) {
-        ASSERT_TRUE(IsAType("class Foo{int i;};"));
+        std::smatch match;
+        ASSERT_TRUE(IsAType("class Foo{int i;};", match));
     }
 
     TEST(IsATypeTest, TemplateClass) {
-        ASSERT_TRUE(IsAType("template<class T> class Foo"));
+        std::smatch match;
+        ASSERT_TRUE(IsAType("template<class T> class Foo {", match));
     }
 
     TEST(IsATypeTest, TemplateSpecializationClass) {
-        ASSERT_TRUE(IsAType("template<> class Foo"));
+        std::smatch match;
+        ASSERT_TRUE(IsAType("template<> class Foo {", match));
     }
 
     TEST(IsATypeTest, DefaultBaseClass) {
-        ASSERT_TRUE(IsAType("class Foo : Bar"));
+        std::smatch match;
+        ASSERT_TRUE(IsAType("class Foo : Bar {", match));
     }
 
     TEST(IsATypeTest, PublicBaseClass) {
-        ASSERT_TRUE(IsAType("class Foo : public Bar"));
+        std::smatch match;
+        ASSERT_TRUE(IsAType("class Foo : public Bar {", match));
     }
 
     TEST(IsATypeTest, ProtectedBaseClass) {
-        ASSERT_TRUE(IsAType("class Foo : protected Bar"));
+        std::smatch match;
+        ASSERT_TRUE(IsAType("class Foo : protected Bar {", match));
     }
 
     TEST(IsATypeTest, PrivateBaseClass) {
-        ASSERT_TRUE(IsAType("class Foo : private Bar"));
+        std::smatch match;
+        ASSERT_TRUE(IsAType("class Foo : private Bar {", match));
     }
 
     TEST(IsATypeTest, GlobalScopeBaseClass) {
-        ASSERT_TRUE(IsAType("class Foo : ::Bar"));
+        std::smatch match;
+        ASSERT_TRUE(IsAType("class Foo : ::Bar {", match));
     }
 
     TEST(IsATypeTest, QualifiedBaseClass) {
-        ASSERT_TRUE(IsAType("class Foo : Bar::Baz"));
+        std::smatch match;
+        ASSERT_TRUE(IsAType("class Foo : Bar::Baz {", match));
     }
 
     TEST(IsATypeTest, GlobalQualifiedBaseClass) {
-        ASSERT_TRUE(IsAType("class Foo : ::Bar::Baz"));
+        std::smatch match;
+        ASSERT_TRUE(IsAType("class Foo : ::Bar::Baz {", match));
     }
 
     TEST(IsATypeTest, MultipleInheritence) {
-        ASSERT_TRUE(IsAType("class Foo : public Bar, protected Baz"));
+        std::smatch match;
+        ASSERT_TRUE(IsAType("class Foo : public Bar, protected Baz {", match));
     }
 
     TEST(IsATypeTest, TemplatedBaseClass) {
-        ASSERT_TRUE(IsAType("class Foo : Bar<Baz>"));
+        std::smatch match;
+        ASSERT_TRUE(IsAType("class Foo : Bar<Baz> {", match));
     }
 
     TEST(IsATypeTest, VirtualInheritence) {
-        ASSERT_TRUE(IsAType("class Foo : virtual Bar"));
+        std::smatch match;
+        ASSERT_TRUE(IsAType("class Foo : virtual Bar {", match));
     }
 
     TEST(IsATypeTest, WithDeclSpec) {
-        ASSERT_TRUE(IsAType("class __declspec(dllexport) Foo"));
+        std::smatch match;
+        ASSERT_TRUE(IsAType("class __declspec(dllexport) Foo {", match));
     }
 
     TEST(IsATypeTest, TemplateWithNestedTemplateDefaultParameters) {
         // not making this up, this came from a real code base
-        ASSERT_TRUE(IsAType("template<typename DataType, typename ValidationPolicy = Range<DataType>, u32 BitCount = MinMax<DataType>::NumBits, bool ServerOwned = false> class SyncedInt : public SyncedVar {"));
+        std::smatch match;
+        ASSERT_TRUE(IsAType("template<typename DataType, typename ValidationPolicy = Range<DataType>, u32 BitCount = MinMax<DataType>::NumBits, bool ServerOwned = false> class SyncedInt : public SyncedVar {", match));
     }
     TEST(IsATypeTest, WithMacroDeclSpec) {
-        ASSERT_TRUE(IsAType("class DLL_EXPORT Foo"));
+        std::smatch match;
+        ASSERT_TRUE(IsAType("class DLL_EXPORT Foo {", match));
     }
 
     TEST(IsATypeTest, ClassNameWithTemplateArgs) {
-        ASSERT_TRUE(IsAType("template<class T> class Foo<T, false>"));
+        std::smatch match;
+        ASSERT_TRUE(IsAType("template<class T> class Foo<T, false> {", match));
     }
 
     TEST(IsATypeTest, ClassWithAttribute) {
-        ASSERT_TRUE(IsAType("class [[nodiscard]] Foo"));
+        std::smatch match;
+        ASSERT_TRUE(IsAType("class [[nodiscard]] Foo {", match));
     }
 
     TEST(IsATypeTest, ForwardDeclarationIsNotAType) {
-        ASSERT_FALSE(IsAType("class Foo;"));
+        std::smatch match;
+        ASSERT_FALSE(IsAType("class Foo;", match));
     }
 
     TEST(IsATypeTest, ForwardDeclarationWithTemplateIsNotAType) {
-        ASSERT_FALSE(IsAType("template<class Foo> class Bar;"));
+        std::smatch match;
+        ASSERT_FALSE(IsAType("template<class Foo> class Bar;", match));
     }
 
     TEST(IsATypeTest, TemplateFunctionIsNotAType) {
-        ASSERT_FALSE(IsAType("template<class Foo> void RunAll() {"));
+        std::smatch match;
+        ASSERT_FALSE(IsAType("template<class Foo> void RunAll() {", match));
     }
 
     class ExtractTypeTest : public ::testing::Test {
@@ -127,79 +161,81 @@ namespace Extractor {
 
         TypeData Extract() {
             std::string line;
-            std::getline(ss, line);
-            return TypeDataExtractor::Extract(line, m_FileName, m_Namespace, ss);
+            LineFetcher::GetNextLine(ss, line);
+            std::smatch match;
+            IsAType(line, match);
+            return TypeDataExtractor::Extract(match, m_FileName, m_Namespace, ss);
         }
     };
 
     TEST_F(ExtractTypeTest, CanExtractClassName) {
-        ss << "class Foo";
+        ss << "class Foo {";
         auto result = Extract();
         ASSERT_EQ(result.ClassName, "Foo");
     }
 
     TEST_F(ExtractTypeTest, PopulatesFileName) {
-        ss << "class Foo";
+        ss << "class Foo {";
         auto result = Extract();
         ASSERT_EQ(result.FileName, m_FileName);
     }
 
     TEST_F(ExtractTypeTest, PopulatesNamespace) {
-        ss << "class Foo";
+        ss << "class Foo {";
         auto result = Extract();
         ASSERT_EQ(result.Namespace, m_Namespace);
     }
 
     TEST_F(ExtractTypeTest, RecognizesClassType) {
-        ss << "class Foo";
+        ss << "class Foo {";
         auto result = Extract();
         ASSERT_EQ(result.TypeKind, TypeKeyword::CLASS);
     }
 
     TEST_F(ExtractTypeTest, RecognizesStructType) {
-        ss << "struct Foo";
+        ss << "struct Foo {";
         auto result = Extract();
         ASSERT_EQ(result.TypeKind, TypeKeyword::STRUCT);
     }
 
     TEST_F(ExtractTypeTest, RecognizesEnumType) {
-        ss << "enum Foo";
+        ss << "enum Foo {";
         auto result = Extract();
         ASSERT_EQ(result.TypeKind, TypeKeyword::ENUM);
     }
 
     TEST_F(ExtractTypeTest, RecognizesUnionType) {
-        ss << "union Foo";
+        ss << "union Foo {";
         auto result = Extract();
         ASSERT_EQ(result.TypeKind, TypeKeyword::UNION);
     }
 
     TEST_F(ExtractTypeTest, CanExtractBaseClass) {
-        ss << "class Foo : Bar";
+        ss << "class Foo : Bar {";
         auto result = Extract();
         ASSERT_TRUE(result.HasBaseClass);
     }
 
     TEST_F(ExtractTypeTest, CanExtractTemplatedBaseClass) {
-        ss << "class Foo : Bar<Baz>";
+        ss << "class Foo : Bar<Baz> {";
         auto result = Extract();
         ASSERT_TRUE(result.HasBaseClass);
     }
 
     TEST_F(ExtractTypeTest, NonBaseClassIsNotMarkedAsHavingBaseClass) {
-        ss << "class Foo";
+        ss << "class Foo {";
         auto result = Extract();
         ASSERT_FALSE(result.HasBaseClass);
     }
 
     TEST_F(ExtractTypeTest, CanExtractTemplateClass) {
-        ss << "template<class T> class Foo";
+        ss << "template<class T> class Foo {";
         auto result = Extract();
         ASSERT_TRUE(result.IsTemplated);
     }
 
     TEST_F(ExtractTypeTest, NonTemplateClassIsNotMarkedAsTemplate) {
-        ss << "class Foo";
+        ss << "class Foo {";
         auto result = Extract();
         ASSERT_FALSE(result.IsTemplated);
     }
@@ -327,7 +363,7 @@ namespace Extractor {
         };)";
         auto result = Extract();
 
-        ASSERT_EQ(result.LineCount, 5);
+        ASSERT_EQ(result.LineCount, 4);
     }
 
     TEST_F(ExtractTypeTest, CountsLinesFromFunctions) {
@@ -343,7 +379,7 @@ namespace Extractor {
         })";
 
         auto result = Extract();
-        ASSERT_EQ(result.LineCount, 9);
+        ASSERT_EQ(result.LineCount, 8);
     }
 
     TEST_F(ExtractTypeTest, CountsLinesFromInnerTypes) {
@@ -358,7 +394,7 @@ namespace Extractor {
         })";
 
         auto result = Extract();
-        ASSERT_EQ(result.LineCount, 5);
+        ASSERT_EQ(result.LineCount, 4);
         /*
         translates to:
         class Foo { //1
@@ -369,12 +405,4 @@ namespace Extractor {
         */
     }
 
-    TEST_F(ExtractTypeTest, ExtractsInterfaces) {
-        ss << R"(interface IUserInterface
-        : public UserInterfaceAudioPlayback
-        , public Core::ISystemDependency
-        , public UIInputHandler
-        {
-        };)";
-    }
 } // namespace Extractor
