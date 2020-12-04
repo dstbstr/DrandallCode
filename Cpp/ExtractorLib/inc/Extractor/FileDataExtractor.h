@@ -12,7 +12,7 @@ namespace Extractor {
         FileDataExtractor(const FileDataExtractor&) = delete;
         FileDataExtractor& operator=(const FileDataExtractor&) = delete;
 
-        FileData Execute();
+        FileData Execute() const;
 
     private:
         std::string m_FilePath;
