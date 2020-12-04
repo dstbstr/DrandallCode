@@ -7,7 +7,7 @@ void ProgressBar::Update(u32 currentProgress) {
     f32 percentComplete = static_cast<f32>(currentProgress) / static_cast<f32>(m_FinalNumber);
     std::cout << "\r[";
     u8 progress = static_cast<u8>(BarWidth * percentComplete);
-    for(u8 i = 0; i < progress; i++) {
+    for(u8 i = 0; i < progress - 1; i++) {
         std::cout << "=";
     }
     std::cout << ">";

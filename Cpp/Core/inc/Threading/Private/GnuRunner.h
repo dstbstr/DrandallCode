@@ -1,6 +1,8 @@
 #ifndef __GNURUNNER_H__
 #define __GNURUNNER_H__
 
+#include "Threading/IRunnable.h"
+
 #include <memory>
 #include <vector>
 
