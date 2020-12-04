@@ -5,14 +5,13 @@
 
 #include <memory>
 
-
 using JobList = std::vector<std::unique_ptr<IRunnable<int>>>;
 using VoidJobList = std::vector<std::unique_ptr<IRunnable<VOID>>>;
 
 class ExampleRunnable : public IRunnable<int> {
 public:
     ExampleRunnable(int number) : m_Num(number) {}
-    int Execute() {
+    int Execute() const {
         return m_Num;
     }
 
@@ -23,7 +22,7 @@ private:
 class VoidRunnable : public IRunnable<VOID> {
 public:
     VoidRunnable(bool& hasRun) : m_HasRun(&hasRun) {}
-    VOID Execute() {
+    VOID Execute() const {
         *m_HasRun = true;
         VOID result;
         return result;
@@ -51,14 +50,17 @@ TEST(ThrottledRunnerTest, WorksWithASingleEntry) {
 
 TEST(ThrottledRunnerTest, WorksWithLargeNumberOfEntries) {
     JobList jobs;
-    for(int i = 0; i < 5000; i++) {
+    const u32 jobSize = 5533;
+    for(int i = 0; i < jobSize; i++) {
         jobs.push_back(std::move(std::make_unique<ExampleRunnable>(i)));
     }
 
     auto result = Runner::Get().RunAll(jobs);
 
     ASSERT_FALSE(result.empty());
-    ASSERT_EQ(result.size(), 5000);
+    ASSERT_EQ(result.size(), jobSize);
+    ASSERT_THAT(result, ::testing::Contains(0));
+    ASSERT_THAT(result, ::testing::Contains(jobSize - 1));
 }
 
 TEST(ThrottledRunnerTest, WorksWithVoidReturns) {

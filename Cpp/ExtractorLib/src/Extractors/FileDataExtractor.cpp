@@ -23,7 +23,7 @@ namespace {
 
 namespace Extractor {
 
-    FileData FileDataExtractor::Execute() {
+    FileData FileDataExtractor::Execute() const {
         FileData result;
         result.FilePath = m_FilePath;
         result.FileName = PathUtils::GetFileName(m_FilePath);
@@ -38,7 +38,8 @@ namespace Extractor {
         bool isHeader = m_FilePath[m_FilePath.length() - 1] == 'h';
         NamespaceExtractor namespaceExtractor;
 
-        ScopedTimer timer(result.FileName + " Extract File", ScopedTimer::TimeUnit::MINUTE);
+        // ScopedTimer timer(result.FileName + " Extract File", ScopedTimer::TimeUnit::MINUTE);
+        // ScopedTimer timer(result.FileName + " Extract File");
         u64 nonBlankLines = 0;
         while(LineFetcher::GetNextLine(stream, line)) {
             nonBlankLines++;
