@@ -42,7 +42,9 @@ int main(int argc, char* argv[]) {
             jobs.push_back(std::move(std::make_unique<FileDataExtractor>(file, settings)));
         }
 
-        std::vector<FileData> files = Runner::Get().RunAll(jobs);
+        // large code bases tend to have bigger files which take longer to parse
+        Threading::ExpectedRunTime expectedRuntime = jobs.size() < 100 ? Threading::ExpectedRunTime::MILLISECONDS : Threading::ExpectedRunTime::SECONDS;
+        std::vector<FileData> files = Runner::Get().RunAll(expectedRuntime, jobs);
 
         std::unique_ptr<IReport> report;
         std::vector<std::pair<std::unique_ptr<IReport>, std::string>> reports;

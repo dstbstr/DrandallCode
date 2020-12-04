@@ -32,30 +32,90 @@ private:
     bool* m_HasRun;
 };
 
-TEST(ThrottledRunnerTest, WorksWithAnEmptyCollection) {
+TEST(ThrottledRunnerTest, ShortLengthRuntimeWorksWithAnEmptyCollection) {
     JobList jobs;
-    auto result = Runner::Get().RunAll(jobs);
+    auto result = Runner::Get().RunAll(Threading::ExpectedRunTime::MICROSECONDS, jobs);
 
     ASSERT_TRUE(result.empty());
 }
 
-TEST(ThrottledRunnerTest, WorksWithASingleEntry) {
+TEST(ThrottledRunnerTest, MediumLengthRuntimeWorksWithEmptyCollection) {
+    JobList jobs;
+    auto result = Runner::Get().RunAll(Threading::ExpectedRunTime::MILLISECONDS, jobs);
+
+    ASSERT_TRUE(result.empty());
+}
+
+TEST(ThrottledRunnerTest, LongLengthRuntimeWorksWithEmptyCollection) {
+    JobList jobs;
+    auto result = Runner::Get().RunAll(Threading::ExpectedRunTime::SECONDS, jobs);
+}
+
+TEST(ThrottledRunnerTest, ShortLengthRuntimeWorksWithASingleEntry) {
     JobList jobs;
     jobs.push_back(std::move(std::make_unique<ExampleRunnable>(1)));
-    auto result = Runner::Get().RunAll(jobs);
+    auto result = Runner::Get().RunAll(Threading::ExpectedRunTime::MICROSECONDS, jobs);
 
     ASSERT_FALSE(result.empty());
     ASSERT_EQ(result[0], 1);
 }
 
-TEST(ThrottledRunnerTest, WorksWithLargeNumberOfEntries) {
+TEST(ThrottledRunnerTest, MediumLengthRuntimeWorksWithASingleEntry) {
     JobList jobs;
-    const u32 jobSize = 5533;
+    jobs.push_back(std::move(std::make_unique<ExampleRunnable>(1)));
+    auto result = Runner::Get().RunAll(Threading::ExpectedRunTime::MILLISECONDS, jobs);
+
+    ASSERT_FALSE(result.empty());
+    ASSERT_EQ(result[0], 1);
+}
+
+TEST(ThrottledRunnerTest, LongLengthRuntimeWorksWithASingleEntry) {
+    JobList jobs;
+    jobs.push_back(std::move(std::make_unique<ExampleRunnable>(1)));
+    auto result = Runner::Get().RunAll(Threading::ExpectedRunTime::SECONDS, jobs);
+
+    ASSERT_FALSE(result.empty());
+    ASSERT_EQ(result[0], 1);
+}
+
+TEST(ThrottledRunnerTest, SmallLengthRuntimeWorksWithLargeNumberOfEntries) {
+    JobList jobs;
+    const u32 jobSize = 1233;
     for(int i = 0; i < jobSize; i++) {
         jobs.push_back(std::move(std::make_unique<ExampleRunnable>(i)));
     }
 
-    auto result = Runner::Get().RunAll(jobs);
+    auto result = Runner::Get().RunAll(Threading::ExpectedRunTime::MICROSECONDS, jobs);
+
+    ASSERT_FALSE(result.empty());
+    ASSERT_EQ(result.size(), jobSize);
+    ASSERT_THAT(result, ::testing::Contains(0));
+    ASSERT_THAT(result, ::testing::Contains(jobSize - 1));
+}
+
+TEST(ThrottledRunnerTest, MediumLengthRuntimeWorksWithLargeNumberOfEntries) {
+    JobList jobs;
+    const u32 jobSize = 1233;
+    for(int i = 0; i < jobSize; i++) {
+        jobs.push_back(std::move(std::make_unique<ExampleRunnable>(i)));
+    }
+
+    auto result = Runner::Get().RunAll(Threading::ExpectedRunTime::MILLISECONDS, jobs);
+
+    ASSERT_FALSE(result.empty());
+    ASSERT_EQ(result.size(), jobSize);
+    ASSERT_THAT(result, ::testing::Contains(0));
+    ASSERT_THAT(result, ::testing::Contains(jobSize - 1));
+}
+
+TEST(ThrottledRunnerTest, LongLengthRuntimeWorksWithLargeNumberOfEntries) {
+    JobList jobs;
+    const u32 jobSize = 1233;
+    for(int i = 0; i < jobSize; i++) {
+        jobs.push_back(std::move(std::make_unique<ExampleRunnable>(i)));
+    }
+
+    auto result = Runner::Get().RunAll(Threading::ExpectedRunTime::SECONDS, jobs);
 
     ASSERT_FALSE(result.empty());
     ASSERT_EQ(result.size(), jobSize);
@@ -67,7 +127,7 @@ TEST(ThrottledRunnerTest, WorksWithVoidReturns) {
     VoidJobList jobs;
     bool hasRun = false;
     jobs.push_back(std::move(std::make_unique<VoidRunnable>(hasRun)));
-    Runner::Get().RunAll(jobs);
+    Runner::Get().RunAll(Threading::ExpectedRunTime::MICROSECONDS, jobs);
 
     ASSERT_TRUE(hasRun);
 }

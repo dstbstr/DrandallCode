@@ -14,7 +14,6 @@
 #include <string>
 #include <vector>
 
-
 template<class T>
 struct IRunnable;
 
@@ -40,7 +39,8 @@ int main(int argc, char* argv[]) {
             jobs.push_back(std::move(std::make_unique<FileDataExtractor>(file, settings)));
         }
 
-        std::vector<FileData> files = Runner::Get().RunAll(jobs);
+        Threading::ExpectedRunTime expectedRunTime = jobs.size() < 100 ? Threading::ExpectedRunTime::MILLISECONDS : Threading::ExpectedRunTime::SECONDS;
+        std::vector<FileData> files = Runner::Get().RunAll(expectedRunTime, jobs);
         IncludeMapGenerator(files).Generate();
         IncludeReport report(files);
 

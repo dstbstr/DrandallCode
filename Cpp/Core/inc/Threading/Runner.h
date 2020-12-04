@@ -1,6 +1,12 @@
 #ifndef __RUNNER_H__
 #define __RUNNER_H__
 
+#include "Platform/Types.h"
+
+namespace Threading {
+    enum ExpectedRunTime : u8 { MICROSECONDS, MILLISECONDS, SECONDS };
+}
+
 #ifdef MSVC
 #include "Threading/Private/MsvcRunner.h"
 using Runner = MsvcRunner;
