@@ -315,6 +315,6 @@ namespace Extractor {
         })";
 
         auto result = Extract();
-        ASSERT_EQ(result.LineCount, 5);
+        ASSERT_EQ(result.LineCount, 4);
     }
 } // namespace Extractor

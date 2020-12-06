@@ -506,7 +506,7 @@ namespace Extractor {
         )";
         auto result = Extract();
 
-        ASSERT_EQ(result.LineCount, 6);
+        ASSERT_EQ(result.LineCount, 5);
     }
 
     TEST_F(ExtractFunctionTest, AtLeastOneNonBlankLine) {
