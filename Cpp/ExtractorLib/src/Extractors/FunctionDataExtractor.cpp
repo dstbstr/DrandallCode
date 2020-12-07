@@ -1,6 +1,7 @@
 #include "Extractor/FunctionDataExtractor.h"
 
 #include "Extractor/CommentExtractor.h"
+#include "Extractor/BodyCount.h"
 #include "Instrumentation/Log.h"
 #include "Utilities/Format.h"
 #include "Utilities/Require.h"
@@ -145,21 +146,6 @@ namespace {
         return result;
     }
 
-    u64 CountLinesInBody(std::string line, std::istream& stream) {
-        auto trimmed = StrUtil::Trim(line);
-        auto nestingDepth = std::count(trimmed.begin(), trimmed.end(), '{');
-        nestingDepth -= std::count(trimmed.begin(), trimmed.end(), '}');
-        u64 lineCount = 0;
-        std::string nextLine;
-        while(nestingDepth > 0 && std::getline(stream, nextLine)) {
-            lineCount++;
-            trimmed = StrUtil::Trim(nextLine);
-            nestingDepth += std::count(trimmed.begin(), trimmed.end(), '{');
-            nestingDepth -= std::count(trimmed.begin(), trimmed.end(), '}');
-        }
-
-        return lineCount;
-    }
 } // namespace
 
 namespace Extractor {
@@ -207,7 +193,7 @@ namespace Extractor {
             // ScopedTimer timer("ExtractFunction: " + line, ScopedTimer::TimeUnit::SECOND);
             auto result = GetFunctionData(match, ns, className, visibility);
 
-            u64 bodyLineCount = CountLinesInBody(line.substr(match[0].length()), stream);
+            u64 bodyLineCount = BodyCount::GetBodyCount(line.substr(match[0].length()), stream);
             result.LineCount = bodyLineCount + 1;
             return result;
         }
@@ -216,7 +202,7 @@ namespace Extractor {
             // ScopedTimer timer("ExtractSpecialFunction: " + line, ScopedTimer::TimeUnit::SECOND);
             auto result = GetSpecialFunctionData(match, ns, visibility);
 
-            u64 bodyLineCount = CountLinesInBody(line.substr(match[0].length()), stream);
+            u64 bodyLineCount = BodyCount::GetBodyCount(line.substr(match[0].length()), stream);
             result.LineCount = bodyLineCount + 1;
             return result;
         }
@@ -225,7 +211,7 @@ namespace Extractor {
             // ScopedTimer timer("ExtractOperatorOverload: " + line, ScopedTimer::TimeUnit::SECOND);
             auto result = GetOperatorOverload(match, ns, className, visibility);
 
-            u64 bodyLineCount = CountLinesInBody(line.substr(match[0].length()), stream);
+            u64 bodyLineCount = BodyCount::GetBodyCount(line.substr(match[0].length()), stream);
             result.LineCount = bodyLineCount + 1;
             return result;
         }

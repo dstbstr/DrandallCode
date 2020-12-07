@@ -5,6 +5,7 @@
 #include "Extractor/NamespaceExtractor.h"
 #include "Extractor/Private/LineFetcher.h"
 #include "Extractor/TypeDataExtractor.h"
+#include "Extractor/BodyCount.h"
 #include "Instrumentation/Log.h"
 #include "Utilities/Format.h"
 #include "Utilities/PathUtils.h"
@@ -74,7 +75,10 @@ namespace Extractor {
                 auto function = FunctionDataExtractor::ExtractOperatorOverload(line, match, stream, namespaceExtractor.GetNamespace(), "", Visibility::PUBLIC);
                 result.FreeOperatorOverloads.push_back(function);
                 nonBlankLines += function.LineCount - 1;
-            } else if(std::regex_search(line, CloseBlockRegex)) {
+            } else if(line[line.length() -1] == '{') {
+                //probably a map or array initializer
+                nonBlankLines += BodyCount::GetBodyCount(line, stream);
+            } else if(line[line.length() -1] == '}') {
                 auto closeBraces = std::count(line.begin(), line.end(), '}');
                 for(int i = 0; i < closeBraces; i++) {
                     try {
