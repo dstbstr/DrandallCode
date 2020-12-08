@@ -26,6 +26,9 @@ namespace {
 
     bool IsLineComplete(const std::string& line) {
         auto lastChar = line[line.length() - 1];
+        if(lastChar == '\\') {
+            return false;
+        }
         return line[0] == '#' || lastChar == ';' || lastChar == '}' || lastChar == '{';
     }
 } // namespace

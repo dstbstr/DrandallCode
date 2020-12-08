@@ -2,7 +2,7 @@
 - Editor
   - Install [VS Code](https://code.visualstudio.com/)
   - cd this directory
-  - code *.code-workspace
+  - code .
   - Extensions (Ctrl+Shift+X)
     - C/C++
     - C/C++ Helper
@@ -24,6 +24,15 @@
 - Run the program
     - Build the project (Ctrl+Shift+B)
     - launch.json has the specific launch commands
+
+#Building From the Command Line
+1. cd this directory
+2. mkdir Build/VS/2019
+3. mkdir Bin
+4. cd Build/VS/2019
+5. `cmake -G 'Visual Studio 16 2019' -DCMAKE_BUILD_TYPE=Debug ../../..`
+6. `cmake --build . --config Release`
+
 
 # How to create a new project
 1. Create a new folder with the name of the project

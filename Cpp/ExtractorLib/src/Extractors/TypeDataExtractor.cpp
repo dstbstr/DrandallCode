@@ -1,5 +1,6 @@
 #include "Extractor/TypeDataExtractor.h"
 
+#include "Extractor/BodyCount.h"
 #include "Extractor/CommentExtractor.h"
 #include "Extractor/FunctionDataExtractor.h"
 #include "Extractor/Private/LineFetcher.h"
@@ -11,6 +12,7 @@
 #include "Utilities/StringUtils.h"
 
 #include <regex>
+
 
 namespace {
     std::regex TypeRegex("^" // start of the string
@@ -129,6 +131,8 @@ namespace Extractor {
                     auto function = FunctionDataExtractor::ExtractOperatorOverload(line, nextMatch, stream, ns, result.ClassName, currentVisibility);
                     result.OperatorOverloads.push_back(function);
                     lineCount += function.LineCount - 1;
+                } else if(line[line.length() - 1] == '{') {
+                    lineCount += BodyCount::GetBodyCount(line, stream);
                 } else if(line[line.length() - 1] == ';') {
                     // can we assume that this is a member variable?  What else is left?
                     switch(currentVisibility) {

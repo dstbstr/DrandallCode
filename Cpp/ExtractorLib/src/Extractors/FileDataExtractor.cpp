@@ -1,11 +1,11 @@
 #include "Extractor/FileDataExtractor.h"
 
+#include "Extractor/BodyCount.h"
 #include "Extractor/Data/Visibility.h"
 #include "Extractor/FunctionDataExtractor.h"
 #include "Extractor/NamespaceExtractor.h"
 #include "Extractor/Private/LineFetcher.h"
 #include "Extractor/TypeDataExtractor.h"
-#include "Extractor/BodyCount.h"
 #include "Instrumentation/Log.h"
 #include "Utilities/Format.h"
 #include "Utilities/PathUtils.h"
@@ -75,23 +75,19 @@ namespace Extractor {
                 auto function = FunctionDataExtractor::ExtractOperatorOverload(line, match, stream, namespaceExtractor.GetNamespace(), "", Visibility::PUBLIC);
                 result.FreeOperatorOverloads.push_back(function);
                 nonBlankLines += function.LineCount - 1;
-            } else if(line[line.length() -1] == '{') {
-                //probably a map or array initializer
+            } else if(line[line.length() - 1] == '{') {
+                // probably a map or array initializer
+                namespaceExtractor.PushNestedCurly();
                 nonBlankLines += BodyCount::GetBodyCount(line, stream);
-            } else if(line[line.length() -1] == '}') {
+            } else if(line[line.length() - 1] == '}') {
                 auto closeBraces = std::count(line.begin(), line.end(), '}');
+                closeBraces -= std::count(line.begin(), line.end(), '{');
                 for(int i = 0; i < closeBraces; i++) {
                     try {
                         namespaceExtractor.PopNamespace();
                     } catch(std::exception e) {
                         LOG_WARN(StrUtil::Format("Failed to pop namespace.  File %s, NonBlankLine %u", result.FileName, nonBlankLines));
                     }
-                }
-            } else {
-                // If we couldn't figure out what this thing is, but it contains a curly, need to let the namespace extractor know about it
-                // It's probably a function like macro
-                if(line.find('{') != line.npos) {
-                    namespaceExtractor.PushNestedCurly();
                 }
             }
         }
