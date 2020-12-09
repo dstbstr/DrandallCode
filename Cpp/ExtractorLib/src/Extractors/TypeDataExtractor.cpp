@@ -13,7 +13,6 @@
 
 #include <regex>
 
-
 namespace {
     std::regex TypeRegex("^" // start of the string
                          "(template[\\w <>=,:]+?> ?)?" // optionally start with a template
@@ -119,13 +118,13 @@ namespace Extractor {
                     auto innerType = TypeDataExtractor::Extract(nextMatch, fileName, ns, stream);
                     result.InnerTypes.push_back(innerType);
                     lineCount += innerType.LineCount - 1;
-                } else if(FunctionDataExtractor::IsAFunction(line, nextMatch)) {
-                    auto function = FunctionDataExtractor::ExtractFunction(line, nextMatch, stream, ns, result.ClassName, currentVisibility);
-                    result.Functions.push_back(function);
-                    lineCount += function.LineCount - 1;
                 } else if(FunctionDataExtractor::IsSpecialFunction(line, nextMatch)) {
                     auto function = FunctionDataExtractor::ExtractSpecialFunction(line, nextMatch, stream, ns, currentVisibility);
                     result.SpecialFunctions.push_back(function);
+                    lineCount += function.LineCount - 1;
+                } else if(FunctionDataExtractor::IsAFunction(line, nextMatch)) {
+                    auto function = FunctionDataExtractor::ExtractFunction(line, nextMatch, stream, ns, result.ClassName, currentVisibility);
+                    result.Functions.push_back(function);
                     lineCount += function.LineCount - 1;
                 } else if(FunctionDataExtractor::IsOperatorOverload(line, nextMatch)) {
                     auto function = FunctionDataExtractor::ExtractOperatorOverload(line, nextMatch, stream, ns, result.ClassName, currentVisibility);

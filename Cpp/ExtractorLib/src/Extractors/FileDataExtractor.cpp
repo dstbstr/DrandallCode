@@ -56,6 +56,9 @@ namespace Extractor {
 
             if(namespaceExtractor.IsNamespace(line)) {
                 namespaceExtractor.ExtractNamespace(line);
+                if(line.empty()) {
+                    continue;
+                }
             }
             if(m_Settings.ExtractTypes && TypeDataExtractor::IsAType(line, match)) {
                 auto type = TypeDataExtractor::Extract(match, result.FileName, namespaceExtractor.GetNamespace(), stream);
