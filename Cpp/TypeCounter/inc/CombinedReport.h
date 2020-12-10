@@ -17,7 +17,7 @@ namespace TypeCounter {
         void PrintResultToStream(std::ostream& targetStream) const final;
 
     private:
-        void PrintTypeData(std::ostream& targetStream, Extractor::TypeData type) const;
+        void PrintTypeData(std::ostream& targetStream, Extractor::TypeData type, std::string filePath) const;
 
         std::vector<Extractor::FileData> m_Files;
     };

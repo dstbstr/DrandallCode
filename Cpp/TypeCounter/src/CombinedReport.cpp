@@ -5,19 +5,19 @@
 namespace {
 
     constexpr char FileLineFormat[]{"%s,%s,,%s,,%u,,,,,,,,,,,,,,,,,,,,\n"};
-    constexpr char TypeLineFormat[]{",%s,%s,%s,%s,%u,"
+    constexpr char TypeLineFormat[]{"%s,%s,%s,%s,%s,%u,"
                                     "%s,%u,%u,%u,%u,%u,%u,%u,"
                                     ",,,,"
                                     "%s,%s,,,,,,,,,\n"};
-    constexpr char FunctionLineFormat[]{",%s,%s,%s,%s,%u,"
+    constexpr char FunctionLineFormat[]{"%s,%s,%s,%s,%s,%u,"
                                         "%s,,,,,,,,"
                                         "%s,%s,%u,%u,"
                                         ",%s,%s,%s,%s,,%s,%s,,,\n"};
-    constexpr char SpecialFunctionFormat[]{",%s,%s,%s,%s,%u,"
+    constexpr char SpecialFunctionFormat[]{"%s,%s,%s,%s,%s,%u,"
                                            "%s,,,,,,,,"
                                            "%s,,%u,%u,"
                                            ",,%s,,,%s,,,,%s,%s\n"};
-    constexpr char OpOverloadFormat[]{",%s,%s,%s,%s,%u,"
+    constexpr char OpOverloadFormat[]{"%s,%s,%s,%s,%s,%u,"
                                       "%s,,,,,,,,"
                                       "%s,,%u,,"
                                       ",,,%s,,%s,,,%s,,\n"};
@@ -34,7 +34,7 @@ namespace {
     std::string PrintFileLine(Extractor::FileData data) {
         return StrUtil::Format(FileLineFormat, data.FilePath, data.FileName, "File", data.LineCount);
     }
-    std::string PrintTypeLine(Extractor::TypeData data) {
+    std::string PrintTypeLine(Extractor::TypeData data, std::string filePath) {
         using namespace Extractor;
         u32 publicMethodCount = 0;
         u32 protectedMethodCount = 0;
@@ -48,6 +48,7 @@ namespace {
             }
         }
         return StrUtil::Format(TypeLineFormat,
+                               filePath,
                                data.FileName,
                                data.Namespace,
                                "Class",
@@ -65,8 +66,9 @@ namespace {
                                PrintBool(data.IsTemplated));
     }
 
-    std::string PrintFunctionLine(std::string fileName, Extractor::FunctionData data) {
+    std::string PrintFunctionLine(std::string filePath, std::string fileName, Extractor::FunctionData data) {
         return StrUtil::Format(FunctionLineFormat,
+                               filePath,
                                fileName,
                                data.Namespace,
                                "Function",
@@ -85,8 +87,9 @@ namespace {
                                PrintBool(data.IsStatic));
     }
 
-    std::string PrintSpecialFunctionLine(std::string fileName, Extractor::SpecialFunctionData data) {
+    std::string PrintSpecialFunctionLine(std::string filePath, std::string fileName, Extractor::SpecialFunctionData data) {
         return StrUtil::Format(SpecialFunctionFormat,
+                               filePath,
                                fileName,
                                data.Namespace,
                                "SpecialFunction",
@@ -102,30 +105,41 @@ namespace {
                                PrintBool(data.IsDefaulted));
     }
 
-    std::string PrintOpOverloadLine(std::string fileName, Extractor::OperatorOverloadData data) {
-        return StrUtil::Format(
-            OpOverloadFormat, fileName, data.Namespace, "Operator Overload", data.Operator, data.LineCount, data.ClassName, ToString(data.Visibility), data.Airity, PrintBool(data.IsInline), PrintBool(data.IsExplicit), PrintBool(data.IsFriend));
+    std::string PrintOpOverloadLine(std::string filePath, std::string fileName, Extractor::OperatorOverloadData data) {
+        return StrUtil::Format(OpOverloadFormat,
+                               filePath,
+                               fileName,
+                               data.Namespace,
+                               "Operator Overload",
+                               data.Operator,
+                               data.LineCount,
+                               data.ClassName,
+                               ToString(data.Visibility),
+                               data.Airity,
+                               PrintBool(data.IsInline),
+                               PrintBool(data.IsExplicit),
+                               PrintBool(data.IsFriend));
     }
 
 } // namespace
 namespace TypeCounter {
     CombinedReport::CombinedReport(const std::vector<Extractor::FileData>& files) : m_Files(files) {}
 
-    void CombinedReport::PrintTypeData(std::ostream& targetStream, Extractor::TypeData type) const {
+    void CombinedReport::PrintTypeData(std::ostream& targetStream, Extractor::TypeData type, std::string filePath) const {
         auto fileName = type.FileName;
-        targetStream << PrintTypeLine(type);
+        targetStream << PrintTypeLine(type, filePath);
 
         for(auto func: type.Functions) {
-            targetStream << PrintFunctionLine(fileName, func);
+            targetStream << PrintFunctionLine(filePath, fileName, func);
         }
         for(auto opOverload: type.OperatorOverloads) {
-            targetStream << PrintOpOverloadLine(fileName, opOverload);
+            targetStream << PrintOpOverloadLine(filePath, fileName, opOverload);
         }
         for(auto specialFunction: type.SpecialFunctions) {
-            targetStream << PrintSpecialFunctionLine(fileName, specialFunction);
+            targetStream << PrintSpecialFunctionLine(filePath, fileName, specialFunction);
         }
         for(auto innerType: type.InnerTypes) {
-            PrintTypeData(targetStream, innerType);
+            PrintTypeData(targetStream, innerType, filePath);
         }
     }
 
@@ -133,16 +147,17 @@ namespace TypeCounter {
         targetStream << LineHeading << std::endl;
 
         for(auto&& file: m_Files) {
+            auto filePath = file.FilePath;
             auto fileName = file.FileName;
             targetStream << PrintFileLine(file);
             for(auto freeFunction: file.FreeFunctions) {
-                targetStream << PrintFunctionLine(fileName, freeFunction);
+                targetStream << PrintFunctionLine(filePath, fileName, freeFunction);
             }
             for(auto freeOperator: file.FreeOperatorOverloads) {
-                targetStream << PrintOpOverloadLine(fileName, freeOperator);
+                targetStream << PrintOpOverloadLine(filePath, fileName, freeOperator);
             }
             for(auto type: file.Types) {
-                PrintTypeData(targetStream, type);
+                PrintTypeData(targetStream, type, filePath);
             }
         }
     }
