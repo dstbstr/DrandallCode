@@ -138,6 +138,11 @@ namespace Extractor {
         ASSERT_TRUE(IsAType("class [[nodiscard]] Foo {", match));
     }
 
+    TEST(IsATypeTest, FinalClass) {
+        std::smatch match;
+        ASSERT_TRUE(IsAType("class Foo final {", match));
+    }
+
     TEST(IsATypeTest, ForwardDeclarationIsNotAType) {
         std::smatch match;
         ASSERT_FALSE(IsAType("class Foo;", match));
@@ -170,6 +175,18 @@ namespace Extractor {
 
     TEST_F(ExtractTypeTest, CanExtractClassName) {
         ss << "class Foo {";
+        auto result = Extract();
+        ASSERT_EQ(result.ClassName, "Foo");
+    }
+
+    TEST_F(ExtractTypeTest, CanExtractClassNameFromFinalClass) {
+        ss << "class Foo final {";
+        auto result = Extract();
+        ASSERT_EQ(result.ClassName, "Foo");
+    }
+
+    TEST_F(ExtractTypeTest, CanExtractClassNameWithAttribute) {
+        ss << "class [[nodiscard]] Foo {";
         auto result = Extract();
         ASSERT_EQ(result.ClassName, "Foo");
     }

@@ -1,7 +1,7 @@
 #include "Extractor/FunctionDataExtractor.h"
 
-#include "Extractor/CommentExtractor.h"
 #include "Extractor/BodyCount.h"
+#include "Extractor/CommentExtractor.h"
 #include "Instrumentation/Log.h"
 #include "Utilities/Format.h"
 #include "Utilities/Require.h"
@@ -9,8 +9,12 @@
 
 #include <regex>
 
+
 namespace {
+    //^(?:template[\w <>=,:]+?> ?)?(virtual )?(explicit )?(~?_*[A-Z]+[a-z][\w:<>~]+)\(([^\)]*)\)? *=? *(default)?(delete)?
     std::regex SpecialFunctionRegex("^(?:template[\\w <>=,:]+?> ?)?(virtual )?(explicit )?(~?_*[A-Z]+[a-z][\\w:<>~]+)\\(([^\\)]*)\\)? *=? *(default)?(delete)?", std::regex_constants::optimize);
+
+    //^(explicit +)?(friend +)?(inline +)?(?:const *)?(?:.+)? *operator *(.+?) *\(([^\)]*)\) *(?:const *)?
     std::regex OperatorOverloadRegex("^(explicit +)?(friend +)?(inline +)?" // optional specifier
                                      "(?:const *)?(?:.+)? *" // optional return type
                                      "operator *" // required operator keyword
@@ -20,6 +24,7 @@ namespace {
                                      std::regex_constants::optimize);
     std::regex SimpleOperatorRegex("(?:operator)");
 
+    //^(template[\w <>=,:]+?> ?)?((?:virtual |_?_?(?:force)?inline |static )+)?(?:[\w\(\)\[\]:<>]+? ?){0,3}(?:const )?[\w\[\]&\*:<>]{0,3}[&\*\w\]>] (?: ?const )?[\*&]? ?([\w:<>]+) ?\(([^\)]*?)\) ?((?:const ?|final ?|override ?){0,3})? ?( ?= ?0)? ?;?
     std::regex FunctionRegex("^" // start of string
                              "(template[\\w <>=,:]+?> ?)?" // optional template
                              "((?:virtual |_?_?(?:force)?inline |static )+)?" // function prefixes

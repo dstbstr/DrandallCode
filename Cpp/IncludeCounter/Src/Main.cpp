@@ -47,7 +47,7 @@ int main(int argc, char* argv[]) {
         if(argParse.GetTargetFile().empty()) {
             report.PrintResultToStream(std::cout);
         } else {
-            auto path = std::filesystem::path(argParse.GetTargetFile());
+            auto path = std::filesystem::path(argParse.GetTargetFile() + "_Includes.csv");
             std::filesystem::remove(path); // clear out old results
             auto stream = std::ofstream(path);
             report.PrintResultToStream(stream);

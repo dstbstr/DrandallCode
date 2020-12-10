@@ -14,11 +14,14 @@
 #include <regex>
 
 namespace {
+    //^(template[\w <>=,:]+?> ?)?(class|enum|struct|union|interface) (?:\[\[\w+\]\] )? ?(?:[\w\(\)]+ )??([\w<>]+) ?(final ?)?:?( ?,?((?:public|protected|private|virtual) ?)? [\w:<>]+){0,10} ?(?:\{[^}]*\}?;?|$)
     std::regex TypeRegex("^" // start of the string
                          "(template[\\w <>=,:]+?> ?)?" // optionally start with a template
                          "(class|enum|struct|union|interface) " // required type
-                         "(?:[\\w\\(\\)\\[\\]]+ ){0,3}" // optional declspec (macro or not) or attributes
+                         "(?:\\[\\[\\w+\\]\\] )?" // optional attributes
+                         "(?:[\\w\\(\\)]+ )??" // optional declspec (macro or not)
                          "([\\w<>]+) ?" // required identifier
+                         "(?:final ?)?" // optionally final
                          ":?( ?,?((?:public|protected|private|virtual) ?)? [\\w:<>]+){0,10} ?" // up to 5 base classes (the {0,10} is to avoid using * which causes infinite matches)
                          "(?:\\{[^}]*\\}?;?|$)", // Can't end with a semicolon unless it's preceeded by a close curly
                          std::regex_constants::optimize);
