@@ -8,6 +8,7 @@
 #include "Threading/Runner.h"
 #include "TypeArgParse.h"
 #include "TypeReport.h"
+#include "Utilities/Require.h"
 #include "Utilities/ScopedTimer.h"
 #include "Utilities/TimeUtils.h"
 
@@ -32,6 +33,8 @@ int main(int argc, char* argv[]) {
             return 0;
         }
         std::vector<std::string> fileNames = argParse.GetFileNames();
+
+        Require::NotEmpty(fileNames, "Did not locate any filenames");
 
         ExtractorSettings settings;
         settings.CountIncludes = false;

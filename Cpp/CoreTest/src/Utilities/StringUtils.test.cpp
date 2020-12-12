@@ -1,6 +1,6 @@
-#include "TestCommon.h"
 #include "Utilities/StringUtils.h"
 
+#include "TestCommon.h"
 
 TEST(TrimStart, RemovesSpaceFromStart) {
     std::string test = " test";
@@ -234,9 +234,49 @@ TEST(SplitString, SplitStringRemovesEmptyEntries) {
     ASSERT_EQ(result[1], "two");
 }
 
-TEST(SplitString, StringEndingWIthDelimiterDoesNotAddEmptyEntry) {
+TEST(SplitString, StringEndingWithDelimiterDoesNotAddEmptyEntry) {
     auto result = StrUtil::Split("one,two,", ",");
     ASSERT_EQ(2, result.size());
     ASSERT_EQ(result[0], "one");
     ASSERT_EQ(result[1], "two");
+}
+
+TEST(StartsWith, FoundPrefixReturnsTrue) {
+    ASSERT_TRUE(StrUtil::StartsWith("Welcome", "Wel"));
+}
+
+TEST(StartsWith, BeginningDoesNotMatchReturnsFalse) {
+    ASSERT_FALSE(StrUtil::StartsWith("Hello", "ell"));
+}
+
+TEST(StartsWith, ExactMatchReturnsTrue) {
+    ASSERT_TRUE(StrUtil::StartsWith("Hello", "Hello"));
+}
+
+TEST(StartsWith, TooLongPrefixReturnsFalse) {
+    ASSERT_FALSE(StrUtil::StartsWith("Hi", "Hello"));
+}
+
+TEST(StartsWith, BlankPrefixReturnsTrue) {
+    ASSERT_TRUE(StrUtil::StartsWith("Hello", ""));
+}
+
+TEST(EndsWith, FoundSuffixReturnsTrue) {
+    ASSERT_TRUE(StrUtil::EndsWith("Welcome", "come"));
+}
+
+TEST(EndsWith, SuffixNotFoundReturnsFalse) {
+    ASSERT_FALSE(StrUtil::EndsWith("Hello", "ell"));
+}
+
+TEST(EndsWith, ExactMatchReturnsTrue) {
+    ASSERT_TRUE(StrUtil::EndsWith("Hello", "Hello"));
+}
+
+TEST(EndsWith, TooLongSuffixReturnsFalse) {
+    ASSERT_FALSE(StrUtil::EndsWith("Hi", "Hello"));
+}
+
+TEST(EndsWith, BlankSuffixReturnsTrue) {
+    ASSERT_TRUE(StrUtil::EndsWith("Hello", ""));
 }
