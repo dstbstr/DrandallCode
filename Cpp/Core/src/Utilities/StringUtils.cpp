@@ -28,4 +28,12 @@ namespace StrUtil {
         }
         return result;
     }
+
+    bool StartsWith(std::string_view string, std::string_view prefix) {
+        return string.rfind(prefix, 0) == 0;
+    }
+
+    bool EndsWith(std::string_view string, std::string_view suffix) {
+        return string.rfind(suffix) == string.length() - suffix.length();
+    }
 } // namespace StrUtil

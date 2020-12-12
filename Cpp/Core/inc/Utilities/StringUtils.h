@@ -1,8 +1,8 @@
 #ifndef __STRINGUTILITIES_H__
 #define __STRINGUTILITIES_H__
 
-#include "Utilities/LambdaUtils.h"
 #include "Platform/Types.h"
+#include "Utilities/LambdaUtils.h"
 
 #include <algorithm>
 #include <cctype>
@@ -87,6 +87,9 @@ namespace StrUtil {
     static inline std::string Trim(std::string s) {
         return TrimStart(TrimEnd(s));
     }
+
+    bool StartsWith(std::string_view string, std::string_view prefix);
+    bool EndsWith(std::string_view string, std::string_view suffix);
 } // namespace StrUtil
 
 #endif // __STRINGUTILITIES_H__
