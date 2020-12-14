@@ -1,10 +1,10 @@
 #include "Extractor/TypeDataExtractor.h"
 
-#include "Extractor/BodyCount.h"
-#include "Extractor/CommentExtractor.h"
 #include "Extractor/FunctionDataExtractor.h"
+#include "Extractor/Private/BodyCount.h"
+#include "Extractor/Private/CommentExtractor.h"
 #include "Extractor/Private/LineFetcher.h"
-#include "Extractor/VisibilityExtractor.h"
+#include "Extractor/Private/VisibilityExtractor.h"
 #include "Instrumentation/Log.h"
 #include "Utilities/Format.h"
 #include "Utilities/Require.h"

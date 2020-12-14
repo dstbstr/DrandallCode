@@ -1,8 +1,10 @@
-#include "Extractor/BodyCount.h"
-#include "TestCommon.h"
+#include "Extractor/Private/BodyCount.h"
+
 #include "Extractor/Private/LineFetcher.h"
+#include "TestCommon.h"
 
 #include <sstream>
+
 
 class BodyCountTest : public ::testing::Test {
 public:
@@ -12,6 +14,7 @@ public:
 
         return Extractor::BodyCount::GetBodyCount(line, ss);
     }
+
 protected:
     std::stringstream ss;
 };

@@ -1,4 +1,4 @@
-#include "Extractor/CommentExtractor.h"
+#include "Extractor/Private/CommentExtractor.h"
 
 namespace {
     bool RemoveFirstBlockComment(std::string& line, bool& isInBlockComment) {
