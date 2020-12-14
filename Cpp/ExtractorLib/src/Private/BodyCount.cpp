@@ -1,4 +1,4 @@
-#include "Extractor/BodyCount.h"
+#include "Extractor/Private/BodyCount.h"
 
 #include "Extractor/Private/LineFetcher.h"
 

@@ -1,4 +1,4 @@
-#include "Extractor/CommentExtractor.h"
+#include "Extractor/Private/CommentExtractor.h"
 
 #include "TestCommon.h"
 

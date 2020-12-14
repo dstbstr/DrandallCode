@@ -1,4 +1,4 @@
-#include "Extractor/NamespaceExtractor.h"
+#include "Extractor/Private/NamespaceExtractor.h"
 
 #include "TestCommon.h"
 #include "Utilities/StringUtils.h"

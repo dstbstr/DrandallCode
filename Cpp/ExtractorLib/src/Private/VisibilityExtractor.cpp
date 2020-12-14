@@ -1,4 +1,4 @@
-#include "Extractor/VisibilityExtractor.h"
+#include "Extractor/Private/VisibilityExtractor.h"
 
 #include "Utilities/Require.h"
 

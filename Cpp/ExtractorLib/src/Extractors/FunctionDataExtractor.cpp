@@ -1,8 +1,8 @@
 #include "Extractor/FunctionDataExtractor.h"
 
-#include "Extractor/BodyCount.h"
-#include "Extractor/CommentExtractor.h"
 #include "Instrumentation/Log.h"
+#include "Extractor/Private/BodyCount.h"
+#include "Extractor/Private/CommentExtractor.h"
 #include "Utilities/Format.h"
 #include "Utilities/Require.h"
 #include "Utilities/ScopedTimer.h"
