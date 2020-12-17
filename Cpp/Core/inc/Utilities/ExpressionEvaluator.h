@@ -5,6 +5,6 @@
 #include <string>
 
 namespace ExpressionEvaluator {
-    bool Evaluate(const std::string& line, std::function<bool(std::string)> predicate);
+    bool Evaluate(const std::string& line, const std::function<bool(std::string)>& predicate);
 }
 #endif // __EXPRESSIONEVALUATOR_H__

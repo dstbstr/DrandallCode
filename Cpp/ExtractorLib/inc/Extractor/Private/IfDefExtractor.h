@@ -1,9 +1,13 @@
 #ifndef __IFDEFEXTRACTOR_H__
 #define __IFDEFEXTRACTOR_H__
 
+#include "Platform/Types.h"
+
 #include <iostream>
+#include <set>
 #include <string>
 #include <vector>
+
 
 namespace Extractor {
     class IfDefExtractor {
@@ -17,8 +21,9 @@ namespace Extractor {
 
     private:
         std::vector<std::string> m_KnownDefines;
-        bool m_MatchedIfDef{false};
-        int m_DefineDepth{0};
+        // u32 m_MatchedIfDef{0};
+        std::set<u8> m_MatchedLevels{};
+        u32 m_DefineDepth{0};
         std::istream* m_Stream{nullptr};
 
         void SkipBody(std::string& line);
