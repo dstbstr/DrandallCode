@@ -4,6 +4,8 @@
 
 mthd_hdr::mthd_hdr()
 {
+    extern long ppqn;
+
     memcpy(id,"MThd",4);
     length = htonl(6);
     format = htons(1);
