@@ -1,6 +1,7 @@
-//consider naming this file something like 'Constants.h'
-
-long ppqn = 384; //would consider defining this in a cpp file, and marking it extern here
+#ifndef ppqn
+long ppqn = 384;
+#endif
+#ifndef inst
 const char *inst[128] = {
         "Acoustic Grand Piano",
         "Bright Acoustic Piano",
@@ -12,7 +13,7 @@ const char *inst[128] = {
         "Clavinet",
         "Celesta",
         "Glockenspiel",
-         "Music Box", //nit: extra space from line 13 to 102
+         "Music Box",
          "Vibraphone",
          "Marimba",
          "Xylophone",
@@ -131,3 +132,5 @@ const char *inst[128] = {
         "Applause",
         "Gunshot",
 };
+#endif
+#define HDRSIZ 8

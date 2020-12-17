@@ -1,6 +1,3 @@
-extern long ppqn; //this doesn't appear to be used in this file.
-
-//would consider adding a header guard to this header file
 class mthd_hdr
 {
     char id[4];
@@ -105,3 +102,5 @@ class chgprog
         unsigned char mnum;
         char instr;
 };
+
+#define HDRSIZ 8

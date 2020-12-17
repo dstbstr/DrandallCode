@@ -1,57 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
 #include <string.h>
-#include <errno.h>
-#include <arpa/inet.h>
-#include <strings.h>
 #include <ctype.h>
+#include <arpa/inet.h>
 #include "midiclass.h"
 #include "libmidiclass.h"
-#define HDRSIZ 8
-
-//in general, I think this file could be broken into a few different responsibilities
-//  - Warning/Errors
-//  - Parsing the command line arguments
-//  - Reading the data from a file (deserialization)
-//  - Writing the data to a file (serialization)
-//  - Notes
-//  - Tracks
-//  - Key Signatures
-//  - etc.
-//I think it would be an interesting challenge to abstract away platform specific things (like unistd, arpa/inet, and strings.h) so that I could
-//compile it on my machine.  Then if you're interested, we could introduce you to automated testing by getting some of these methods tested.
-//Also, I think that this file will get smaller if you start working with strings. :)
-
-//would consider moving these to a separate file
-void
-error(const char *str)
-
-{
-    fprintf(stderr,"%s\n",str);
-    exit(1);
-}
+#include "libdefs.h"
 
 void
-fatal(const char *str)
-
-{
-    perror(str);
-    exit(1);
-}
-
-void
-warning(const char *str)
-
-{
-    perror(str); //it seems odd to me that error uses fprintf, fatal uses perror, and warning uses perror.  Should this be fprintf?
-}
-
-void
-trkfill(track *&tp,void *var1,int sz1,void *var2,int sz2,int type)
+addtrkdata(track *&tp,void *var1,int sz1,void *var2,int sz2,int type)
 
 {
     int i;
@@ -77,7 +34,7 @@ trkfill(track *&tp,void *var1,int sz1,void *var2,int sz2,int type)
 }
 
 void
-parsekey(char *arg,keysig &keystr,track *tp)
+setkey(char *arg,keysig &keystr,track *tp)
 
 {
     int dp = 0;
@@ -152,55 +109,11 @@ parsekey(char *arg,keysig &keystr,track *tp)
     keystr.fltshrp = htons(keystr.fltshrp)/256;
     keystr.majmin = htons(keystr.majmin)/256;
 
-    trkfill(tp,&dp,1,&keystr,5,type);
-}
-
-//if I'm reading this method correctly, I might call it 'split'
-//you can see an example C++ implementation in my StringUtilities file
-int
-parselin(char *line,char parsechr,char *&arg1,char *&arg2)
-
-{
-    char *cp;
-    char *iptr;
-
-    cp=line;
-    if ((iptr=strchr(cp,parsechr)) == NULL)
-        return(-1);
-    arg2 = (iptr + 1);
-    *iptr = '\0';
-    arg1 = cp;
-    for (cp = arg2;*cp != '\n';cp++)
-        ;
-    *cp = '\0';
-    return(0);
-}
-
-int
-writevarlen(unsigned char *buf,unsigned long value)
-
-{
-    int i;
-    unsigned long val;
-
-    val = value & 0x7f;
-
-    while (value >>= 7) {
-        val <<= 8;
-        val |= ((value & 0x7f) | 0x80);
-    }
-    for (i = 0;i<4;i++) {
-        buf[i] = val;
-        if (val & 0x80)
-            val >>= 8;
-        else
-            break;
-    }
-    return(i + 1);
+    addtrkdata(tp,&dp,1,&keystr,5,type);
 }
 
 void
-parsetim(char *arg,tsig &ts,track *tp)
+settimesig(char *arg,tsig &ts,track *tp)
 
 {
     char *cp = strchr(arg,'/');
@@ -235,11 +148,11 @@ parsetim(char *arg,tsig &ts,track *tp)
     }
 
     len = writevarlen(timbuf,tp->notelen);
-    trkfill(tp,timbuf,len,&ts,7,type);
+    addtrkdata(tp,timbuf,len,&ts,7,type);
 }
 
 void
-parsetmp(char *arg,tmpo &tmp,int skip,track *tp)
+settempo(char *arg,tmpo &tmp,int skip,track *tp)
 
 {
     int dp = 0;
@@ -257,11 +170,11 @@ parsetmp(char *arg,tmpo &tmp,int skip,track *tp)
 
     if (skip == 0) {
         type = 1;
-        trkfill(tp,&dp,1,&tmp,6,type);
+        addtrkdata(tp,&dp,1,&tmp,6,type);
     }
     else {
         len = writevarlen(tmpobuf,skip);
-        trkfill(tp,tmpobuf,len,&tmp,6,type);
+        addtrkdata(tp,tmpobuf,len,&tmp,6,type);
     }
 }
 
@@ -297,12 +210,12 @@ sustain(char *arg,track *tp)
         sus.onoff = 0x7f;
     else
         sus.onoff = 0x00;
-    trkfill(tp,susbuf,len,&sus,3,type);
+    addtrkdata(tp,susbuf,len,&sus,3,type);
     tp->ticks += tp->notelen;
 }
 
 char *
-getnot(char *cp,int *note)
+getnote(char *cp,int *note)
 
 {
     char *cpp = cp;
@@ -352,7 +265,7 @@ getnot(char *cp,int *note)
 }
 
 void
-parsechord(char *arg,track *tp,int notelen)
+setchords(char *arg,track *tp,int notelen)
 
 {
     char *cp;
@@ -369,39 +282,39 @@ parsechord(char *arg,track *tp,int notelen)
 
     for (cp = arg;*cp;cp++) {
         len = 0;
-        cp = getnot(cp,&note);
+        cp = getnote(cp,&note);
         msg.note = note;
         msg.vel = tp->vel;
         if (note!= 0) {
             msg.mnum = 0x90 | chnlnum(tp);
             type=1;
-            trkfill(tp,&len,1,&msg,3,type);
+            addtrkdata(tp,&len,1,&msg,3,type);
         }
     }
     tp->ticks += notelen;
     len = writevarlen(buf,notelen);
     cp = arg;
-    cp = getnot(cp,&note);
+    cp = getnote(cp,&note);
     msg.note = note;
     msg.mnum = 0x80 | chnlnum(tp);
     type=2;
-    trkfill(tp,buf,len,&msg,3,type);
+    addtrkdata(tp,buf,len,&msg,3,type);
     cp++;
     for (;*cp;cp++) {
         len = 0;
-        cp = getnot(cp,&note);
+        cp = getnote(cp,&note);
         msg.note = note;
         msg.vel = tp->vel;
         if (note != 0) {
             msg.mnum = 0x80 | chnlnum(tp);
             type=1;
-            trkfill(tp,&len,1,&msg,3,type);
+            addtrkdata(tp,&len,1,&msg,3,type);
         }
     }
 }
 
 void
-parsenot(char *arg,track *tp,int notelen)
+setnotes(char *arg,track *tp,int notelen)
 
 {
     char *cp;
@@ -413,24 +326,24 @@ parsenot(char *arg,track *tp,int notelen)
 
     for (cp = arg;*cp;cp++) {
         len = 0;
-        cp = getnot(cp,&note);
+        cp = getnote(cp,&note);
         msg.note = note;
         msg.vel = tp->vel;
         if (note!= 0) {
             msg.mnum = 0x90 | chnlnum(tp);
             type=1;
-            trkfill(tp,&len,1,&msg,3,type);
+            addtrkdata(tp,&len,1,&msg,3,type);
         }
         tp->ticks += notelen;
         len = writevarlen(buf,notelen);
         msg.mnum = 0x80 | chnlnum(tp);
         type=2;
-        trkfill(tp,buf,len,&msg,3,type);
+        addtrkdata(tp,buf,len,&msg,3,type);
     }
 }
 
 void
-parsestacnot(char *arg,track *tp,int notelen)
+setstacnotes(char *arg,track *tp,int notelen)
 
 {
     char *cp;
@@ -443,31 +356,31 @@ parsestacnot(char *arg,track *tp,int notelen)
 
     for (cp = arg;*cp;cp++) {
         len = 0;
-        cp = getnot(cp,&note);
+        cp = getnote(cp,&note);
         msg.note = note;
         msg.vel = tp->vel;
         if (note!= 0) {
             msg.mnum = 0x90 | chnlnum(tp);
             type=1;
-            trkfill(tp,&len,1,&msg,3,type);
+            addtrkdata(tp,&len,1,&msg,3,type);
         }
         tp->ticks += staclen;
         len = writevarlen(buf,staclen);
         msg.mnum = 0x80 | chnlnum(tp);
         type=2;
-        trkfill(tp,buf,len,&msg,3,type);
+        addtrkdata(tp,buf,len,&msg,3,type);
 
         tp->ticks += (notelen - staclen);
         len = writevarlen(buf,(notelen - staclen));
         msg.mnum = 0x80 | chnlnum(tp);
         type=2;
-        trkfill(tp,buf,len,&msg,3,type);
+        addtrkdata(tp,buf,len,&msg,3,type);
 
     }
 }
 
 void
-parsetype(char *arg,track *tp,const char *ptype)
+strtstpnote(char *arg,track *tp,const char *ptype)
 
 {
     char *cp;
@@ -479,7 +392,7 @@ parsetype(char *arg,track *tp,const char *ptype)
 
     cp = arg;
     if (!strcmp(ptype,"STN") || !strcmp(ptype,"STP"))
-        cp = getnot(cp,&note);
+        cp = getnote(cp,&note);
     if (!strcmp(ptype,"STNN") || !strcmp(ptype,"STPN"))
         note= atoi(cp);
     msg.note = note;
@@ -490,13 +403,13 @@ parsetype(char *arg,track *tp,const char *ptype)
     if (!strcmp(ptype,"STP") || !strcmp(ptype,"STPN"))
         msg.mnum = 0x80 | chnlnum(tp);;
     type = 2;
-    trkfill(tp,buf,len,&msg,3,type);
+    addtrkdata(tp,buf,len,&msg,3,type);
     if (!strcmp(ptype,"STP") || !strcmp(ptype,"STPN"))
         tp->ticks += tp->notelen;
 }
 
 int
-parselen(char *arg,track *tp)
+setnotelen(char *arg,track *tp)
 
 {
     int len;
@@ -554,7 +467,7 @@ parselen(char *arg,track *tp)
 }
 
 void
-parsestuff(char *arg,track *tp,void (*parse)(char *,track *,int)) //great descriptive name here. :)
+setstuff(char *arg,track *tp,void (*set)(char *,track *,int)) //great descriptive name here. :)
 
 {
     int notelen;
@@ -573,7 +486,7 @@ parsestuff(char *arg,track *tp,void (*parse)(char *,track *,int)) //great descri
         *cp2 = '\0';
         cp2++;
 
-        notelen = parselen(cp,tp);
+        notelen = setnotelen(cp,tp);
         cp = cp2;
         cp2 = strchr(cp,';');
         if (cp2 == NULL) {
@@ -583,13 +496,13 @@ parsestuff(char *arg,track *tp,void (*parse)(char *,track *,int)) //great descri
         }
         *cp2 = '\0';
         cp2++;
-        (*parse)(cp,tp,notelen);
+        (*set)(cp,tp,notelen);
         cp = cp2;
     }
 }
 
 void
-parseinst(char *arg,track *tp)
+setinstr(char *arg,track *tp)
 
 {
     int i;
@@ -612,7 +525,7 @@ parseinst(char *arg,track *tp)
     chp.mnum = 0xc0 | chnlnum(tp);
     chp.instr = i;
     type=2;
-    trkfill(tp,buf,len,&chp,2,type);
+    addtrkdata(tp,buf,len,&chp,2,type);
 
 }
 
@@ -626,7 +539,7 @@ endtrk(mtrk_hdr &mh,eot end,track *&tp)
 
     for (tp = &trk;tp->np;tp = tp->np)
         ;
-    trkfill(tp,&dp,1,&end,3,type);
+    addtrkdata(tp,&dp,1,&end,3,type);
     mh.length = htonl(tp->datalen);
     memcpy(tp->datap + 4,&(mh.length),4);
 }
@@ -640,18 +553,18 @@ newendtrk(mtrk_hdr &mh,eot end,track *&tp)
     extern track trk;
 
     for (tp = &trk;tp->np;tp = tp->np) {
-        trkfill(tp,&dp,1,&end,3,type);
+        addtrkdata(tp,&dp,1,&end,3,type);
         mh.length = htonl(tp->datalen);
         memcpy(tp->datap + 4,&(mh.length),4);
     }
-    trkfill(tp,&dp,1,&end,3,type);
+    addtrkdata(tp,&dp,1,&end,3,type);
     mh.length = htonl(tp->datalen);
     memcpy(tp->datap + 4,&(mh.length),4);
 }
 
 void
-initMTrk(mtrk_hdr &mh,mthd_hdr &mc,track *&tp)
 
+initMTrk(mtrk_hdr &mh,mthd_hdr &mc,track *&tp)
 {
     if ((tp->datap = (char *)malloc(HDRSIZ)) == NULL)
         fatal("malloc");
@@ -678,7 +591,7 @@ newtrack(track *&tp)
 }
 
 int
-parsevel(char *arg,track *tp)
+setvel(char *arg,track *tp)
 
 {
     char *cp;
@@ -754,43 +667,43 @@ dofuncs(int trck,char *arg1,char *arg2)
     }
 
     if (!strcmp(arg1,"Key"))
-        parsekey(arg2,ks,tp);
+        setkey(arg2,ks,tp);
 
     if (!strcmp(arg1,"Tim"))
-        parsetim(arg2,ts,tp);
+        settimesig(arg2,ts,tp);
 
     if (!strcmp(arg1,"Tmpo"))
-        parsetmp(arg2,tmp,tp->notelen,tp);
+        settempo(arg2,tmp,tp->notelen,tp);
 
     if (!strcmp(arg1,"V"))
-        tp->vel = parsevel(arg2,tp);
+        tp->vel = setvel(arg2,tp);
 
     if (!strcmp(arg1,"R"))
-        tp->notelen = parselen(arg2,tp);
+        tp->notelen = setnotelen(arg2,tp);
 
     if (!strcmp(arg1,"STN"))
-        parsetype(arg2,tp,"STN");
+        strtstpnote(arg2,tp,"STN");
 
     if (!strcmp(arg1,"STNN"))
-        parsetype(arg2,tp,"STNN");
+        strtstpnote(arg2,tp,"STNN");
 
     if (!strcmp(arg1,"STP"))
-        parsetype(arg2,tp,"STP");
+        strtstpnote(arg2,tp,"STP");
 
     if (!strcmp(arg1,"STPN"))
-        parsetype(arg2,tp,"STPN");
+        strtstpnote(arg2,tp,"STPN");
 
     if (!strcmp(arg1,"RN"))
-        parsestuff(arg2,tp,parsenot);
+        setstuff(arg2,tp,setnotes);
 
     if (!strcmp(arg1,"RS"))
-        parsestuff(arg2,tp,parsestacnot);
+        setstuff(arg2,tp,setstacnotes);
 
     if (!strcmp(arg1,"RCN"))
-        parsestuff(arg2,tp,parsechord);
+        setstuff(arg2,tp,setchords);
 
     if (!strcmp(arg1,"I"))
-        parseinst(arg2,tp);
+        setinstr(arg2,tp);
 
     if (!strcmp(arg1,"Tcks"))
         print(tp);
@@ -807,93 +720,4 @@ dofuncs(int trck,char *arg1,char *arg2)
     }
     if (!strcmp(arg1,"CHNL"))
         tp->chnl = atoi(arg2);
-}
-
-void
-checkargs(FILE *&fp,int &fd,int argc,char *argv[])
-
-{
-    char name[1024];
-    char *cp;
-
-    if (argc == 2) {
-        if ((fd = open(argv[1],O_RDONLY)) < 0)
-            fatal("open");
-        close(fd);
-        if ((fp = fopen(argv[1],"r")) < 0)
-            fatal("fopen");
-        if (strlen(argv[1]) > 1020)
-            fatal("filnam too long");
-        memcpy(name,argv[1],strlen(argv[1]));
-        cp = (strrchr(name,'.')+1);
-        *cp++ = 'm';
-        *cp++ = 'i';
-        *cp++ = 'd';
-        *cp++ = 'i';
-        *cp = '\0';
-        if ((fd = open(name,O_RDWR | O_CREAT,0644)) < 0)
-            fatal("open");
-    }
-    else {
-        printf("usage: %s filename\n",argv[0]);
-        exit(1);
-    }
-}
-
-void
-writemidifil(int fd,mthd_hdr mc)
-
-{
-    extern track trk;
-    track *tp = &trk;
-
-    mc.numtrks = htons(mc.numtrks);
-    if (write(fd,&mc,14) < 0)
-        fatal("write");
-    while (tp->np) {
-       if (write(fd,tp->datap,tp->datalen + HDRSIZ) < 0)
-            warning("write");
-       tp = tp->np;
-    }
-    if (write(fd,tp->datap,tp->datalen + HDRSIZ) < 0)
-        warning("write");
-}
-
-int preparselin(char *&buf)
-{
-    char *cp = buf;
-    char *cp2;
-    int mnum;
-    int tnum = 0;
-    extern track trk;
-    extern mthd_hdr mc;
-    extern mtrk_hdr mh;
-    extern eot end;
-    extern int trkexists[];
-    track *tp;
-
-    if (*cp != 'M')
-        return(-1);
-    if ((cp2 = strchr(++cp,':')) == NULL)
-        return(-1);
-    *cp2++ = '\0';
-    mnum = atoi(cp);
-    cp = cp2;
-    if (*cp != 'T')
-        return(-1);
-    if ((cp2 = strchr(++cp,':')) == NULL)
-        return(-1);
-    *cp2++ = '\0';
-    tnum = atoi(cp);
-    if (!trkexists[tnum]) {
-        trkexists[tnum] = 1;
-        for (tp = &trk;tp->np;tp = tp->np)
-            ;
-        if (tnum)
-            newtrack(tp);
-        tp->trck = tnum;
-        initMTrk(mh,mc,tp);
-    }
-    buf = cp2;
-    return(tnum);
 }
