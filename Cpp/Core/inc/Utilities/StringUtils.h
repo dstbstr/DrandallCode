@@ -1,5 +1,5 @@
-#ifndef __STRINGUTILITIES_H__
-#define __STRINGUTILITIES_H__
+#ifndef __STRINGUTILS_H__
+#define __STRINGUTILS_H__
 
 #include "Platform/Types.h"
 #include "Utilities/LambdaUtils.h"
@@ -73,6 +73,8 @@ namespace StrUtil {
     std::vector<std::string_view> Split(std::string_view input, std::string_view delimiter);
 
     bool EqualsIgnoreCase(std::string_view lhs, std::string_view rhs);
+    std::string ToUpper(const std::string& str);
+    std::string ToLower(const std::string& str);
 
     static inline std::string TrimStart(std::string s) {
         s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) { return !std::isspace(ch); }));
@@ -92,4 +94,4 @@ namespace StrUtil {
     bool EndsWith(std::string_view string, std::string_view suffix);
 } // namespace StrUtil
 
-#endif // __STRINGUTILITIES_H__
+#endif // __STRINGUTILS_H__

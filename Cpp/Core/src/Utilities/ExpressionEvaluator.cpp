@@ -82,7 +82,6 @@ namespace {
 
 namespace ExpressionEvaluator {
     bool Evaluate(const std::string& line, const std::function<bool(std::string)>& predicate) {
-        bool result = false;
         std::string copy = std::regex_replace(line, spaceRegex, ""); // remove all the spaces
 
         Evaluate_Impl(copy, predicate);

@@ -10,6 +10,18 @@ namespace StrUtil {
         return (lhs.size() == rhs.size()) && std::equal(lhs.begin(), lhs.end(), rhs.begin(), comparer);
     }
 
+    std::string ToUpper(const std::string& str) {
+        std::string result = str;
+        std::transform(str.cbegin(), str.cend(), result.begin(), [](const char& letter) { return std::toupper(letter); });
+        return result;
+    }
+
+    std::string ToLower(const std::string& str) {
+        std::string result = str;
+        std::transform(str.cbegin(), str.cend(), result.begin(), [](const char& letter) { return std::tolower(letter); });
+        return result;
+    }
+
     std::vector<std::string_view> Split(std::string_view input, std::string_view delimiter) {
         size_t last = 0;
         size_t next = 0;
