@@ -2,11 +2,11 @@
 
 #include "Extractor/Data/Visibility.h"
 #include "Extractor/FunctionDataExtractor.h"
-#include "Extractor/TypeDataExtractor.h"
-#include "Instrumentation/Log.h"
 #include "Extractor/Private/BodyCount.h"
 #include "Extractor/Private/LineFetcher.h"
 #include "Extractor/Private/NamespaceExtractor.h"
+#include "Extractor/TypeDataExtractor.h"
+#include "Instrumentation/Log.h"
 #include "Utilities/Format.h"
 #include "Utilities/PathUtils.h"
 #include "Utilities/ScopedTimer.h"
@@ -14,6 +14,7 @@
 
 #include <fstream>
 #include <regex>
+
 
 namespace {
     std::regex IncludeRegex("^#include [\"<]([^\">]+)[\">]$");
@@ -88,7 +89,7 @@ namespace Extractor {
                 for(int i = 0; i < closeBraces; i++) {
                     try {
                         namespaceExtractor.PopNamespace();
-                    } catch(std::exception e) {
+                    } catch(std::exception& e) {
                         LOG_WARN(StrUtil::Format("Failed to pop namespace.  File %s, NonBlankLine %u", result.FileName, nonBlankLines));
                     }
                 }

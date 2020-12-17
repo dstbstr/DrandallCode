@@ -102,6 +102,46 @@ TEST(EqualsIgnoreCase, EmptyEqualsEmpty) {
     ASSERT_TRUE(StrUtil::EqualsIgnoreCase("", ""));
 }
 
+TEST(ToUpper, EmptyReturnsEmpty) {
+    ASSERT_EQ(StrUtil::ToUpper(""), "");
+}
+
+TEST(ToUpper, UppercaseWordIsUnchanged) {
+    ASSERT_EQ(StrUtil::ToUpper("UPPER"), "UPPER");
+}
+
+TEST(ToUpper, LowercaseWordIsUppercased) {
+    ASSERT_EQ(StrUtil::ToUpper("lower"), "LOWER");
+}
+
+TEST(ToUpper, SymbolsAreUnchanged) {
+    ASSERT_EQ(StrUtil::ToUpper("!@#$%^&*()-_=+,./<>?;':\"[]{}\\|`~"), "!@#$%^&*()-_=+,./<>?;':\"[]{}\\|`~");
+}
+
+TEST(ToUpper, NumbersAreUnchanged) {
+    ASSERT_EQ(StrUtil::ToUpper("1234567890"), "1234567890");
+}
+
+TEST(ToLower, EmptyReturnsEmpty) {
+    ASSERT_EQ(StrUtil::ToLower(""), "");
+}
+
+TEST(ToLower, UppercaseWordIsLowercased) {
+    ASSERT_EQ(StrUtil::ToLower("UPPER"), "upper");
+}
+
+TEST(ToLower, LowercaseWordIsUnchanged) {
+    ASSERT_EQ(StrUtil::ToLower("lower"), "lower");
+}
+
+TEST(ToLower, SymbolsAreUnchanged) {
+    ASSERT_EQ(StrUtil::ToLower("!@#$%^&*()-_=+,./<>?;':\"[]{}\\|`~"), "!@#$%^&*()-_=+,./<>?;':\"[]{}\\|`~");
+}
+
+TEST(ToLower, NumbersAreUnchanged) {
+    ASSERT_EQ(StrUtil::ToLower("1234567890"), "1234567890");
+}
+
 TEST(StringJoin, JoinVecCombinesArguments) {
     std::vector<std::string> input{"one", "two", "three"};
     auto result = StrUtil::JoinVec("", input);

@@ -34,7 +34,7 @@ namespace {
     constexpr size_t BaseClassIndex = 4;
     constexpr size_t InheritenceScopeIndex = 5;
 
-    Extractor::TypeData GetTypeData(std::smatch match, std::string fileName) {
+    Extractor::TypeData GetTypeData(std::smatch match, const std::string& fileName) {
         Extractor::TypeData result;
         result.ClassName = match[NameIndex];
         result.FileName = fileName;

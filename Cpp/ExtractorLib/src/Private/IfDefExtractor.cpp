@@ -22,9 +22,7 @@ namespace Extractor {
 
     void IfDefExtractor::Extract(std::string& line) {
         if(line == EndIf) {
-            if(m_MatchedLevels.find(m_DefineDepth) != m_MatchedLevels.end()) {
-                m_MatchedLevels.erase(m_DefineDepth);
-            }
+            m_MatchedLevels.erase(m_DefineDepth);
             m_DefineDepth--;
             if(m_DefineDepth < 0) {
                 LOG_WARN("Found unexpected endif");
