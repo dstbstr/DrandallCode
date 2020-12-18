@@ -1,6 +1,10 @@
 #include "Platform.h"
-#include "libdefs.h"
 #include "libmidiclass.h"
+#include "LibConvertGdbMidiClass.h"
+#include "Utils.h"
+#include "Parse.h"
+#include "ReturnStatus.h"
+#include "MidiOut.h"
 
 #include <stdio.h>
 #include <stdlib.h>
