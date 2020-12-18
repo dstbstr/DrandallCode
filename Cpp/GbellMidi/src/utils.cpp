@@ -6,12 +6,9 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include "libmidiclass.h"
-#include "libdefs.h"
+#include "ReturnStatus.h"
 
-int
-writevarlen(unsigned char *buf,unsigned long value)
-
-{
+int writevarlen(unsigned char *buf,unsigned long value) {
     int i;
     unsigned long val;
 
@@ -31,10 +28,7 @@ writevarlen(unsigned char *buf,unsigned long value)
     return(i + 1);
 }
 
-void
-checkargs(FILE *&fp,int &fd,int argc,char *argv[])
-
-{
+void checkargs(FILE *&fp,int &fd,int argc,char *argv[]) {
     char name[1024];
     char *cp;
 

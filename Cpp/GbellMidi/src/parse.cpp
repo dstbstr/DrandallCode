@@ -1,13 +1,12 @@
+#include "Parse.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "libmidiclass.h"
-#include "libdefs.h"
+#include "LibConvertGdbMidiClass.h"
 
-int
-parselin(char *line,char parsechr,char *&arg1,char *&arg2)
-
-{
+int parselin(char *line,char parsechr,char *&arg1,char *&arg2) {
     char *cp;
     char *iptr;
 
@@ -23,9 +22,7 @@ parselin(char *line,char parsechr,char *&arg1,char *&arg2)
     return(0);
 }
 
-int 
-preparselin(char *&buf)
-{
+int preparselin(char *&buf) {
     char *cp = buf;
     char *cp2;
     int mnum;

@@ -5,12 +5,10 @@
 #include <ctype.h>
 #include "Constants.h"
 #include "libmidiclass.h"
-#include "libdefs.h"
+#include "ReturnStatus.h"
+#include "Utils.h"
 
-void
-addtrkdata(track *&tp,void *var1,int sz1,void *var2,int sz2,int type)
-
-{
+void addtrkdata(track *&tp,void *var1,int sz1,void *var2,int sz2,int type) {
     int i;
 
     if ((tp->datap = (char *)realloc(tp->datap,HDRSIZ + tp->datalen + sz1 + sz2)) == NULL)
@@ -33,10 +31,7 @@ addtrkdata(track *&tp,void *var1,int sz1,void *var2,int sz2,int type)
     (tp->datalen) += sz2;
 }
 
-void
-setkey(char *arg,keysig &keystr,track *tp)
-
-{
+void setkey(char *arg,keysig &keystr,track *tp) {
     int dp = 0;
     int type = 1;
 
@@ -112,10 +107,7 @@ setkey(char *arg,keysig &keystr,track *tp)
     addtrkdata(tp,&dp,1,&keystr,5,type);
 }
 
-void
-settimesig(char *arg,tsig &ts,track *tp)
-
-{
+void settimesig(char *arg,tsig &ts,track *tp) {
     char *cp = strchr(arg,'/');
     int len;
     unsigned char timbuf[4] = {'\0','\0','\0','\0'};
@@ -151,10 +143,7 @@ settimesig(char *arg,tsig &ts,track *tp)
     addtrkdata(tp,timbuf,len,&ts,7,type);
 }
 
-void
-settempo(char *arg,tmpo &tmp,int skip,track *tp)
-
-{
+void settempo(char *arg,tmpo &tmp,int skip,track *tp) {
     int dp = 0;
     int len;
     unsigned char tmpobuf[4] = {'\0','\0','\0','\0'};
@@ -178,10 +167,7 @@ settempo(char *arg,tmpo &tmp,int skip,track *tp)
     }
 }
 
-int
-chnlnum(track *tp)
-
-{
+int chnlnum(track *tp) {
     int trk = tp->trck;
     int ornum;
 
@@ -194,10 +180,7 @@ chnlnum(track *tp)
     return(ornum);
 }
 
-void
-sustain(char *arg,track *tp)
-
-{
+void sustain(char *arg,track *tp) {
     susmsg sus;
     int len;
     unsigned char susbuf[4] = {'\0','\0','\0','\0'};
@@ -214,10 +197,7 @@ sustain(char *arg,track *tp)
     tp->ticks += tp->notelen;
 }
 
-char *
-getnote(char *cp,int *note)
-
-{
+char* getnote(char *cp,int *note) {
     char *cpp = cp;
     int oct;
 
@@ -264,10 +244,7 @@ getnote(char *cp,int *note)
     return(cpp);
 }
 
-void
-setchords(char *arg,track *tp,int notelen)
-
-{
+void setchords(char *arg,track *tp,int notelen) {
     char *cp;
     int note;
     unsigned char buf[4] = {'\0','\0','\0','\0'};
@@ -313,10 +290,7 @@ setchords(char *arg,track *tp,int notelen)
     }
 }
 
-void
-setnotes(char *arg,track *tp,int notelen)
-
-{
+void setnotes(char *arg,track *tp,int notelen) {
     char *cp;
     int note;
     unsigned char buf[4] = {'\0','\0','\0','\0'};
@@ -342,10 +316,7 @@ setnotes(char *arg,track *tp,int notelen)
     }
 }
 
-void
-setstacnotes(char *arg,track *tp,int notelen)
-
-{
+void setstacnotes(char *arg,track *tp,int notelen) {
     char *cp;
     int note;
     unsigned char buf[4] = {'\0','\0','\0','\0'};
@@ -379,10 +350,7 @@ setstacnotes(char *arg,track *tp,int notelen)
     }
 }
 
-void
-strtstpnote(char *arg,track *tp,const char *ptype)
-
-{
+void strtstpnote(char *arg,track *tp,const char *ptype) {
     char *cp;
     int note;
     notemsg msg;
@@ -408,10 +376,7 @@ strtstpnote(char *arg,track *tp,const char *ptype)
         tp->ticks += tp->notelen;
 }
 
-int
-setnotelen(char *arg,track *tp)
-
-{
+int setnotelen(char *arg,track *tp) {
     int len;
     int totlen = 0;
     char *cp;
@@ -466,10 +431,7 @@ setnotelen(char *arg,track *tp)
     return(totlen);
 }
 
-void
-setstuff(char *arg,track *tp,void (*set)(char *,track *,int)) //great descriptive name here. :)
-
-{
+void setstuff(char *arg,track *tp,void (*set)(char *,track *,int)) {
     int notelen;
     char *cp;
     char *cp2 = arg;
@@ -501,10 +463,7 @@ setstuff(char *arg,track *tp,void (*set)(char *,track *,int)) //great descriptiv
     }
 }
 
-void
-setinstr(char *arg,track *tp)
-
-{
+void setinstr(char *arg,track *tp) {
     int i;
     chgprog chp;
     int len=0;
@@ -528,10 +487,7 @@ setinstr(char *arg,track *tp)
 
 }
 
-void
-endtrk(mtrk_hdr &mh,eot end,track *&tp)
-
-{
+void endtrk(mtrk_hdr &mh,eot end,track *&tp) {
     int dp=0;
     int type=1;
     extern track trk;
@@ -543,10 +499,7 @@ endtrk(mtrk_hdr &mh,eot end,track *&tp)
     memcpy(tp->datap + 4,&(mh.length),4);
 }
 
-void
-newendtrk(mtrk_hdr &mh,eot end,track *&tp)
-
-{
+void newendtrk(mtrk_hdr &mh,eot end,track *&tp) {
     int dp=0;
     int type=1;
     extern track trk;
@@ -561,10 +514,7 @@ newendtrk(mtrk_hdr &mh,eot end,track *&tp)
     memcpy(tp->datap + 4,&(mh.length),4);
 }
 
-void
-
-initMTrk(mtrk_hdr &mh,mthd_hdr &mc,track *&tp)
-{
+void initMTrk(mtrk_hdr &mh,mthd_hdr &mc,track *&tp) {
     if ((tp->datap = (char *)malloc(HDRSIZ)) == NULL)
         fatal("malloc");
     tp->datalen = 0;
@@ -574,10 +524,7 @@ initMTrk(mtrk_hdr &mh,mthd_hdr &mc,track *&tp)
     mc.numtrks++;
 }
 
-void
-newtrack(track *&tp)
-
-{
+void newtrack(track *&tp) {
     if ((tp->np = (track *)malloc(sizeof(track))) == NULL) 
         fatal("malloc");
     tp = tp->np;
@@ -589,10 +536,7 @@ newtrack(track *&tp)
     tp->np = NULL;
 }
 
-int
-setvel(char *arg,track *tp)
-
-{
+int setvel(char *arg,track *tp) {
     char *cp;
     int vel;
 
@@ -632,17 +576,11 @@ setvel(char *arg,track *tp)
     return(vel);
 }
 
-void
-print(track *tp)
-
-{
+void print(track *tp) {
     printf("Track %d ticks: %d\n",tp->trck,tp->ticks);
 }
 
-void
-dofuncs(int trck,char *arg1,char *arg2)
-
-{
+void dofuncs(int trck,char *arg1,char *arg2) {
     keysig ks;
     tsig ts;
     tmpo tmp;

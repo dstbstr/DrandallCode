@@ -1,14 +1,12 @@
+#include "MidiOut.h"
+
 #include "Platform.h"
-#include "libmidiclass.h"
-#include "libdefs.h"
 #include "Constants.h"
+#include "ReturnStatus.h"
 
 #include <stdio.h>
 
-void
-writemidifil(int fd,mthd_hdr mc)
-
-{
+void writemidifil(int fd,mthd_hdr mc) {
     extern track trk;
     track *tp = &trk;
 
