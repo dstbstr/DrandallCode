@@ -11,5 +11,5 @@ int writevarlen(unsigned char *,unsigned long);
 void newtrack(track *&);
 void initMTrk(mtrk_hdr &,mthd_hdr &,track *&);
 void error(const char *);
-void fatal(const char *);
-void warning(const char *);
+void fatal(const char *); //this is already declared
+void warning(const char *); //this too

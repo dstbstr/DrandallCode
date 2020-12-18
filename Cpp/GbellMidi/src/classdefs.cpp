@@ -2,6 +2,8 @@
 #include <string.h>
 #include "libmidiclass.h"
 
+extern long ppqn;
+
 mthd_hdr::mthd_hdr()
 {
     memcpy(id,"MThd",4);

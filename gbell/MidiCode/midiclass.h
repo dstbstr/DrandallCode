@@ -42,7 +42,7 @@ const char *inst[128] = {
          "Slap Bass 2",
          "Synth Bass 1",
          "Synth Bass 2",
-         "",
+         "", //blank?
          "Violin",
          "Viola",
          "Cello",
