@@ -510,10 +510,9 @@ setinstr(char *arg,track *tp)
     int len=0;
     unsigned char buf[4] = {'\0','\0','\0','\0'};
     int type;
-    extern const char *inst[];
 
     for (i = 0;i < 128;i++)
-        if (!strcmp(inst[i],arg))
+        if(inst[i] == arg)
             break;
 
     if (i == 128) {

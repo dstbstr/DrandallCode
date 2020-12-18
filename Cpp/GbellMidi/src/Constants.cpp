@@ -1,7 +1,7 @@
 #include "Constants.h"
 
 long ppqn = 384; //would consider defining this in a cpp file, and marking it extern here
-const char* inst[128] = {
+std::vector<std::string> inst = {
         "Acoustic Grand Piano",
         "Bright Acoustic Piano",
         "Electric Grand Piano",
