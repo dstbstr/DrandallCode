@@ -1,2 +1,0 @@
-C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\MidiLib\Debug\MidiLib.pdb
-C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\MidiLib\MidiLib.dir\Debug\MidiLib.pdb
