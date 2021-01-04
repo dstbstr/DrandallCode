@@ -21,6 +21,7 @@ namespace Extractor {
         u64 IncludedByCount{0};
         u64 LineCount{0};
         u64 TotalLineCount{0};
+        u64 PreProcessorCount{0};
     };
 } // namespace Extractor
 #endif // __FILEDATA_H__

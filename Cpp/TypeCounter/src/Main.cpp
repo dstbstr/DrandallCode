@@ -18,10 +18,8 @@
 #include <fstream>
 #include <iostream>
 #include <string>
+#include <unordered_map>
 #include <vector>
-
-template<class T>
-struct IRunnable;
 
 Log::StdOutLogWriter logWriter{};
 using namespace Extractor;
@@ -30,19 +28,24 @@ using namespace TypeCounter;
 using ReportCollection = std::vector<std::pair<std::unique_ptr<IReport>, std::string>>;
 
 namespace {
-    std::vector<PreProcessorResult> PreProcessFiles(const std::vector<std::string>& fileNames) {
+    static constexpr ExtractorSettings Settings{false, true, true};
+
+    std::unordered_map<std::string, PreProcessorResult> PreProcessFiles(const std::vector<std::string>& fileNames) {
         std::vector<std::unique_ptr<IRunnable<PreProcessorResult>>> preProcessingJobs;
         std::transform(fileNames.begin(), fileNames.end(), std::back_inserter(preProcessingJobs), [](const std::string& file) { return std::make_unique<FilePreProcessor>(file); });
-        return Runner::Get().RunAll(Threading::ExpectedRunTime::MILLISECONDS, preProcessingJobs);
+        auto preProcessedResults = Runner::Get().RunAll(Threading::ExpectedRunTime::MILLISECONDS, preProcessingJobs);
+
+        std::unordered_map<std::string, PreProcessorResult> result;
+        for(auto&& file: preProcessedResults) {
+            result[file.FileName] = file;
+        }
+
+        return result;
     }
 
-    std::vector<FileData> GatherFileData(const std::vector<std::string>& fileNames) {
-        ExtractorSettings settings;
-        settings.CountIncludes = false;
-        settings.ExtractFunctions = true;
-        settings.ExtractTypes = true;
+    std::vector<FileData> GatherFileData(const std::vector<std::string>& fileNames, std::unordered_map<std::string, PreProcessorResult>& preProcessedFileData) {
         std::vector<std::unique_ptr<IRunnable<FileData>>> jobs;
-        std::transform(fileNames.begin(), fileNames.end(), std::back_inserter(jobs), [&settings](const std::string& file) { return std::make_unique<FileDataExtractor>(file, settings); });
+        std::transform(fileNames.begin(), fileNames.end(), std::back_inserter(jobs), [&preProcessedFileData](const std::string& file) { return std::make_unique<FileDataExtractor>(file, preProcessedFileData, Settings); });
 
         // large code bases tend to have bigger files which take longer to parse
         Threading::ExpectedRunTime expectedRuntime = jobs.size() < 100 ? Threading::ExpectedRunTime::MILLISECONDS : Threading::ExpectedRunTime::SECONDS;
@@ -92,8 +95,7 @@ int main(int argc, char* argv[]) {
 
         Require::NotEmpty(fileNames, "Did not locate any filenames");
 
-        auto preProcessedResults = PreProcessFiles(fileNames);
-        auto files = GatherFileData(fileNames);
+        auto files = GatherFileData(fileNames, PreProcessFiles(fileNames));
 
         auto reports = GenerateReports(files, argParse.RunFunctionReport(), argParse.RunTypeReport());
 

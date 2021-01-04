@@ -5,6 +5,7 @@
 #include <unordered_map>
 
 struct PreProcessorResult {
+    std::string FilePath;
     std::string FileName;
     bool HasConditionalDefines{false};
     std::unordered_map<std::string, std::string> Defines;

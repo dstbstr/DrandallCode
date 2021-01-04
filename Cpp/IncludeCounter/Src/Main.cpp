@@ -1,6 +1,8 @@
 #include "Extractor/Data/FileData.h"
+#include "Extractor/Data/PreProcessorResult.h"
 #include "Extractor/ExtractorSettings.h"
 #include "Extractor/FileDataExtractor.h"
+#include "Extractor/FilePreProcessor.h"
 #include "Extractor/Workers/IncludeMapGenerator.h"
 #include "IncludeArgParse.h"
 #include "IncludeReport.h"
@@ -14,12 +16,25 @@
 #include <string>
 #include <vector>
 
-template<class T>
-struct IRunnable;
-
 Log::StdOutLogWriter logWriter{};
 using namespace IncludeCounter;
 using namespace Extractor;
+
+namespace {
+    constexpr ExtractorSettings Settings{true, false, false};
+    std::unordered_map<std::string, PreProcessorResult> PreProcessFiles(const std::vector<std::string>& fileNames) {
+        std::vector<std::unique_ptr<IRunnable<PreProcessorResult>>> preProcessingJobs;
+        std::transform(fileNames.begin(), fileNames.end(), std::back_inserter(preProcessingJobs), [](const std::string& file) { return std::make_unique<FilePreProcessor>(file); });
+        auto preProcessedResults = Runner::Get().RunAll(Threading::ExpectedRunTime::MILLISECONDS, preProcessingJobs);
+
+        std::unordered_map<std::string, PreProcessorResult> result;
+        for(auto&& file: preProcessedResults) {
+            result[file.FileName] = file;
+        }
+
+        return result;
+    }
+} // namespace
 
 int main(int argc, char* argv[]) {
     ScopedTimer executionTimer("Total Runtime");
@@ -28,15 +43,12 @@ int main(int argc, char* argv[]) {
         if(!argParse.ShouldParse()) {
             return 0;
         }
-        std::vector<std::string> fileNames = argParse.GetFileNames();
+        auto fileNames = argParse.GetFileNames();
+        auto preProcessedFiles = PreProcessFiles(fileNames);
 
-        ExtractorSettings settings;
-        settings.CountIncludes = true;
-        settings.ExtractFunctions = false;
-        settings.ExtractTypes = false;
         std::vector<std::unique_ptr<IRunnable<FileData>>> jobs;
         for(auto&& file: fileNames) {
-            jobs.push_back(std::move(std::make_unique<FileDataExtractor>(file, settings)));
+            jobs.push_back(std::move(std::make_unique<FileDataExtractor>(file, preProcessedFiles, Settings)));
         }
 
         Threading::ExpectedRunTime expectedRunTime = jobs.size() < 100 ? Threading::ExpectedRunTime::MILLISECONDS : Threading::ExpectedRunTime::SECONDS;

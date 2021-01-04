@@ -5,6 +5,7 @@
 #include "Threading/IRunnable.h"
 
 #include <string>
+#include <vector>
 
 namespace Extractor {
     class FilePreProcessor : public IRunnable<PreProcessorResult> {
@@ -14,6 +15,7 @@ namespace Extractor {
         FilePreProcessor& operator=(const FilePreProcessor&) = delete;
 
         PreProcessorResult Execute() const;
+        void Reprocess(PreProcessorResult& existingResult, std::vector<std::string> knownDefines) const;
 
     private:
         std::string m_FilePath;
