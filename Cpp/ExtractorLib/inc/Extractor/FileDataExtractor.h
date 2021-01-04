@@ -2,13 +2,16 @@
 #define __FILEDATAEXTRACTOR_H__
 
 #include "Extractor/Data/FileData.h"
+#include "Extractor/Data/PreProcessorResult.h"
 #include "Extractor/ExtractorSettings.h"
 #include "Threading/IRunnable.h"
+
+#include <unordered_map>
 
 namespace Extractor {
     class FileDataExtractor : public IRunnable<FileData> {
     public:
-        FileDataExtractor(std::string filePath, ExtractorSettings settings) : m_FilePath(filePath), m_Settings(settings) {}
+        FileDataExtractor(std::string filePath, std::unordered_map<std::string, PreProcessorResult>& preProcessedFiles, ExtractorSettings settings) : m_FilePath(filePath), m_PreProcessedFiles(&preProcessedFiles), m_Settings(settings) {}
         FileDataExtractor(const FileDataExtractor&) = delete;
         FileDataExtractor& operator=(const FileDataExtractor&) = delete;
 
@@ -16,6 +19,7 @@ namespace Extractor {
 
     private:
         std::string m_FilePath;
+        std::unordered_map<std::string, PreProcessorResult>* m_PreProcessedFiles;
         ExtractorSettings m_Settings;
     };
 

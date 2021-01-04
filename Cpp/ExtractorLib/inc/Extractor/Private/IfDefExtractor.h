@@ -8,16 +8,18 @@
 #include <string>
 #include <vector>
 
-
 namespace Extractor {
     class IfDefExtractor {
     public:
-        IfDefExtractor(std::vector<std::string> knownDefines, std::istream* stream) : m_KnownDefines(knownDefines), m_Stream(stream) {}
+        IfDefExtractor(std::vector<std::string> knownDefines, std::istream& stream) : m_KnownDefines(knownDefines), m_Stream(&stream) {}
         IfDefExtractor(const IfDefExtractor& other) = delete;
         IfDefExtractor operator=(const IfDefExtractor& other) = delete;
 
-        bool CanExtract(const std::string& line);
+        bool CanExtract(const std::string& line) const;
         void Extract(std::string& line);
+        void AddDefine(std::string define) {
+            m_KnownDefines.push_back(define);
+        }
 
     private:
         std::vector<std::string> m_KnownDefines;
@@ -27,6 +29,7 @@ namespace Extractor {
         std::istream* m_Stream{nullptr};
 
         void SkipBody(std::string& line);
+        void SkipToEndif();
     };
 } // namespace Extractor
 #endif // __IFDEFEXTRACTOR_H__

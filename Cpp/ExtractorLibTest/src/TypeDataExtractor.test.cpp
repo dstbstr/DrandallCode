@@ -166,10 +166,11 @@ namespace Extractor {
 
         TypeData Extract() {
             std::string line;
+            std::vector<std::string> knownDefines{"IS_DEFINED"};
             LineFetcher::GetNextLine(ss, line);
             std::smatch match;
             IsAType(line, match);
-            return TypeDataExtractor::Extract(match, m_FileName, m_Namespace, ss);
+            return TypeDataExtractor::Extract(match, m_FileName, m_Namespace, knownDefines, ss);
         }
     };
 
@@ -420,6 +421,30 @@ namespace Extractor {
             }; //4
         } //5
         */
+    }
+
+    TEST_F(ExtractTypeTest, IncludesMembersInAnIfdef) {
+        ss << R"(class Foo {
+            #ifdef IS_DEFINED
+            int a = 0;
+            #endif
+            int b = 1;
+        })";
+
+        auto result = Extract();
+        ASSERT_EQ(result.PrivateDataMemberCount, 2);
+    }
+
+    TEST_F(ExtractTypeTest, ExcludesMembersInAnUndefinedDefine) {
+        ss << R"(class Foo {
+            #ifdef 0
+            int a = 0;
+            #endif
+            int b = 1;
+        })";
+
+        auto result = Extract();
+        ASSERT_EQ(result.PrivateDataMemberCount, 1);
     }
 
 } // namespace Extractor

@@ -17,15 +17,7 @@ namespace IncludeCounter {
     }
 
     std::string IncludeReport::ReportLine::ToString() const {
-        return StrUtil::Format(LineFormat,
-                               Data.FilePath,
-                               Data.IncludeFiles.size(),
-                               Data.TotalIncludeCount,
-                               Data.LineCount,
-                               Data.TotalLineCount,
-                               Data.IncludedByCount,
-                               CouplingImpact,
-                               SizeImpact);
+        return StrUtil::Format(LineFormat, Data.FilePath, Data.IncludeFiles.size(), Data.TotalIncludeCount, Data.LineCount, Data.TotalLineCount, Data.IncludedByCount, CouplingImpact, SizeImpact);
     }
 
     IncludeReport::IncludeReport(const std::vector<Extractor::FileData>& results) {

@@ -11,7 +11,7 @@ namespace Extractor {
     class IfDefExtractorTest : public ::testing::Test {
     protected:
         void SetUp() override {
-            extractor = std::make_unique<IfDefExtractor>(m_KnownDefines, &ss);
+            extractor = std::make_unique<IfDefExtractor>(m_KnownDefines, ss);
         }
 
         bool CanExtract() {
@@ -248,6 +248,21 @@ namespace Extractor {
         ASSERT_EQ(Extract(), "Line 2;");
         ASSERT_EQ(Extract(), "Line 3;");
         ASSERT_EQ(Extract(), "Line 5;");
+    }
+
+    TEST_F(IfDefExtractorTest, SupportsNestingInUndefinedMacros) {
+        ss << R"(
+            #ifdef 0
+                Line 1;
+                #ifdef 1
+                    Line 2;
+                #endif
+                Line 3;
+            #endif
+            Line 4;
+        )";
+
+        ASSERT_EQ(Extract(), "Line 4;");
     }
 
 } // namespace Extractor

@@ -3,6 +3,7 @@
 #include "Extractor/FunctionDataExtractor.h"
 #include "Extractor/Private/BodyCount.h"
 #include "Extractor/Private/CommentExtractor.h"
+#include "Extractor/Private/IfDefExtractor.h"
 #include "Extractor/Private/LineFetcher.h"
 #include "Extractor/Private/VisibilityExtractor.h"
 #include "Instrumentation/Log.h"
@@ -75,8 +76,9 @@ namespace Extractor {
 
         // Should extract a type (class, struct, union, enum) from the provided stream (and initial line)
         // Would almost certainly break with something like class Foo{struct Bar{union Baz{};};}; (in a single line)
-        TypeData Extract(const std::smatch& match, const std::string& fileName, const std::string& ns, std::istream& stream) {
+        TypeData Extract(const std::smatch& match, const std::string& fileName, const std::string& ns, const std::vector<std::string>& knownDefines, std::istream& stream) {
             // ScopedTimer timer("ExtractType: " + initialLine, ScopedTimer::TimeUnit::SECOND);
+
             auto result = GetTypeData(match, fileName);
             result.Namespace = ns;
             result.LineCount = 1;
@@ -96,7 +98,16 @@ namespace Extractor {
             std::string line;
             std::smatch nextMatch;
 
+            // if some monster adds defines inside of a type, they don't deserve to have them preprocessed correctly...
+            IfDefExtractor ifDefExtractor(knownDefines, stream);
+
             while(LineFetcher::GetNextLine(stream, line)) {
+                if(ifDefExtractor.CanExtract(line)) {
+                    result.IfDefCount++;
+                    ifDefExtractor.Extract(line);
+                    continue;
+                }
+
                 lineCount++;
                 nestingDepth += std::count(line.begin(), line.end(), '{');
                 nestingDepth -= std::count(line.begin(), line.end(), '}');
@@ -118,7 +129,7 @@ namespace Extractor {
                     if(std::find(line.begin(), line.end(), '{') != line.end() && std::find(line.begin(), line.end(), '}') == line.end()) {
                         nestingDepth--;
                     }
-                    auto innerType = TypeDataExtractor::Extract(nextMatch, fileName, ns, stream);
+                    auto innerType = TypeDataExtractor::Extract(nextMatch, fileName, ns, knownDefines, stream);
                     result.InnerTypes.push_back(innerType);
                     lineCount += innerType.LineCount - 1;
                 } else if(FunctionDataExtractor::IsSpecialFunction(line, nextMatch)) {

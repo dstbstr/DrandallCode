@@ -16,7 +16,7 @@ static const std::regex IfndefRegex("^#ifndef");
 static const std::regex ExtractRegex("^#(?:el|end)?(?:if|se)n?(?:def)?");
 
 namespace Extractor {
-    bool IfDefExtractor::CanExtract(const std::string& line) {
+    bool IfDefExtractor::CanExtract(const std::string& line) const {
         return std::regex_search(line, ExtractRegex);
     }
 
@@ -63,11 +63,27 @@ namespace Extractor {
 
     // private
     void IfDefExtractor::SkipBody(std::string& line) {
-        while(Extractor::LineFetcher::GetNextLine(*m_Stream, line) && !CanExtract(line)) {
-            // intentionally blank
-        }
-        if(CanExtract(line)) {
-            Extract(line);
+        while(LineFetcher::GetNextLine(*m_Stream, line)) {
+            if(CanExtract(line)) {
+                if(StrUtil::StartsWith(line, "#if")) {
+                    SkipToEndif();
+                } else {
+                    Extract(line);
+                    break;
+                }
+            }
         }
     }
+
+    void IfDefExtractor::SkipToEndif() {
+        std::string line;
+        while(LineFetcher::GetNextLine(*m_Stream, line)) {
+            if(StrUtil::StartsWith(line, "#if")) {
+                SkipToEndif();
+            } else if(line == EndIf) {
+                return;
+            }
+        }
+    }
+
 } // namespace Extractor

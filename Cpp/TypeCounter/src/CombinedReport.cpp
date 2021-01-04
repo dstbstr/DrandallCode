@@ -4,25 +4,25 @@
 
 namespace {
 
-    constexpr char FileLineFormat[]{"%s,%s,,%s,,%u,,,,,,,,,,,,,,,,,,,,\n"};
-    constexpr char TypeLineFormat[]{"%s,%s,%s,%s,%s,%u,"
+    constexpr char FileLineFormat[]{"%s,%s,,%s,,%u,%u,,,,,,,,,,,,,,,,,,,\n"};
+    constexpr char TypeLineFormat[]{"%s,%s,%s,%s,%s,%u,%u,"
                                     "%s,%u,%u,%u,%u,%u,%u,%u,"
                                     ",,,,"
                                     "%s,%s,,,,,,,,,\n"};
-    constexpr char FunctionLineFormat[]{"%s,%s,%s,%s,%s,%u,"
+    constexpr char FunctionLineFormat[]{"%s,%s,%s,%s,%s,%u,,"
                                         "%s,,,,,,,,"
                                         "%s,%s,%u,%u,"
                                         ",%s,%s,%s,%s,,%s,%s,,,\n"};
-    constexpr char SpecialFunctionFormat[]{"%s,%s,%s,%s,%s,%u,"
+    constexpr char SpecialFunctionFormat[]{"%s,%s,%s,%s,%s,%u,,"
                                            "%s,,,,,,,,"
                                            "%s,,%u,%u,"
                                            ",,%s,,,%s,,,,%s,%s\n"};
-    constexpr char OpOverloadFormat[]{"%s,%s,%s,%s,%s,%u,"
+    constexpr char OpOverloadFormat[]{"%s,%s,%s,%s,%s,%u,,"
                                       "%s,,,,,,,,"
                                       "%s,,%u,,"
                                       ",,,%s,,%s,,,%s,,\n"};
 
-    constexpr char LineHeading[]{"FilePath,FileName,Namespace,Category,SpecificType,LineCount,"
+    constexpr char LineHeading[]{"FilePath,FileName,Namespace,Category,SpecificType,LineCount,PreProcessorCount,"
                                  "ClassName,PublicMethodCount,ProtectedMethodCount,PrivateMethodCount,PublicDataCount,ProtectedDataCount,PrivateDataCount,InnerTypeCount,"
                                  "Visibility,FunctionName,Airity,DefaultParameterCount,"
                                  "HasBaseClass,IsTemplated,IsVirtual,IsInline,IsConst,IsExplicit,IsAbstract,IsStatic,IsFriend,IsDeleted,IsDefaulted"};
@@ -32,7 +32,7 @@ namespace {
     }
 
     std::string PrintFileLine(Extractor::FileData data) {
-        return StrUtil::Format(FileLineFormat, data.FilePath, data.FileName, "File", data.LineCount);
+        return StrUtil::Format(FileLineFormat, data.FilePath, data.FileName, "File", data.LineCount, data.PreProcessorCount);
     }
     std::string PrintTypeLine(Extractor::TypeData data, std::string filePath) {
         using namespace Extractor;
@@ -54,6 +54,7 @@ namespace {
                                "Class",
                                ToString(data.TypeKind),
                                data.LineCount,
+                               data.IfDefCount,
                                data.ClassName,
                                publicMethodCount,
                                protectedMethodCount,
