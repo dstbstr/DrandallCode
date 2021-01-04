@@ -1,0 +1,146 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "PrepareFoldersWindows",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}"
+            },
+            "command": "if(-not(test-path Build/VS/2017)) {mkdir Build/VS/2017}; if(-not(test-path Build/VS/2019)) {mkdir Build/VS/2019}; if(-not(test-path bin)) {mkdir bin}"
+        },
+        {
+            "label": "GenerateWindowsDebug2017",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/Build/VS/2017"
+            },
+            "dependsOn": "PrepareFoldersWindows",
+            "command": "cmake -G 'Visual Studio 15 2017 Win64' -DCMAKE_BUILD_TYPE=Debug ../../.."
+        },
+        {
+            "label": "GenerateWindowsDebug2019",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/Build/VS/2019"
+            },
+            "dependsOn": "PrepareFoldersWindows",
+            "command": "cmake -G 'Visual Studio 16 2019' -DCMAKE_BUILD_TYPE=Debug ../../.."
+        },
+        {
+            "label": "GenerateWindowsRelease2017",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/Build/VS/2017"
+            },
+            "dependsOn": "PrepareFoldersWindows",
+            "command": "cmake -G 'Visual Studio 15 2017 Win64' -DCMAKE_BUILD_TYPE=Release ../../.."
+        },
+        {
+            "label": "GenerateWindowsRelease2019",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/Build/VS/2019"
+            },
+            "dependsOn": "PrepareFoldersWindows",
+            "command": "cmake -G 'Visual Studio 16 2019' -DCMAKE_BUILD_TYPE=Release ../../.."
+        },
+        {
+            "label": "GenerateNixDebug",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/Build"
+            },
+            "command": "cmake -G 'Unix Makefiles' -DCMAKE_BUILD_TYPE=Debug .."
+        },
+        {
+            "label": "GenerateNixRelease",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/Build"
+            },
+            "command": "cmake -G 'Unix Makefiles' -DCMAKE_BUILD_TYPE=Release .."
+        },
+        {
+            "label": "buildWindowsDebug2017",
+            "type": "shell",
+            "command": "cmake --build . --config Debug",
+            "options": {
+                "cwd": "${workspaceRoot}/Build/VS/2017"
+            },
+            "dependsOn": [
+                "GenerateWindowsDebug2017"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "buildWindowsDebug2019",
+            "type": "shell",
+            "command": "cmake --build . --config Debug ",
+            "options": {
+                "cwd": "${workspaceRoot}/Build/VS/2019"
+            },
+            "dependsOn": [
+                "GenerateWindowsDebug2019"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "buildNixDebug",
+            "type": "shell",
+            "command": "cmake --build .",
+            "options": {
+                "cwd": "${workspaceRoot}/Build"
+            },
+            "dependsOn": [
+                "GenerateNixDebug"
+            ],
+            "group": "build"
+        },
+        {
+            "label": "buildWindowsRelease2017",
+            "type": "shell",
+            "command": "cmake --build . --config Release ",
+            "options": {
+                "cwd": "${workspaceRoot}/Build/VS/2017"
+            },
+            "dependsOn": [
+                "GenerateWindowsRelease2017"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "buildWindowsRelease2019",
+            "type": "shell",
+            "command": "cmake --build . --config Release ",
+            "options": {
+                "cwd": "${workspaceRoot}/Build/VS/2019"
+            },
+            "dependsOn": [
+                "GenerateWindowsRelease2019"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "buildNixRelease",
+            "type": "shell",
+            "command": "cmake --build .",
+            "options": {
+                "cwd": "${workspaceRoot}/Build"
+            },
+            "dependsOn": [
+                "GenerateNixRelease"
+            ],
+            "group": "build"
+        }
+    ]
+}
