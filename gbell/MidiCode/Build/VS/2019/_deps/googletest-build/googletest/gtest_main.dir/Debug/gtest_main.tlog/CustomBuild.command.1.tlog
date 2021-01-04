@@ -1,0 +1,10 @@
+^C:\USERS\DURANDAL\SOURCE\REPOS\DRANDALLCODE\GBELL\MIDICODE\BUILD\VS\2019\_DEPS\GOOGLETEST-SRC\GOOGLETEST\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/durandal/source/repos/DrandallCode/gbell/MidiCode -BC:/Users/durandal/source/repos/DrandallCode/gbell/MidiCode/Build/VS/2019 --check-stamp-file C:/Users/durandal/source/repos/DrandallCode/gbell/MidiCode/Build/VS/2019/_deps/googletest-build/googletest/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

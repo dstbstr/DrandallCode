@@ -1,0 +1,300 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+  </PropertyGroup>
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{571ED69D-B819-34CC-9134-B346A77E42E2}</ProjectGuid>
+    <WindowsTargetPlatformVersion>10.0.19041.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <ProjectName>gmock</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v142</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\lib\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">gmock.dir\Debug\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">gmockd</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\lib\Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">gmock.dir\Release\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">gmock</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='Release|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\lib\MinSizeRel\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">gmock.dir\MinSizeRel\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">gmock</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">.lib</TargetExt>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\lib\RelWithDebInfo\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">gmock.dir\RelWithDebInfo\</IntDir>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">gmock</TargetName>
+    <TargetExt Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">.lib</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googlemock\include;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googlemock;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googletest\include;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) -J</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4251;4275;4702</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>Disabled</InlineFunctionExpansion>
+      <Optimization>Disabled</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>_UNICODE;UNICODE;WIN32;_WIN32;STRICT;WIN32_LEAN_AND_MEAN;GTEST_HAS_PTHREAD=0;_HAS_EXCEPTIONS=1;MSVC;DEBUG;CMAKE_INTDIR="Debug";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\bin\Debug\gmockd.pdb</ProgramDataBaseFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_UNICODE;UNICODE;_WIN32;STRICT;WIN32_LEAN_AND_MEAN;GTEST_HAS_PTHREAD=0;_HAS_EXCEPTIONS=1;MSVC;DEBUG;CMAKE_INTDIR=\"Debug\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googlemock\include;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googlemock;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googletest\include;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googlemock\include;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googlemock;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googletest\include;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googlemock\include;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googlemock;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googletest\include;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) -J</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4251;4275;4702</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>NDEBUG;_UNICODE;UNICODE;WIN32;_WIN32;STRICT;WIN32_LEAN_AND_MEAN;GTEST_HAS_PTHREAD=0;_HAS_EXCEPTIONS=1;MSVC;DEBUG;CMAKE_INTDIR="Release";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\bin\Release\gmock.pdb</ProgramDataBaseFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_UNICODE;UNICODE;_WIN32;STRICT;WIN32_LEAN_AND_MEAN;GTEST_HAS_PTHREAD=0;_HAS_EXCEPTIONS=1;MSVC;DEBUG;CMAKE_INTDIR=\"Release\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googlemock\include;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googlemock;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googletest\include;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googlemock\include;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googlemock;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googletest\include;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googlemock\include;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googlemock;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googletest\include;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) -J</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4251;4275;4702</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <Optimization>MinSpace</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>NDEBUG;_UNICODE;UNICODE;WIN32;_WIN32;STRICT;WIN32_LEAN_AND_MEAN;GTEST_HAS_PTHREAD=0;_HAS_EXCEPTIONS=1;MSVC;DEBUG;CMAKE_INTDIR="MinSizeRel";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\bin\MinSizeRel\gmock.pdb</ProgramDataBaseFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_UNICODE;UNICODE;_WIN32;STRICT;WIN32_LEAN_AND_MEAN;GTEST_HAS_PTHREAD=0;_HAS_EXCEPTIONS=1;MSVC;DEBUG;CMAKE_INTDIR=\"MinSizeRel\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googlemock\include;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googlemock;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googletest\include;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googlemock\include;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googlemock;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googletest\include;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googlemock\include;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googlemock;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googletest\include;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>%(AdditionalOptions) -J</AdditionalOptions>
+      <AssemblerListingLocation>$(IntDir)</AssemblerListingLocation>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4251;4275;4702</DisableSpecificWarnings>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <InlineFunctionExpansion>OnlyExplicitInline</InlineFunctionExpansion>
+      <Optimization>MaxSpeed</Optimization>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <UseFullPaths>false</UseFullPaths>
+      <WarningLevel>Level4</WarningLevel>
+      <PreprocessorDefinitions>NDEBUG;_UNICODE;UNICODE;WIN32;_WIN32;STRICT;WIN32_LEAN_AND_MEAN;GTEST_HAS_PTHREAD=0;_HAS_EXCEPTIONS=1;MSVC;DEBUG;CMAKE_INTDIR="RelWithDebInfo";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ObjectFileName>$(IntDir)</ObjectFileName>
+      <ProgramDataBaseFileName>C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\bin\RelWithDebInfo\gmock.pdb</ProgramDataBaseFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_UNICODE;UNICODE;_WIN32;STRICT;WIN32_LEAN_AND_MEAN;GTEST_HAS_PTHREAD=0;_HAS_EXCEPTIONS=1;MSVC;DEBUG;CMAKE_INTDIR=\"RelWithDebInfo\";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googlemock\include;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googlemock;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googletest\include;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Midl>
+      <AdditionalIncludeDirectories>C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googlemock\include;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googlemock;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googletest\include;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googletest;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+    <Lib>
+      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googlemock\CMakeLists.txt">
+      <StdOutEncoding>UTF-8</StdOutEncoding>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule C:/Users/durandal/source/repos/DrandallCode/gbell/MidiCode/Build/VS/2019/_deps/googletest-src/googlemock/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/durandal/source/repos/DrandallCode/gbell/MidiCode -BC:/Users/durandal/source/repos/DrandallCode/gbell/MidiCode/Build/VS/2019 --check-stamp-file C:/Users/durandal/source/repos/DrandallCode/gbell/MidiCode/Build/VS/2019/_deps/googletest-build/googlemock/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Program Files\CMake\share\cmake-3.18\Modules\CheckCSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CheckIncludeFile.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CheckLibraryExists.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\FindThreads.cmake;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\CMakeFiles\cmake.verify_globs;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googlemock\cmake\gmock.pc.in;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googlemock\cmake\gmock_main.pc.in;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-build\googlemock\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule C:/Users/durandal/source/repos/DrandallCode/gbell/MidiCode/Build/VS/2019/_deps/googletest-src/googlemock/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/durandal/source/repos/DrandallCode/gbell/MidiCode -BC:/Users/durandal/source/repos/DrandallCode/gbell/MidiCode/Build/VS/2019 --check-stamp-file C:/Users/durandal/source/repos/DrandallCode/gbell/MidiCode/Build/VS/2019/_deps/googletest-build/googlemock/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Program Files\CMake\share\cmake-3.18\Modules\CheckCSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CheckIncludeFile.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CheckLibraryExists.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\FindThreads.cmake;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\CMakeFiles\cmake.verify_globs;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googlemock\cmake\gmock.pc.in;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googlemock\cmake\gmock_main.pc.in;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-build\googlemock\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule C:/Users/durandal/source/repos/DrandallCode/gbell/MidiCode/Build/VS/2019/_deps/googletest-src/googlemock/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/durandal/source/repos/DrandallCode/gbell/MidiCode -BC:/Users/durandal/source/repos/DrandallCode/gbell/MidiCode/Build/VS/2019 --check-stamp-file C:/Users/durandal/source/repos/DrandallCode/gbell/MidiCode/Build/VS/2019/_deps/googletest-build/googlemock/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Program Files\CMake\share\cmake-3.18\Modules\CheckCSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CheckIncludeFile.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CheckLibraryExists.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\FindThreads.cmake;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\CMakeFiles\cmake.verify_globs;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googlemock\cmake\gmock.pc.in;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googlemock\cmake\gmock_main.pc.in;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-build\googlemock\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule C:/Users/durandal/source/repos/DrandallCode/gbell/MidiCode/Build/VS/2019/_deps/googletest-src/googlemock/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/durandal/source/repos/DrandallCode/gbell/MidiCode -BC:/Users/durandal/source/repos/DrandallCode/gbell/MidiCode/Build/VS/2019 --check-stamp-file C:/Users/durandal/source/repos/DrandallCode/gbell/MidiCode/Build/VS/2019/_deps/googletest-build/googlemock/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Program Files\CMake\share\cmake-3.18\Modules\CheckCSourceCompiles.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CheckIncludeFile.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\CheckLibraryExists.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\FindPackageHandleStandardArgs.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\FindPackageMessage.cmake;C:\Program Files\CMake\share\cmake-3.18\Modules\FindThreads.cmake;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\CMakeFiles\cmake.verify_globs;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googlemock\cmake\gmock.pc.in;C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googlemock\cmake\gmock_main.pc.in;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-build\googlemock\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googletest\src\gtest-all.cc" />
+    <ClCompile Include="C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\_deps\googletest-src\googlemock\src\gmock-all.cc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\Build\VS\2019\ZERO_CHECK.vcxproj">
+      <Project>{A2666B60-B3C6-3BC4-8CFE-823B0F57B36C}</Project>
+      <Name>ZERO_CHECK</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="16.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\MidiMain\src\convertgdbmidiclass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\durandal\source\repos\DrandallCode\gbell\MidiCode\MidiMain\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{D3EE8105-71F7-3126-8126-D9902E0F0FC2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
