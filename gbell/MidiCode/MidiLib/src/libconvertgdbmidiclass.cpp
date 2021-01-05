@@ -3,9 +3,10 @@
 #include <string.h>
 #include <ctype.h>
 #include "Platform.h"
-#include "midiclass.h"
+#include "Constants.h"
 #include "libmidiclass.h"
-#include "libdefs.h"
+#include "ReturnStatus.h"
+#include "Utils.h"
 
 void
 addtrkdata(track *&tp,void *var1,int sz1,void *var2,int sz2,int type)
@@ -510,10 +511,9 @@ setinstr(char *arg,track *tp)
     int len=0;
     unsigned char buf[4] = {'\0','\0','\0','\0'};
     int type;
-    extern const char *inst[];
 
     for (i = 0;i < 128;i++)
-        if (!strcmp(inst[i],arg))
+        if (inst[i] == arg)
             break;
 
     if (i == 128) {

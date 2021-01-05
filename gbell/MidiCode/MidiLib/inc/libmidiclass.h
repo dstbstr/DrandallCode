@@ -1,3 +1,6 @@
+#ifndef __LIBMIDICLASS_H__
+#define __LIBMIDICLASS_H__
+
 class mthd_hdr
 {
     char id[4];
@@ -104,3 +107,5 @@ class chgprog
 };
 
 #define HDRSIZ 8
+
+#endif // __LIBMIDICLASS_H__

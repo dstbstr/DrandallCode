@@ -2,7 +2,12 @@
 #include <stdlib.h>
 #include "Platform.h"
 #include "libmidiclass.h"
-#include "libdefs.h"
+#include "LibConvertGdbMidiClass.h"
+#include "Utils.h"
+#include "Parse.h"
+#include "ReturnStatus.h"
+#include "MidiOut.h"
+
 
 mthd_hdr mc;
 mtrk_hdr mh;

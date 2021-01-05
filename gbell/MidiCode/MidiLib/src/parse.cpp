@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "libmidiclass.h"
-#include "libdefs.h"
+#include "LibConvertGdbMidiClass.h"
 
 int
 parselin(char *line,char parsechr,char *&arg1,char *&arg2)
