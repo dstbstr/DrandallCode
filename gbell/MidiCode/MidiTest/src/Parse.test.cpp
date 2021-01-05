@@ -9,10 +9,21 @@ eot end;
 int trkexists[20] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                      0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
+constexpr char Separator = ':';
+
 TEST(ParseLine, GivenNullReturnsNegativeOne) {
   char *arg = "";
 
-  ASSERT_EQ(-1, parselin("", '\n', arg, arg));
+  ASSERT_EQ(-1, parselin("", Separator, arg, arg));
+}
+
+TEST(ParseLine, GivenValidStringReturnsZero) {
+  char *leftArg = "";
+  char *rightArg = "";
+  char *line = strdup("A:B\n");
+
+  ASSERT_EQ(0, parselin(line, Separator, leftArg, rightArg));
+  free(line);
 }
 
 /*
