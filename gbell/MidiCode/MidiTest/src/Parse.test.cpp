@@ -16,10 +16,10 @@ public:
   void SetUp() override {
     leftArg = "";
     rightArg = "";
-    line = strdup("Left:Right\n");
+    line = new char[]{"Left:Right\n"};
   }
 
-  void TearDown() override { free(line); }
+  void TearDown() override { delete line; }
 
 protected:
   char *leftArg;
@@ -45,45 +45,59 @@ TEST_F(ParseLineTest, RightOfSeparatorAssignedToArg2) {
   ASSERT_STREQ(rightArg, "Right");
 }
 
-/*
-int
-preparselin(char *&buf)
-{
-    char *cp = buf;
-    char *cp2;
-    int mnum;
-    int tnum = 0;
-    extern track trk;
-    extern mthd_hdr mc;
-    extern mtrk_hdr mh;
-    extern eot end;
-    extern int trkexists[];
-    track *tp;
-
-    if (*cp != 'M')
-        return(-1);
-    if ((cp2 = strchr(++cp,':')) == NULL)
-        return(-1);
-    *cp2++ = '\0';
-    mnum = atoi(cp);
-    cp = cp2;
-    if (*cp != 'T')
-        return(-1);
-    if ((cp2 = strchr(++cp,':')) == NULL)
-        return(-1);
-    *cp2++ = '\0';
-    tnum = atoi(cp);
-    if (!trkexists[tnum]) {
-        trkexists[tnum] = 1;
-        for (tp = &trk;tp->np;tp = tp->np)
-            ;
-        if (tnum)
-            newtrack(tp);
-        tp->trck = tnum;
-        initMTrk(mh,mc,tp);
+// All of these tests leak because preparselin reassigns the provided pointer,
+// making it impossible to free/delete
+class PreParseLineTest : public ::testing::Test {
+public:
+  void TearDown() override {
+    for (int i = 0; i < 20; i++) {
+      trkexists[i] = 0;
     }
-    buf = cp2;
-    return(tnum);
+  }
+
+protected:
+  char *line;
+};
+
+TEST_F(PreParseLineTest, BlankStringReturnsNegativeOne) {
+  line = new char[]{""};
+  ASSERT_EQ(-1, preparselin(line));
 }
 
-*/
+TEST_F(PreParseLineTest, MissingMeasureReturnsNegativeOne) {
+  line = new char[]{"ABC"};
+  ASSERT_EQ(-1, preparselin(line));
+}
+
+TEST_F(PreParseLineTest, MissingColonReturnsNegativeOne) {
+  line = new char[]{"MBA"};
+  ASSERT_EQ(-1, preparselin(line));
+}
+
+TEST_F(PreParseLineTest, MissingTrackReturnsNegativeOne) {
+  line = new char[]{"M3:A"};
+  ASSERT_EQ(-1, preparselin(line));
+}
+
+TEST_F(PreParseLineTest, MissingColonAfterTrackReturnsNegativeOne) {
+  line = new char[]{"M3:T4"};
+  ASSERT_EQ(-1, preparselin(line));
+}
+
+TEST_F(PreParseLineTest, PreParseReturnsTrackNumber) {
+  line = new char[]{"M3:T1:ABC"};
+  ASSERT_EQ(1, preparselin(line));
+}
+
+TEST_F(PreParseLineTest, StripsMeasureAndTrackInfo) {
+  line = new char[]{"M3:T1:ABC"};
+  preparselin(line);
+  ASSERT_STREQ(line, "ABC");
+}
+
+TEST_F(PreParseLineTest, MarksTrackAsConstructed) {
+  line = new char[]{"M3:T1:ABC"};
+  ASSERT_EQ(0, trkexists[1]);
+  preparselin(line);
+  ASSERT_EQ(1, trkexists[1]);
+}
