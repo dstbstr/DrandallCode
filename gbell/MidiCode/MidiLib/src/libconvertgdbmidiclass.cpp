@@ -584,6 +584,7 @@ newtrack(track *&tp)
     tp = tp->np;
     tp->datap = NULL;
     tp->datalen = 0;
+    tp->notelen = 0;
     tp->vel = 60;
     tp->nu = 1;
     tp->chnl = -1;
