@@ -11,41 +11,41 @@ int trkexists[20] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 
 constexpr char Separator = ':';
 
-TEST(ParseLine, GivenNullReturnsNegativeOne) {
-  char *arg = "";
+class ParseLineTest : public ::testing::Test {
+public:
+  void SetUp() override {
+    leftArg = "";
+    rightArg = "";
+    line = strdup("Left:Right\n");
+  }
 
-  ASSERT_EQ(-1, parselin("", Separator, arg, arg));
+  void TearDown() override { free(line); }
+
+protected:
+  char *leftArg;
+  char *rightArg;
+  char *line;
+};
+
+TEST_F(ParseLineTest, GivenNullReturnsNegativeOne) {
+  ASSERT_EQ(-1, parselin("", Separator, leftArg, rightArg));
 }
 
-TEST(ParseLine, GivenValidStringReturnsZero) {
-  char *leftArg = "";
-  char *rightArg = "";
-  char *line = strdup("A:B\n");
-
+TEST_F(ParseLineTest, GivenValidStringReturnsZero) {
   ASSERT_EQ(0, parselin(line, Separator, leftArg, rightArg));
-  free(line);
+}
+
+TEST_F(ParseLineTest, LeftOfSeparatorAssignedToArg1) {
+  ASSERT_EQ(0, parselin(line, Separator, leftArg, rightArg));
+  ASSERT_STREQ(leftArg, "Left");
+}
+
+TEST_F(ParseLineTest, RightOfSeparatorAssignedToArg2) {
+  ASSERT_EQ(0, parselin(line, Separator, leftArg, rightArg));
+  ASSERT_STREQ(rightArg, "Right");
 }
 
 /*
-int
-parselin(char *line,char parsechr,char *&arg1,char *&arg2)
-
-{
-    char *cp;
-    char *iptr;
-
-    cp=line;
-    if ((iptr=strchr(cp,parsechr)) == NULL)
-        return(-1);
-    arg2 = (iptr + 1);
-    *iptr = '\0';
-    arg1 = cp;
-    for (cp = arg2;*cp != '\n';cp++)
-        ;
-    *cp = '\0';
-    return(0);
-}
-
 int
 preparselin(char *&buf)
 {
