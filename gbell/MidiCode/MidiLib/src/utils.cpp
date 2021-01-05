@@ -6,7 +6,7 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include "libmidiclass.h"
-#include "libdefs.h"
+#include "ReturnStatus.h"
 
 int
 writevarlen(unsigned char *buf,unsigned long value)

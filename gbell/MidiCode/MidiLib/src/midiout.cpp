@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "Platform.h"
 #include "libmidiclass.h"
-#include "libdefs.h"
+#include "ReturnStatus.h"
 
 void
 writemidifil(int fd,mthd_hdr mc)
