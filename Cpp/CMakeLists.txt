@@ -40,7 +40,6 @@ add_subdirectory(ExtractorLib)
 
 add_subdirectory(IncludeCounter)
 add_subdirectory(TypeCounter)
-add_subdirectory(GbellMidi)
 
 add_subdirectory(CoreTest)
 add_subdirectory(CommandParserTest)
