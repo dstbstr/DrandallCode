@@ -10,7 +10,7 @@
 namespace Extractor {
     class FilePreProcessor : public IRunnable<PreProcessorResult> {
     public:
-        FilePreProcessor(std::string filePath) : m_FilePath(filePath) {}
+        FilePreProcessor(std::string filePath, const std::vector<std::string>& userDefines) : m_FilePath(filePath), m_UserDefines(userDefines) {}
         FilePreProcessor(const FilePreProcessor&) = delete;
         FilePreProcessor& operator=(const FilePreProcessor&) = delete;
 
@@ -19,6 +19,7 @@ namespace Extractor {
 
     private:
         std::string m_FilePath;
+        std::vector<std::string> m_UserDefines;
     };
 } // namespace Extractor
 

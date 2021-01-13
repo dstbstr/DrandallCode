@@ -29,9 +29,8 @@ namespace Extractor {
             LOG_WARN(StrUtil::Format("Failed to open file: %s", m_FilePath));
             return result;
         }
-        static std::vector<std::string> emptyDefineList = {};
 
-        IfDefExtractor ifdefExtractor(emptyDefineList, stream);
+        IfDefExtractor ifdefExtractor(m_UserDefines, stream);
         u8 ifDefDepth = 0;
 
         std::string line;
@@ -68,7 +67,11 @@ namespace Extractor {
             LOG_WARN(StrUtil::Format("Failed to open file: %s", m_FilePath));
             return;
         }
-        IfDefExtractor ifdefExtractor(knownDefines, stream);
+
+        std::vector<std::string> defines = knownDefines;
+        defines.insert(defines.end(), m_UserDefines.begin(), m_UserDefines.end());
+
+        IfDefExtractor ifdefExtractor(defines, stream);
         std::string line;
 
         while(LineFetcher::GetNextLine(stream, line)) {
