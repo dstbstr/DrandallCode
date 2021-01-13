@@ -131,4 +131,19 @@ namespace CommandParser {
         ASSERT_EQ(restOpt.GetValue()[0], "foo");
     }
 
+    TEST(OptionCollectionTest, ExtractsVectorFromDuplicateParams) {
+        VecStringOption option("-d", "define", false);
+        OptionCollection collection("Extracting vector elements from duplicate parameters");
+        collection.Add(option);
+
+        OptionValuePair pair1("d", "Foo");
+        OptionValuePair pair2("d", "Bar");
+        collection.Apply(std::vector<OptionValuePair>{pair1, pair2});
+
+        ASSERT_TRUE(option.IsPopulated());
+        ASSERT_EQ(option.GetValue().size(), 2);
+        ASSERT_EQ(option.GetValue()[0], "Foo");
+        ASSERT_EQ(option.GetValue()[1], "Bar");
+    }
+
 } // namespace CommandParser

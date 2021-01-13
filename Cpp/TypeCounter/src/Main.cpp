@@ -30,9 +30,9 @@ using ReportCollection = std::vector<std::pair<std::unique_ptr<IReport>, std::st
 namespace {
     static constexpr ExtractorSettings Settings{false, true, true};
 
-    std::unordered_map<std::string, PreProcessorResult> PreProcessFiles(const std::vector<std::string>& fileNames) {
+    std::unordered_map<std::string, PreProcessorResult> PreProcessFiles(const std::vector<std::string>& fileNames, const std::vector<std::string>& userDefines) {
         std::vector<std::unique_ptr<IRunnable<PreProcessorResult>>> preProcessingJobs;
-        std::transform(fileNames.begin(), fileNames.end(), std::back_inserter(preProcessingJobs), [](const std::string& file) { return std::make_unique<FilePreProcessor>(file); });
+        std::transform(fileNames.begin(), fileNames.end(), std::back_inserter(preProcessingJobs), [&userDefines](const std::string& file) { return std::make_unique<FilePreProcessor>(file, userDefines); });
         auto preProcessedResults = Runner::Get().RunAll(Threading::ExpectedRunTime::MILLISECONDS, preProcessingJobs);
 
         std::unordered_map<std::string, PreProcessorResult> result;
@@ -43,9 +43,9 @@ namespace {
         return result;
     }
 
-    std::vector<FileData> GatherFileData(const std::vector<std::string>& fileNames, std::unordered_map<std::string, PreProcessorResult>& preProcessedFileData) {
+    std::vector<FileData> GatherFileData(const std::vector<std::string>& fileNames, const std::vector<std::string>& userDefines, std::unordered_map<std::string, PreProcessorResult>& preProcessedFileData) {
         std::vector<std::unique_ptr<IRunnable<FileData>>> jobs;
-        std::transform(fileNames.begin(), fileNames.end(), std::back_inserter(jobs), [&preProcessedFileData](const std::string& file) { return std::make_unique<FileDataExtractor>(file, preProcessedFileData, Settings); });
+        std::transform(fileNames.begin(), fileNames.end(), std::back_inserter(jobs), [&userDefines, &preProcessedFileData](const std::string& file) { return std::make_unique<FileDataExtractor>(file, userDefines, preProcessedFileData, Settings); });
 
         // large code bases tend to have bigger files which take longer to parse
         Threading::ExpectedRunTime expectedRuntime = jobs.size() < 100 ? Threading::ExpectedRunTime::MILLISECONDS : Threading::ExpectedRunTime::SECONDS;
@@ -91,11 +91,11 @@ int main(int argc, char* argv[]) {
         if(!argParse.ShouldParse()) {
             return 0;
         }
-        std::vector<std::string> fileNames = argParse.GetFileNames();
-
+        auto fileNames = argParse.GetFileNames();
         Require::NotEmpty(fileNames, "Did not locate any filenames");
+        auto userDefines = argParse.GetDefines();
 
-        auto files = GatherFileData(fileNames, PreProcessFiles(fileNames));
+        auto files = GatherFileData(fileNames, userDefines, PreProcessFiles(fileNames, userDefines));
 
         auto reports = GenerateReports(files, argParse.RunFunctionReport(), argParse.RunTypeReport());
 

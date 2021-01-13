@@ -60,7 +60,7 @@ namespace Extractor {
                 if(m_PreProcessedFiles->find(includeName) != m_PreProcessedFiles->end() && includeName != result.FileName) {
                     PreProcessorResult preProcessedFile = m_PreProcessedFiles->at(includeName);
                     if(preProcessedFile.HasConditionalDefines) {
-                        FilePreProcessor preprocessor(preProcessedFile.FilePath);
+                        FilePreProcessor preprocessor(preProcessedFile.FilePath, m_UserDefines);
                         preprocessor.Reprocess(preProcessedFile, knownDefines);
                     }
                     for(auto&& defineKV: preProcessedFile.Defines) {

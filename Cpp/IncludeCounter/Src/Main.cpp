@@ -21,10 +21,11 @@ using namespace IncludeCounter;
 using namespace Extractor;
 
 namespace {
-    constexpr ExtractorSettings Settings{true, false, false};
-    std::unordered_map<std::string, PreProcessorResult> PreProcessFiles(const std::vector<std::string>& fileNames) {
+    constexpr ExtractorSettings Settings{true /*countIncludes*/, false /*extractTypes*/, false /*extractFunctions*/};
+
+    std::unordered_map<std::string, PreProcessorResult> PreProcessFiles(const std::vector<std::string>& fileNames, const std::vector<std::string>& userDefines) {
         std::vector<std::unique_ptr<IRunnable<PreProcessorResult>>> preProcessingJobs;
-        std::transform(fileNames.begin(), fileNames.end(), std::back_inserter(preProcessingJobs), [](const std::string& file) { return std::make_unique<FilePreProcessor>(file); });
+        std::transform(fileNames.begin(), fileNames.end(), std::back_inserter(preProcessingJobs), [&userDefines](const std::string& file) { return std::make_unique<FilePreProcessor>(file, userDefines); });
         auto preProcessedResults = Runner::Get().RunAll(Threading::ExpectedRunTime::MILLISECONDS, preProcessingJobs);
 
         std::unordered_map<std::string, PreProcessorResult> result;
@@ -44,11 +45,12 @@ int main(int argc, char* argv[]) {
             return 0;
         }
         auto fileNames = argParse.GetFileNames();
-        auto preProcessedFiles = PreProcessFiles(fileNames);
+        auto userDefines = argParse.GetDefines();
+        auto preProcessedFiles = PreProcessFiles(fileNames, userDefines);
 
         std::vector<std::unique_ptr<IRunnable<FileData>>> jobs;
         for(auto&& file: fileNames) {
-            jobs.push_back(std::move(std::make_unique<FileDataExtractor>(file, preProcessedFiles, Settings)));
+            jobs.push_back(std::move(std::make_unique<FileDataExtractor>(file, userDefines, preProcessedFiles, Settings)));
         }
 
         Threading::ExpectedRunTime expectedRunTime = jobs.size() < 100 ? Threading::ExpectedRunTime::MILLISECONDS : Threading::ExpectedRunTime::SECONDS;

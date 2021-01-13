@@ -17,6 +17,7 @@ namespace TypeCounter {
         bool ShouldParse() const;
 
         std::vector<std::string> GetFileNames() const;
+        std::vector<std::string> GetDefines() const;
 
         std::string GetTargetFile() const {
             return m_OutFile.IsPopulated() ? m_OutFile.GetValue() : "";
@@ -36,6 +37,8 @@ namespace TypeCounter {
         CommandParser::BoolOption m_FunctionFlag{"", "function", false, "Produces the function report"};
         CommandParser::BoolOption m_TypeFlag{"", "type", false, "Produces the type report"};
         CommandParser::StringOption m_OutFile{"f", "file", false, "File name prefix"};
+        CommandParser::VecStringOption m_Defines{"d", "define", false, "Preprocessor defines to set"};
+        CommandParser::StringOption m_DefineFile{"", "defineFile", false, "File with space separated defines"};
         CommandParser::VecStringOption m_FilePathOption{false, "File paths and directories"};
         CommandParser::OptionCollection m_Options{"Produces a report about the types and their functions"};
     };

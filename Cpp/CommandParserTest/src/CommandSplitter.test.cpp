@@ -1,15 +1,16 @@
 #include "CommandParser/CommandSplitter.h"
 
+#include "Instrumentation/LogWriter/AssertToException.h"
 #include "Macros/PreProcessorOverride.h"
 #include "TestCommon.h"
 #include "Utilities/LambdaUtils.h"
-#include "Instrumentation/LogWriter/AssertToException.h"
 
 #define ARGV_1(str, ...) \
     { (char*)str }
-#define ARGV_2(str, ...) {(char*)str}, ARGV_1(__VA_ARGS__)
-#define ARGV_3(str, ...) {(char*)str}, ARGV_2(__VA_ARGS__)
-#define ARGV_4(str, ...) {(char*)str}, ARGV_3(__VA_ARGS__)
+#define ARGV_2(str, ...) {(char*)str}, EXPAND(ARGV_1(__VA_ARGS__))
+#define ARGV_3(str, ...) {(char*)str}, EXPAND(ARGV_2(__VA_ARGS__))
+#define ARGV_4(str, ...) {(char*)str}, EXPAND(ARGV_3(__VA_ARGS__))
+#define ARGV_5(str, ...) {(char*)str}, EXPAND(ARGV_4(__VA_ARGS__))
 #define ARGV(...) \
     { {(char*)"ProgramName"}, MACRO_OVERRIDE(ARGV_, __VA_ARGS__) }
 
@@ -21,6 +22,11 @@
 #define GET_PAIRS_2(arg1, arg2)        \
     ArgType args = ARGV(arg1, arg2);   \
     CommandSplitter splitter(3, args); \
+    auto pairs = GetOptions(splitter);
+
+#define GET_PAIRS_4(arg1, arg2, arg3, arg4)      \
+    ArgType args = ARGV(arg1, arg2, arg3, arg4); \
+    CommandSplitter splitter(5, args);           \
     auto pairs = GetOptions(splitter);
 
 namespace CommandParser {
@@ -157,6 +163,20 @@ namespace CommandParser {
         ASSERT_EQ(pairs[0].Name, "t");
         ASSERT_TRUE(pairs[0].HasValue);
         ASSERT_EQ(pairs[0].Value, "val");
+    }
+
+    TEST(CommandSplitter, SplitsDuplicateValues) {
+        GET_PAIRS_4("-d", "One", "-d", "Two");
+
+        ASSERT_EQ(2, pairs.size());
+
+        ASSERT_EQ(pairs[0].Name, "d");
+        ASSERT_TRUE(pairs[0].HasValue);
+        ASSERT_EQ(pairs[0].Value, "One");
+
+        ASSERT_EQ(pairs[1].Name, "d");
+        ASSERT_TRUE(pairs[1].HasValue);
+        ASSERT_EQ(pairs[1].Value, "Two");
     }
 
     class CommandSplitterErrorTest : public ::testing::Test {

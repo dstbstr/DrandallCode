@@ -11,7 +11,11 @@
 namespace Extractor {
     class FileDataExtractor : public IRunnable<FileData> {
     public:
-        FileDataExtractor(std::string filePath, std::unordered_map<std::string, PreProcessorResult>& preProcessedFiles, ExtractorSettings settings) : m_FilePath(filePath), m_PreProcessedFiles(&preProcessedFiles), m_Settings(settings) {}
+        FileDataExtractor(std::string filePath, std::vector<std::string> userDefines, std::unordered_map<std::string, PreProcessorResult>& preProcessedFiles, ExtractorSettings settings)
+            : m_FilePath(filePath)
+            , m_UserDefines(userDefines)
+            , m_PreProcessedFiles(&preProcessedFiles)
+            , m_Settings(settings) {}
         FileDataExtractor(const FileDataExtractor&) = delete;
         FileDataExtractor& operator=(const FileDataExtractor&) = delete;
 
@@ -19,6 +23,7 @@ namespace Extractor {
 
     private:
         std::string m_FilePath;
+        std::vector<std::string> m_UserDefines;
         std::unordered_map<std::string, PreProcessorResult>* m_PreProcessedFiles;
         ExtractorSettings m_Settings;
     };
