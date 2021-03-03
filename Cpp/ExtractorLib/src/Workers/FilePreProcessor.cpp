@@ -4,11 +4,14 @@
 #include "Extractor/Private/IfDefExtractor.h"
 #include "Extractor/Private/LineFetcher.h"
 #include "Instrumentation/Log.h"
+#include "Utilities/FileUtils.h"
 #include "Utilities/Format.h"
 #include "Utilities/PathUtils.h"
+#include "Utilities/Require.h"
 #include "Utilities/StringUtils.h"
 
 #include <fstream>
+#include <memory>
 
 namespace {
     std::string GetIncludeGuardName(const std::string& fileName) {
@@ -24,18 +27,17 @@ namespace Extractor {
 
         std::string includeGuardName = GetIncludeGuardName(result.FileName);
 
-        std::ifstream stream(m_FilePath, std::ifstream::in);
-        if(!stream.is_open()) {
-            LOG_WARN(StrUtil::Format("Failed to open file: %s", m_FilePath));
-            return result;
+        if(!m_Stream) {
+            Require::True(FileUtils::Exists(m_FilePath));
+            m_Stream = FileUtils::OpenForRead(m_FilePath);
         }
 
-        IfDefExtractor ifdefExtractor(m_UserDefines, stream);
+        IfDefExtractor ifdefExtractor(m_UserDefines, *m_Stream);
         u8 ifDefDepth = 0;
 
         std::string line;
 
-        while(LineFetcher::GetNextLine(stream, line)) {
+        while(LineFetcher::GetNextLine(*m_Stream, line)) {
             if(ifdefExtractor.CanExtract(line)) {
                 if(line.find(includeGuardName) != line.npos) {
                     // include guard
@@ -50,31 +52,40 @@ namespace Extractor {
             if(DefineExtractor::CanExtract(line)) {
                 if(ifDefDepth > 0) {
                     result.HasConditionalDefines = true;
-                } else {
+                } else if(line.find(includeGuardName) == line.npos) {
                     auto keyAndValue = DefineExtractor::Extract(line);
                     result.Defines[keyAndValue.first] = keyAndValue.second;
                 }
             }
         }
 
+        LOG_INFO(StrUtil::Format("Finished FirstPass of %s", m_FilePath));
+        if(result.Defines.empty()) {
+            LOG_INFO("Found no defines on first pass");
+        } else {
+            for(auto&& define: result.Defines) {
+                LOG_INFO(define.first + " = " + define.second);
+            }
+        }
         return result;
     }
 
     void FilePreProcessor::Reprocess(PreProcessorResult& initialResult, std::vector<std::string> knownDefines) const {
+        LOG_INFO(StrUtil::Format("Reprocessing %s", initialResult.FileName));
+
         std::string includeGuardName = GetIncludeGuardName(initialResult.FileName);
-        std::ifstream stream(m_FilePath, std::ifstream::in);
-        if(!stream.is_open()) {
-            LOG_WARN(StrUtil::Format("Failed to open file: %s", m_FilePath));
-            return;
+        if(!m_Stream) {
+            Require::True(FileUtils::Exists(m_FilePath));
+            m_Stream = FileUtils::OpenForRead(m_FilePath);
         }
 
         std::vector<std::string> defines = knownDefines;
         defines.insert(defines.end(), m_UserDefines.begin(), m_UserDefines.end());
 
-        IfDefExtractor ifdefExtractor(defines, stream);
+        IfDefExtractor ifdefExtractor(defines, *m_Stream);
         std::string line;
 
-        while(LineFetcher::GetNextLine(stream, line)) {
+        while(LineFetcher::GetNextLine(*m_Stream, line)) {
             if(ifdefExtractor.CanExtract(line)) {
                 ifdefExtractor.Extract(line);
                 continue;
@@ -82,6 +93,7 @@ namespace Extractor {
             if(DefineExtractor::CanExtract(line)) {
                 auto keyAndValue = DefineExtractor::Extract(line);
                 initialResult.Defines[keyAndValue.first] = keyAndValue.second;
+                LOG_INFO(StrUtil::Format("Found define: %s = %s", keyAndValue.first, keyAndValue.second));
             }
         }
     }

@@ -42,7 +42,8 @@ namespace IncludeCounter {
     std::vector<std::string> ArgParse::GetDefines() const {
         std::unordered_set<std::string> defines;
         if(m_Defines.IsPopulated()) {
-            defines.insert(m_Defines.GetValue().begin(), m_Defines.GetValue().end());
+            auto userDefines = m_Defines.GetValue();
+            defines.insert(userDefines.begin(), userDefines.end());
         }
         if(m_DefineFile.IsPopulated()) {
             Require::True(FileUtils::Exists(m_DefineFile.GetValue()));
