@@ -11,7 +11,6 @@
 #include <iostream>
 #include <unordered_set>
 
-
 namespace TypeCounter {
     ArgParse::ArgParse(int argc, char* argv[]) {
         m_Options.Add(m_RecurseFlag).Add(m_HelpFlag).Add(m_FilePathOption).Add(m_OutFile).Add(m_FunctionFlag).Add(m_TypeFlag).Add(m_Defines).Add(m_DefineFile);
@@ -43,7 +42,8 @@ namespace TypeCounter {
     std::vector<std::string> ArgParse::GetDefines() const {
         std::unordered_set<std::string> defines;
         if(m_Defines.IsPopulated()) {
-            defines.insert(m_Defines.GetValue().begin(), m_Defines.GetValue().end());
+            auto userDefines = m_Defines.GetValue();
+            defines.insert(userDefines.begin(), userDefines.end());
         }
         if(m_DefineFile.IsPopulated()) {
             Require::True(FileUtils::Exists(m_DefineFile.GetValue()));
