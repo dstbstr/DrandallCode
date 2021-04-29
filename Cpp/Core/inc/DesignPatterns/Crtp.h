@@ -1,6 +1,25 @@
 #ifndef __CRTP_H__
 #define __CRTP_H__
 
+/*
+Example of creating a capability for CRTP or Mixin
+
+template<typename Derived>
+class MyCapability : public Crtp<Derived, MyCapability<Derived>> {
+public:
+    void myMethod() {
+        auto& self = this->Self();
+        //do stuff with/to self
+    }
+};
+
+
+Example of using the Capability through CRTP:
+class MyClass : public MyCapability<MyClass> {
+public:
+    //methods used by MyCapability
+}
+*/
 template<class T, template<typename> class CrtpType>
 class Crtp {
 public:
