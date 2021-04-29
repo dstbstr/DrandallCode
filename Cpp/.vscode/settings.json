@@ -85,6 +85,9 @@
         "mutex": "cpp",
         "shared_mutex": "cpp",
         "typeindex": "cpp",
-        "filesystem": "cpp"
+        "filesystem": "cpp",
+        "bit": "cpp",
+        "clocale": "cpp",
+        "stop_token": "cpp"
     }
 }
