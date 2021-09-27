@@ -2,11 +2,11 @@
 #define __DEFINEFILEPARSER_H__
 
 #include <string>
-#include <vector>
+#include <unordered_map>
 
 namespace Extractor {
     namespace DefineFileParser {
-        std::vector<std::string> Parse(std::istream& fileStream);
+        std::unordered_map<std::string, std::string> Parse(std::istream& fileStream);
     }
 } // namespace Extractor
 

@@ -5,7 +5,9 @@
 
 #include <sstream>
 #include <string>
+#include <unordered_map>
 #include <vector>
+
 
 namespace Extractor {
     class IfDefExtractorTest : public ::testing::Test {
@@ -31,7 +33,7 @@ namespace Extractor {
         }
 
         std::stringstream ss;
-        std::vector<std::string> m_KnownDefines{"IS_DEFINED"};
+        std::unordered_map<std::string, std::string> m_KnownDefines{{"IS_DEFINED", "1"}};
         std::unique_ptr<IfDefExtractor> extractor{nullptr};
     };
 

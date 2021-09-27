@@ -48,6 +48,19 @@ namespace Require {
         Null(ptr, "Expected pointer to be null, but was not");
     }
 
+#if __has_include("winerror.h")
+#include "winerror.h"
+    inline void Success(HRESULT hr, std::string message) {
+        if(!(SUCCEEDED(hr))) {
+            throw std::runtime_error(message);
+        }
+    }
+
+    inline void Success(HRESULT hr) {
+        Success(hr, "Provided HRESULT was not a success");
+    }
+#endif
+
     template<class T>
     inline void Empty(const T& t, std::string message) {
         if(!t.empty()) {

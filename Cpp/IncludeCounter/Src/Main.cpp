@@ -23,18 +23,27 @@ using namespace Extractor;
 namespace {
     constexpr ExtractorSettings Settings{true /*countIncludes*/, false /*extractTypes*/, false /*extractFunctions*/};
 
-    std::unordered_map<std::string, PreProcessorResult> PreProcessFiles(const std::vector<std::string>& fileNames, const std::vector<std::string>& userDefines) {
-        std::vector<std::unique_ptr<IRunnable<PreProcessorResult>>> preProcessingJobs;
-        std::transform(fileNames.begin(), fileNames.end(), std::back_inserter(preProcessingJobs), [&userDefines](const std::string& file) { return std::make_unique<FilePreProcessor>(file, userDefines); });
-        auto preProcessedResults = Runner::Get().RunAll(Threading::ExpectedRunTime::MILLISECONDS, preProcessingJobs);
-
-        std::unordered_map<std::string, PreProcessorResult> result;
-        for(auto&& file: preProcessedResults) {
-            result[file.FileName] = file;
+    std::unordered_map<std::string, std::string> GenerateHeaderFileMappings(const std::vector<std::string>& filePaths) {
+        std::unordered_map<std::string, std::string> result{};
+        for(const auto& file: filePaths) {
+            auto toLower = StrUtil::ToLower(file);
+            auto shortName = toLower.substr(toLower.find("inc") + 4); // skip inc and the path separator
+            result[shortName] = file;
         }
 
         return result;
     }
+
+    void PreProcessFiles(const std::vector<std::string>& filePaths, std::unordered_map<std::string, std::string>& defines) {
+        auto headerMapping = GenerateHeaderFileMappings(filePaths);
+        std::unordered_set<std::string> processedFiles{};
+
+        for(const auto& filePath: filePaths) {
+            FilePreProcessor fpp{filePath, headerMapping};
+            fpp.Execute(defines, processedFiles);
+        }
+    }
+
 } // namespace
 
 int main(int argc, char* argv[]) {
@@ -45,12 +54,12 @@ int main(int argc, char* argv[]) {
             return 0;
         }
         auto fileNames = argParse.GetFileNames();
-        auto userDefines = argParse.GetDefines();
-        auto preProcessedFiles = PreProcessFiles(fileNames, userDefines);
+        auto defines = argParse.GetDefines();
+        PreProcessFiles(fileNames, defines);
 
         std::vector<std::unique_ptr<IRunnable<FileData>>> jobs;
         for(auto&& file: fileNames) {
-            jobs.push_back(std::move(std::make_unique<FileDataExtractor>(file, userDefines, preProcessedFiles, Settings)));
+            jobs.push_back(std::move(std::make_unique<FileDataExtractor>(file, defines, Settings)));
         }
 
         Threading::ExpectedRunTime expectedRunTime = jobs.size() < 100 ? Threading::ExpectedRunTime::MILLISECONDS : Threading::ExpectedRunTime::SECONDS;

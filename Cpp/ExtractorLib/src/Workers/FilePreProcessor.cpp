@@ -10,91 +10,52 @@
 #include "Utilities/Require.h"
 #include "Utilities/StringUtils.h"
 
-#include <fstream>
-#include <memory>
-
 namespace {
+    std::regex IncludeRegex("^#include [\"<]([^\">]+)[\">]$");
+
     std::string GetIncludeGuardName(const std::string& fileName) {
         return StrUtil::ToUpper(fileName.substr(0, fileName.find_first_of('.')));
     }
 } // namespace
 
 namespace Extractor {
-    PreProcessorResult FilePreProcessor::Execute() const {
-        PreProcessorResult result;
-        result.FilePath = m_FilePath;
-        result.FileName = PathUtils::GetFileName(m_FilePath);
+    void FilePreProcessor::Execute(std::unordered_map<std::string, std::string>& knownDefines, std::unordered_set<std::string>& processedFiles) const {
+        if(processedFiles.find(m_FilePath) != processedFiles.end()) {
+            return;
+        }
+        processedFiles.insert(m_FilePath);
 
-        std::string includeGuardName = GetIncludeGuardName(result.FileName);
+        const auto includeGuardName = GetIncludeGuardName(PathUtils::GetFileName(m_FilePath));
 
         if(!m_Stream) {
             Require::True(FileUtils::Exists(m_FilePath));
             m_Stream = FileUtils::OpenForRead(m_FilePath);
         }
 
-        IfDefExtractor ifdefExtractor(m_UserDefines, *m_Stream);
+        IfDefExtractor ifdefExtractor(knownDefines, *m_Stream);
         u8 ifDefDepth = 0;
 
         std::string line;
+        std::smatch match;
+        u16 newDefines{0};
 
         while(LineFetcher::GetNextLine(*m_Stream, line)) {
-            if(ifdefExtractor.CanExtract(line)) {
-                if(line.find(includeGuardName) != line.npos) {
-                    // include guard
-                } else if(line == "#endif") {
-                    ifDefDepth--;
-                } else if(StrUtil::StartsWith(line, "#if")) {
-                    ifDefDepth++;
+            if(std::regex_search(line, match, IncludeRegex)) {
+                const auto lowerHeader = StrUtil::ToLower(match[1]);
+                if(m_HeaderToFileMap->find(lowerHeader) != m_HeaderToFileMap->end()) {
+                    const auto includeFilePath = m_HeaderToFileMap->at(lowerHeader);
+                    FilePreProcessor fpp{includeFilePath, *m_HeaderToFileMap};
+                    fpp.Execute(knownDefines, processedFiles);
                 }
-                continue;
-            }
-
-            if(DefineExtractor::CanExtract(line)) {
-                if(ifDefDepth > 0) {
-                    result.HasConditionalDefines = true;
-                } else if(line.find(includeGuardName) == line.npos) {
-                    auto keyAndValue = DefineExtractor::Extract(line);
-                    result.Defines[keyAndValue.first] = keyAndValue.second;
-                }
-            }
-        }
-
-        LOG_INFO(StrUtil::Format("Finished FirstPass of %s", m_FilePath));
-        if(result.Defines.empty()) {
-            LOG_INFO("Found no defines on first pass");
-        } else {
-            for(auto&& define: result.Defines) {
-                LOG_INFO(define.first + " = " + define.second);
-            }
-        }
-        return result;
-    }
-
-    void FilePreProcessor::Reprocess(PreProcessorResult& initialResult, std::vector<std::string> knownDefines) const {
-        LOG_INFO(StrUtil::Format("Reprocessing %s", initialResult.FileName));
-
-        std::string includeGuardName = GetIncludeGuardName(initialResult.FileName);
-        if(!m_Stream) {
-            Require::True(FileUtils::Exists(m_FilePath));
-            m_Stream = FileUtils::OpenForRead(m_FilePath);
-        }
-
-        std::vector<std::string> defines = knownDefines;
-        defines.insert(defines.end(), m_UserDefines.begin(), m_UserDefines.end());
-
-        IfDefExtractor ifdefExtractor(defines, *m_Stream);
-        std::string line;
-
-        while(LineFetcher::GetNextLine(*m_Stream, line)) {
-            if(ifdefExtractor.CanExtract(line)) {
+            } else if(ifdefExtractor.CanExtract(line)) {
                 ifdefExtractor.Extract(line);
-                continue;
-            }
-            if(DefineExtractor::CanExtract(line)) {
-                auto keyAndValue = DefineExtractor::Extract(line);
-                initialResult.Defines[keyAndValue.first] = keyAndValue.second;
-                LOG_INFO(StrUtil::Format("Found define: %s = %s", keyAndValue.first, keyAndValue.second));
+            } else if(DefineExtractor::CanExtract(line)) {
+                const auto& [key, value] = DefineExtractor::Extract(line);
+                knownDefines[key] = value;
+                newDefines++;
             }
         }
+
+        LOG_INFO(StrUtil::Format("Found %d defines for %s", newDefines, m_FilePath));
     }
 } // namespace Extractor

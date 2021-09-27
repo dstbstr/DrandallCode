@@ -5,22 +5,26 @@
 
 #include <filesystem>
 #include <fstream>
-#include <unordered_set>
 
 namespace Extractor {
     namespace DefineFileParser {
-        std::vector<std::string> Parse(std::istream& stream) {
+        std::unordered_map<std::string, std::string> Parse(std::istream& stream) {
             std::string line;
-            std::unordered_set<std::string> result;
+            std::unordered_map<std::string, std::string> result;
             while(std::getline(stream, line)) {
-                for(auto&& token: StrUtil::Split(line, " ")) {
+                for(const auto& token: StrUtil::Split(line, " ")) {
                     if(!token.empty()) {
-                        result.insert(std::string(token));
+                        auto keyValue = StrUtil::Split(token, "=");
+                        if(keyValue.size() > 1) {
+                            result[std::string(keyValue[0])] = keyValue[1];
+                        } else {
+                            result[std::string(token)] = "";
+                        }
                     }
                 }
             }
 
-            return std::vector<std::string>{result.begin(), result.end()};
+            return result;
         }
     } // namespace DefineFileParser
 } // namespace Extractor

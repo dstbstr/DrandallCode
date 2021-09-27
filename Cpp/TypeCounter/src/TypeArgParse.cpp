@@ -9,7 +9,6 @@
 #include "Utilities/StringUtils.h"
 
 #include <iostream>
-#include <unordered_set>
 
 namespace TypeCounter {
     ArgParse::ArgParse(int argc, char* argv[]) {
@@ -39,11 +38,18 @@ namespace TypeCounter {
         return fnc.GetAllFullyQualifiedPaths();
     }
 
-    std::vector<std::string> ArgParse::GetDefines() const {
-        std::unordered_set<std::string> defines;
+    std::unordered_map<std::string, std::string> ArgParse::GetDefines() const {
+        std::unordered_map<std::string, std::string> defines{};
         if(m_Defines.IsPopulated()) {
             auto userDefines = m_Defines.GetValue();
-            defines.insert(userDefines.begin(), userDefines.end());
+            for(const auto& define: userDefines) {
+                auto split = StrUtil::Split(define, "=");
+                if(split.size() > 1) {
+                    defines[std::string(split[0])] = split[1];
+                } else {
+                    defines[define] = "";
+                }
+            }
         }
         if(m_DefineFile.IsPopulated()) {
             Require::True(FileUtils::Exists(m_DefineFile.GetValue()));
@@ -52,7 +58,7 @@ namespace TypeCounter {
             defines.insert(fromFile.begin(), fromFile.end());
         }
 
-        return std::vector<std::string>{defines.begin(), defines.end()};
+        return defines;
     }
 
 } // namespace TypeCounter

@@ -166,7 +166,7 @@ namespace Extractor {
 
         TypeData Extract() {
             std::string line;
-            std::vector<std::string> knownDefines{"IS_DEFINED"};
+            std::unordered_map<std::string, std::string> knownDefines{{"IS_DEFINED", "1"}};
             LineFetcher::GetNextLine(ss, line);
             std::smatch match;
             IsAType(line, match);

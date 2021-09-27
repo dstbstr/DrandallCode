@@ -2,7 +2,6 @@
 
 #include "TestCommon.h"
 
-
 using Extractor::DefineExtractor::CanExtract;
 using Extractor::DefineExtractor::Extract;
 
@@ -35,31 +34,31 @@ TEST(DefineExtractorCanExtract, CanNotExtractCommentedDefine) {
 }
 
 TEST(DefineExtractorExtract, ExtractsValueLikeMacro) {
-    auto result = Extract("#define Foo");
-    ASSERT_EQ(result.first, "Foo");
-    ASSERT_EQ(result.second, "");
+    auto [name, value] = Extract("#define Foo");
+    ASSERT_EQ(name, "Foo");
+    ASSERT_EQ(value, "");
 }
 
 TEST(DefineExtractorExtract, ExtractsValueLikeMacroWithValue) {
-    auto result = Extract("#define Foo 4");
-    ASSERT_EQ(result.first, "Foo");
-    ASSERT_EQ(result.second, "4");
+    auto [name, value] = Extract("#define Foo 4");
+    ASSERT_EQ(name, "Foo");
+    ASSERT_EQ(value, "4");
 }
 
 TEST(DefineExtractorExtract, ExtractsFunctionLikeMacro) {
-    auto result = Extract("#define Foo()");
-    ASSERT_EQ(result.first, "Foo()");
-    ASSERT_EQ(result.second, "");
+    auto [name, value] = Extract("#define Foo()");
+    ASSERT_EQ(name, "Foo()");
+    ASSERT_EQ(value, "");
 }
 
 TEST(DefineExtractorExtract, ExtractsFunctionLikeMacroWithDefinition) {
-    auto result = Extract("#define Foo() Bar");
-    ASSERT_EQ(result.first, "Foo()");
-    ASSERT_EQ(result.second, "Bar");
+    auto [name, value] = Extract("#define Foo() Bar");
+    ASSERT_EQ(name, "Foo()");
+    ASSERT_EQ(value, "Bar");
 }
 
 TEST(DefineExtractorExtract, ExtractsFunctionLikeMacroWithArguments) {
-    auto result = Extract("#define Foo(a, b) Bar(b, a)");
-    ASSERT_EQ(result.first, "Foo(a, b)");
-    ASSERT_EQ(result.second, "Bar(b, a)");
+    auto [name, value] = Extract("#define Foo(a, b) Bar(b, a)");
+    ASSERT_EQ(name, "Foo(a, b)");
+    ASSERT_EQ(value, "Bar(b, a)");
 }
