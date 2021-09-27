@@ -3,12 +3,13 @@
 
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 
 struct PreProcessorResult {
     std::string FilePath;
     std::string FileName;
-    bool HasConditionalDefines{false};
     std::unordered_map<std::string, std::string> Defines;
+    std::unordered_set<std::string> ConditionalDefines;
 };
 
 #endif // __PREPROCESSORRESULT_H__

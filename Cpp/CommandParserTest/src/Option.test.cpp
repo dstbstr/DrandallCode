@@ -48,12 +48,12 @@ namespace CommandParser {
     }
 
     TEST(OptionConstruction, TakesTheFirstValidCharacterSetInShortName) {
-        IntOption opt("-a-b-", "", false);
+        IntOption opt("-a*b&", "", false);
         ASSERT_EQ(opt.GetShortName(), "a");
     }
 
     TEST(OptionConstruction, TakesTheFirstValidCharacterSetInLongName) {
-        IntOption opt("", "-abc-def", false);
+        IntOption opt("", "-abc*def", false);
         ASSERT_EQ(opt.GetLongName(), "abc");
     }
 

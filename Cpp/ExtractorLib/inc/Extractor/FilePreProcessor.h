@@ -2,25 +2,25 @@
 #define __FILEPREPROCESSOR_H__
 
 #include "Extractor/Data/PreProcessorResult.h"
-#include "Threading/IRunnable.h"
 
 #include <iostream>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace Extractor {
-    class FilePreProcessor : public IRunnable<PreProcessorResult> {
+    class FilePreProcessor {
     public:
-        FilePreProcessor(std::string filePath, const std::vector<std::string>& userDefines, std::shared_ptr<std::istream> stream = nullptr) : m_FilePath(filePath), m_UserDefines(userDefines), m_Stream(stream) {}
+        FilePreProcessor(std::string filePath, const std::unordered_map<std::string, std::string>& headerToFileMap) : m_FilePath(filePath), m_Stream(nullptr), m_HeaderToFileMap(&headerToFileMap) {}
+        FilePreProcessor(std::string filePath, const std::unordered_map<std::string, std::string>& headerToFileMap, std::shared_ptr<std::istream> stream) : m_FilePath(filePath), m_HeaderToFileMap(&headerToFileMap), m_Stream(stream) {}
         FilePreProcessor(const FilePreProcessor&) = delete;
         FilePreProcessor& operator=(const FilePreProcessor&) = delete;
 
-        PreProcessorResult Execute() const;
-        void Reprocess(PreProcessorResult& existingResult, std::vector<std::string> knownDefines) const;
+        void Execute(std::unordered_map<std::string, std::string>& knownDefines, std::unordered_set<std::string>& processedFiles) const;
 
     private:
         std::string m_FilePath;
-        std::vector<std::string> m_UserDefines;
+        const std::unordered_map<std::string, std::string>* m_HeaderToFileMap;
         mutable std::shared_ptr<std::istream> m_Stream;
     };
 } // namespace Extractor

@@ -9,10 +9,7 @@ namespace CommandParser {
         ValidateName();
     }
 
-    BaseOption::BaseOption(std::string shortName, std::string longName, bool required, std::string helpText)
-        : m_Required(required)
-        , m_IsRestOption(false)
-        , m_HelpText(helpText) {
+    BaseOption::BaseOption(std::string shortName, std::string longName, bool required, std::string helpText) : m_Required(required), m_IsRestOption(false), m_HelpText(helpText) {
         m_ShortName = CleanName(shortName);
         m_LongName = CleanName(longName);
         ValidateName();
@@ -63,19 +60,14 @@ namespace CommandParser {
     }
 
     std::string BaseOption::ToString() {
-        return StrUtil::Format(UsageFormat,
-                               m_ShortName.length() > 0 ? "-" + m_ShortName : "",
-                               m_LongName.length() > 0 ? "--" + m_LongName : "",
-                               m_Required ? "X" : "",
-                               GetInnerType() == InnerType::BOOL ? "X" : "",
-                               m_HelpText);
+        return StrUtil::Format(UsageFormat, m_ShortName.length() > 0 ? "-" + m_ShortName : "", m_LongName.length() > 0 ? "--" + m_LongName : "", m_Required ? "X" : "", GetInnerType() == InnerType::BOOL ? "X" : "", m_HelpText);
     }
 
     std::string BaseOption::CleanName(std::string input) const {
         if(input == "" || input == BaseOption::BLANK) {
             return input; // blank is a valid if command doesn't have a short/long version
         }
-        static std::regex cleanRegex(R"(\w+)");
+        static std::regex cleanRegex(R"(\w[\w-]*)");
         std::smatch match;
         Require::True(std::regex_search(input, match, cleanRegex), "Invalid option name " + input);
         return match[0];

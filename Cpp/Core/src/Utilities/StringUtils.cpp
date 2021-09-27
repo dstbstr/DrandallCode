@@ -1,5 +1,7 @@
 #include "Utilities/StringUtils.h"
 
+#include "Utilities/Require.h"
+
 namespace StrUtil {
 
     bool EqualsIgnoreCase(std::string_view lhs, std::string_view rhs) {

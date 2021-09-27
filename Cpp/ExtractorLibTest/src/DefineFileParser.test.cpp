@@ -13,7 +13,10 @@ TEST(DefineFileParser, SplitsLineOnSpace) {
 
     auto result = Parse(ss);
     ASSERT_EQ(3, result.size());
-    ASSERT_THAT(result, UnorderedElementsAre("A", "B", "C"));
+
+    ASSERT_EQ(result["A"], "");
+    ASSERT_EQ(result["B"], "");
+    ASSERT_EQ(result["C"], "");
 }
 
 TEST(DefineFileParser, GathersAllLines) {
@@ -24,7 +27,9 @@ TEST(DefineFileParser, GathersAllLines) {
 
     auto result = Parse(ss);
     ASSERT_EQ(3, result.size());
-    ASSERT_THAT(result, UnorderedElementsAre("A", "B", "C"));
+    ASSERT_EQ(result["A"], "");
+    ASSERT_EQ(result["B"], "");
+    ASSERT_EQ(result["C"], "");
 }
 
 TEST(DefineFileParser, RemovesDuplicates) {
@@ -33,7 +38,8 @@ TEST(DefineFileParser, RemovesDuplicates) {
     auto result = Parse(ss);
 
     ASSERT_EQ(2, result.size());
-    ASSERT_THAT(result, UnorderedElementsAre("A", "B"));
+    ASSERT_EQ(result["A"], "");
+    ASSERT_EQ(result["B"], "");
 }
 
 TEST(DefineFileParser, DoesNotAddBlanksFromSpaces) {
@@ -42,7 +48,8 @@ TEST(DefineFileParser, DoesNotAddBlanksFromSpaces) {
     auto result = Parse(ss);
 
     ASSERT_EQ(2, result.size());
-    ASSERT_THAT(result, UnorderedElementsAre("A", "B"));
+    ASSERT_EQ(result["A"], "");
+    ASSERT_EQ(result["B"], "");
 }
 
 TEST(DefineFileParser, DoesNotAddBlanksFromLines) {
@@ -52,5 +59,15 @@ TEST(DefineFileParser, DoesNotAddBlanksFromLines) {
     auto result = Parse(ss);
 
     ASSERT_EQ(2, result.size());
-    ASSERT_THAT(result, UnorderedElementsAre("A", "B"));
+    ASSERT_EQ(result["A"], "");
+    ASSERT_EQ(result["B"], "");
+}
+
+TEST(DefineFileParser, SplitsOnEquals) {
+    std::stringstream ss;
+    ss << "A=B";
+    auto result = Parse(ss);
+
+    ASSERT_EQ(1, result.size());
+    ASSERT_EQ(result["A"], "B");
 }

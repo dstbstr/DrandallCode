@@ -30,22 +30,30 @@ using ReportCollection = std::vector<std::pair<std::unique_ptr<IReport>, std::st
 namespace {
     static constexpr ExtractorSettings Settings{false, true, true};
 
-    std::unordered_map<std::string, PreProcessorResult> PreProcessFiles(const std::vector<std::string>& fileNames, const std::vector<std::string>& userDefines) {
-        std::vector<std::unique_ptr<IRunnable<PreProcessorResult>>> preProcessingJobs;
-        std::transform(fileNames.begin(), fileNames.end(), std::back_inserter(preProcessingJobs), [&userDefines](const std::string& file) { return std::make_unique<FilePreProcessor>(file, userDefines); });
-        auto preProcessedResults = Runner::Get().RunAll(Threading::ExpectedRunTime::MILLISECONDS, preProcessingJobs);
-
-        std::unordered_map<std::string, PreProcessorResult> result;
-        for(auto&& file: preProcessedResults) {
-            result[file.FileName] = file;
+    std::unordered_map<std::string, std::string> GenerateHeaderFileMappings(const std::vector<std::string>& filePaths) {
+        std::unordered_map<std::string, std::string> result{};
+        for(const auto& file: filePaths) {
+            auto toLower = StrUtil::ToLower(file);
+            auto shortName = toLower.substr(toLower.find("inc") + 4); // skip inc and the path separator
+            result[shortName] = file;
         }
 
         return result;
     }
 
-    std::vector<FileData> GatherFileData(const std::vector<std::string>& fileNames, const std::vector<std::string>& userDefines, std::unordered_map<std::string, PreProcessorResult>& preProcessedFileData) {
+    void PreProcessFiles(const std::vector<std::string>& filePaths, std::unordered_map<std::string, std::string>& defines) {
+        auto headerMapping = GenerateHeaderFileMappings(filePaths);
+        std::unordered_set<std::string> processedFiles{};
+
+        for(const auto& filePath: filePaths) {
+            FilePreProcessor fpp{filePath, headerMapping};
+            fpp.Execute(defines, processedFiles);
+        }
+    }
+
+    std::vector<FileData> GatherFileData(const std::vector<std::string>& fileNames, const std::unordered_map<std::string, std::string>& defines) {
         std::vector<std::unique_ptr<IRunnable<FileData>>> jobs;
-        std::transform(fileNames.begin(), fileNames.end(), std::back_inserter(jobs), [&userDefines, &preProcessedFileData](const std::string& file) { return std::make_unique<FileDataExtractor>(file, userDefines, preProcessedFileData, Settings); });
+        std::transform(fileNames.begin(), fileNames.end(), std::back_inserter(jobs), [&defines](const std::string& file) { return std::make_unique<FileDataExtractor>(file, defines, Settings); });
 
         // large code bases tend to have bigger files which take longer to parse
         Threading::ExpectedRunTime expectedRuntime = jobs.size() < 100 ? Threading::ExpectedRunTime::MILLISECONDS : Threading::ExpectedRunTime::SECONDS;
@@ -75,11 +83,11 @@ namespace {
     }
 
     void WriteReport(ReportCollection& reports, const std::string& filePrefix) {
-        for(auto&& reportPair: reports) {
-            auto path = std::filesystem::path(filePrefix + "_" + reportPair.second + ".csv"); // todo: get the suffix from the report
+        for(const auto& [report, name]: reports) {
+            auto path = std::filesystem::path(filePrefix + "_" + name + ".csv"); // todo: get the suffix from the report
             std::filesystem::remove(path); // clear out any old results
             auto stream = std::ofstream(path);
-            reportPair.first->PrintResultToStream(stream);
+            report->PrintResultToStream(stream);
         }
     }
 } // namespace
@@ -93,9 +101,11 @@ int main(int argc, char* argv[]) {
         }
         auto fileNames = argParse.GetFileNames();
         Require::NotEmpty(fileNames, "Did not locate any filenames");
-        auto userDefines = argParse.GetDefines();
+        auto defines = argParse.GetDefines();
 
-        auto files = GatherFileData(fileNames, userDefines, PreProcessFiles(fileNames, userDefines));
+        PreProcessFiles(fileNames, defines);
+
+        auto files = GatherFileData(fileNames, defines);
 
         auto reports = GenerateReports(files, argParse.RunFunctionReport(), argParse.RunTypeReport());
 

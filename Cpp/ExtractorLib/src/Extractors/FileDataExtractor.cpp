@@ -40,8 +40,7 @@ namespace Extractor {
         std::smatch match;
         bool isHeader = m_FilePath[m_FilePath.length() - 1] == 'h';
         NamespaceExtractor namespaceExtractor;
-        std::vector<std::string> knownDefines;
-        IfDefExtractor ifdefExtractor(knownDefines, stream);
+        IfDefExtractor ifdefExtractor(*m_Defines, stream);
 
         u64 nonBlankLines = 0;
         while(LineFetcher::GetNextLine(stream, line)) {
@@ -55,18 +54,6 @@ namespace Extractor {
             if(std::regex_search(line, match, IncludeRegex)) {
                 if(m_Settings.CountIncludes) {
                     result.IncludeFiles.insert(match[1]);
-                }
-                std::string includeName = PathUtils::GetFileName(match[1]);
-                if(m_PreProcessedFiles->find(includeName) != m_PreProcessedFiles->end() && includeName != result.FileName) {
-                    PreProcessorResult preProcessedFile = m_PreProcessedFiles->at(includeName);
-                    if(preProcessedFile.HasConditionalDefines) {
-                        FilePreProcessor preprocessor(preProcessedFile.FilePath, m_UserDefines);
-                        preprocessor.Reprocess(preProcessedFile, knownDefines);
-                    }
-                    for(auto&& defineKV: preProcessedFile.Defines) {
-                        knownDefines.push_back(defineKV.first); // TODO: later if we want to do more preprocess work, we'll want to keep the definition as well
-                        ifdefExtractor.AddDefine(defineKV.first);
-                    }
                 }
                 continue;
             }
@@ -83,7 +70,7 @@ namespace Extractor {
                 }
             }
             if(m_Settings.ExtractTypes && TypeDataExtractor::IsAType(line, match)) {
-                auto type = TypeDataExtractor::Extract(match, result.FileName, namespaceExtractor.GetNamespace(), knownDefines, stream);
+                auto type = TypeDataExtractor::Extract(match, result.FileName, namespaceExtractor.GetNamespace(), *m_Defines, stream);
                 result.Types.push_back(type);
                 nonBlankLines += type.LineCount - 1;
             } else if(m_Settings.ExtractFunctions && FunctionDataExtractor::IsAFunction(line, match)) {

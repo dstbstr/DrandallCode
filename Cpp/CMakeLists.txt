@@ -6,18 +6,15 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR
     "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    #set(warnings "-Wall -Wextra -Werror")
-    set(warnings "")
+    set(warnings "-Wall -Wextra -Werror")
     if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
         add_definitions(-DGNU)
     else()
         add_definitions(-DCLANG)
     endif()
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-    #set(warnings "/W4 /WX /EHsc")
-    set(warnings "/W1 /EHsc")
+    set(warnings "/W4 /WX /EHsc")
     add_definitions(-DMSVC)
-    #add_definitions(-D_REGEX_MAX_COMPLEXITY_COUNT=0) #remove max regex complexity, not sure if this would work outside of MSVC
 endif()
 if (NOT CONFIGURED_ONCE)
     set(CMAKE_CXX_FLAGS "${warnings}"

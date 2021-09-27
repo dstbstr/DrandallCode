@@ -51,7 +51,26 @@ namespace Extractor {
         line = std::regex_replace(line, IfndefRegex, "!"); // turn #ifndef X into !X
         line = std::regex_replace(line, IfdefRegex, ""); // turn #ifdef X into X and #elif X into X
 
-        bool matches = ExpressionEvaluator::Evaluate(line, [&](std::string str) -> bool { return std::find(m_KnownDefines.begin(), m_KnownDefines.end(), str) != m_KnownDefines.end(); });
+        bool matches = ExpressionEvaluator::Evaluate(line, [&](std::string str) -> bool {
+            if(str.find("==") != str.npos) {
+                auto split = StrUtil::Split(str, "==");
+                auto key = std::string(split[0]);
+                if(m_KnownDefines->find(key) == m_KnownDefines->end()) {
+                    return false;
+                }
+                return m_KnownDefines->at(key).compare(split[1]) == 0;
+            } else if(str.find("!=") != str.npos) {
+                auto split = StrUtil::Split(str, "!=");
+                auto key = std::string(split[0]);
+                if(m_KnownDefines->find(key) == m_KnownDefines->end()) {
+                    return true;
+                }
+
+                return m_KnownDefines->at(key).compare(split[1]) != 0;
+            }
+
+            return m_KnownDefines->find(str) != m_KnownDefines->end();
+        });
         if(matches) {
             m_MatchedLevels.insert(m_DefineDepth);
             line = "";

@@ -13,15 +13,12 @@
                 "-d",
                 "MSVC",
                 "-r",
-                "CommandParser",
-                "IncludeCounter",
-                "TypeCounter",
-                "Core"
+                "D:/T10/Engine/Core"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
-            "externalConsole": true
+            "console": "externalTerminal"
         },
         {
             "name": "(Windows) TypeCounter",
@@ -30,27 +27,14 @@
             "program": "${workspaceFolder}/bin/Debug/TypeCounter.exe",
             "args": [
                 "-r",
-                "CommandParser",
-                "ExtractorLib",
-                "Core"
+                "D:/T10/Engine/Core",
+                "--define-file",
+                "ForzaDefines.txt"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
-            "externalConsole": true
-        },
-        {
-            "name": "(Windows) Gbell Midi",
-            "type": "cppvsdbg",
-            "request": "launch",
-            "program": "${workspaceFolder}/bin/Debug/GBellMidi.exe",
-            "args": [
-                "${workspaceFolder}/GbellMidi/row.gdb"
-            ],
-            "stopAtEntry": false,
-            "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": true
+            "console": "externalTerminal"
         },
         {
             "name": "(Windows) Run Tests: Core",
@@ -60,8 +44,7 @@
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": false
+            "environment": []
         },
         {
             "name": "(Windows) Run Tests: CommandParser",
@@ -71,8 +54,7 @@
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": false
+            "environment": []
         },
         {
             "name": "(Windows) Run Tests: ExtractorLib",
@@ -82,8 +64,7 @@
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
-            "environment": [],
-            "externalConsole": false
+            "environment": []
         },
         {
             "name": "(Nix) IncludeCounter",
