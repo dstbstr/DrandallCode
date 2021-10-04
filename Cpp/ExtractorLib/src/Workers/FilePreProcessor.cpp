@@ -33,7 +33,6 @@ namespace Extractor {
         }
 
         IfDefExtractor ifdefExtractor(knownDefines, *m_Stream);
-        u8 ifDefDepth = 0;
 
         std::string line;
         std::smatch match;
@@ -55,7 +54,5 @@ namespace Extractor {
                 newDefines++;
             }
         }
-
-        LOG_INFO(StrUtil::Format("Found %d defines for %s", newDefines, m_FilePath));
     }
 } // namespace Extractor

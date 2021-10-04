@@ -97,7 +97,7 @@ namespace Extractor {
                 for(int i = 0; i < closeBraces; i++) {
                     try {
                         namespaceExtractor.PopNamespace();
-                    } catch(std::exception& e) {
+                    } catch(std::exception&) {
                         LOG_WARN(StrUtil::Format("Failed to pop namespace.  File %s, NonBlankLine %u", result.FileName, nonBlankLines));
                     }
                 }

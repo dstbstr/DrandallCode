@@ -13,7 +13,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR
         add_definitions(-DCLANG)
     endif()
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-    set(warnings "/W4 /WX /EHsc")
+    set(warnings "/W3 /WX /EHsc")
     add_definitions(-DMSVC)
 endif()
 if (NOT CONFIGURED_ONCE)
@@ -31,9 +31,13 @@ endif()
 
 set(CMAKE_CXX_STANDARD 17)
 
+#External
+add_subdirectory(OpenXLSX)
+#Internal
 add_subdirectory(Core)
 add_subdirectory(CommandParser)
 add_subdirectory(ExtractorLib)
+add_subdirectory(ReportGenerator)
 
 add_subdirectory(IncludeCounter)
 add_subdirectory(TypeCounter)

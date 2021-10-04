@@ -3,11 +3,10 @@
 
 #include <iostream>
 
-namespace TypeCounter {
-
+namespace Report {
     struct IReport {
         virtual ~IReport() = default;
-        virtual void PrintResultToStream(std::ostream& targetStream) const = 0;
+        virtual void WriteReport(std::string fileName) const = 0;
     };
-} // namespace TypeCounter
+} // namespace Report
 #endif // __IREPORT_H__

@@ -1,15 +1,11 @@
-#include "CombinedReport.h"
 #include "Extractor/Data/FileData.h"
-#include "Extractor/Data/PreProcessorResult.h"
 #include "Extractor/ExtractorSettings.h"
 #include "Extractor/FileDataExtractor.h"
 #include "Extractor/FilePreProcessor.h"
-#include "FunctionReport.h"
-#include "IReport.h"
 #include "Instrumentation/LogWriter/StdOutLogWriter.h"
+#include "Report/ExcelReport.h"
 #include "Threading/Runner.h"
 #include "TypeArgParse.h"
-#include "TypeReport.h"
 #include "Utilities/Require.h"
 #include "Utilities/ScopedTimer.h"
 #include "Utilities/TimeUtils.h"
@@ -24,8 +20,6 @@
 Log::StdOutLogWriter logWriter{};
 using namespace Extractor;
 using namespace TypeCounter;
-
-using ReportCollection = std::vector<std::pair<std::unique_ptr<IReport>, std::string>>;
 
 namespace {
     static constexpr ExtractorSettings Settings{false, true, true};
@@ -60,20 +54,6 @@ namespace {
         return Runner::Get().RunAll(expectedRuntime, jobs);
     }
 
-    ReportCollection GenerateReports(std::vector<FileData> results, bool functionReport, bool typeReport) {
-        ReportCollection reports;
-        reports.push_back(std::make_pair(std::make_unique<CombinedReport>(results), "Combined"));
-
-        if(functionReport) {
-            reports.push_back(std::make_pair(std::make_unique<FunctionReport>(results), "Function"));
-        }
-        if(typeReport) {
-            reports.push_back(std::make_pair(std::make_unique<TypeReport>(results), "Types"));
-        }
-
-        return reports;
-    }
-
     std::string GetFilePrefix(std::string targetFileOption) {
         if(targetFileOption.empty()) {
             return TimeUtils::TodayNowToString("%Y_%m_%d_%H_%M_%S");
@@ -82,14 +62,6 @@ namespace {
         }
     }
 
-    void WriteReport(ReportCollection& reports, const std::string& filePrefix) {
-        for(const auto& [report, name]: reports) {
-            auto path = std::filesystem::path(filePrefix + "_" + name + ".csv"); // todo: get the suffix from the report
-            std::filesystem::remove(path); // clear out any old results
-            auto stream = std::ofstream(path);
-            report->PrintResultToStream(stream);
-        }
-    }
 } // namespace
 
 int main(int argc, char* argv[]) {
@@ -107,11 +79,15 @@ int main(int argc, char* argv[]) {
 
         auto files = GatherFileData(fileNames, defines);
 
-        auto reports = GenerateReports(files, argParse.RunFunctionReport(), argParse.RunTypeReport());
+        // auto reports = GenerateReports(files, argParse.RunFunctionReport(), argParse.RunTypeReport());
 
         std::string filePrefix = GetFilePrefix(argParse.GetTargetFile());
 
-        WriteReport(reports, filePrefix);
+        // WriteReport(reports, filePrefix);
+
+        auto report = Report::ExcelReport(files);
+
+        report.WriteReport(filePrefix);
 
         return 0;
     } catch(std::exception& err) {

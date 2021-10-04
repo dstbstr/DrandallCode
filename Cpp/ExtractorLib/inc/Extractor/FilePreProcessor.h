@@ -1,11 +1,10 @@
 #ifndef __FILEPREPROCESSOR_H__
 #define __FILEPREPROCESSOR_H__
 
-#include "Extractor/Data/PreProcessorResult.h"
-
 #include <iostream>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 namespace Extractor {

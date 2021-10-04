@@ -7,7 +7,7 @@ namespace Extractor {
         u32 GetBodyCount(const std::string& line, std::istream& stream) {
             auto nestingDepth = std::count(line.begin(), line.end(), '{');
             nestingDepth -= std::count(line.begin(), line.end(), '}');
-            u64 lineCount = 0;
+            u32 lineCount = 0;
             std::string nextLine;
             while(nestingDepth > 0 && LineFetcher::GetNextLine(stream, nextLine)) {
                 lineCount++;
