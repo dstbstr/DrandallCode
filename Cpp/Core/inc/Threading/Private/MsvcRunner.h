@@ -26,6 +26,7 @@ private:
     template<class ReturnType>
     struct IRunner {
         virtual std::vector<ReturnType> Run(u32 maxConcurrency, std::vector<std::unique_ptr<IRunnable<ReturnType>>>& runnables) = 0;
+        virtual ~IRunner() = default;
     };
 
     template<class ReturnType>
@@ -128,7 +129,7 @@ public:
     std::vector<ReturnType> RunAll(Threading::ExpectedRunTime expectedRunTime, std::vector<std::unique_ptr<IRunnable<ReturnType>>>& runnables) {
         ScopedTimer timer("Runner::RunAll");
         std::unique_ptr<IRunner<ReturnType>> runner;
-        if(runnables.size() < m_MaxConcurrency * 2 && expectedRunTime < Threading::ExpectedRunTime::SECONDS) {
+        if(runnables.size() < (u64)m_MaxConcurrency * 2 && expectedRunTime < Threading::ExpectedRunTime::SECONDS) {
             runner = std::make_unique<SerialRunner<ReturnType>>();
         } else if(expectedRunTime < Threading::ExpectedRunTime::SECONDS) {
             runner = std::make_unique<BatchRunner<ReturnType>>();

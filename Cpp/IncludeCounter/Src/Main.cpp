@@ -1,5 +1,4 @@
 #include "Extractor/Data/FileData.h"
-#include "Extractor/Data/PreProcessorResult.h"
 #include "Extractor/ExtractorSettings.h"
 #include "Extractor/FileDataExtractor.h"
 #include "Extractor/FilePreProcessor.h"
@@ -7,6 +6,8 @@
 #include "IncludeArgParse.h"
 #include "IncludeReport.h"
 #include "Instrumentation/LogWriter/StdOutLogWriter.h"
+#include "Report/CsvReport.h"
+#include "Report/ExcelReport.h"
 #include "Threading/Runner.h"
 #include "Utilities/ScopedTimer.h"
 
@@ -44,6 +45,14 @@ namespace {
         }
     }
 
+    std::string GetFilePrefix(std::string targetFileOption) {
+        if(targetFileOption.empty()) {
+            return TimeUtils::TodayNowToString("%Y_%m_%d_%H_%M_%S");
+        } else {
+            return targetFileOption;
+        }
+    }
+
 } // namespace
 
 int main(int argc, char* argv[]) {
@@ -65,16 +74,19 @@ int main(int argc, char* argv[]) {
         Threading::ExpectedRunTime expectedRunTime = jobs.size() < 100 ? Threading::ExpectedRunTime::MILLISECONDS : Threading::ExpectedRunTime::SECONDS;
         std::vector<FileData> files = Runner::Get().RunAll(expectedRunTime, jobs);
         IncludeMapGenerator(files).Generate();
-        IncludeReport report(files);
+        // IncludeReport report(files);
+        // Report::CsvReport report(files);
+        Report::ExcelReport report(files);
 
-        if(argParse.GetTargetFile().empty()) {
-            report.PrintResultToStream(std::cout);
-        } else {
-            auto path = std::filesystem::path(argParse.GetTargetFile() + "_Includes.csv");
-            std::filesystem::remove(path); // clear out old results
-            auto stream = std::ofstream(path);
-            report.PrintResultToStream(stream);
-        }
+        report.WriteReport(GetFilePrefix(argParse.GetTargetFile()));
+        /*
+                if(argParse.GetTargetFile().empty()) {
+                    report.WriteReportToStream(std::cout);
+                } else {
+                    report.WriteReport(argParse.GetTargetFile());
+                }
+                */
+
         return 0;
     } catch(std::exception& err) {
         std::cerr << err.what() << std::endl;

@@ -5,12 +5,12 @@
 
 class ProgressBar {
 public:
-    ProgressBar(u32 finalNumber) : m_FinalNumber(finalNumber) {}
+    ProgressBar(size_t finalNumber) : m_FinalNumber(finalNumber) {}
     ~ProgressBar();
-    void Update(u32 currentProgress);
+    void Update(size_t currentProgress);
 
 private:
-    u32 m_FinalNumber;
+    size_t m_FinalNumber{0};
 };
 
 #endif // __PROGRESSBAR_H__

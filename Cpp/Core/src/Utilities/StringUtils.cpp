@@ -14,13 +14,13 @@ namespace StrUtil {
 
     std::string ToUpper(const std::string& str) {
         std::string result = str;
-        std::transform(str.cbegin(), str.cend(), result.begin(), [](const char& letter) { return std::toupper(letter); });
+        std::transform(str.cbegin(), str.cend(), result.begin(), [](const char& letter) { return (char)std::toupper(letter); });
         return result;
     }
 
     std::string ToLower(const std::string& str) {
         std::string result = str;
-        std::transform(str.cbegin(), str.cend(), result.begin(), [](const char& letter) { return std::tolower(letter); });
+        std::transform(str.cbegin(), str.cend(), result.begin(), [](const char& letter) { return (char)std::tolower(letter); });
         return result;
     }
 
@@ -48,6 +48,6 @@ namespace StrUtil {
     }
 
     bool EndsWith(std::string_view string, std::string_view suffix) {
-        return string.rfind(suffix) == string.length() - suffix.length();
+        return string.rfind(suffix) == string.length() - suffix.length() && string.length() >= suffix.length();
     }
 } // namespace StrUtil

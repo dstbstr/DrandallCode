@@ -320,3 +320,7 @@ TEST(EndsWith, TooLongSuffixReturnsFalse) {
 TEST(EndsWith, BlankSuffixReturnsTrue) {
     ASSERT_TRUE(StrUtil::EndsWith("Hello", ""));
 }
+
+TEST(EndsWith, SuffixOneLongerThanStringReturnsFalse) {
+    ASSERT_FALSE(StrUtil::EndsWith("Test", ".xlsx"));
+}

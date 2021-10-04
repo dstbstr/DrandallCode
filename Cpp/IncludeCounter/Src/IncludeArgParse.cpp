@@ -53,7 +53,7 @@ namespace IncludeCounter {
             }
         }
         if(m_DefineFile.IsPopulated()) {
-            Require::True(FileUtils::Exists(m_DefineFile.GetValue()));
+            Require::True(FileUtils::Exists(m_DefineFile.GetValue()), StrUtil::Format("Could not find file %s", m_DefineFile.GetValue()));
             auto stream = FileUtils::OpenForRead(m_DefineFile.GetValue());
             auto fromFile = Extractor::DefineFileParser::Parse(*stream);
             defines.insert(fromFile.begin(), fromFile.end());

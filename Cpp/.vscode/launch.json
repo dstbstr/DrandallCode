@@ -13,7 +13,14 @@
                 "-d",
                 "MSVC",
                 "-r",
-                "D:/T10/Engine/Core"
+                "-f",
+                "Test",
+                "CommandParser",
+                "Core",
+                "ExtractorLib",
+                "IncludeCounter",
+                "ReportGenerator",
+                "TypeCounter"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

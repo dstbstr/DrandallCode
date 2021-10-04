@@ -3,7 +3,7 @@
 #include <iostream>
 
 constexpr u8 BarWidth = 80;
-void ProgressBar::Update(u32 currentProgress) {
+void ProgressBar::Update(size_t currentProgress) {
     f32 percentComplete = static_cast<f32>(currentProgress) / static_cast<f32>(m_FinalNumber);
     std::cout << "\r[";
     u8 progress = static_cast<u8>(BarWidth * percentComplete);

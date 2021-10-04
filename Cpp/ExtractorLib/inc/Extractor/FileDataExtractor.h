@@ -2,7 +2,6 @@
 #define __FILEDATAEXTRACTOR_H__
 
 #include "Extractor/Data/FileData.h"
-#include "Extractor/Data/PreProcessorResult.h"
 #include "Extractor/ExtractorSettings.h"
 #include "Threading/IRunnable.h"
 

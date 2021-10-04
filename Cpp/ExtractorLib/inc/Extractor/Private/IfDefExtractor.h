@@ -22,7 +22,7 @@ namespace Extractor {
         const std::unordered_map<std::string, std::string>* m_KnownDefines;
         // u32 m_MatchedIfDef{0};
         std::set<u8> m_MatchedLevels{};
-        u32 m_DefineDepth{0};
+        u8 m_DefineDepth{0};
         std::istream* m_Stream{nullptr};
 
         void SkipBody(std::string& line);
