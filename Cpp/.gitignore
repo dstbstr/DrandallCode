@@ -8,3 +8,4 @@
 **/.vs/*
 **/c_cpp_properties.json
 *.csv
+*.xlsx

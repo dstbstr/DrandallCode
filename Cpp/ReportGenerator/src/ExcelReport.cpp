@@ -8,6 +8,21 @@
 namespace {
     using namespace OpenXLSX;
 
+    bool IsDetailed(const std::vector<Extractor::FileData>& files) {
+        for(const auto& file: files) {
+            if(file.Types.size() > 0) {
+                return true;
+            }
+            if(file.FreeFunctions.size() > 0) {
+                return true;
+            }
+            if(file.FreeOperatorOverloads.size() > 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
     static const std::vector<std::string> FunctionHeaders =
         {"FilePath", "FileName", "Line Count", "Namespace", "Class Name", "Function Name", "Visibility", "Airity", "Default Parameters", "Abstract", "Const", "Explicit", "Inline", "Static", "Templated", "Virtual", "Friend"};
     static bool FunctionHeaderAdded = false;
@@ -215,21 +230,25 @@ namespace Report {
         auto includes = wb.worksheet("Sheet1");
         includes.setName("Includes");
         auto files = AddWorksheet(wb, "Files");
-        auto types = AddWorksheet(wb, "Types");
-        auto functions = AddWorksheet(wb, "Functions");
+        std::unique_ptr<XLWorksheet> types = nullptr;
+        std::unique_ptr<XLWorksheet> functions = nullptr;
+        if(IsDetailed(m_FileData)) {
+            types = std::make_unique<XLWorksheet>(AddWorksheet(wb, "Types"));
+            functions = std::make_unique<XLWorksheet>(AddWorksheet(wb, "Functions"));
+        }
 
         for(const auto& file: m_FileData) {
             AppendIncludeData(includes, file);
             AppendFileData(files, file);
 
             for(const auto& freeFunc: file.FreeFunctions) {
-                AppendFunctionData(functions, freeFunc, file.FilePath, file.FileName);
+                AppendFunctionData(*functions, freeFunc, file.FilePath, file.FileName);
             }
             for(const auto& freeOp: file.FreeOperatorOverloads) {
-                AppendFunctionData(functions, freeOp, file.FilePath, file.FileName);
+                AppendFunctionData(*functions, freeOp, file.FilePath, file.FileName);
             }
             for(const auto& type: file.Types) {
-                AppendTypeData(types, functions, type, file.FilePath);
+                AppendTypeData(*types, *functions, type, file.FilePath);
             }
         }
 

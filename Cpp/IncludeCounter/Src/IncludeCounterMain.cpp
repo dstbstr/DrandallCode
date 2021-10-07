@@ -4,7 +4,6 @@
 #include "Extractor/FilePreProcessor.h"
 #include "Extractor/Workers/IncludeMapGenerator.h"
 #include "IncludeArgParse.h"
-#include "IncludeReport.h"
 #include "Instrumentation/LogWriter/StdOutLogWriter.h"
 #include "Report/CsvReport.h"
 #include "Report/ExcelReport.h"
@@ -73,19 +72,19 @@ int main(int argc, char* argv[]) {
 
         Threading::ExpectedRunTime expectedRunTime = jobs.size() < 100 ? Threading::ExpectedRunTime::MILLISECONDS : Threading::ExpectedRunTime::SECONDS;
         std::vector<FileData> files = Runner::Get().RunAll(expectedRunTime, jobs);
-        IncludeMapGenerator(files).Generate();
-        // IncludeReport report(files);
-        // Report::CsvReport report(files);
-        Report::ExcelReport report(files);
+        auto includeMap = GenerateIncludeMap(files);
 
+        for(auto& file: files) {
+            file.TotalIncludeCount = includeMap.Dependencies[file.FileName].size();
+            file.IncludedByCount = includeMap.DependsOnMe[file.FileName].size();
+            file.TotalLineCount = file.LineCount;
+            for(const auto& include: includeMap.Dependencies[file.FileName]) {
+                file.TotalLineCount += includeMap.LineCounts[include];
+            }
+        }
+
+        Report::ExcelReport report(files);
         report.WriteReport(GetFilePrefix(argParse.GetTargetFile()));
-        /*
-                if(argParse.GetTargetFile().empty()) {
-                    report.WriteReportToStream(std::cout);
-                } else {
-                    report.WriteReport(argParse.GetTargetFile());
-                }
-                */
 
         return 0;
     } catch(std::exception& err) {
