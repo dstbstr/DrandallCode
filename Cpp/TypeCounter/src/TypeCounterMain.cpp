@@ -79,15 +79,9 @@ int main(int argc, char* argv[]) {
 
         auto files = GatherFileData(fileNames, defines);
 
-        // auto reports = GenerateReports(files, argParse.RunFunctionReport(), argParse.RunTypeReport());
-
-        std::string filePrefix = GetFilePrefix(argParse.GetTargetFile());
-
-        // WriteReport(reports, filePrefix);
-
         auto report = Report::ExcelReport(files);
 
-        report.WriteReport(filePrefix);
+        report.WriteReport(GetFilePrefix(argParse.GetTargetFile()));
 
         return 0;
     } catch(std::exception& err) {

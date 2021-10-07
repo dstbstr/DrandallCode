@@ -1,79 +1,51 @@
 #include "Extractor/Workers/IncludeMapGenerator.h"
 
-#include "Platform/Types.h"
 #include "Utilities/PathUtils.h"
-#include "Utilities/Require.h"
 #include "Utilities/ScopedTimer.h"
-#include "Utilities/StringUtils.h"
 
-#include <string>
-#include <unordered_map>
-#include <unordered_set>
+namespace {
+    void Recurse(const std::string& fileName, const std::unordered_map<std::string, const Extractor::FileData*>& firstParty, Extractor::IncludeMap& result) {
+        if(result.Dependencies.find(fileName) != result.Dependencies.end()) {
+            return; // already processed
+        }
+
+        result.Dependencies.emplace(fileName, std::unordered_set<std::string>{});
+        result.DependsOnMe.emplace(fileName, std::unordered_set<std::string>{});
+        result.LineCounts.emplace(fileName, 0);
+
+        if(firstParty.find(fileName) == firstParty.end()) {
+            return; // Third party
+        }
+        const auto& file = firstParty.at(fileName);
+        result.LineCounts[fileName] = file->LineCount;
+        for(const auto& includePath: file->IncludeFiles) {
+            auto include = PathUtils::GetFileName(includePath);
+            Recurse(include, firstParty, result);
+
+            result.Dependencies[fileName].insert(include);
+            result.Dependencies[fileName].insert(result.Dependencies[include].begin(), result.Dependencies[include].end());
+
+            for(const auto& dep: result.Dependencies[fileName]) {
+                result.DependsOnMe[dep].insert(fileName);
+            }
+        }
+    }
+} // namespace
 
 namespace Extractor {
-    static std::vector<std::string> CircDepPath{};
-
-    static void RecurseIncludes(FileData& file,
-                                std::unordered_map<std::string, std::unordered_set<std::string>>& resolved,
-                                std::unordered_map<std::string, FileData*>& knownIncludes,
-                                std::unordered_set<std::string>& currentPaths,
-                                bool failOnCircularDependencies) {
-        if(resolved.find(file.FileName) != resolved.end()) {
-            return;
-        }
-
-        std::unordered_set<std::string> allDependencies;
-
-        for(auto&& include: file.IncludeFiles) {
-            auto fileName = PathUtils::GetFileName(include);
-            allDependencies.insert(fileName);
-            if(resolved.find(fileName) != resolved.end()) {
-                auto dependencies = resolved[fileName];
-                allDependencies.insert(dependencies.begin(), dependencies.end());
-            } else if(knownIncludes.find(fileName) == knownIncludes.end()) {
-                resolved[fileName] = std::unordered_set<std::string>{}; // Assume all system dependencies have no transitive dependencies
-            } else {
-                bool circularDependency = currentPaths.find(file.FileName) != currentPaths.end();
-                if(circularDependency) {
-                    if(failOnCircularDependencies) {
-                        CircDepPath.push_back(file.FileName);
-                        Require::False(circularDependency, StrUtil::Format("Circular dependency detected! %s", StrUtil::JoinVec(" -> ", CircDepPath)));
-                    }
-                } else {
-                    currentPaths.insert(file.FileName);
-                    CircDepPath.push_back(file.FileName);
-                    RecurseIncludes(*knownIncludes[fileName], resolved, knownIncludes, currentPaths, failOnCircularDependencies);
-                    allDependencies.insert(resolved[fileName].begin(), resolved[fileName].end());
-                    currentPaths.erase(file.FileName);
-                    CircDepPath.pop_back();
-                }
-            }
-        }
-
-        file.TotalIncludeCount = allDependencies.size();
-        file.TotalLineCount = file.LineCount;
-        for(auto&& dependency: allDependencies) {
-            if(knownIncludes.find(dependency) != knownIncludes.end()) {
-                knownIncludes[dependency]->IncludedByCount++;
-                file.TotalLineCount += knownIncludes[dependency]->LineCount;
-            }
-        }
-
-        resolved[file.FileName] = allDependencies;
-    }
-
-    void IncludeMapGenerator::Generate() {
+    IncludeMap GenerateIncludeMap(const std::vector<FileData>& files) {
         ScopedTimer timer("IncludeMapGenerator::Generate");
-        std::unordered_map<std::string, std::unordered_set<std::string>> resolved;
-        std::unordered_map<std::string, FileData*> knownIncludes;
-        std::unordered_set<std::string> currentPaths;
+        std::unordered_map<std::string, const FileData*> firstPartyIncludes;
 
-        for(auto&& file: m_Files) {
-            knownIncludes[file.FileName] = &file;
+        for(const auto& file: files) {
+            firstPartyIncludes[file.FileName] = &file;
         }
 
-        for(auto& file: m_Files) {
-            RecurseIncludes(file, resolved, knownIncludes, currentPaths, m_FailOnCircularDependencies);
+        IncludeMap result{};
+        for(const auto& file: files) {
+            Recurse(file.FileName, firstPartyIncludes, result);
         }
+
+        return result;
     }
 } // namespace Extractor

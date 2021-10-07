@@ -50,8 +50,11 @@ namespace Extractor {
                 ifdefExtractor.Extract(line);
             } else if(DefineExtractor::CanExtract(line)) {
                 const auto& [key, value] = DefineExtractor::Extract(line);
-                knownDefines[key] = value;
-                newDefines++;
+                // let's not add the header guard to known defines.  Otherwise our IfDefExtractor will skip the file on the second pass
+                if(key.find(includeGuardName) == key.npos) {
+                    knownDefines[key] = value;
+                    newDefines++;
+                }
             }
         }
     }
