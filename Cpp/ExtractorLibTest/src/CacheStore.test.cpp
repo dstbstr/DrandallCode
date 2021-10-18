@@ -54,8 +54,8 @@ namespace Extractor {
 
         auto result = RoundTrip();
 
-        ASSERT_EQ(result.DefineCache.FileDefines.size(), 1);
-        ASSERT_EQ(result.DefineCache.FileDefines[sourceFile.FilePath]["TEST"], "1");
+        ASSERT_EQ(result.Defines.size(), 1);
+        ASSERT_EQ(result.Defines[sourceFile.FilePath]["TEST"], "1");
     }
 
     TEST_F(CacheStoreTest, ReadCache_WithIncludeData_HasIncludeData) {
@@ -66,12 +66,11 @@ namespace Extractor {
 
         auto result = RoundTrip();
 
-        auto& includes = result.IncludeCache.FileIncludes;
-        ASSERT_EQ(includes.size(), 2);
-        ASSERT_NE(includes.at(sourceFile.FilePath).find(headerFile.FileName), includes.at(sourceFile.FilePath).end());
-        ASSERT_EQ(includes.at(headerFile.FilePath).size(), 0);
+        auto& includes = result.FileData.at(sourceFile.FilePath).IncludeFiles;
+        ASSERT_EQ(includes.size(), 1);
+        ASSERT_NE(includes.find(headerFile.FileName), includes.end());
 
-        auto& includedBy = result.IncludeCache.FileIncludedBy;
+        auto& includedBy = result.IncludedByMap;
         ASSERT_EQ(includedBy.size(), 2);
         ASSERT_NE(includedBy.at(headerFile.FilePath).find(sourceFile.FileName), includedBy.at(headerFile.FilePath).end());
         ASSERT_EQ(includedBy.at(sourceFile.FilePath).size(), 0);
