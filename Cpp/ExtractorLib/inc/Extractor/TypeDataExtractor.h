@@ -9,9 +9,11 @@
 #include <unordered_map>
 
 namespace Extractor {
+    struct DefineData;
+
     namespace TypeDataExtractor {
         bool IsAType(const std::string& line, std::smatch& outMatch);
-        TypeData Extract(const std::smatch& match, const std::string& fileName, const std::string& ns, const std::unordered_map<std::string, std::string>& knownDefines, std::istream& stream);
+        TypeData Extract(const std::smatch& match, const std::string& fileName, const std::string& ns, const DefineData& knownDefines, std::istream& stream);
     } // namespace TypeDataExtractor
 } // namespace Extractor
 #endif // __TYPEDATAEXTRACTOR_H__

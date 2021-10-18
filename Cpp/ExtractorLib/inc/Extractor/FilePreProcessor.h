@@ -8,6 +8,9 @@
 #include <vector>
 
 namespace Extractor {
+    struct DefineData;
+    struct CacheResult;
+    
     class FilePreProcessor {
     public:
         FilePreProcessor(std::string filePath, const std::unordered_map<std::string, std::string>& headerToFileMap) : m_FilePath(filePath), m_Stream(nullptr), m_HeaderToFileMap(&headerToFileMap) {}
@@ -15,7 +18,7 @@ namespace Extractor {
         FilePreProcessor(const FilePreProcessor&) = delete;
         FilePreProcessor& operator=(const FilePreProcessor&) = delete;
 
-        void Execute(std::unordered_map<std::string, std::string>& knownDefines, std::unordered_set<std::string>& processedFiles) const;
+        void Execute(const CacheResult& cache, DefineData& knownDefines, std::unordered_set<std::string>& processedFiles) const;
 
     private:
         std::string m_FilePath;

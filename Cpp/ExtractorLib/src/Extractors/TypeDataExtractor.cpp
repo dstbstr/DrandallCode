@@ -1,5 +1,6 @@
 #include "Extractor/TypeDataExtractor.h"
 
+#include "Extractor/Data/DefineData.h"
 #include "Extractor/FunctionDataExtractor.h"
 #include "Extractor/Private/BodyCount.h"
 #include "Extractor/Private/CommentExtractor.h"
@@ -76,7 +77,7 @@ namespace Extractor {
 
         // Should extract a type (class, struct, union, enum) from the provided stream (and initial line)
         // Would almost certainly break with something like class Foo{struct Bar{union Baz{};};}; (in a single line)
-        TypeData Extract(const std::smatch& match, const std::string& fileName, const std::string& ns, const std::unordered_map<std::string, std::string>& knownDefines, std::istream& stream) {
+        TypeData Extract(const std::smatch& match, const std::string& fileName, const std::string& ns, const DefineData& knownDefines, std::istream& stream) {
             // ScopedTimer timer("ExtractType: " + initialLine, ScopedTimer::TimeUnit::SECOND);
 
             auto result = GetTypeData(match, fileName);

@@ -1,5 +1,7 @@
 #include "Extractor/FilePreProcessor.h"
 
+#include "Extractor/Data/CacheResult.h"
+#include "Extractor/Data/DefineData.h"
 #include "Extractor/Private/DefineExtractor.h"
 #include "Extractor/Private/IfDefExtractor.h"
 #include "Extractor/Private/LineFetcher.h"
@@ -10,6 +12,7 @@
 #include "Utilities/Require.h"
 #include "Utilities/StringUtils.h"
 
+
 namespace {
     std::regex IncludeRegex("^#include [\"<]([^\">]+)[\">]$");
 
@@ -19,11 +22,21 @@ namespace {
 } // namespace
 
 namespace Extractor {
-    void FilePreProcessor::Execute(std::unordered_map<std::string, std::string>& knownDefines, std::unordered_set<std::string>& processedFiles) const {
+    void FilePreProcessor::Execute(const CacheResult& cache, DefineData& knownDefines, std::unordered_set<std::string>& processedFiles) const {
         if(processedFiles.find(m_FilePath) != processedFiles.end()) {
             return;
         }
         processedFiles.insert(m_FilePath);
+
+        const auto& cacheDefines = cache.DefineCache.FileDefines;
+        if(cacheDefines.find(m_FilePath) != cacheDefines.end()) {
+            knownDefines.Defines.insert(cacheDefines.at(m_FilePath).begin(), cacheDefines.at(m_FilePath).end());
+            for(const auto& [define, value]: cacheDefines.at(m_FilePath)) {
+                knownDefines.DefineSource[define] = m_FilePath;
+            }
+
+            return;
+        }
 
         const auto includeGuardName = GetIncludeGuardName(PathUtils::GetFileName(m_FilePath));
 
@@ -44,7 +57,7 @@ namespace Extractor {
                 if(m_HeaderToFileMap->find(lowerHeader) != m_HeaderToFileMap->end()) {
                     const auto includeFilePath = m_HeaderToFileMap->at(lowerHeader);
                     FilePreProcessor fpp{includeFilePath, *m_HeaderToFileMap};
-                    fpp.Execute(knownDefines, processedFiles);
+                    fpp.Execute(cache, knownDefines, processedFiles);
                 }
             } else if(ifdefExtractor.CanExtract(line)) {
                 ifdefExtractor.Extract(line);
@@ -52,7 +65,8 @@ namespace Extractor {
                 const auto& [key, value] = DefineExtractor::Extract(line);
                 // let's not add the header guard to known defines.  Otherwise our IfDefExtractor will skip the file on the second pass
                 if(key.find(includeGuardName) == key.npos) {
-                    knownDefines[key] = value;
+                    knownDefines.Defines[key] = value;
+                    knownDefines.DefineSource[key] = m_FilePath;
                     newDefines++;
                 }
             }

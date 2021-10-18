@@ -1,5 +1,6 @@
 #include "Extractor/Workers/IncludeMapGenerator.h"
 
+#include "Extractor/Data/FileData.h"
 #include "Utilities/PathUtils.h"
 #include "Utilities/ScopedTimer.h"
 

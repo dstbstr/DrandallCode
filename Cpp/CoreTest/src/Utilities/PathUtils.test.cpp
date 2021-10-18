@@ -2,49 +2,69 @@
 
 #include "TestCommon.h"
 
-TEST(PathUtilities, GetFileNameWithNoSeparatorsReturnsFileName) {
+TEST(GetFileName, WithNoSeparators_ReturnsFileName) {
     std::string path = "foo.txt";
     ASSERT_EQ(PathUtils::GetFileName(path), path);
 }
 
-TEST(PathUtilities, GetFileNameWithSingleForwardSlashReturnsFileName) {
+TEST(GetFileName, WithSingleForwardSlash_ReturnsFileName) {
     std::string path = "one/two.txt";
     ASSERT_EQ(PathUtils::GetFileName(path), "two.txt");
 }
 
-TEST(PathUtilities, GetFileNameWithSingleBackSlashReturnsFileName) {
+TEST(GetFileName, WithSingleBackSlash_ReturnsFileName) {
     std::string path = "one\\two.txt";
     ASSERT_EQ(PathUtils::GetFileName(path), "two.txt");
 }
 
-TEST(PathUtilities, GetFileNameFromBlankPathReturnsBlank) {
+TEST(GetFileName, FromBlankPath_ReturnsBlank) {
     std::string path = "";
     ASSERT_EQ(PathUtils::GetFileName(path), "");
 }
 
-TEST(PathUtilities, GetFileWithMultipleForwardSlashesReturnsFileName) {
+TEST(GetFileName, WithMultipleForwardSlashes_ReturnsFileName) {
     std::string path = "one/two/three.txt";
     ASSERT_EQ(PathUtils::GetFileName(path), "three.txt");
 }
 
-TEST(PathUtilities, GetFileWithMultipleBackSlashesReturnsFileName) {
+TEST(GetFileName, WithMultipleBackSlashes_ReturnsFileName) {
     std::string path = R"(one\two\three.txt)";
     ASSERT_EQ(PathUtils::GetFileName(path), "three.txt");
 }
 
-TEST(PathUtilities, GetFileFromDirectoryReturnsBlank) {
+TEST(GetFileName, FromDirectory_ReturnsBlank) {
     std::string path = "one/two/three/";
     ASSERT_EQ(PathUtils::GetFileName(path), "");
 }
 
-TEST(PathUtilities, GetFileFromRelativePathReturnsFileName) {
+TEST(GetFileName, FromRelativePath_ReturnsFileName) {
     std::string path = "/one/two.txt";
     ASSERT_EQ(PathUtils::GetFileName(path), "two.txt");
 }
 
-TEST(PathUtilities, GetFileWithoutExtensionReturnsFileName) {
+TEST(GetFileName, WithoutExtension_ReturnsFileName) {
     std::string path = "one/two/three";
     ASSERT_EQ(PathUtils::GetFileName(path), "three");
+}
+
+TEST(GetFileDirectory, WithDirectoryAndFile_ReturnsDirectory) {
+    std::string path = "one/two/three";
+    ASSERT_EQ(PathUtils::GetFileDirectory(path), "one/two/");
+}
+
+TEST(GetFileDirectory, FromRelativePath_ReturnsRelativePath) {
+    std::string path = "/one/two/three";
+    ASSERT_EQ(PathUtils::GetFileDirectory(path), "/one/two/");
+}
+
+TEST(GetFileDirectory, WithDirectory_ReturnsDirectory) {
+    std::string path = "one/two/three/";
+    ASSERT_EQ(PathUtils::GetFileDirectory(path), path);
+}
+
+TEST(GetFileDirectory, WithBackslashes_ReturnsDirectory) {
+    std::string path = "one\\two\\three";
+    ASSERT_EQ(PathUtils::GetFileDirectory(path), "one\\two\\");
 }
 
 TEST(ContainsWildcard, WithStarReturnsTrue) {

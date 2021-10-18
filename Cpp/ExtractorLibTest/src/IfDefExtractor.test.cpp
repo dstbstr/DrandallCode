@@ -1,5 +1,6 @@
 #include "Extractor/Private/IfDefExtractor.h"
 
+#include "Extractor/Data/DefineData.h"
 #include "Extractor/Private/LineFetcher.h"
 #include "TestCommon.h"
 
@@ -8,12 +9,12 @@
 #include <unordered_map>
 #include <vector>
 
-
 namespace Extractor {
     class IfDefExtractorTest : public ::testing::Test {
     protected:
         void SetUp() override {
             extractor = std::make_unique<IfDefExtractor>(m_KnownDefines, ss);
+            m_KnownDefines.Defines.emplace("IS_DEFINED", "1");
         }
 
         bool CanExtract() {
@@ -33,7 +34,7 @@ namespace Extractor {
         }
 
         std::stringstream ss;
-        std::unordered_map<std::string, std::string> m_KnownDefines{{"IS_DEFINED", "1"}};
+        DefineData m_KnownDefines;
         std::unique_ptr<IfDefExtractor> extractor{nullptr};
     };
 

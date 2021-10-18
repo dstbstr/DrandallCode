@@ -10,6 +10,15 @@ namespace PathUtils {
         return pathOrFile.substr(lastSeparator + 1);
     }
 
+    std::string GetFileDirectory(const std::string& pathToFile) {
+        auto lastSeparator = pathToFile.find_last_of("/\\");
+        if(lastSeparator == pathToFile.npos) {
+            return "";
+        }
+
+        return pathToFile.substr(0, lastSeparator + 1);
+    }
+
     bool PathContainsWildcard(const std::string& path) {
         return path.find_last_of("*?") != path.npos;
     }
