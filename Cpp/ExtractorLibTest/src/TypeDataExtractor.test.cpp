@@ -1,5 +1,6 @@
 #include "Extractor/TypeDataExtractor.h"
 
+#include "Extractor/Data/DefineData.h"
 #include "Extractor/Private/LineFetcher.h"
 #include "TestCommon.h"
 #include "Utilities/StringUtils.h"
@@ -166,7 +167,8 @@ namespace Extractor {
 
         TypeData Extract() {
             std::string line;
-            std::unordered_map<std::string, std::string> knownDefines{{"IS_DEFINED", "1"}};
+            auto knownDefines = DefineData{};
+            knownDefines.Defines.emplace("IS_DEFINED", "1");
             LineFetcher::GetNextLine(ss, line);
             std::smatch match;
             IsAType(line, match);

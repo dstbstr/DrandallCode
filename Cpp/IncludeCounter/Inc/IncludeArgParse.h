@@ -1,5 +1,6 @@
-#ifndef __ARGPARSE_H__
-#define __ARGPARSE_H__
+#ifndef __INCLUDEARGPARSE_H__
+#define __INCLUDEARGPARSE_H__
+
 #include "CommandParser/Option.h"
 #include "CommandParser/OptionCollection.h"
 
@@ -32,4 +33,4 @@ namespace IncludeCounter {
         CommandParser::OptionCollection m_Options{"Produces a report about the number of includes"};
     };
 } // namespace IncludeCounter
-#endif // __ARGPARSE_H__
+#endif // __INCLUDEARGPARSE_H__

@@ -8,17 +8,21 @@
 #include <unordered_map>
 
 namespace Extractor {
+    struct DefineData;
+    struct CacheResult;
+
     class FileDataExtractor : public IRunnable<FileData> {
     public:
-        FileDataExtractor(std::string filePath, const std::unordered_map<std::string, std::string>& defines, ExtractorSettings settings) : m_FilePath(filePath), m_Defines(&defines), m_Settings(settings) {}
+        FileDataExtractor(std::string filePath, const CacheResult& cache, const DefineData& defines, ExtractorSettings settings) : m_FilePath(filePath), m_Cache(&cache), m_Defines(&defines), m_Settings(settings) {}
         FileDataExtractor(const FileDataExtractor&) = delete;
         FileDataExtractor& operator=(const FileDataExtractor&) = delete;
 
-        FileData Execute() const;
+        FileData Execute() const override;
 
     private:
         std::string m_FilePath;
-        const std::unordered_map<std::string, std::string>* m_Defines;
+        const DefineData* m_Defines;
+        const CacheResult* m_Cache;
         ExtractorSettings m_Settings;
     };
 

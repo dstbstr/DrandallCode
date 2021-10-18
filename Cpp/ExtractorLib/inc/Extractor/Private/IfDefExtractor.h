@@ -9,9 +9,11 @@
 #include <unordered_map>
 
 namespace Extractor {
+    struct DefineData;
+
     class IfDefExtractor {
     public:
-        IfDefExtractor(const std::unordered_map<std::string, std::string>& knownDefines, std::istream& stream) : m_KnownDefines(&knownDefines), m_Stream(&stream) {}
+        IfDefExtractor(const DefineData& knownDefines, std::istream& stream) : m_KnownDefines(&knownDefines), m_Stream(&stream) {}
         IfDefExtractor(const IfDefExtractor& other) = delete;
         IfDefExtractor operator=(const IfDefExtractor& other) = delete;
 
@@ -19,8 +21,7 @@ namespace Extractor {
         void Extract(std::string& line);
 
     private:
-        const std::unordered_map<std::string, std::string>* m_KnownDefines;
-        // u32 m_MatchedIfDef{0};
+        const DefineData* m_KnownDefines;
         std::set<u8> m_MatchedLevels{};
         u8 m_DefineDepth{0};
         std::istream* m_Stream{nullptr};

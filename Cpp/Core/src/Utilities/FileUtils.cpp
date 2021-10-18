@@ -13,4 +13,8 @@ namespace FileUtils {
     std::unique_ptr<std::istream> OpenForRead(const std::string_view filePath) {
         return std::make_unique<std::ifstream>(filePath, std::ifstream::in);
     }
+
+    std::unique_ptr<std::ostream> OpenForWrite(const std::string_view filePath) {
+        return std::make_unique<std::ofstream>(filePath, std::ifstream::out | std::ifstream::trunc);
+    }
 } // namespace FileUtils

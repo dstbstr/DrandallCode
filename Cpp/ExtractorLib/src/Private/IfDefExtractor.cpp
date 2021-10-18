@@ -1,5 +1,6 @@
 #include "Extractor/Private/IfDefExtractor.h"
 
+#include "Extractor/Data/DefineData.h"
 #include "Extractor/Private/LineFetcher.h"
 #include "Instrumentation/Log.h"
 #include "Utilities/ExpressionEvaluator.h"
@@ -55,21 +56,21 @@ namespace Extractor {
             if(str.find("==") != str.npos) {
                 auto split = StrUtil::Split(str, "==");
                 auto key = std::string(split[0]);
-                if(m_KnownDefines->find(key) == m_KnownDefines->end()) {
+                if(m_KnownDefines->Defines.find(key) == m_KnownDefines->Defines.end()) {
                     return false;
                 }
-                return m_KnownDefines->at(key).compare(split[1]) == 0;
+                return m_KnownDefines->Defines.at(key).compare(split[1]) == 0;
             } else if(str.find("!=") != str.npos) {
                 auto split = StrUtil::Split(str, "!=");
                 auto key = std::string(split[0]);
-                if(m_KnownDefines->find(key) == m_KnownDefines->end()) {
+                if(m_KnownDefines->Defines.find(key) == m_KnownDefines->Defines.end()) {
                     return true;
                 }
 
-                return m_KnownDefines->at(key).compare(split[1]) != 0;
+                return m_KnownDefines->Defines.at(key).compare(split[1]) != 0;
             }
 
-            return m_KnownDefines->find(str) != m_KnownDefines->end();
+            return m_KnownDefines->Defines.find(str) != m_KnownDefines->Defines.end();
         });
         if(matches) {
             m_MatchedLevels.insert(m_DefineDepth);

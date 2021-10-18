@@ -1,3 +1,6 @@
+#include "Extractor/Cache/CachePurge.h"
+#include "Extractor/Cache/CacheStore.h"
+#include "Extractor/Data/DefineData.h"
 #include "Extractor/Data/FileData.h"
 #include "Extractor/ExtractorSettings.h"
 #include "Extractor/FileDataExtractor.h"
@@ -34,19 +37,29 @@ namespace {
         return result;
     }
 
-    void PreProcessFiles(const std::vector<std::string>& filePaths, std::unordered_map<std::string, std::string>& defines) {
+    DefineData BuildDefineData(const std::unordered_map<std::string, std::string>& userDefines) {
+        DefineData result;
+        result.Defines.insert(userDefines.begin(), userDefines.end());
+        for(const auto& [define, value]: userDefines) {
+            result.DefineSource[define] = UserProvidedDefineName;
+        }
+
+        return result;
+    }
+
+    void PreProcessFiles(const std::vector<std::string>& filePaths, const CacheResult& cache, DefineData& defines) {
         auto headerMapping = GenerateHeaderFileMappings(filePaths);
         std::unordered_set<std::string> processedFiles{};
 
         for(const auto& filePath: filePaths) {
             FilePreProcessor fpp{filePath, headerMapping};
-            fpp.Execute(defines, processedFiles);
+            fpp.Execute(cache, defines, processedFiles);
         }
     }
 
     std::string GetFilePrefix(std::string targetFileOption) {
         if(targetFileOption.empty()) {
-            return TimeUtils::TodayNowToString("%Y_%m_%d_%H_%M_%S");
+            return TimeUtils::TodayNowLocalToString("%Y_%m_%d_%H_%M_%S");
         } else {
             return targetFileOption;
         }
@@ -62,12 +75,16 @@ int main(int argc, char* argv[]) {
             return 0;
         }
         auto fileNames = argParse.GetFileNames();
-        auto defines = argParse.GetDefines();
-        PreProcessFiles(fileNames, defines);
+        auto cacheStore = CacheStore("TestCache.txt");
+        auto cache = cacheStore.ReadCache();
+        Extractor::Cache::Purge(cache, fileNames);
+
+        auto defines = BuildDefineData(argParse.GetDefines()); // TODO: if user defines have changed, does that invalidate the cache?
+        PreProcessFiles(fileNames, cache, defines);
 
         std::vector<std::unique_ptr<IRunnable<FileData>>> jobs;
-        for(auto&& file: fileNames) {
-            jobs.push_back(std::move(std::make_unique<FileDataExtractor>(file, defines, Settings)));
+        for(const auto& file: fileNames) {
+            jobs.push_back(std::move(std::make_unique<FileDataExtractor>(file, cache, defines, Settings)));
         }
 
         Threading::ExpectedRunTime expectedRunTime = jobs.size() < 100 ? Threading::ExpectedRunTime::MILLISECONDS : Threading::ExpectedRunTime::SECONDS;
@@ -83,6 +100,7 @@ int main(int argc, char* argv[]) {
             }
         }
 
+        cacheStore.WriteCache(files, defines, includeMap);
         Report::ExcelReport report(files);
         report.WriteReport(GetFilePrefix(argParse.GetTargetFile()));
 

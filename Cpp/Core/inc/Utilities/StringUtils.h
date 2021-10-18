@@ -14,38 +14,40 @@
 #include <vector>
 
 namespace StrUtil {
-    template<typename T>
-    std::string JoinVec(std::string&& delimiter, std::vector<T>&& input) {
+    template<typename Collection>
+    std::string JoinVec(std::string&& delimiter, Collection&& input) {
         std::stringstream stream;
-        if(!input.empty()) {
-            stream << input[0];
-        }
-
-        for(u32 i = 1; i < input.size(); i++) {
-            stream << delimiter;
-            stream << input[i];
+        bool first = true;
+        for(auto it = input.begin(); it != input.end(); it++) {
+            if(first) {
+                first = false;
+            } else {
+                stream << delimiter;
+            }
+            stream << *it;
         }
 
         return stream.str();
     }
 
-    template<typename T>
-    std::string JoinVec(std::string&& delimiter, std::vector<T> const& input) {
+    template<typename Collection>
+    std::string JoinVec(std::string&& delimiter, Collection const& input) {
         std::stringstream stream;
-        if(!input.empty()) {
-            stream << input[0];
-        }
-
-        for(u32 i = 1; i < input.size(); i++) {
-            stream << delimiter;
-            stream << input[i];
+        bool first = true;
+        for(auto it = input.begin(); it != input.end(); it++) {
+            if(first) {
+                first = false;
+            } else {
+                stream << delimiter;
+            }
+            stream << *it;
         }
 
         return stream.str();
     }
 
-    template<typename T>
-    std::string JoinVec(char&& delimiter, std::vector<T> const& input) {
+    template<typename Collection>
+    std::string JoinVec(char&& delimiter, Collection const& input) {
         return JoinVec(std::string(1, delimiter), input);
     }
 

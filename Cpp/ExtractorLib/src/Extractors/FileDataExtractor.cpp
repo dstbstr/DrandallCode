@@ -1,5 +1,6 @@
 #include "Extractor/FileDataExtractor.h"
 
+#include "Extractor/Data/DefineData.h"
 #include "Extractor/Data/Visibility.h"
 #include "Extractor/FilePreProcessor.h"
 #include "Extractor/FunctionDataExtractor.h"

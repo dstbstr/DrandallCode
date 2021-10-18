@@ -1,3 +1,6 @@
+#include "Extractor/Cache/CachePurge.h"
+#include "Extractor/Cache/CacheStore.h"
+#include "Extractor/Data/DefineData.h"
 #include "Extractor/Data/FileData.h"
 #include "Extractor/ExtractorSettings.h"
 #include "Extractor/FileDataExtractor.h"
@@ -35,19 +38,29 @@ namespace {
         return result;
     }
 
-    void PreProcessFiles(const std::vector<std::string>& filePaths, std::unordered_map<std::string, std::string>& defines) {
+    DefineData BuildDefineData(const std::unordered_map<std::string, std::string>& userDefines) {
+        DefineData result;
+        result.Defines.insert(userDefines.begin(), userDefines.end());
+        for(const auto& [define, value]: userDefines) {
+            result.DefineSource[define] = "UserProvided";
+        }
+
+        return result;
+    }
+
+    void PreProcessFiles(const std::vector<std::string>& filePaths, const CacheResult& cache, DefineData& defines) {
         auto headerMapping = GenerateHeaderFileMappings(filePaths);
         std::unordered_set<std::string> processedFiles{};
 
         for(const auto& filePath: filePaths) {
             FilePreProcessor fpp{filePath, headerMapping};
-            fpp.Execute(defines, processedFiles);
+            fpp.Execute(cache, defines, processedFiles);
         }
     }
 
-    std::vector<FileData> GatherFileData(const std::vector<std::string>& fileNames, const std::unordered_map<std::string, std::string>& defines) {
+    std::vector<FileData> GatherFileData(const std::vector<std::string>& fileNames, const CacheResult& cache, const DefineData& defines) {
         std::vector<std::unique_ptr<IRunnable<FileData>>> jobs;
-        std::transform(fileNames.begin(), fileNames.end(), std::back_inserter(jobs), [&defines](const std::string& file) { return std::make_unique<FileDataExtractor>(file, defines, Settings); });
+        std::transform(fileNames.begin(), fileNames.end(), std::back_inserter(jobs), [&cache, &defines](const std::string& file) { return std::make_unique<FileDataExtractor>(file, cache, defines, Settings); });
 
         // large code bases tend to have bigger files which take longer to parse
         Threading::ExpectedRunTime expectedRuntime = jobs.size() < 100 ? Threading::ExpectedRunTime::MILLISECONDS : Threading::ExpectedRunTime::SECONDS;
@@ -56,7 +69,7 @@ namespace {
 
     std::string GetFilePrefix(std::string targetFileOption) {
         if(targetFileOption.empty()) {
-            return TimeUtils::TodayNowToString("%Y_%m_%d_%H_%M_%S");
+            return TimeUtils::TodayNowLocalToString("%Y_%m_%d_%H_%M_%S");
         } else {
             return targetFileOption;
         }
@@ -73,11 +86,16 @@ int main(int argc, char* argv[]) {
         }
         auto fileNames = argParse.GetFileNames();
         Require::NotEmpty(fileNames, "Did not locate any filenames");
-        auto defines = argParse.GetDefines();
 
-        PreProcessFiles(fileNames, defines);
+        auto cacheStore = CacheStore("TestCache.txt");
+        auto cache = cacheStore.ReadCache();
+        Extractor::Cache::Purge(cache, fileNames);
 
-        auto files = GatherFileData(fileNames, defines);
+        auto defines = BuildDefineData(argParse.GetDefines());
+
+        PreProcessFiles(fileNames, cache, defines);
+
+        auto files = GatherFileData(fileNames, cache, defines);
 
         auto report = Report::ExcelReport(files);
 

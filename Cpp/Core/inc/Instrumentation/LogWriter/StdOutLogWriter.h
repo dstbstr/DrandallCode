@@ -42,7 +42,7 @@ namespace Log {
             }
 
             if(entry.Level >= LogLevel::Error) {
-                *out << TimeUtils::DateTimeToString(entry.Timestamp);
+                *out << TimeUtils::DateTimeLocalToString(entry.Timestamp);
                 *out << StrUtil::Format(ErrorLineFormat, LogLevel::AsString(entry.Level), context.FileNameShort, context.LineNumber, context.FunctionName, entry.Message);
                 if(!event.StackTrace.empty()) {
                     *out << "\n\t";
