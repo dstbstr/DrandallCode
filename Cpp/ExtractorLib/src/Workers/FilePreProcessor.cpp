@@ -12,7 +12,6 @@
 #include "Utilities/Require.h"
 #include "Utilities/StringUtils.h"
 
-
 namespace {
     std::regex IncludeRegex("^#include [\"<]([^\">]+)[\">]$");
 
@@ -28,7 +27,7 @@ namespace Extractor {
         }
         processedFiles.insert(m_FilePath);
 
-        const auto& cacheDefines = cache.DefineCache.FileDefines;
+        const auto& cacheDefines = cache.Defines;
         if(cacheDefines.find(m_FilePath) != cacheDefines.end()) {
             knownDefines.Defines.insert(cacheDefines.at(m_FilePath).begin(), cacheDefines.at(m_FilePath).end());
             for(const auto& [define, value]: cacheDefines.at(m_FilePath)) {

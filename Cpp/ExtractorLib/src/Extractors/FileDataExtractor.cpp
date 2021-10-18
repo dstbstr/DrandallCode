@@ -1,5 +1,6 @@
 #include "Extractor/FileDataExtractor.h"
 
+#include "Extractor/Data/CacheResult.h"
 #include "Extractor/Data/DefineData.h"
 #include "Extractor/Data/Visibility.h"
 #include "Extractor/FilePreProcessor.h"
@@ -31,6 +32,22 @@ namespace Extractor {
         FileData result;
         result.FilePath = m_FilePath;
         result.FileName = PathUtils::GetFileName(m_FilePath);
+        bool isHeader = m_FilePath[m_FilePath.length() - 1] == 'h';
+
+        const FileData* cacheData = nullptr;
+        if(m_Cache->FileData.find(m_FilePath) != m_Cache->FileData.end()) {
+            cacheData = &m_Cache->FileData.at(m_FilePath);
+        }
+
+        if(cacheData) {
+            result.LineCount = cacheData->LineCount;
+            if(m_Settings.CountIncludes) {
+                result.IncludeFiles.insert(cacheData->IncludeFiles.begin(), cacheData->IncludeFiles.end());
+            }
+            if(!isHeader) { // we only process cpp files for includes, and we've collected that data from the cache
+                return result;
+            }
+        }
 
         std::ifstream stream(m_FilePath, std::ifstream::in);
         if(!stream.is_open()) {
@@ -39,7 +56,6 @@ namespace Extractor {
 
         std::string line;
         std::smatch match;
-        bool isHeader = m_FilePath[m_FilePath.length() - 1] == 'h';
         NamespaceExtractor namespaceExtractor;
         IfDefExtractor ifdefExtractor(*m_Defines, stream);
 
@@ -53,7 +69,7 @@ namespace Extractor {
             }
 
             if(std::regex_search(line, match, IncludeRegex)) {
-                if(m_Settings.CountIncludes) {
+                if(m_Settings.CountIncludes && !cacheData) {
                     result.IncludeFiles.insert(match[1]);
                 }
                 continue;
@@ -105,7 +121,9 @@ namespace Extractor {
             }
         }
 
-        result.LineCount = nonBlankLines;
+        if(!cacheData) {
+            result.LineCount = nonBlankLines;
+        }
         return result;
     }
 } // namespace Extractor

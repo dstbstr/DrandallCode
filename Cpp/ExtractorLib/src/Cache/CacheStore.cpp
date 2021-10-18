@@ -10,6 +10,7 @@
 #include "Utilities/TimeUtils.h"
 
 #include <algorithm>
+#include <charconv>
 #include <fstream>
 
 constexpr char TimeFormat[]{"%Y/%m/%d %H_%M_%S"};
@@ -57,8 +58,9 @@ namespace Extractor {
                 std::transform(definesBySource.at(file.FilePath).begin(), definesBySource.at(file.FilePath).end(), defineStrings.begin(), combiner);
                 stream << "Define" << CategorySeparator << file.FilePath << CategorySeparator << StrUtil::JoinVec(ValueSeparator, defineStrings) << "\n";
             }
-            stream << "Dependency" << CategorySeparator << file.FilePath << CategorySeparator << StrUtil::JoinVec(ValueSeparator, includes.Dependencies.at(file.FileName)) << "\n";
+            stream << "Dependency" << CategorySeparator << file.FilePath << CategorySeparator << StrUtil::JoinVec(ValueSeparator, file.IncludeFiles) << "\n";
             stream << "DependsOnMe" << CategorySeparator << file.FilePath << CategorySeparator << StrUtil::JoinVec(ValueSeparator, includes.DependsOnMe.at(file.FileName)) << "\n";
+            stream << "LineCount" << CategorySeparator << file.FilePath << CategorySeparator << file.LineCount << "\n";
         }
 
         m_OutStream.reset();
@@ -87,7 +89,7 @@ namespace Extractor {
                 auto cacheTime = TimeUtils::StringToTimePoint(std::string(split[1]), TimeFormat);
                 result.CacheTime = TimeUtils::SystemTimeToFileTime(cacheTime);
             } else if(split[0] == "Define") {
-                auto& defines = result.DefineCache.FileDefines;
+                auto& defines = result.Defines;
                 auto source = std::string(split[1]);
                 if(defines.find(source) == defines.end()) {
                     defines.emplace(source, std::unordered_map<std::string, std::string>{});
@@ -107,26 +109,37 @@ namespace Extractor {
                     }
                 }
             } else if(split[0] == "Dependency") {
-                auto& includes = result.IncludeCache.FileIncludes;
+                auto& fileData = result.FileData;
                 auto source = std::string(split[1]);
-
-                if(includes.find(source) == includes.end()) {
-                    includes.emplace(source, std::unordered_set<std::string>{});
+                if(fileData.find(source) == fileData.end()) {
+                    fileData.emplace(source, FileData{});
                 }
+
                 if(split.size() == 3) {
                     auto dependencies = StrUtil::Split(split[2], ValueSeparator);
-                    includes.at(source).insert(dependencies.begin(), dependencies.end());
+                    fileData.at(source).IncludeFiles.insert(dependencies.begin(), dependencies.end());
                 }
             } else if(split[0] == "DependsOnMe") {
-                auto& includeBy = result.IncludeCache.FileIncludedBy;
+                auto& includedBy = result.IncludedByMap;
                 auto source = std::string(split[1]);
-                if(includeBy.find(source) == includeBy.end()) {
-                    includeBy.emplace(source, std::unordered_set<std::string>{});
+                if(includedBy.find(source) == includedBy.end()) {
+                    includedBy.emplace(source, std::unordered_set<std::string>{});
+                }
+                if(split.size() == 3) {
+                    auto dependsOn = StrUtil::Split(split[2], ValueSeparator);
+                    includedBy.at(source).insert(dependsOn.begin(), dependsOn.end());
+                }
+            } else if(split[0] == "LineCount") {
+                auto& fileData = result.FileData;
+                auto source = std::string(split[1]);
+                if(fileData.find(source) == fileData.end()) {
+                    fileData.emplace(source, FileData{});
                 }
 
-                if(split.size() == 3) {
-                    auto dependencies = StrUtil::Split(split[2], ValueSeparator);
-                    includeBy.at(source).insert(dependencies.begin(), dependencies.end());
+                u64 lineCount;
+                auto statusCode = std::from_chars(split[2].data(), split[2].data() + split[2].size(), lineCount);
+                if(statusCode.ec == std::errc{}) {
+                    fileData.at(source).LineCount = lineCount;
                 }
             }
         }
