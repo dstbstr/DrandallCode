@@ -67,7 +67,6 @@ XLCellIterator::XLCellIterator(const XLCellRange& cellRange, XLIteratorLocation 
     : m_dataNode(std::make_unique<XMLNode>(*cellRange.m_dataNode)),
       m_topLeft(cellRange.m_topLeft),
       m_bottomRight(cellRange.m_bottomRight),
-      m_currentCell(),
       m_sharedStrings(cellRange.m_sharedStrings)
 {
     if (loc == XLIteratorLocation::End)
@@ -189,7 +188,7 @@ XLCellIterator::pointer XLCellIterator::operator->()
 /**
  * @details
  */
-bool XLCellIterator::operator==(const XLCellIterator& rhs)
+bool XLCellIterator::operator==(const XLCellIterator& rhs) const
 {
     if (m_currentCell && !rhs.m_currentCell)
         return false;
@@ -201,7 +200,7 @@ bool XLCellIterator::operator==(const XLCellIterator& rhs)
 /**
  * @details
  */
-bool XLCellIterator::operator!=(const XLCellIterator& rhs)
+bool XLCellIterator::operator!=(const XLCellIterator& rhs) const
 {
     return !(*this == rhs);
 }

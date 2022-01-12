@@ -2,7 +2,6 @@
 
 #include "CommandParser/CommandSplitter.h"
 #include "Extractor/Workers/DefineFileParser.h"
-#include "Extractor/Workers/FileNameCollector.h"
 #include "Utilities/FileUtils.h"
 #include "Utilities/Require.h"
 #include "Utilities/ScopedTimer.h"
@@ -34,7 +33,7 @@ namespace TypeCounter {
             targets.push_back(std::filesystem::current_path().string());
         }
 
-        Extractor::FileNameCollector fnc{targets, std::vector<std::string>{".h"}, m_RecurseFlag.IsPopulated()};
+        FileUtils::FileNameCollector fnc{targets, std::vector<std::string>{".h"}, m_RecurseFlag.IsPopulated()};
         return fnc.GetAllFullyQualifiedPaths();
     }
 

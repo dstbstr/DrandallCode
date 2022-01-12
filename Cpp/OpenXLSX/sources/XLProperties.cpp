@@ -84,13 +84,17 @@ namespace
  */
 XLProperties::XLProperties(XLXmlData* xmlData) : XLXmlFile(xmlData) {}
 
+/**
+ * @details
+ */
 XLProperties::~XLProperties() = default;
 
 /**
  * @details
  */
-bool XLProperties::setProperty(const std::string& name, const std::string& value)
+void XLProperties::setProperty(const std::string& name, const std::string& value)
 {
+    if (!m_xmlData) return;
     XMLNode node;
     if (xmlDocument().first_child().child(name.c_str()) != nullptr)
         node = xmlDocument().first_child().child(name.c_str());
@@ -98,23 +102,22 @@ bool XLProperties::setProperty(const std::string& name, const std::string& value
         node = xmlDocument().first_child().prepend_child(name.c_str());
 
     node.text().set(value.c_str());
-    return true;
 }
 
 /**
  * @details
  */
-bool XLProperties::setProperty(const std::string& name, int value)
+void XLProperties::setProperty(const std::string& name, int value)
 {
-    return setProperty(name, std::to_string(value));
+    setProperty(name, std::to_string(value));
 }
 
 /**
  * @details
  */
-bool XLProperties::setProperty(const std::string& name, double value)
+void XLProperties::setProperty(const std::string& name, double value)
 {
-    return setProperty(name, std::to_string(value));
+    setProperty(name, std::to_string(value));
 }
 
 /**
@@ -122,6 +125,7 @@ bool XLProperties::setProperty(const std::string& name, double value)
  */
 std::string XLProperties::property(const std::string& name) const
 {
+    if (!m_xmlData) return "";
     auto property = xmlDocument().first_child().child(name.c_str());
     if (!property) {
         property = xmlDocument().first_child().append_child(name.c_str());
@@ -135,6 +139,7 @@ std::string XLProperties::property(const std::string& name) const
  */
 void XLProperties::deleteProperty(const std::string& name)
 {
+    if (!m_xmlData) return;
     auto property = xmlDocument().first_child().child(name.c_str());
     if (property != nullptr) xmlDocument().first_child().remove_child(property);
 }
@@ -154,6 +159,7 @@ XLAppProperties::~XLAppProperties() = default;
  */
 void XLAppProperties::addSheetName(const std::string& title)
 {
+    if (!m_xmlData) return;
     auto theNode = sheetNames(xmlDocument().document_element()).append_child("vt:lpstr");
     theNode.text().set(title.c_str());
     sheetCount(xmlDocument().document_element()).set_value(sheetCount(xmlDocument().document_element()).as_uint() + 1);
@@ -164,6 +170,7 @@ void XLAppProperties::addSheetName(const std::string& title)
  */
 void XLAppProperties::deleteSheetName(const std::string& title)
 {
+    if (!m_xmlData) return;
     for (auto& iter : sheetNames(xmlDocument().document_element()).children()) {
         if (iter.child_value() == title) {
             sheetNames(xmlDocument().document_element()).remove_child(iter);
@@ -178,6 +185,7 @@ void XLAppProperties::deleteSheetName(const std::string& title)
  */
 void XLAppProperties::setSheetName(const std::string& oldTitle, const std::string& newTitle)
 {
+    if (!m_xmlData) return;
     for (auto& iter : sheetNames(xmlDocument().document_element())) {
         if (iter.child_value() == oldTitle) {
             iter.text().set(newTitle.c_str());
@@ -191,6 +199,7 @@ void XLAppProperties::setSheetName(const std::string& oldTitle, const std::strin
  */
 void XLAppProperties::addHeadingPair(const std::string& name, int value)
 {
+    if (!m_xmlData) return;
     for (auto& item : headingPairsCategories(xmlDocument().document_element()).children()) {
         if (item.child_value() == name) return;
     }
@@ -211,6 +220,7 @@ void XLAppProperties::addHeadingPair(const std::string& name, int value)
  */
 void XLAppProperties::deleteHeadingPair(const std::string& name)
 {
+    if (!m_xmlData) return;
     auto category = headingPairsCategories(xmlDocument().document_element()).begin();
     auto count    = headingPairsCounts(xmlDocument().document_element()).begin();
     while (category != headingPairsCategories(xmlDocument().document_element()).end() &&
@@ -231,6 +241,7 @@ void XLAppProperties::deleteHeadingPair(const std::string& name)
  */
 void XLAppProperties::setHeadingPair(const std::string& name, int newValue)
 {
+    if (!m_xmlData) return;
     auto category = headingPairsCategories(xmlDocument().document_element()).begin();
     auto count    = headingPairsCounts(xmlDocument().document_element()).begin();
     while (category != headingPairsCategories(xmlDocument().document_element()).end() &&
@@ -248,12 +259,12 @@ void XLAppProperties::setHeadingPair(const std::string& name, int newValue)
 /**
  * @details
  */
-bool XLAppProperties::setProperty(const std::string& name, const std::string& value)
+void XLAppProperties::setProperty(const std::string& name, const std::string& value)
 {
+    if (!m_xmlData) return;
     auto property = xmlDocument().first_child().child(name.c_str());
     if (!property) xmlDocument().first_child().append_child(name.c_str());
     property.text().set(value.c_str());
-    return true;
 }
 
 /**
@@ -261,6 +272,7 @@ bool XLAppProperties::setProperty(const std::string& name, const std::string& va
  */
 std::string XLAppProperties::property(const std::string& name) const
 {
+    if (!m_xmlData) return "";
     auto property = xmlDocument().first_child().child(name.c_str());
     if (!property) xmlDocument().first_child().append_child(name.c_str());
 
@@ -272,6 +284,7 @@ std::string XLAppProperties::property(const std::string& name) const
  */
 void XLAppProperties::deleteProperty(const std::string& name)
 {
+    if (!m_xmlData) return;
     auto property = xmlDocument().first_child().child(name.c_str());
     if (!property) return;
 
@@ -283,6 +296,7 @@ void XLAppProperties::deleteProperty(const std::string& name)
  */
 void XLAppProperties::appendSheetName(const std::string& sheetName)
 {
+    if (!m_xmlData) return;
     auto theNode = sheetNames(xmlDocument().document_element()).append_child("vt:lpstr");
     theNode.text().set(sheetName.c_str());
     sheetCount(xmlDocument().document_element()).set_value(sheetCount(xmlDocument().document_element()).as_uint() + 1);
@@ -293,6 +307,7 @@ void XLAppProperties::appendSheetName(const std::string& sheetName)
  */
 void XLAppProperties::prependSheetName(const std::string& sheetName)
 {
+    if (!m_xmlData) return;
     auto theNode = sheetNames(xmlDocument().document_element()).prepend_child("vt:lpstr");
     theNode.text().set(sheetName.c_str());
     sheetCount(xmlDocument().document_element()).set_value(sheetCount(xmlDocument().document_element()).as_uint() + 1);
@@ -303,6 +318,7 @@ void XLAppProperties::prependSheetName(const std::string& sheetName)
  */
 void XLAppProperties::insertSheetName(const std::string& sheetName, unsigned int index)
 {
+    if (!m_xmlData) return;
     if (index <= 1) {
         prependSheetName(sheetName);
         return;

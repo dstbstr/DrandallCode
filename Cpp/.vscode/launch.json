@@ -44,6 +44,25 @@
             "console": "externalTerminal"
         },
         {
+            "name": "TodoManager",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/bin/Debug/TodoManager.exe",
+            "args": [
+                "-r",
+                "CommandParser",
+                "Core",
+                "ExtractorLib",
+                "IncludeCounter",
+                "ReportGenerator",
+                "TypeCounter"
+            ],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "console": "externalTerminal"
+        },
+        {
             "name": "(Windows) Run Tests: Core",
             "type": "cppvsdbg",
             "request": "launch",

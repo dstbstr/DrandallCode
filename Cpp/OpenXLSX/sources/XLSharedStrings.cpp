@@ -57,11 +57,13 @@ using namespace OpenXLSX;
  * @details Constructs a new XLSharedStrings object. Only one (common) object is allowed per XLDocument instance.
  * A filepath to the underlying XML file must be provided.
  */
-XLSharedStrings::XLSharedStrings(XLXmlData* xmlData) : XLXmlFile(xmlData)
+XLSharedStrings::XLSharedStrings(XLXmlData* xmlData, std::deque<std::string> *stringCache) : XLXmlFile(xmlData), m_stringCache(stringCache)
 {
-    for (const auto& str : xmlDocument().document_element().children()) m_stringCache.emplace_back(str.first_child().text().get());
 }
 
+/**
+ * @details
+ */
 XLSharedStrings::~XLSharedStrings() = default;
 
 /**
@@ -69,9 +71,9 @@ XLSharedStrings::~XLSharedStrings() = default;
  */
 int32_t XLSharedStrings::getStringIndex(const std::string& str) const
 {
-    auto iter = std::find_if(m_stringCache.begin(), m_stringCache.end(), [&](const std::string& s) { return str == s; });
+    auto iter = std::find_if(m_stringCache->begin(), m_stringCache->end(), [&](const std::string& s) { return str == s; });
 
-    return iter == m_stringCache.end() ? -1 : static_cast<int32_t>(std::distance(m_stringCache.begin(), iter));
+    return iter == m_stringCache->end() ? -1 : static_cast<int32_t>(std::distance(m_stringCache->begin(), iter));
 }
 
 /**
@@ -85,32 +87,9 @@ bool XLSharedStrings::stringExists(const std::string& str) const
 /**
  * @details
  */
-bool XLSharedStrings::stringExists(uint32_t index) const
-{
-    return index <= std::distance(m_stringCache.begin(), m_stringCache.end()) - 1;
-
-    //    return index <=
-    //           std::distance(xmlDocument().document_element().children().begin(), xmlDocument().document_element().children().end()) - 1;
-}
-
-/**
- * @details
- * @pre
- * @post
- * @throws
- */
 const char* XLSharedStrings::getString(uint32_t index) const
 {
-    return m_stringCache[index].c_str();
-
-    //    auto element = xmlDocument().document_element().first_child();
-    //    for (uint32_t current = 1; current < index; ++current) {
-    //    }
-    //
-    //    auto iter = xmlDocument().document_element().children().begin();
-    //    std::advance(iter, index);
-    //
-    //    return iter->first_child().text().get();
+    return (*m_stringCache)[index].c_str();
 }
 
 /**
@@ -123,21 +102,18 @@ int32_t XLSharedStrings::appendString(const std::string& str)
     if (str.front() == ' ' || str.back() == ' ') textNode.append_attribute("xml:space").set_value("preserve");
 
     textNode.text().set(str.c_str());
-    m_stringCache.emplace_back(textNode.text().get());
+    m_stringCache->emplace_back(textNode.text().get());
 
-    return static_cast<int32_t>(std::distance(m_stringCache.begin(), m_stringCache.end()) - 1);
-
-    //    return static_cast<int32_t>(
-    //        std::distance(xmlDocument().document_element().children().begin(), xmlDocument().document_element().children().end()) - 1);
+    return static_cast<int32_t>(std::distance(m_stringCache->begin(), m_stringCache->end()) - 1);
 }
 
 /**
  * @details Clear the string at the given index. This will affect the entire spreadsheet; everywhere the shared string
  * is used, it will be erased.
  */
-void XLSharedStrings::clearString(unsigned long index)
+void XLSharedStrings::clearString(uint64_t index)
 {
-    m_stringCache[index] = "";
+    (*m_stringCache)[index] = "";
     auto iter            = xmlDocument().document_element().children().begin();
     std::advance(iter, index);
     iter->text().set("");

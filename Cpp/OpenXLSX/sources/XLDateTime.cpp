@@ -4,7 +4,8 @@
 
 #include "XLDateTime.hpp"
 #include "XLException.hpp"
-#include <iostream>
+#include <string>
+#include <cmath>
 
 namespace {
 
@@ -81,7 +82,7 @@ namespace OpenXLSX
      * @details Constructor taking an Excel date/time serial number as an argument.
      */
     XLDateTime::XLDateTime(double serial) : m_serial(serial) {
-        if (serial < 1.0) throw XLDateTimeError("Excel date/time serial number is invalid (must be >= 1.0.");
+        if (serial < 1.0) throw XLDateTimeError("Excel date/time serial number is invalid (must be >= 1.0.)");
     }
 
     /**
@@ -117,6 +118,15 @@ namespace OpenXLSX
         // ===== Convert hour, minute and second to fraction of a full day.
         int32_t seconds = timepoint.tm_hour * 3600 + timepoint.tm_min * 60 + timepoint.tm_sec;
         m_serial += seconds / 86400.0;
+    }
+
+    /**
+     * @details Constructor taking a unixtime format (seconds since 1/1/1970) as an argument.
+     */
+    XLDateTime::XLDateTime(time_t unixtime) {
+        // There are 86400 seconds in a day
+        // There are 25569 days between 1/1/1970 and 30/12/1899 (the epoch used by Excel)
+        m_serial = static_cast<double>(unixtime) / 86400 + 25569;
     }
 
     /**
@@ -231,7 +241,7 @@ namespace OpenXLSX
         serial -= (result.tm_min / (24.0 * 60.0));
 
         // ===== Calculate the number of seconds.
-        result.tm_sec = static_cast<int>(serial * 24 * 60 * 60);
+        result.tm_sec = static_cast<int>(lround(serial * 24 * 60 * 60));
 
         return result;
     }

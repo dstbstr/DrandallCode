@@ -58,7 +58,6 @@ using namespace OpenXLSX;
  */
 XLCell::XLCell()
     : m_cellNode(nullptr),
-      m_sharedStrings(nullptr),
       m_valueProxy(XLCellValueProxy(this, m_cellNode.get())),
       m_formulaProxy(XLFormulaProxy(this, m_cellNode.get()))
 {}
@@ -69,7 +68,7 @@ XLCell::XLCell()
  * If a cell XMLNode does not exist (i.e., the cell is empty), use the relevant constructor to create an XLCell
  * from a XLCellReference parameter.
  */
-XLCell::XLCell(const XMLNode& cellNode, XLSharedStrings* sharedStrings)
+XLCell::XLCell(const XMLNode& cellNode, const XLSharedStrings& sharedStrings)
     : m_cellNode(std::make_unique<XMLNode>(cellNode)),
       m_sharedStrings(sharedStrings),
       m_valueProxy(XLCellValueProxy(this, m_cellNode.get())),
@@ -91,7 +90,7 @@ XLCell::XLCell(const XLCell& other)
  */
 XLCell::XLCell(XLCell&& other) noexcept
     : m_cellNode(std::move(other.m_cellNode)),
-      m_sharedStrings(other.m_sharedStrings),
+      m_sharedStrings(std::move(other.m_sharedStrings)),
       m_valueProxy(XLCellValueProxy(this, m_cellNode.get())),
       m_formulaProxy(XLFormulaProxy(this, m_cellNode.get()))
 {}
@@ -148,13 +147,13 @@ XLCellReference XLCell::cellReference() const
 /**
  * @details This function returns a const reference to the cell reference by the offset from the current one.
  */
-XLCell XLCell::offset(uint16_t rowoff, uint16_t coloff) const
+XLCell XLCell::offset(uint16_t rowOffset, uint16_t colOffset) const
 {
     if (!*this) throw XLInternalError("XLCell object has not been properly initiated.");
-    XLCellReference offsetRef(cellReference().row() + rowoff, cellReference().column() + coloff);
+    XLCellReference offsetRef(cellReference().row() + rowOffset, cellReference().column() + colOffset);
     auto            rownode  = getRowNode(m_cellNode->parent().parent(), offsetRef.row());
     auto            cellnode = getCellNode(rownode, offsetRef.column());
-    return XLCell(cellnode, m_sharedStrings);
+    return XLCell{cellnode, m_sharedStrings};
 }
 
 /**
