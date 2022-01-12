@@ -9,7 +9,6 @@
 #include "XLCell.hpp"
 #include "XLCellValue.hpp"
 #include "XLException.hpp"
-#include "XLSharedStrings.hpp"
 
 using namespace OpenXLSX;
 
@@ -64,7 +63,7 @@ XLCellValue& OpenXLSX::XLCellValue::operator=(OpenXLSX::XLCellValue&& other) noe
 XLCellValue& XLCellValue::clear()
 {
     m_type  = XLValueType::Empty;
-    m_value = "";
+    m_value = std::string("");
     return *this;
 }
 
@@ -76,7 +75,7 @@ XLCellValue& XLCellValue::clear()
 XLCellValue& XLCellValue::setError()
 {
     m_type  = XLValueType::Error;
-    m_value = "";
+    m_value = std::string("");
     return *this;
 }
 
@@ -244,34 +243,32 @@ XLValueType XLCellValueProxy::type() const
     if (!m_cellNode->attribute("t") && !m_cellNode->child("v")) return XLValueType::Empty;
 
     // ===== If a Type attribute is not present, but a value node is, the cell contains a number.
-    else if ((!m_cellNode->attribute("t") || (strcmp(m_cellNode->attribute("t").value(), "n") == 0 && m_cellNode->child("v") != nullptr))) {
+    if ((!m_cellNode->attribute("t") || (strcmp(m_cellNode->attribute("t").value(), "n") == 0 && m_cellNode->child("v") != nullptr))) {
         std::string numberString = m_cellNode->child("v").text().get();
         if (numberString.find('.') != std::string::npos || numberString.find("E-") != std::string::npos ||
             numberString.find("e-") != std::string::npos)
             return XLValueType::Float;
-        else
-            return XLValueType::Integer;
+        return XLValueType::Integer;
     }
 
     // ===== If the cell is of type "s", the cell contains a shared string.
-    else if (m_cellNode->attribute("t") != nullptr && strcmp(m_cellNode->attribute("t").value(), "s") == 0)
+    if (m_cellNode->attribute("t") != nullptr && strcmp(m_cellNode->attribute("t").value(), "s") == 0)
         return XLValueType::String;    // NOLINT
 
     // ===== If the cell is of type "inlineStr", the cell contains an inline string.
-    else if (m_cellNode->attribute("t") != nullptr && strcmp(m_cellNode->attribute("t").value(), "inlineStr") == 0)
+    if (m_cellNode->attribute("t") != nullptr && strcmp(m_cellNode->attribute("t").value(), "inlineStr") == 0)
         return XLValueType::String;
 
     // ===== If the cell is of type "str", the cell contains an ordinary string.
-    else if (m_cellNode->attribute("t") != nullptr && strcmp(m_cellNode->attribute("t").value(), "str") == 0)
+    if (m_cellNode->attribute("t") != nullptr && strcmp(m_cellNode->attribute("t").value(), "str") == 0)
         return XLValueType::String;
 
     // ===== If the cell is of type "b", the cell contains a boolean.
-    else if (m_cellNode->attribute("t") != nullptr && strcmp(m_cellNode->attribute("t").value(), "b") == 0)
+    if (m_cellNode->attribute("t") != nullptr && strcmp(m_cellNode->attribute("t").value(), "b") == 0)
         return XLValueType::Boolean;
 
     // ===== Otherwise, the cell contains an error.
-    else
-        return XLValueType::Error;    // the m_typeAttribute has the ValueAsString "e"
+    return XLValueType::Error;    // the m_typeAttribute has the ValueAsString "e"
 }
 
 /**
@@ -397,8 +394,8 @@ void XLCellValueProxy::setString(const char* stringValue)
     m_cellNode->attribute("t").set_value("s");
 
     // ===== Get or create the index in the XLSharedStrings object.
-    auto index = (m_cell->m_sharedStrings->stringExists(stringValue) ? m_cell->m_sharedStrings->getStringIndex(stringValue)
-                                                                     : m_cell->m_sharedStrings->appendString(stringValue));
+    auto index = (m_cell->m_sharedStrings.stringExists(stringValue) ? m_cell->m_sharedStrings.getStringIndex(stringValue)
+                                                                     : m_cell->m_sharedStrings.appendString(stringValue));
 
     // ===== Set the text of the value node.
     m_cellNode->child("v").text().set(index);
@@ -438,9 +435,11 @@ XLCellValue XLCellValueProxy::getValue() const
 
         case XLValueType::String:
             if (strcmp(m_cellNode->attribute("t").value(), "s") == 0)
-                return XLCellValue { m_cell->m_sharedStrings->getString(static_cast<uint32_t>(m_cellNode->child("v").text().as_ullong())) };
+                return XLCellValue { m_cell->m_sharedStrings.getString(static_cast<uint32_t>(m_cellNode->child("v").text().as_ullong())) };
             else if (strcmp(m_cellNode->attribute("t").value(), "str") == 0)
                 return XLCellValue { m_cellNode->child("v").text().get() };
+            else if (strcmp(m_cellNode->attribute("t").value(), "inlineStr") == 0)
+                return XLCellValue { m_cellNode->child("is").child("t").text().get() };
             else
                 throw XLInternalError("Unknown string type");
 

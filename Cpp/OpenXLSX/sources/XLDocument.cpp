@@ -47,7 +47,6 @@ YM      M9  MM    MM MM       MM    MM   d'  `MM.    MM            MM   d'  `MM.
 #include <nowide/fstream.hpp>
 #include <pugixml.hpp>
 #if defined(_WIN32)
-#    include <cstdio>
 #    include <random>
 #endif
 
@@ -55,7 +54,6 @@ YM      M9  MM    MM MM       MM    MM   d'  `MM.    MM            MM   d'  `MM.
 #include "XLContentTypes.hpp"
 #include "XLDocument.hpp"
 #include "XLSheet.hpp"
-#include "utilities/XLUtilities.hpp"
 
 using namespace OpenXLSX;
 
@@ -422,12 +420,6 @@ namespace
  * @details An alternative constructor, taking a std::string with the path to the .xlsx package as an argument.
  */
 XLDocument::XLDocument(const std::string& docPath)
-    : m_filePath(),
-      m_docRelationships(),
-      m_contentTypes(),
-      m_appProperties(),
-      m_coreProperties(),
-      m_workbook()
 {
     open(docPath);
 }
@@ -464,7 +456,8 @@ void XLDocument::open(const std::string& fileName)
     m_docRelationships = XLRelationships(getXmlData("_rels/.rels"));
     m_wbkRelationships = XLRelationships(getXmlData("xl/_rels/workbook.xml.rels"));
 
-    if (!m_archive.hasEntry("xl/sharedStrings.xml")) executeCommand(XLCommandAddSharedStrings());
+    if (!m_archive.hasEntry("xl/sharedStrings.xml"))
+        execCommand(XLCommand(XLCommandType::AddSharedStrings));
 
     // ===== Add remaining spreadsheet elements to the vector of XLXmlData objects.
     for (auto& item : m_contentTypes.getContentItems()) {
@@ -481,10 +474,25 @@ void XLDocument::open(const std::string& fileName)
                                 /* xmlType   */ item.type());
     }
 
+    for (const auto& node : getXmlData("xl/sharedStrings.xml")->getXmlDocument()->document_element().children()){
+        if (std::string(node.first_child().name()) == "r") {
+            std::string result;
+            for (const auto& elem : node.children())
+                result += elem.child("t").text().get();
+            m_sharedStringCache.emplace_back(result);
+        }
+
+        else
+            m_sharedStringCache.emplace_back(node.first_child().text().get());
+
+    }
+
+
     // ===== Open the workbook and document property items
-    m_coreProperties = XLProperties(getXmlData("docProps/core.xml"));
-    m_appProperties  = XLAppProperties(getXmlData("docProps/app.xml"));
-    m_sharedStrings  = XLSharedStrings(getXmlData("xl/sharedStrings.xml"));
+    // TODO: If property data doesn't exist, consider creating them, instead of ignoring it.
+    m_coreProperties = (hasXmlData("docProps/core.xml") ? XLProperties(getXmlData("docProps/core.xml")) : XLProperties());
+    m_appProperties  = (hasXmlData("docProps/app.xml") ? XLAppProperties(getXmlData("docProps/app.xml")) : XLAppProperties());
+    m_sharedStrings  = XLSharedStrings(getXmlData("xl/sharedStrings.xml"), &m_sharedStringCache);
     m_workbook       = XLWorkbook(getXmlData("xl/workbook.xml"));
 }
 
@@ -643,7 +651,7 @@ std::string XLDocument::property(XLProperty prop) const
  *
  * ```
  */
-void XLDocument::setProperty(XLProperty prop, const std::string& value)
+void XLDocument::setProperty(XLProperty prop, const std::string& value) // NOLINT
 {
     switch (prop) {
         case XLProperty::Application:
@@ -658,7 +666,7 @@ void XLDocument::setProperty(XLProperty prop, const std::string& value)
             }
 
             if (value.find('.') != std::string::npos) {
-                if (!value.substr(value.find('.') + 1).empty() && value.substr(value.find('.') + 1).size() <= 5) {
+                if (!value.substr(value.find('.') + 1).empty() && value.substr(value.find('.') + 1).size() <= 5) { // NOLINT
                     if (!value.substr(0, value.find('.')).empty() && value.substr(0, value.find('.')).size() <= 2) {
                         m_appProperties.setProperty("AppVersion", value);
                     }
@@ -762,9 +770,209 @@ void XLDocument::deleteProperty(XLProperty theProperty)
 /**
  * @details
  */
+void XLDocument::execCommand(const XLCommand& command) {
+
+    switch (command.type()) {
+        case XLCommandType::SetSheetName:
+            m_appProperties.setSheetName(command.getParam<std::string>("sheetName"), command.getParam<std::string>("newName"));
+            m_workbook.setSheetName(command.getParam<std::string>("sheetID"), command.getParam<std::string>("newName"));
+            break;
+
+        case XLCommandType::SetSheetColor:
+            // TODO: To be implemented
+            break;
+
+        case XLCommandType::SetSheetVisibility:
+            m_workbook.setSheetVisibility(command.getParam<std::string>("sheetID"), command.getParam<std::string>("sheetVisibility"));
+            break;
+
+        case XLCommandType::SetSheetIndex:
+            {
+                XLQuery qry(XLQueryType::QuerySheetName);
+                auto sheetName = execQuery(qry.setParam("sheetID", command.getParam<std::string>("sheetID"))).result<std::string>();
+                m_workbook.setSheetIndex(sheetName, command.getParam<uint16_t>("sheetIndex"));
+            }
+            break;
+
+        case XLCommandType::SetSheetActive:
+            m_workbook.setSheetActive(command.getParam<std::string>("sheetID"));
+            break;
+
+        case XLCommandType::ResetCalcChain:
+            {
+                m_archive.deleteEntry("xl/calcChain.xml");
+                auto item = std::find_if(m_data.begin(), m_data.end(), [&](const XLXmlData& item) {
+                    return item.getXmlPath() == "xl/calcChain.xml";
+                });
+
+                if (item != m_data.end()) m_data.erase(item);
+            }
+            break;
+        case XLCommandType::AddSharedStrings:
+            {
+                std::string sharedStrings {
+                    "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                    "<sst xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" count=\"1\" uniqueCount=\"1\">\n"
+                    "  <si>\n"
+                    "    <t/>\n"
+                    "  </si>\n"
+                    "</sst>"
+                };
+                m_contentTypes.addOverride("/xl/sharedStrings.xml", XLContentType::SharedStrings);
+                m_wbkRelationships.addRelationship(XLRelationshipType::SharedStrings, "sharedStrings.xml");
+                m_archive.addEntry("xl/sharedStrings.xml", sharedStrings);
+            }
+            break;
+        case XLCommandType::AddWorksheet:
+            {
+                std::string emptyWorksheet {
+                    "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n"
+                    "<worksheet xmlns=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\""
+                    " xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\""
+                    " xmlns:mc=\"http://schemas.openxmlformats.org/markup-compatibility/2006\" mc:Ignorable=\"x14ac\""
+                    " xmlns:x14ac=\"http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac\">"
+                    "<dimension ref=\"A1\"/>"
+                    "<sheetViews>"
+                    "<sheetView workbookViewId=\"0\"/>"
+                    "</sheetViews>"
+                    "<sheetFormatPr baseColWidth=\"10\" defaultRowHeight=\"16\" x14ac:dyDescent=\"0.2\"/>"
+                    "<sheetData/>"
+                    "<pageMargins left=\"0.7\" right=\"0.7\" top=\"0.75\" bottom=\"0.75\" header=\"0.3\" footer=\"0.3\"/>"
+                    "</worksheet>"
+                };
+                m_contentTypes.addOverride(command.getParam<std::string>("sheetPath"), XLContentType::Worksheet);
+                m_wbkRelationships.addRelationship(XLRelationshipType::Worksheet, command.getParam<std::string>("sheetPath").substr(4));
+                m_appProperties.appendSheetName(command.getParam<std::string>("sheetName"));
+                m_archive.addEntry(command.getParam<std::string>("sheetPath").substr(1), emptyWorksheet);
+                m_data.emplace_back(
+                    /* parentDoc */ this,
+                    /* xmlPath   */ command.getParam<std::string>("sheetPath").substr(1),
+                    /* xmlID     */ m_wbkRelationships.relationshipByTarget(command.getParam<std::string>("sheetPath").substr(4)).id(),
+                    /* xmlType   */ XLContentType::Worksheet);
+            }
+            break;
+        case XLCommandType::AddChartsheet:
+            // TODO: To be implemented
+            break;
+        case XLCommandType::DeleteSheet:
+        {
+            m_appProperties.deleteSheetName(command.getParam<std::string>("sheetName"));
+            auto sheetPath = "/xl/" + m_wbkRelationships.relationshipById(command.getParam<std::string>("sheetID")).target();
+            m_archive.deleteEntry(sheetPath.substr(1));
+            m_contentTypes.deleteOverride(sheetPath);
+            m_wbkRelationships.deleteRelationship(command.getParam<std::string>("sheetID"));
+            m_data.erase(std::find_if(m_data.begin(), m_data.end(), [&](const XLXmlData& item) {
+                return item.getXmlPath() == sheetPath.substr(1);
+            }));
+        }
+            break;
+        case XLCommandType::CloneSheet:
+        {
+            auto internalID = m_workbook.createInternalSheetID();
+            auto sheetPath  = "/xl/worksheets/sheet" + std::to_string(internalID) + ".xml";
+            if (m_workbook.sheetExists(command.getParam<std::string>("cloneName")))
+                throw XLInternalError("Sheet named \"" + command.getParam<std::string>("cloneName") + "\" already exists.");
+
+            if (m_wbkRelationships.relationshipById(command.getParam<std::string>("sheetID")).type() == XLRelationshipType::Worksheet) {
+                m_contentTypes.addOverride(sheetPath, XLContentType::Worksheet);
+                m_wbkRelationships.addRelationship(XLRelationshipType::Worksheet, sheetPath.substr(4));
+                m_appProperties.appendSheetName(command.getParam<std::string>("cloneName"));
+                m_archive.addEntry(sheetPath.substr(1), std::find_if(m_data.begin(), m_data.end(), [&](const XLXmlData& data) {
+                                                            return data.getXmlPath().substr(3) ==
+                                                                   m_wbkRelationships.relationshipById(command.getParam<std::string>
+                                                                       ("sheetID")).target();
+                                                        })->getRawData());
+                m_data.emplace_back(
+                    /* parentDoc */ this,
+                    /* xmlPath   */ sheetPath.substr(1),
+                    /* xmlID     */ m_wbkRelationships.relationshipByTarget(sheetPath.substr(4)).id(),
+                    /* xmlType   */ XLContentType::Worksheet);
+            }
+            else {
+                m_contentTypes.addOverride(sheetPath, XLContentType::Chartsheet);
+                m_wbkRelationships.addRelationship(XLRelationshipType::Chartsheet, sheetPath.substr(4));
+                m_appProperties.appendSheetName(command.getParam<std::string>("cloneName"));
+                m_archive.addEntry(sheetPath.substr(1), std::find_if(m_data.begin(), m_data.end(), [&](const XLXmlData& data) {
+                                                            return data.getXmlPath().substr(3) ==
+                                                                   m_wbkRelationships.relationshipById(command.getParam<std::string>
+                                                                       ("sheetID")).target();
+                                                        })->getRawData());
+                m_data.emplace_back(
+                    /* parentDoc */ this,
+                    /* xmlPath   */ sheetPath.substr(1),
+                    /* xmlID     */ m_wbkRelationships.relationshipByTarget(sheetPath.substr(4)).id(),
+                    /* xmlType   */ XLContentType::Chartsheet);
+            }
+
+            m_workbook.prepareSheetMetadata(command.getParam<std::string>("cloneName"), internalID);
+        }
+            break;
+    }
+}
+
+/**
+ * @details
+ */
+XLQuery XLDocument::execQuery(const XLQuery& query) const
+{
+
+    switch (query.type()) {
+        case XLQueryType::QuerySheetName:
+            return XLQuery(query).setResult(m_workbook.sheetName(query.getParam<std::string>("sheetID")));
+
+        case XLQueryType::QuerySheetIndex:
+            return query;
+
+        case XLQueryType::QuerySheetVisibility:
+            return XLQuery(query).setResult(m_workbook.sheetVisibility(query.getParam<std::string>("sheetID")));
+
+        case XLQueryType::QuerySheetType:
+            if (m_wbkRelationships.relationshipById(query.getParam<std::string>("sheetID")).type() == XLRelationshipType::Worksheet)
+                return XLQuery(query).setResult(XLContentType::Worksheet);
+            else
+                return XLQuery(query).setResult(XLContentType::Chartsheet);
+
+        case XLQueryType::QuerySheetIsActive:
+            return XLQuery(query).setResult(m_workbook.sheetIsActive(query.getParam<std::string>("sheetID")));
+
+        case XLQueryType::QuerySheetID:
+            return XLQuery(query).setResult(m_workbook.sheetVisibility(query.getParam<std::string>("sheetID")));
+
+        case XLQueryType::QuerySheetRelsID:
+            return XLQuery(query).setResult(m_wbkRelationships.relationshipByTarget(query.getParam<std::string>("sheetPath").substr(4)).id());
+
+        case XLQueryType::QuerySheetRelsTarget:
+            return XLQuery(query).setResult(m_wbkRelationships.relationshipById(query.getParam<std::string>("sheetID")).target());
+
+        case XLQueryType::QuerySharedStrings:
+            return XLQuery(query).setResult(m_sharedStrings);
+
+        case XLQueryType::QueryXmlData:
+            {
+                auto result =
+                    std::find_if(m_data.begin(), m_data.end(), [&](const XLXmlData& item) { return item.getXmlPath() == query.getParam<std::string>("xmlPath"); });
+                if (result == m_data.end()) throw XLInternalError("Path does not exist in zip archive (" + query.getParam<std::string>("xmlPath") + ")");
+                return XLQuery(query).setResult(&*result);
+            }
+    }
+
+    return query; // Needed in order to suppress compiler warning
+}
+
+/**
+ * @details
+ */
+XLQuery XLDocument::execQuery(const XLQuery& query)
+{
+    return static_cast<const XLDocument&>(*this).execQuery(query);
+}
+
+/**
+ * @details
+ */
 XLDocument::operator bool() const
 {
-    return !!m_archive;
+    return !!m_archive; // NOLINT
 }
 
 /**
@@ -772,9 +980,11 @@ XLDocument::operator bool() const
  */
 XLXmlData* XLDocument::getXmlData(const std::string& path)
 {
-    auto result = std::find_if(m_data.begin(), m_data.end(), [&](const XLXmlData& item) { return item.getXmlPath() == path; });
-    if (result == m_data.end()) throw XLInternalError("Path does not exist in zip archive.");
-    return &*result;
+    if (!hasXmlData(path)) throw XLInternalError("Path does not exist in zip archive.");
+    return &*std::find_if(m_data.begin(), m_data.end(), [&](const XLXmlData& item) { return item.getXmlPath() == path; });
+//    auto result = std::find_if(m_data.begin(), m_data.end(), [&](const XLXmlData& item) { return item.getXmlPath() == path; });
+//    if (result == m_data.end()) throw XLInternalError("Path does not exist in zip archive.");
+//    return &*result;
 }
 
 /**
@@ -782,9 +992,18 @@ XLXmlData* XLDocument::getXmlData(const std::string& path)
  */
 const XLXmlData* XLDocument::getXmlData(const std::string& path) const
 {
-    auto result = std::find_if(m_data.begin(), m_data.end(), [&](const XLXmlData& item) { return item.getXmlPath() == path; });
-    if (result == m_data.end()) throw XLInternalError("Path does not exist in zip archive.");
-    return &*result;
+    if (!hasXmlData(path)) throw XLInternalError("Path does not exist in zip archive.");
+    return &*std::find_if(m_data.begin(), m_data.end(), [&](const XLXmlData& item) { return item.getXmlPath() == path; });
+//    if (result == m_data.end()) throw XLInternalError("Path does not exist in zip archive.");
+//    return &*result;
+}
+
+/**
+ * @details
+ */
+bool XLDocument::hasXmlData(const std::string& path) const
+{
+    return std::find_if(m_data.begin(), m_data.end(), [&](const XLXmlData& item) { return item.getXmlPath() == path; }) != m_data.end();
 }
 
 /**

@@ -14,7 +14,7 @@ FetchContent_MakeAvailable(googletest)
 
 
 #########################
-# IncludeCounterTest
+# ExtractorLibTest
 #########################
 project(ExtractorLibTest)
 

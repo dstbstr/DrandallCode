@@ -86,7 +86,7 @@ namespace OpenXLSX
          * @param rowNode
          * @param sharedStrings
          */
-        XLRow(const XMLNode& rowNode, XLSharedStrings* sharedStrings);
+        XLRow(const XMLNode& rowNode, const XLSharedStrings& sharedStrings);
 
         /**
          * @brief Copy Constructor
@@ -212,10 +212,27 @@ namespace OpenXLSX
          */
         XLRowDataRange cells(uint16_t firstCell, uint16_t lastCell) const;
 
-        //---------- PRIVATE MEMBER VARIABLES ----------//
     private:
+
+        /**
+         * @brief
+         * @param lhs
+         * @param rhs
+         * @return
+         */
+        static bool isEqual(const XLRow& lhs, const XLRow& rhs);
+
+        /**
+         * @brief
+         * @param lhs
+         * @param rhs
+         * @return
+         */
+        static bool isLessThan(const XLRow& lhs, const XLRow& rhs);
+
+        //---------- PRIVATE MEMBER VARIABLES ----------//
         std::unique_ptr<XMLNode> m_rowNode;       /**< The XMLNode object for the row. */
-        XLSharedStrings*         m_sharedStrings; /**< */
+        XLSharedStrings          m_sharedStrings; /**< */
         XLRowDataProxy           m_rowDataProxy;  /**< */
     };
 
@@ -298,14 +315,14 @@ namespace OpenXLSX
          * @param rhs
          * @return
          */
-        bool operator==(const XLRowIterator& rhs);
+        bool operator==(const XLRowIterator& rhs) const;
 
         /**
          * @brief
          * @param rhs
          * @return
          */
-        bool operator!=(const XLRowIterator& rhs);
+        bool operator!=(const XLRowIterator& rhs) const;
 
         /**
          * @brief
@@ -318,7 +335,7 @@ namespace OpenXLSX
         uint32_t                 m_firstRow { 1 };            /**< The cell reference of the first cell in the range */
         uint32_t                 m_lastRow { 1 };             /**< The cell reference of the last cell in the range */
         XLRow                    m_currentRow;                /**< */
-        XLSharedStrings*         m_sharedStrings { nullptr }; /**< */
+        XLSharedStrings          m_sharedStrings; /**< */
     };
 
     /**
@@ -340,7 +357,7 @@ namespace OpenXLSX
          * @param last
          * @param sharedStrings
          */
-        explicit XLRowRange(const XMLNode& dataNode, uint32_t first, uint32_t last, XLSharedStrings* sharedStrings);
+        explicit XLRowRange(const XMLNode& dataNode, uint32_t first, uint32_t last, const XLSharedStrings& sharedStrings);
 
         /**
          * @brief
@@ -399,7 +416,7 @@ namespace OpenXLSX
         std::unique_ptr<XMLNode> m_dataNode;                  /**< */
         uint32_t                 m_firstRow;                  /**< The cell reference of the first cell in the range */
         uint32_t                 m_lastRow;                   /**< The cell reference of the last cell in the range */
-        XLSharedStrings*         m_sharedStrings { nullptr }; /**< */
+        XLSharedStrings          m_sharedStrings; /**< */
     };
 
 }    // namespace OpenXLSX
@@ -415,7 +432,7 @@ namespace OpenXLSX
      */
     inline bool operator==(const XLRow& lhs, const XLRow& rhs)
     {
-        return lhs.m_rowNode == rhs.m_rowNode;
+        return XLRow::isEqual(lhs, rhs);
     }
 
     /**
@@ -437,7 +454,7 @@ namespace OpenXLSX
      */
     inline bool operator<(const XLRow& lhs, const XLRow& rhs)
     {
-        return lhs.rowNumber() < rhs.rowNumber();
+        return XLRow::isLessThan(lhs, rhs);
     }
 
     /**

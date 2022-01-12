@@ -189,8 +189,12 @@ namespace OpenXLSX
      * @pre
      * @post
      */
-    bool XLRowDataIterator::operator==(const XLRowDataIterator& rhs)
+    bool XLRowDataIterator::operator==(const XLRowDataIterator& rhs) const
     {
+        if (m_currentCell && !rhs.m_currentCell)
+            return false;
+        if (!m_currentCell && !rhs.m_currentCell)
+            return true;
         return m_currentCell == rhs.m_currentCell;
     }
 
@@ -199,9 +203,9 @@ namespace OpenXLSX
      * @pre
      * @post
      */
-    bool XLRowDataIterator::operator!=(const XLRowDataIterator& rhs)
+    bool XLRowDataIterator::operator!=(const XLRowDataIterator& rhs) const
     {
-        return !(m_currentCell == rhs.m_currentCell);
+        return !(*this == rhs);
     }
 
 }    // namespace OpenXLSX
@@ -215,7 +219,7 @@ namespace OpenXLSX
      * @pre
      * @post
      */
-    XLRowDataRange::XLRowDataRange(const XMLNode& rowNode, uint16_t firstColumn, uint16_t lastColumn, XLSharedStrings* sharedStrings)
+    XLRowDataRange::XLRowDataRange(const XMLNode& rowNode, uint16_t firstColumn, uint16_t lastColumn, const XLSharedStrings& sharedStrings)
         : m_rowNode(std::make_unique<XMLNode>(rowNode)),
           m_firstCol(firstColumn),
           m_lastCol(lastColumn),
@@ -479,7 +483,7 @@ namespace OpenXLSX
      * @pre
      * @post
      */
-    XLSharedStrings* XLRowDataProxy::getSharedStrings() const
+    XLSharedStrings XLRowDataProxy::getSharedStrings() const
     {
         return m_row->m_sharedStrings;
     }

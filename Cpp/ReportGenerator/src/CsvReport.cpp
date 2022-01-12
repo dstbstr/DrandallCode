@@ -73,6 +73,7 @@ namespace {
             return format;
         }
 
+#pragma warning(suppress : 4702) // Don't know why it feels m_Data(&data) is unreachable code in release build...
         FileLine(const Report::SimpleData& data) : m_Data(&data) {}
 
         std::string ToString() const override {

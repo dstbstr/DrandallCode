@@ -45,7 +45,6 @@ YM      M9  MM    MM MM       MM    MM   d'  `MM.    MM            MM   d'  `MM.
 
 // ===== External Includes ===== //
 #include <pugixml.hpp>
-#include <vector>
 
 // ===== OpenXLSX Includes ===== //
 #include "XLCell.hpp"
@@ -62,7 +61,8 @@ namespace OpenXLSX
      * @pre
      * @post
      */
-    XLRow::XLRow() : m_rowNode(nullptr), m_sharedStrings(nullptr), m_rowDataProxy(this, m_rowNode.get()) {}
+    XLRow::XLRow() : m_rowNode(nullptr),
+                     m_rowDataProxy(this, m_rowNode.get()) {}
 
     /**
      * @details Constructs a new XLRow object from information in the underlying XML file. A pointer to the corresponding
@@ -70,7 +70,7 @@ namespace OpenXLSX
      * @pre
      * @post
      */
-    XLRow::XLRow(const XMLNode& rowNode, XLSharedStrings* sharedStrings)
+    XLRow::XLRow(const XMLNode& rowNode, const XLSharedStrings& sharedStrings)
         : m_rowNode(std::make_unique<XMLNode>(rowNode)),
           m_sharedStrings(sharedStrings),
           m_rowDataProxy(this, m_rowNode.get())
@@ -95,7 +95,7 @@ namespace OpenXLSX
      */
     XLRow::XLRow(XLRow&& other) noexcept
         : m_rowNode(std::move(other.m_rowNode)),
-          m_sharedStrings(other.m_sharedStrings),
+          m_sharedStrings(std::move(other.m_sharedStrings)),
           m_rowDataProxy(this, m_rowNode.get())
     {}
 
@@ -143,7 +143,7 @@ namespace OpenXLSX
      */
     double XLRow::height() const
     {
-        return m_rowNode->attribute("ht").as_double(15.0);
+        return m_rowNode->attribute("ht").as_double(15.0); // NOLINT
     }
 
     /**
@@ -174,7 +174,7 @@ namespace OpenXLSX
      */
     float XLRow::descent() const
     {
-        return m_rowNode->attribute("x14ac:dyDescent").as_float(0.25);
+        return m_rowNode->attribute("x14ac:dyDescent").as_float(0.25); // NOLINT
     }
 
     /**
@@ -234,8 +234,7 @@ namespace OpenXLSX
     {
         if (!m_rowNode->last_child())
             return 0;
-        else
-            return XLCellReference(m_rowNode->last_child().attribute("r").value()).column();
+        return XLCellReference(m_rowNode->last_child().attribute("r").value()).column();
     }
 
     /**
@@ -288,6 +287,20 @@ namespace OpenXLSX
         return XLRowDataRange(*m_rowNode, firstCell, lastCell, m_sharedStrings);
     }
 
+    bool XLRow::isEqual(const XLRow& lhs, const XLRow& rhs)
+    {
+        if (lhs.m_rowNode && !rhs.m_rowNode)
+            return false;
+        if (!lhs.m_rowNode && !rhs.m_rowNode)
+            return true;
+        return *lhs.m_rowNode == *rhs.m_rowNode;
+    }
+
+    bool XLRow::isLessThan(const XLRow& lhs, const XLRow& rhs)
+    {
+        return *lhs.m_rowNode < *rhs.m_rowNode;
+    }
+
 }    // namespace OpenXLSX
 
 // ========== XLRowIterator  ================================================ //
@@ -302,7 +315,6 @@ namespace OpenXLSX
         : m_dataNode(std::make_unique<XMLNode>(*rowRange.m_dataNode)),
           m_firstRow(rowRange.m_firstRow),
           m_lastRow(rowRange.m_lastRow),
-          m_currentRow(),
           m_sharedStrings(rowRange.m_sharedStrings)
     {
         if (loc == XLIteratorLocation::End)
@@ -423,7 +435,7 @@ namespace OpenXLSX
      * @pre
      * @post
      */
-    bool XLRowIterator::operator==(const XLRowIterator& rhs)
+    bool XLRowIterator::operator==(const XLRowIterator& rhs) const
     {
         return m_currentRow == rhs.m_currentRow;
     }
@@ -433,7 +445,7 @@ namespace OpenXLSX
      * @pre
      * @post
      */
-    bool XLRowIterator::operator!=(const XLRowIterator& rhs)
+    bool XLRowIterator::operator!=(const XLRowIterator& rhs) const
     {
         return !(m_currentRow == rhs.m_currentRow);
     }
@@ -458,7 +470,7 @@ namespace OpenXLSX
      * @pre
      * @post
      */
-    XLRowRange::XLRowRange(const XMLNode& dataNode, uint32_t first, uint32_t last, OpenXLSX::XLSharedStrings* sharedStrings)
+    XLRowRange::XLRowRange(const XMLNode& dataNode, uint32_t first, uint32_t last, const OpenXLSX::XLSharedStrings& sharedStrings)
         : m_dataNode(std::make_unique<XMLNode>(dataNode)),
           m_firstRow(first),
           m_lastRow(last),

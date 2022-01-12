@@ -80,7 +80,7 @@ namespace OpenXLSX
          * @brief
          * @param xmlData
          */
-        explicit XLSharedStrings(XLXmlData* xmlData);
+        explicit XLSharedStrings(XLXmlData* xmlData, std::deque<std::string> *stringCache);
 
         /**
          * @brief Destructor
@@ -132,13 +132,6 @@ namespace OpenXLSX
          * @param index
          * @return
          */
-        bool stringExists(uint32_t index) const;
-
-        /**
-         * @brief
-         * @param index
-         * @return
-         */
         const char* getString(uint32_t index) const;
 
         /**
@@ -155,10 +148,10 @@ namespace OpenXLSX
          * shared string indices for the cells in the spreadsheet. Instead use this member functions, which clears
          * the contents of the string, but keeps the XMLNode holding the string.
          */
-        void clearString(unsigned long index);
+        void clearString(uint64_t index);
 
     private:
-        std::deque<std::string> m_stringCache {}; /** < Each string must have an unchanging memory address; hence the use of std::deque */
+        std::deque<std::string> *m_stringCache {}; /** < Each string must have an unchanging memory address; hence the use of std::deque */
     };
 }    // namespace OpenXLSX
 
