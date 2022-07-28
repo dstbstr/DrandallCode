@@ -2,6 +2,7 @@
 
 #include "TestCommon.h"
 
+#if !_HAS_CXX20
 struct BaseEnum : ExtendableEnum<BaseEnum> {
     static const BaseEnum Zero;
     static const BaseEnum One;
@@ -65,3 +66,4 @@ TEST(ExtendableEnum, EnumCanBeUsedInSwitch) {
     default: FAIL() << "Expected Two, but got default";
     }
 }
+#endif

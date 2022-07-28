@@ -1,5 +1,8 @@
 #ifndef __EXTENDABLEENUM_H__
 #define __EXTENDABLEENUM_H__
+#include <vcruntime.h>
+
+#if !_HAS_CXX20
 #include "Utilities/ConstexprCounter.h"
 
 #define EXTENDABLE_ENUM_COUNT(BaseEnum) ConstexprCounter::Count<BaseEnum>() - 1
@@ -24,5 +27,5 @@ struct ExtendableEnum {
     template<int N = ConstexprCounter::Next<T>()>
     constexpr ExtendableEnum() : id(N - 1) {}
 };
-
+#endif
 #endif // __EXTENDABLEENUM_H__

@@ -1,6 +1,9 @@
 #ifndef __CONSTEXPRCOUNTER_H__
 #define __CONSTEXPRCOUNTER_H__
 
+#include <vcruntime.h>
+
+#if !_HAS_CXX20
 namespace ConstexprCounter {
     template<typename T, int N>
     struct Flag {
@@ -41,5 +44,5 @@ namespace ConstexprCounter {
         return N;
     }
 } // namespace ConstexprCounter
-
+#endif
 #endif // __CONSTEXPRCOUNTER_H__
