@@ -10,6 +10,7 @@
 #include "Instrumentation/LogWriter/StdOutLogWriter.h"
 #include "Report/CsvReport.h"
 #include "Report/ExcelReport.h"
+#include "Report/DotReport.h"
 #include "Threading/Runner.h"
 #include "Utilities/ScopedTimer.h"
 
@@ -91,6 +92,9 @@ int main(int argc, char* argv[]) {
         std::vector<FileData> files = Runner::Get().RunAll(expectedRunTime, jobs);
         auto includeMap = GenerateIncludeMap(files);
 
+        Report::DotReport dotReport;
+        dotReport.WriteReport(includeMap, GetFilePrefix(argParse.GetTargetFile()));
+        /*
         for(auto& file: files) {
             file.TotalIncludeCount = includeMap.Dependencies[file.FileName].size();
             file.IncludedByCount = includeMap.DependsOnMe[file.FileName].size();
@@ -103,7 +107,7 @@ int main(int argc, char* argv[]) {
         cacheStore.WriteCache(files, defines, includeMap);
         Report::ExcelReport report(files);
         report.WriteReport(GetFilePrefix(argParse.GetTargetFile()));
-
+        */
         return 0;
     } catch(std::exception& err) {
         std::cerr << err.what() << std::endl;

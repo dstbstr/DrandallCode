@@ -95,5 +95,6 @@
     "python.testing.pytestEnabled": false,
     "python.testing.unittestEnabled": false,
     "python.testing.nosetestsEnabled": false,
-    "cmake.configureOnOpen": false
+    "cmake.configureOnOpen": false,
+    "git.ignoreLimitWarning": true
 }

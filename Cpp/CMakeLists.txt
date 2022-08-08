@@ -71,8 +71,6 @@ add_subdirectory(TodoLibTest)
 
 add_subdirectory(CppKata)
 add_subdirectory(CppKataTest)
-add_subdirectory(SampleModule)
-add_subdirectory(SampleModuleTest)
 
 set(CONFIGURED_ONCE TRUE CACHE INTERNAL
     "A flag showing that CMake has configured at least once.")
