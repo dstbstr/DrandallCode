@@ -96,5 +96,8 @@
     "python.testing.unittestEnabled": false,
     "python.testing.nosetestsEnabled": false,
     "cmake.configureOnOpen": false,
-    "git.ignoreLimitWarning": true
+    "git.ignoreLimitWarning": true,
+    "C_Cpp.default.defines": [
+        "MSVC"
+    ]
 }

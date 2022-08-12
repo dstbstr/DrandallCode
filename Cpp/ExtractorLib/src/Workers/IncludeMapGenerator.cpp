@@ -31,6 +31,28 @@ namespace {
             }
         }
     }
+
+    void RecursiveFind(const Extractor::IncludeMap& includeMap, const std::string& fileName, const std::string& targetFile, std::vector<std::string>& result) {
+        if(fileName == targetFile) {
+            return;
+        }
+        for(const auto& dependency : includeMap.Dependencies.at(fileName)) {
+            if(dependency == targetFile) {
+                result.push_back(dependency);
+                return;
+            }
+            if(includeMap.Dependencies.at(dependency).contains(targetFile)) {
+                if(std::find(result.begin(), result.end(), dependency) != result.end()) {
+                    continue; //already added this dependency, try a different one
+                }
+                result.push_back(dependency);
+                RecursiveFind(includeMap, dependency, targetFile, result);
+                return; //for now, just find a single circular dependency path
+            }
+        }
+
+        throw std::runtime_error("No circular dependency path found");
+    }
 } // namespace
 
 namespace Extractor {
@@ -47,6 +69,27 @@ namespace Extractor {
             Recurse(file.FileName, firstPartyIncludes, result);
         }
 
+        return result;
+    }
+
+    bool HasCircularDependency(const IncludeMap& includeMap, const std::string& fileName) {
+        if(includeMap.Dependencies.find(fileName) == includeMap.Dependencies.end()) {
+            return false;
+        }
+
+        return includeMap.Dependencies.at(fileName).contains(fileName);
+    }
+
+    std::vector<std::string> GetCircularDependencyTrail(const IncludeMap& includeMap, const std::string& fileName) {
+        std::vector<std::string> result;
+        result.push_back(fileName);
+        for(const auto& dependency : includeMap.Dependencies.at(fileName)) {
+            if(includeMap.Dependencies.at(dependency).contains(fileName)) {
+                result.push_back(dependency);
+                RecursiveFind(includeMap, dependency, fileName, result);
+                break;
+            }
+        }
         return result;
     }
 } // namespace Extractor

@@ -9,3 +9,6 @@
 **/c_cpp_properties.json
 *.csv
 *.xlsx
+*.txt
+*.svg
+*.dot
