@@ -11,6 +11,7 @@
 #include "Report/CsvReport.h"
 #include "Report/ExcelReport.h"
 #include "Report/DotReport.h"
+#include "Report/DotToSvg.h"
 #include "Threading/Runner.h"
 #include "Utilities/ScopedTimer.h"
 
@@ -71,17 +72,19 @@ namespace {
 int main(int argc, char* argv[]) {
     ScopedTimer executionTimer("Total Runtime");
     try {
+        
         ArgParse argParse(argc, argv);
         if(!argParse.ShouldParse()) {
             return 0;
         }
+        
         auto fileNames = argParse.GetFileNames();
         auto cacheStore = CacheStore("TestCache.txt");
         auto cache = cacheStore.ReadCache();
         Extractor::Cache::Purge(cache, fileNames);
 
         auto defines = BuildDefineData(argParse.GetDefines()); // TODO: if user defines have changed, does that invalidate the cache?
-        PreProcessFiles(fileNames, cache, defines);
+        //PreProcessFiles(fileNames, cache, defines);
 
         std::vector<std::unique_ptr<IRunnable<FileData>>> jobs;
         for(const auto& file: fileNames) {
@@ -89,11 +92,17 @@ int main(int argc, char* argv[]) {
         }
 
         Threading::ExpectedRunTime expectedRunTime = jobs.size() < 100 ? Threading::ExpectedRunTime::MILLISECONDS : Threading::ExpectedRunTime::SECONDS;
+
         std::vector<FileData> files = Runner::Get().RunAll(expectedRunTime, jobs);
         auto includeMap = GenerateIncludeMap(files);
+        cacheStore.WriteCache(files, defines, includeMap);
 
         Report::DotReport dotReport;
-        dotReport.WriteReport(includeMap, GetFilePrefix(argParse.GetTargetFile()));
+        auto outDir = GetFilePrefix(argParse.GetTargetFile());
+        dotReport.WriteReport(includeMap, outDir);
+        Report::ConvertDotsToSvg(outDir);
+        Report::DeleteDotFiles(outDir);
+
         /*
         for(auto& file: files) {
             file.TotalIncludeCount = includeMap.Dependencies[file.FileName].size();
@@ -104,7 +113,6 @@ int main(int argc, char* argv[]) {
             }
         }
 
-        cacheStore.WriteCache(files, defines, includeMap);
         Report::ExcelReport report(files);
         report.WriteReport(GetFilePrefix(argParse.GetTargetFile()));
         */

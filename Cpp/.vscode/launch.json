@@ -10,17 +10,10 @@
             "request": "launch",
             "program": "${workspaceFolder}/bin/Debug/IncludeCounter.exe",
             "args": [
-                "-d",
-                "MSVC",
                 "-r",
                 "-f",
-                "Test",
-                "CommandParser",
-                "Core",
-                "ExtractorLib",
-                "IncludeCounter",
-                "ReportGenerator",
-                "TypeCounter"
+                "ForzaEngine",
+                "E:/T10/Engine/RttiTestFramework"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -34,7 +27,7 @@
             "program": "${workspaceFolder}/bin/Debug/TypeCounter.exe",
             "args": [
                 "-r",
-                "D:/T10/Engine/Core",
+                "E:/T10/Engine/Core",
                 "--define-file",
                 "ForzaDefines.txt"
             ],

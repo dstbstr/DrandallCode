@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <fstream>
 #include <regex>
+#include <thread>
 
 namespace {
     void RecursePath(const std::filesystem::path& path, const std::unordered_set<std::string>& extensions, std::vector<std::filesystem::path>& resolvedPaths) {
@@ -56,6 +57,54 @@ namespace FileUtils {
 
     std::unique_ptr<std::ostream> OpenForWrite(const std::string_view filePath) {
         return std::make_unique<std::ofstream>(filePath, std::ifstream::out | std::ifstream::trunc);
+    }
+
+    std::vector<std::string> GetFullyQualifiedFilesWithExtension(const std::filesystem::path& path, const std::string& extension) {
+        std::vector<std::string> result;
+        std::string ext = StrUtil::StartsWith(extension, ".") ? extension : "." + extension;
+        for(const std::filesystem::path& file : std::filesystem::directory_iterator{path}) {
+            if(file.extension() == ext) {
+                result.push_back(std::filesystem::absolute(file).string());
+            }
+        }
+        return result;
+    }
+
+    std::vector<std::string> GetFullyQualifiedFilesWithExtension(const std::string& directory, const std::string& extension) {
+        return GetFullyQualifiedFilesWithExtension(std::filesystem::path(directory), extension);
+    }
+
+    void DeleteFiles(const std::vector<std::string>& files) {
+        using namespace std::chrono_literals;
+
+        for(const auto& file : files) {
+            int attempt = 0;
+            std::error_code ec;
+            while(attempt < 3) {
+                if(std::filesystem::remove(file, ec)) {
+                    break;
+                }
+                if(ec.message().find("used by another process") == ec.message().npos) {
+                    std::cout << ec.message();
+                    break;
+                }
+                std::this_thread::sleep_for(100ms);
+                attempt++;
+            }
+        }
+    }
+
+    void DeleteFiles(const std::string& directory) {
+        std::vector<std::string> files;
+        for(const std::filesystem::path& file : std::filesystem::directory_iterator{directory}) {
+            files.push_back(std::filesystem::absolute(file).string());
+        }
+
+        DeleteFiles(files);
+    }
+
+    void DeleteFiles(const std::string& directory, const std::string& extension) {
+        DeleteFiles(GetFullyQualifiedFilesWithExtension(directory, extension));
     }
 
     FileNameCollector::FileNameCollector(const std::vector<std::string>& inputs, const std::vector<std::string>& extensions, bool recurse) : m_Recurse(recurse) {

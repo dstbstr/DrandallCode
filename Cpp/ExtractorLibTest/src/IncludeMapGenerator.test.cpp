@@ -4,6 +4,17 @@
 #include "TestCommon.h"
 #include "Utilities/Require.h"
 
+namespace {
+    Extractor::FileData MakeData(std::string name, u8 lineCount) {
+        Extractor::FileData result{name, name + "/" + name};
+        result.LineCount = lineCount;
+        return result;
+    }
+
+    void AddDependency(Extractor::FileData& data, const Extractor::FileData& dependency) {
+        data.IncludeFiles.insert(dependency.FileName);
+    }
+}
 //            A
 //          /   \ 
 //        B       C
@@ -32,15 +43,6 @@ namespace Extractor {
         }
 
         std::vector<FileData> m_Files;
-
-        FileData MakeData(std::string name, u8 lineCount) {
-            FileData result{name, name + "/" + name};
-            result.LineCount = lineCount;
-            return result;
-        }
-        void AddDependency(FileData& data, const FileData& dependency) {
-            data.IncludeFiles.insert(dependency.FileName);
-        }
 
         IncludeMap Run() {
             return GenerateIncludeMap(m_Files);
@@ -92,6 +94,58 @@ namespace Extractor {
         ASSERT_EQ(result.LineCounts["D"], 4);
         ASSERT_EQ(result.LineCounts["E"], 5);
         ASSERT_EQ(result.LineCounts["F"], 6);
+    }
+
+    TEST(CircularDependencyTest, HasCircularDependency_WithCircularDependency_ReturnsTrue) {
+        // A -> B -> C -> A
+        auto A = MakeData("A", 1);
+        auto B = MakeData("B", 2);
+        auto C = MakeData("C", 3);
+
+        AddDependency(B, A);
+        AddDependency(C, B);
+        AddDependency(A, C);
+
+        std::vector<FileData> files{C, B, A};
+        auto includeMap = GenerateIncludeMap(files);
+
+        ASSERT_TRUE(HasCircularDependency(includeMap, "C"));
+        ASSERT_FALSE(HasCircularDependency(includeMap, "A"));
+        ASSERT_FALSE(HasCircularDependency(includeMap, "B"));
+    }
+
+    TEST(CircularDependencyTest, HasCircularDependency_WithoutCircularDependencies_ReturnsFalse) {
+        // A -> B -> C
+        auto A = MakeData("A", 1);
+        auto B = MakeData("B", 2);
+        auto C = MakeData("C", 3);
+
+        AddDependency(B, A);
+        AddDependency(C, B);
+
+        std::vector<FileData> files{C, B, A};
+        auto includeMap = GenerateIncludeMap(files);
+
+        ASSERT_FALSE(HasCircularDependency(includeMap, "A"));
+        ASSERT_FALSE(HasCircularDependency(includeMap, "B"));
+        ASSERT_FALSE(HasCircularDependency(includeMap, "C"));
+    }
+
+    TEST(CircularDependencyTest, GetCircularDependencyTrail_WithCircularDependency_ReturnsFullTrail) {
+        // A -> B -> C -> A
+        auto A = MakeData("A", 1);
+        auto B = MakeData("B", 2);
+        auto C = MakeData("C", 3);
+
+        AddDependency(B, A);
+        AddDependency(C, B);
+        AddDependency(A, C);
+
+        std::vector<FileData> files{C, B, A};
+        auto includeMap = GenerateIncludeMap(files);
+
+        auto trail = GetCircularDependencyTrail(includeMap, "C");
+        ASSERT_EQ("CBAC", StrUtil::JoinVec("", trail));
     }
 
 } // namespace Extractor
