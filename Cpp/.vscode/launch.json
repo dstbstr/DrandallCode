@@ -28,8 +28,6 @@
             "args": [
                 "-r",
                 "E:/T10/Engine/Core",
-                "--define-file",
-                "ForzaDefines.txt"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
