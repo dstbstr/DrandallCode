@@ -54,6 +54,16 @@
             "console": "externalTerminal"
         },
         {
+            "name": "AdventOfCode",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/bin/Debug/AdventOfCode.exe",
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "console": "externalTerminal"
+        },
+        {
             "name": "(Windows) Run Tests: Core",
             "type": "cppvsdbg",
             "request": "launch",
