@@ -29,8 +29,8 @@ std::vector<std::string> ReadInputFile() {
 
 u32 RunAgainstInput() {
     //auto lines = ReadInputFile();
-    return RunBattles();
-    //return 0;
+    //return RunBattles();
+    return 0;
 }
 
 void Check() {
@@ -44,8 +44,8 @@ void Check() {
 int main(int, char**) {
     auto timer = ScopedTimer();
 
-    //Check();
-    std::cout << "Result: " << RunAgainstInput() << "\n";
+    Check();
+    //std::cout << "Result: " << RunAgainstInput() << "\n";
     return 0;
 }
 

@@ -9,7 +9,7 @@
             "options": {
                 "cwd": "${workspaceRoot}"
             },
-            "command": "if(-not(test-path Build/VS/2017)) {mkdir Build/VS/2017}; if(-not(test-path Build/VS/2019)) {mkdir Build/VS/2019}; if(-not(test-path bin)) {mkdir bin}"
+            "command": "if(-not(test-path Build/VS/2017)) {mkdir Build/VS/2017}; if(-not(test-path Build/VS/2019)) {mkdir Build/VS/2019}; if(-not(test-path Build/VS/2022)) {mkdir Build/VS/2022}; if(-not(test-path bin)) {mkdir bin}"
         },
         {
             "label": "GenerateWindowsDebug2017",
@@ -30,6 +30,15 @@
             "command": "cmake -G 'Visual Studio 16 2019' -DCMAKE_BUILD_TYPE=Debug ../../.."
         },
         {
+            "label": "GenerateWindowsDebug2022",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/Build/VS/2022"
+            },
+            "dependsOn": "PrepareFoldersWindows",
+            "command": "cmake -G 'Visual Studio 17 2022' -DCMAKE_BUILD_TYPE=Debug ../../.."
+        },
+        {
             "label": "GenerateWindowsRelease2017",
             "type": "shell",
             "options": {
@@ -46,6 +55,15 @@
             },
             "dependsOn": "PrepareFoldersWindows",
             "command": "cmake -G 'Visual Studio 16 2019' -DCMAKE_BUILD_TYPE=Release ../../.."
+        },
+        {
+            "label": "GenerateWindowsRelease2022",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/Build/VS/2022"
+            },
+            "dependsOn": "PrepareFoldersWindows",
+            "command": "cmake -G 'Visual Studio 17 2022' -DCMAKE_BUILD_TYPE=Release ../../.."
         },
         {
             "label": "GenerateNixDebug",
@@ -85,6 +103,19 @@
             },
             "dependsOn": [
                 "GenerateWindowsDebug2019"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "buildWindowsDebug2022",
+            "type": "shell",
+            "command": "cmake --build . --config Debug ",
+            "options": {
+                "cwd": "${workspaceRoot}/Build/VS/2022"
+            },
+            "dependsOn": [
+                "GenerateWindowsDebug2022"
             ],
             "group": {
                 "kind": "build",
@@ -126,6 +157,19 @@
             },
             "dependsOn": [
                 "GenerateWindowsRelease2019"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "buildWindowsRelease2022",
+            "type": "shell",
+            "command": "cmake --build . --config Release ",
+            "options": {
+                "cwd": "${workspaceRoot}/Build/VS/2022"
+            },
+            "dependsOn": [
+                "GenerateWindowsRelease2022"
             ],
             "group": "build",
             "problemMatcher": []
