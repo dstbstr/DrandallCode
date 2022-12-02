@@ -1,4 +1,4 @@
-#include "2015/TuringLock.h"
+#include "2015/SecretCode.h"
 
 #include "Utilities/StringUtils.h"
 #include "Utilities/ScopedTimer.h"
@@ -27,12 +27,12 @@ std::vector<std::string> ReadInputFile() {
     return result;
 }
 
-u32 RunAgainstInput() {
+u64 RunAgainstInput() {
     //auto lines = ReadInputFile();
-    //return RunBattles();
-    return 0;
+    return Run();
+    //return 0;
 }
-
+/*
 void Check() {
     if(RunTests()) {
         std::cout << "Tests Pass\n";
@@ -40,12 +40,13 @@ void Check() {
         std::cout << "Tests Fail. :(\n";
     }
 }
+*/
 
 int main(int, char**) {
     auto timer = ScopedTimer();
 
-    Check();
-    //std::cout << "Result: " << RunAgainstInput() << "\n";
+    //Check();
+    std::cout << "Result: " << RunAgainstInput() << "\n";
     return 0;
 }
 
