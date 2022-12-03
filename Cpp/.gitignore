@@ -13,4 +13,9 @@
 *.svg
 *.dot
 
+.nuget/
+MyQlDb/
+cpp-queries/
+lizardOut.html
+
 *Defines.txt

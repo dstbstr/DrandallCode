@@ -1,4 +1,4 @@
-#include "2015/SecretCode.h"
+#include "2016/DecoyRoom.h"
 
 #include "Utilities/StringUtils.h"
 #include "Utilities/ScopedTimer.h"
@@ -28,11 +28,10 @@ std::vector<std::string> ReadInputFile() {
 }
 
 u64 RunAgainstInput() {
-    //auto lines = ReadInputFile();
-    return Run();
-    //return 0;
+    auto lines = ReadInputFile();
+    return Run(lines);
 }
-/*
+
 void Check() {
     if(RunTests()) {
         std::cout << "Tests Pass\n";
@@ -40,7 +39,7 @@ void Check() {
         std::cout << "Tests Fail. :(\n";
     }
 }
-*/
+
 
 int main(int, char**) {
     auto timer = ScopedTimer();

@@ -89,7 +89,10 @@
         "bit": "cpp",
         "clocale": "cpp",
         "stop_token": "cpp",
-        "format": "cpp"
+        "format": "cpp",
+        "execution": "cpp",
+        "numeric": "cpp",
+        "queue": "cpp"
     },
     "python.testing.promptToConfigure": false,
     "python.testing.pytestEnabled": false,

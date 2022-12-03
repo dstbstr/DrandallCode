@@ -8,6 +8,7 @@
 #include <numeric>
 #include <execution>
 
+#include "Utilities/ConstexprUtils.h"
 
 bool IsNumber(std::string val) {
     static auto IsNumberRegex = std::regex("-?\\d+");
@@ -27,35 +28,12 @@ std::string ToString(T input) {
     return std::string(buf);
 }
 
-constexpr u32 SumConstexpr(const std::vector<u32>& vec) {
-    u32 result = 0;
-    for(auto e : vec) {
-        result += e;
-    }
-
-    return result;
-}
-
 u32 Sum(const std::vector<u32>& vec) {
     return std::reduce(std::execution::par, vec.cbegin(), vec.cend(), 0, [](s32 lhs, s32 rhs) { return lhs + rhs;});
 }
 
-namespace Detail {
-    constexpr double SqrtImpl(double x, double curr, double prev) {
-        return curr == prev ? curr : SqrtImpl(x, 0.5 * (curr + x / curr), curr);
-    }
-}
-constexpr double Sqrt(double x) {
-    return x >= 0 && x < std::numeric_limits<double>::infinity() 
-    ? Detail::SqrtImpl(x, x, 0)
-    : std::numeric_limits<double>::quiet_NaN();
-}
-
-static_assert(Sqrt(9) == 3.0);
-static_assert(Sqrt(1) == 1.0);
-
 constexpr std::vector<u32> GetDivisors(u32 input) {
-    auto last = static_cast<u32>(Sqrt(input));
+    auto last = static_cast<u32>(Constexpr::Sqrt(input));
     auto result = std::vector<u32>{};
 
     for(u32 i = 1; i < last; i++) {
