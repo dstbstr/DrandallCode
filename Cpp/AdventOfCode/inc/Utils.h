@@ -24,8 +24,11 @@ bool ParseNumber(std::string_view number, T& result) {
 template<typename T>
 std::string ToString(T input) {
     auto buf = std::unique_ptr<char[]>(new char[20]);
+    for (auto i = 0; i < 20; i++) {
+        buf[i] = 0;
+    }
     std::to_chars(buf.get(), buf.get() + 20, input);
-    return std::string(buf);
+    return std::string(buf.get());
 }
 
 u32 Sum(const std::vector<u32>& vec) {
