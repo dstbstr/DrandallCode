@@ -222,18 +222,29 @@ namespace md5 {
 }
 
 
-constexpr std::string ToHex(md5::Digest digest) {
+constexpr std::string ToHexUpper(md5::Digest digest) {
     std::string result;
     for(auto c : digest) {
-        result += ToHex(char(c));
+        result += ToHexUpper(char(c));
     }
     return result;
 }
 
-static_assert(ToHex(md5::compute("")) == "D41D8CD98F00B204E9800998ECF8427E");
-static_assert(ToHex(md5::compute("abcdef609043")) == "000001DBBFA3A5C83A2D506429C7B00E");
-//static_assert(ToHex(md5::compute("ckczppom117946")) == "00000");
-static_assert(ToHex(md5::compute("ckczppom3938038")) == "00000028023E3B4729684757F8DC3FBF");
+constexpr std::string ToHexLower(md5::Digest digest) {
+    std::string result;
+    for (auto c : digest) {
+        result += ToHexLower(char(c));
+    }
+    return result;
+}
+
+static_assert(ToHexUpper(md5::compute("")) == "D41D8CD98F00B204E9800998ECF8427E");
+static_assert(ToHexUpper(md5::compute("abcdef609043")) == "000001DBBFA3A5C83A2D506429C7B00E");
+static_assert(ToHexUpper(md5::compute("ckczppom3938038")) == "00000028023E3B4729684757F8DC3FBF");
+
+static_assert(ToHexLower(md5::compute("")) == "d41d8cd98f00b204e9800998ecf8427e");
+static_assert(ToHexLower(md5::compute("abcdef609043")) == "000001dbbfa3a5c83a2d506429c7b00e");
+static_assert(ToHexLower(md5::compute("ckczppom3938038")) == "00000028023e3b4729684757f8dc3fbf");
 
 #endif
 

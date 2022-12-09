@@ -39,4 +39,48 @@ namespace Constexpr {
     static_assert(Sqrt(9) == 3.0);
     static_assert(Sqrt(1) == 1.0);
     static_assert(Sqrt(-1) != Sqrt(-1)); // no way to test for NaN, but NaN != NaN
+
+    template<typename Collection>
+    constexpr std::string JoinVec(std::string&& delimiter, Collection&& input) {
+        std::string result;
+        bool first = true;
+        for (const auto& elem : input) {
+            if (first) first = false;
+            else result += delimiter;
+            result += elem;
+        }
+
+        return result;
+    }
+
+    template<typename Collection>
+    constexpr std::string JoinVec(std::string&& delimiter, const Collection& input) {
+        std::string result;
+        bool first = true;
+        for (const auto& elem : input) {
+            if (first) first = false;
+            else result += delimiter;
+            result += elem;
+        }
+
+        return result;
+    }
+
+    template<typename Collection>
+    constexpr std::string JoinVec(char&& delimiter, Collection const& input) {
+        return JoinVec(std::string(1, delimiter), input);
+    }
+
+    static_assert(JoinVec(" ", std::vector<std::string>{ "a", "b", "c" }) == "a b c");
+    static_assert(JoinVec(' ', std::vector<std::string>{ "a", "b", "c" }) == "a b c");
+    static_assert(JoinVec("Hello", std::vector<std::string>{ "a", "b", "c" }) == "aHellobHelloc");
+    /*
+
+
+    template<typename Collection>
+    std::string JoinVec(char&& delimiter, Collection const& input) {
+        return JoinVec(std::string(1, delimiter), input);
+    }
+
+    */
 }
