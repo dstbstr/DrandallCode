@@ -1,4 +1,5 @@
-#include "2016/DecoyRoom.h"
+#include "2022/Pressure.h"
+//#include "2016/Scrambler.h"
 
 #include "Utilities/StringUtils.h"
 #include "Utilities/ScopedTimer.h"
@@ -14,7 +15,7 @@ Log::StdOutLogWriter logWriter{};
 std::vector<std::string> ReadInputFile() {
     std::vector<std::string> result{};
 
-    auto stream = std::ifstream("AdventOfCode\\input.txt");
+    auto stream = std::ifstream("C:\\Users\\durandal\\source\\repos\\Scratch\\AdventOfCode\\AdventOfCode\\input.txt");
     if(!stream.is_open()) {
         return {};
     }
@@ -27,9 +28,9 @@ std::vector<std::string> ReadInputFile() {
     return result;
 }
 
-u64 RunAgainstInput() {
+void RunAgainstInput() {
     auto lines = ReadInputFile();
-    return Run(lines);
+    std::cout << Run(lines) << "\n";
 }
 
 void Check() {
@@ -45,7 +46,7 @@ int main(int, char**) {
     auto timer = ScopedTimer();
 
     //Check();
-    std::cout << "Result: " << RunAgainstInput() << "\n";
+    RunAgainstInput();
     return 0;
 }
 

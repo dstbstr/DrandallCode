@@ -8,7 +8,7 @@
 struct Room {
     std::string Name;
     std::string OriginalString;
-    u32 Id;
+    u32 Id = 0;
     std::string Checksum;
 };
 

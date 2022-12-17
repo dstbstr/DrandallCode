@@ -265,15 +265,15 @@ namespace Constexpr {
 
         std::vector<T> result{};
 
-        for (auto factor : primes) {
-            auto running = Value;
-            while (running % factor == 0) {
-                result.push_back(factor);
-                running /= factor;
-            }
-        }
+for (auto factor : primes) {
+    auto running = Value;
+    while (running % factor == 0) {
+        result.push_back(factor);
+        running /= factor;
+    }
+}
 
-        return result;
+return result;
     }
 
     static_assert(GetAllPrimeFactors<16, u32>() == std::vector<u32>{2, 2, 2, 2});
@@ -335,7 +335,7 @@ namespace Constexpr {
     constexpr T FindLcm() {
         return detail::FindLcm(GetAllPrimeFactors<Lhs, T>(), GetAllPrimeFactors<Rhs, T>());
     }
-    
+
     static_assert(FindLcm<60, 90, u32>() == 180);
     static_assert(FindLcm<3, 5, u32>() == 15);
     static_assert(FindLcm<12, 16, u32>() == 48);
@@ -353,5 +353,35 @@ namespace Constexpr {
         static_assert(TestParseNumber("0", u32(0)));
         static_assert(!TestParseNumber("-1", s32(1)));
         static_assert(!TestParseNumber("abc", 0));
+    }
+
+    template<size_t Verts, typename T>
+    constexpr void FloydWarshall(std::array<std::array<T, Verts>, Verts>& table) {
+        for (size_t i = 0; i < Verts; i++) {
+            for (size_t x = 0; x < Verts; x++) {
+                for (size_t y = 0; y < Verts; y++) {
+                    table[x][y] = std::min(table[x][y], table[x][i] + table[i][y]);
+                }
+            }
+        }
+    }
+
+    namespace ConstexprTests {
+        constexpr bool TestFloydWarshall(size_t x, size_t y, u32 expectedValue) {
+            std::array<std::array<u32, 4>, 4> graph = { {
+                { 0, 5, 99, 10 },
+                { 99, 0, 3, 99 },
+                { 99, 99, 0, 1} ,
+                { 99, 99, 99, 0 }
+            } };
+
+            FloydWarshall(graph);
+            return graph[y][x] == expectedValue;
+        }
+
+        static_assert(TestFloydWarshall(0, 0, 0));
+        static_assert(TestFloydWarshall(1, 0, 5));
+        static_assert(TestFloydWarshall(2, 0, 8));
+        static_assert(TestFloydWarshall(3, 1, 4));
     }
 }

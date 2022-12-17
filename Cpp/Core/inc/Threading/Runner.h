@@ -4,7 +4,7 @@
 #include "Platform/Types.h"
 
 namespace Threading {
-    enum ExpectedRunTime : u8 { MICROSECONDS, MILLISECONDS, SECONDS };
+    enum struct ExpectedRunTime : u8 { MICROSECONDS, MILLISECONDS, SECONDS };
 }
 
 #ifdef MSVC

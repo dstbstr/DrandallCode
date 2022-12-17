@@ -59,3 +59,17 @@ constexpr std::vector<u32> GetDivisors(u32 input) {
 static_assert(GetDivisors(24) == std::vector<u32>{1, 24, 2, 12, 3, 8, 4, 6});
 static_assert(GetDivisors(9) == std::vector<u32>{1, 9, 3});
 static_assert(GetDivisors(1) == std::vector<u32>{1});
+
+template<size_t Rows, size_t Cols>
+constexpr size_t GetIndex(size_t row, size_t col) {
+    return row * Cols + col;
+}
+
+static_assert(GetIndex<3, 3>(0, 0) == 0);
+static_assert(GetIndex<3, 3>(2, 2) == 8);
+
+template<size_t Rows, size_t Cols>
+constexpr void GetRowCol(size_t index, size_t& row, size_t& col) {
+    row = index / Cols;
+    col = index % Cols;
+}
