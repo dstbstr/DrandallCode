@@ -17,9 +17,14 @@ namespace Constexpr {
     static_assert(Sum(std::vector{ 1,2,3 }) == 6);
     static_assert(Sum(std::array{ -1, -2, -3 }) == -6);
 
-    template<typename T>
+    template<typename T, typename std::enable_if_t<std::is_signed_v<T>, bool> = true>
     constexpr T Abs(T t) {
         return t < 0 ? -t : t;
+    }
+
+    template<typename T, typename std::enable_if_t<!std::is_signed_v<T>, bool> = true>
+    constexpr T Abs(T t) {
+        return t;
     }
 
     static_assert(Abs(3) == 3);
@@ -39,6 +44,15 @@ namespace Constexpr {
     static_assert(Sqrt(9) == 3.0);
     static_assert(Sqrt(1) == 1.0);
     static_assert(Sqrt(-1) != Sqrt(-1)); // no way to test for NaN, but NaN != NaN
+
+    template<typename T>
+    constexpr T EuclideanModulo(T value, T modulus) {
+        if (modulus == 0) return 0;
+        T remainder = value % modulus;
+        return remainder >= 0 ? remainder : remainder + Abs(modulus);
+    }
+
+    static_assert(EuclideanModulo(-5, 3) == 1);
 
     template<typename Collection>
     constexpr std::string JoinVec(std::string&& delimiter, Collection&& input) {
@@ -99,7 +113,7 @@ namespace Constexpr {
     static_assert(Split("abc", " ").size() == 1);
 
     template<typename T>
-    constexpr bool ParseNumber(std::string_view input, T& result, typename std::enable_if<std::is_signed<T>::value>::type* = 0) {
+    constexpr bool ParseNumber(std::string_view input, T& result, typename std::enable_if_t<std::is_signed_v<T>, bool> = true) {
         u32 place = 1;
         u32 pos = input[0] == '-' ? 1 : 0;
 
@@ -122,7 +136,7 @@ namespace Constexpr {
     }
 
     template<typename T>
-    constexpr bool ParseNumber(std::string_view input, T& result, typename std::enable_if<!std::is_signed<T>::value>::type* = 0) {
+    constexpr bool ParseNumber(std::string_view input, T& result, typename std::enable_if_t<!std::is_signed_v<T>, bool> = true) {
         u32 place = 1;
         if (input[0] == '-') {
             return false;
@@ -136,9 +150,22 @@ namespace Constexpr {
             result += (input[i] - '0') * place;
             place *= 10;
         }
-        result += (input[0] - '0' * place);
+        result += (input[0] - '0') * place;
 
         return true;
+    }
+
+    namespace ContexprTests {
+        template<typename T>
+        constexpr bool TestParseNumber(const std::string& str, T expected) {
+            T actual;
+            auto success = ParseNumber<T>(str, actual);
+            return success && actual == expected;
+        }
+
+        static_assert(TestParseNumber<u32>("1234", 1234));
+        static_assert(TestParseNumber<s32>("-1234", -1234));
+        static_assert(TestParseNumber<u64>("123454321", 123454321));
     }
 
     template<typename T>

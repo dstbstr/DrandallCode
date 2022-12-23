@@ -1,15 +1,16 @@
 #ifndef __TYPES_H__
 #define __TYPES_H__
+#include <stdint.h>
 
-using s8 = __int8;
-using s16 = __int16;
-using s32 = __int32;
-using s64 = __int64;
+using s8 = int8_t;
+using s16 = int16_t;
+using s32 = int32_t;
+using s64 = int64_t;
 
-using u8 = unsigned __int8;
-using u16 = unsigned __int16;
-using u32 = unsigned __int32;
-using u64 = unsigned __int64;
+using u8 = uint8_t;
+using u16 = uint16_t;
+using u32 = uint32_t;
+using u64 = uint64_t;
 
 using f32 = float;
 using f64 = double;
