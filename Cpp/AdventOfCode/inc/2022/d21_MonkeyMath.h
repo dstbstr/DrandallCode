@@ -96,34 +96,6 @@ u64 PartOne(const std::vector<std::string>& lines) {
     return monkeys[rootIndex].Value;
 }
 
-void Reduce(std::string& equation) {
-    const static auto re = std::regex(R"(\(?(\d+)([\/\-\+\*])(\d+)\)?)");
-    std::smatch match;
-
-    for (auto i = 0; i < equation.size(); i++) {
-        if (equation[i] == ')') {
-            auto openParen = equation.substr(0, i).find_last_of('(');
-            auto expression = equation.substr(openParen, i - openParen);
-            if (std::regex_search(expression, match, re)) {
-                u64 combined = 0;
-                u64 lhs;
-                u64 rhs;
-                ParseNumber(match[1].str(), lhs);
-                ParseNumber(match[3].str(), rhs);
-                switch (match[2].str()[0]) {
-                case '+': combined = lhs + rhs; break;
-                case '-': combined = lhs - rhs; break;
-                case '*': combined = lhs * rhs; break;
-                case '/': combined = lhs / rhs; break;
-                }
-
-                equation = std::regex_replace(equation, re, ToString(combined));
-                return;
-            }
-        }
-    }
-}
-
 u64 PartTwo(const std::vector<std::string>& lines) {
     std::vector<Monkey> monkeys;
     size_t rootIndex = 0;
@@ -146,6 +118,9 @@ u64 PartTwo(const std::vector<std::string>& lines) {
         }
     }
 
+    monkeys[humanIndex].ValueSet = false;
+    monkeys[humanIndex].Value = 0;
+
     leftMonkeyIndex = monkeyMap[monkeys[rootIndex].Lhs];
     rightMonkeyIndex = monkeyMap[monkeys[rootIndex].Rhs];
 
@@ -154,21 +129,17 @@ u64 PartTwo(const std::vector<std::string>& lines) {
     while (added > 0) {
         added = 0;
         for (auto& monkey : monkeys) {
-            if (monkey.ValueSet) continue;
+            if (monkey.ValueSet || monkey.Name == "humn") continue;
 
             auto leftIndex = monkeyMap.at(monkey.Lhs);
             auto rightIndex = monkeyMap.at(monkey.Rhs);
             if (monkeys[leftIndex].ValueSet && monkeys[rightIndex].ValueSet) {
-                if (leftIndex == humanIndex || rightIndex == humanIndex) continue;
                 added++;
                 monkey.Value = CalcValue(monkey, monkeys[leftIndex], monkeys[rightIndex]);
                 monkey.ValueSet = true;
             }
         }
     }
-
-    monkeys[humanIndex].ValueSet = false;
-    monkeys[humanIndex].Value = 0;
 
     auto& currentMonkey = monkeys[rootIndex];
     currentMonkey.Operation = Op::Minus;
@@ -178,23 +149,28 @@ u64 PartTwo(const std::vector<std::string>& lines) {
         leftMonkeyIndex = monkeyMap[currentMonkey.Lhs];
         rightMonkeyIndex = monkeyMap[currentMonkey.Rhs];
 
-        u64 knownValue = monkeys[leftMonkeyIndex].ValueSet ? monkeys[leftMonkeyIndex].Value : monkeys[rightMonkeyIndex].Value;
-        auto& nextMonkey = monkeys[leftMonkeyIndex].ValueSet ? monkeys[rightMonkeyIndex] : monkeys[leftMonkeyIndex];
+        bool leftKnown = monkeys[leftMonkeyIndex].ValueSet;
+        u64 knownValue = leftKnown ? monkeys[leftMonkeyIndex].Value : monkeys[rightMonkeyIndex].Value;
+        auto& nextMonkey = leftKnown ? monkeys[rightMonkeyIndex] : monkeys[leftMonkeyIndex];
+
         u64 nextValue = 0;
         switch (currentMonkey.Operation) {
         case Op::Plus: nextValue = targetValue - knownValue; break;
-        case Op::Minus: nextValue = targetValue + knownValue; break;
         case Op::Mul: nextValue = targetValue / knownValue; break;
-        case Op::Div: nextValue = targetValue * knownValue; break;
-        default: break;
         }
-
-        switch (currentMonkey.Operation) {
-        case Op::Plus: std::cout << nextValue << " + " << knownValue << " == " << targetValue << "\n"; break;
-        case Op::Minus: std::cout << nextValue << " - " << knownValue << " == " << targetValue << "\n"; break;
-        case Op::Mul: std::cout << nextValue << " * " << knownValue << " == " << targetValue << "\n"; break;
-        case Op::Div: std::cout << nextValue << " / " << knownValue << " == " << targetValue << "\n"; break;
-        default:break;
+        if (nextValue == 0) {
+            if (leftKnown) {
+                switch (currentMonkey.Operation) {
+                case Op::Minus: nextValue = knownValue - targetValue; break;
+                case Op::Div: nextValue = knownValue / targetValue; break;
+                }
+            }
+            else {
+                switch (currentMonkey.Operation) {
+                case Op::Minus: nextValue = targetValue + knownValue; break;
+                case Op::Div: nextValue = targetValue * knownValue; break;
+                }
+            }
         }
 
         nextMonkey.Value = nextValue;
@@ -208,87 +184,10 @@ u64 PartTwo(const std::vector<std::string>& lines) {
     return monkeys[humanIndex].Value;
     
 
-    //8759966720571 is too high
-
-    /*
-    std::vector<std::string> tokens = {
-        "(" + monkeys[rootIndex].Lhs + ")",
-        "==",
-        "(" + monkeys[rootIndex].Rhs + ")"
-    };
-
-    std::vector<std::string> nextTokens;
-    while (true) {
-        for (auto& token : tokens) {
-            if (token.size() < 4) {
-                nextTokens.push_back(token);
-                continue;
-            }
-
-            auto monkey = monkeys[monkeyMap[token.substr(1, 4)]];
-            if (monkey.Name == "humn") {
-                nextTokens.push_back("X");
-            }
-            else if (monkey.ValueSet) {
-                nextTokens.push_back(ToString(monkey.Value));
-            }
-            else {
-                nextTokens.push_back("(");
-                nextTokens.push_back("(" + monkey.Lhs + ")");
-                nextTokens.push_back(ToString(monkey.Operation));
-                nextTokens.push_back("(" + monkey.Rhs + ")");
-                nextTokens.push_back(")");
-            }
-        }
-
-        size_t oldSize = tokens.size();
-        tokens = nextTokens;
-        nextTokens.clear();
-        if (oldSize == tokens.size()) {
-            break;
-        }
-    }
-
-    std::string equation = StrUtil::JoinVec("", tokens);
-
-    std::cout << equation << "\n\n";
-    size_t oldSize = equation.size();
-    Reduce(equation);
-    
-    while (oldSize != equation.size()) {
-        std::cout << equation << "\n\n";
-        oldSize = equation.size();
-        Reduce(equation);
-    }
-
-    return equation;
-    */
-    
-    
-
-    /*
-    RunMonkeys(monkeys, monkeyMap, rootIndex);
-    u64 i = 8759963400000;
-    while (true) {
-        if (i % 100000 == 0) {
-            std::cout << i << '\n';
-        }
-        monkeys[humanIndex].Value = i;
-        auto copy = monkeys;
-        RunMonkeys(copy, monkeyMap, rootIndex);
-        if (copy[leftMonkeyIndex].Value == copy[rightMonkeyIndex].Value) {
-            return i;
-        }
-
-        i--;
-    }
-    */
-    
 }
 
 std::string Run(const std::vector<std::string>& lines) {
     //return ToString(PartOne(lines));
-    //return PartTwo(lines);
     return ToString(PartTwo(lines));
 }
 
@@ -313,10 +212,6 @@ bool RunTests() {
 
     if(ParseLine("abcd: 42").Value != u64(42)) return false;
     if (PartOne(lines) != 152) return false;
-    
-    //auto equation = PartTwo(lines);
-    //if (equation.empty()) return false;
-    //if (PartTwo(lines) != 301) return false;
 
     return true;
 }
