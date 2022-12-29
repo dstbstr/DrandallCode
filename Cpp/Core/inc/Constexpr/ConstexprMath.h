@@ -54,119 +54,20 @@ namespace Constexpr {
 
     static_assert(EuclideanModulo(-5, 3) == 1);
 
-    template<typename Collection>
-    constexpr std::string JoinVec(std::string&& delimiter, Collection&& input) {
-        std::string result;
-        bool first = true;
-        for (const auto& elem : input) {
-            if (first) first = false;
-            else result += delimiter;
-            result += elem;
+    constexpr size_t FromBase26(std::string_view str) {
+        auto pow = 1;
+        size_t result = 0;
+        for (auto it = str.rbegin(); it != str.rend(); it++) {
+            result += (*it - 'a' + 1) * pow;
+            pow *= 26;
         }
 
-        return result;
+        return result - 1;
     }
 
-    template<typename Collection>
-    constexpr std::string JoinVec(std::string&& delimiter, const Collection& input) {
-        std::string result;
-        bool first = true;
-        for (const auto& elem : input) {
-            if (first) first = false;
-            else result += delimiter;
-            result += elem;
-        }
-
-        return result;
-    }
-
-    template<typename Collection>
-    constexpr std::string JoinVec(char&& delimiter, Collection const& input) {
-        return JoinVec(std::string(1, delimiter), input);
-    }
-
-    static_assert(JoinVec(" ", std::vector<std::string>{ "a", "b", "c" }) == "a b c");
-    static_assert(JoinVec(' ', std::vector<std::string>{ "a", "b", "c" }) == "a b c");
-    static_assert(JoinVec("Hello", std::vector<std::string>{ "a", "b", "c" }) == "aHellobHelloc");
-
-
-    constexpr std::vector<std::string_view> Split(std::string_view input, std::string_view delimiter) {
-        size_t last = 0;
-        size_t next = 0;
-        std::vector<std::string_view> result;
-
-        while ((next = input.find(delimiter, last)) != std::string::npos) {
-            if (next - last > 0) {
-                result.push_back(input.substr(last, next - last));
-            }
-            last = next + delimiter.size();
-        }
-
-        auto lastEntry = input.substr(last);
-        if (lastEntry.length() > 0) {
-            result.push_back(lastEntry);
-        }
-        return result;
-    }
-
-    static_assert(Split("a b c", " ").size() == 3);
-    static_assert(Split("abc", " ").size() == 1);
-
-    template<typename T>
-    constexpr bool ParseNumber(std::string_view input, T& result, typename std::enable_if_t<std::is_signed_v<T>, bool> = true) {
-        u32 place = 1;
-        u32 pos = input[0] == '-' ? 1 : 0;
-
-        result = 0;
-        for (size_t i = input.size() - 1; i != pos; i--) {
-            if (input[i] < '0' || input[i] > '9') {
-                return false;
-            }
-            result += (input[i] - '0') * place;
-            place *= 10;
-        }
-        result += (input[pos] - '0') * place;
-#pragma warning(push)
-#pragma warning(disable:4146)
-        if (input[0] == '-') {
-            result = -result;
-        }
-#pragma warning(pop)
-        return true;
-    }
-
-    template<typename T>
-    constexpr bool ParseNumber(std::string_view input, T& result, typename std::enable_if_t<!std::is_signed_v<T>, bool> = true) {
-        u32 place = 1;
-        if (input[0] == '-') {
-            return false;
-        }
-
-        result = 0;
-        for (size_t i = input.size() - 1; i != 0; i--) {
-            if (input[i] < '0' || input[i] > '9') {
-                return false;
-            }
-            result += (input[i] - '0') * place;
-            place *= 10;
-        }
-        result += (input[0] - '0') * place;
-
-        return true;
-    }
-
-    namespace ContexprTests {
-        template<typename T>
-        constexpr bool TestParseNumber(const std::string& str, T expected) {
-            T actual;
-            auto success = ParseNumber<T>(str, actual);
-            return success && actual == expected;
-        }
-
-        static_assert(TestParseNumber<u32>("1234", 1234));
-        static_assert(TestParseNumber<s32>("-1234", -1234));
-        static_assert(TestParseNumber<u64>("123454321", 123454321));
-    }
+    static_assert(FromBase26(std::string_view("a")) == 0);
+    static_assert(FromBase26(std::string_view("z")) == 25);
+    static_assert(FromBase26(std::string_view("aa")) == 26);
 
     template<typename T>
     constexpr std::vector<T> GetPrimes(T max) {
@@ -292,19 +193,45 @@ namespace Constexpr {
 
         std::vector<T> result{};
 
-for (auto factor : primes) {
-    auto running = Value;
-    while (running % factor == 0) {
-        result.push_back(factor);
-        running /= factor;
-    }
-}
+        for (auto factor : primes) {
+            auto running = Value;
+            while (running % factor == 0) {
+                result.push_back(factor);
+                running /= factor;
+            }
+        }
 
-return result;
+        return result;
     }
 
     static_assert(GetAllPrimeFactors<16, u32>() == std::vector<u32>{2, 2, 2, 2});
     static_assert(GetAllPrimeFactors<7, u32>() == std::vector<u32>{7});
+
+    constexpr std::vector<u32> GetDivisors(u32 input) {
+        auto last = static_cast<u32>(Sqrt(input));
+        auto result = std::vector<u32>{};
+
+        for (u32 i = 1; i < last; i++) {
+            if (input % i == 0) {
+                result.push_back(i);
+                result.push_back(input / i);
+            }
+        }
+
+        if (last * last == input) {
+            result.push_back(last);
+        }
+        else if (input % last == 0) {
+            result.push_back(last);
+            result.push_back(input / last);
+        }
+
+        return result;
+    }
+
+    static_assert(GetDivisors(24) == std::vector<u32>{1, 24, 2, 12, 3, 8, 4, 6});
+    static_assert(GetDivisors(9) == std::vector<u32>{1, 9, 3});
+    static_assert(GetDivisors(1) == std::vector<u32>{1});
 
     namespace detail {
         template<typename T>
@@ -367,21 +294,6 @@ return result;
     static_assert(FindLcm<3, 5, u32>() == 15);
     static_assert(FindLcm<12, 16, u32>() == 48);
 
-    namespace ConstexprTests {
-        template<typename T>
-        constexpr bool TestParseNumber(const std::string& input, T expectedOutput) {
-            T actual;
-            if (!ParseNumber<T>(input, actual)) return false;
-            return expectedOutput == actual;
-        }
-
-        static_assert(TestParseNumber("42", 42));
-        static_assert(TestParseNumber("-42", -42));
-        static_assert(TestParseNumber("0", u32(0)));
-        static_assert(!TestParseNumber("-1", s32(1)));
-        static_assert(!TestParseNumber("abc", 0));
-    }
-
     template<size_t Verts, typename T>
     constexpr void FloydWarshall(std::array<std::array<T, Verts>, Verts>& table) {
         for (size_t i = 0; i < Verts; i++) {
@@ -411,4 +323,43 @@ return result;
         static_assert(TestFloydWarshall(2, 0, 8));
         static_assert(TestFloydWarshall(3, 1, 4));
     }
+
+    template<typename T>
+    constexpr bool Eval(T lhs, T rhs, std::string_view op) {
+        if (op == "<") {
+            return lhs < rhs;
+        }
+        else if (op == ">") {
+            return lhs > rhs;
+        }
+        else if (op == "<=") {
+            return lhs <= rhs;
+        }
+        else if (op == ">=") {
+            return lhs >= rhs;
+        }
+        else if (op == "==") {
+            return lhs == rhs;
+        }
+        else if (op == "!=") {
+            return lhs != rhs;
+        }
+
+        return false;
+    }
+
+    static_assert(Eval(20, 40, "<"));
+    static_assert(Eval(40, 20, ">"));
+    static_assert(Eval(20, 20, "<="));
+    static_assert(Eval(20, 20, ">="));
+    static_assert(Eval(20, 20, "=="));
+    static_assert(Eval(20, 40, "!="));
+
+    static_assert(!Eval(40, 20, "<"));
+    static_assert(!Eval(20, 40, ">"));
+    static_assert(!Eval(40, 20, "<="));
+    static_assert(!Eval(20, 40, ">="));
+    static_assert(!Eval(20, 40, "=="));
+    static_assert(!Eval(20, 20, "!="));
+
 }

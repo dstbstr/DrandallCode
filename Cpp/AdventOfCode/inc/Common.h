@@ -14,4 +14,10 @@
 #include "Utils.h"
 #include "Coord.h"
 #include "Utilities/StringUtils.h"
-#include "Utilities/ConstexprUtils.h"
+
+#include "Constexpr/ConstexprCollections.h"
+#include "Constexpr/ConstexprMath.h"
+#include "Constexpr/ConstexprStrUtils.h"
+
+using namespace std::string_view_literals;
+using namespace std::string_literals;
