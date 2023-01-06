@@ -31,6 +31,35 @@ struct UCoordHash {
     }
 };
 
+constexpr void GetLimits(const std::vector<UCoord>& coords, UCoord& min, UCoord& max) {
+    min.X = 9999;
+    min.Y = 9999;
+    max.X = 0;
+    max.Y = 0;
+
+    for (const auto& coord : coords) {
+        min.X = std::min(min.X, coord.X);
+        min.Y = std::min(min.Y, coord.Y);
+        max.X = std::max(max.X, coord.X);
+        max.Y = std::max(max.Y, coord.Y);
+    }
+}
+
+constexpr void GetLimits(const std::vector<Coord>& coords, Coord& min, Coord& max) {
+    min.X = 9999;
+    min.Y = 9999;
+    max.X = 0;
+    max.Y = 0;
+
+    for (const auto& coord : coords) {
+        min.X = std::min(min.X, coord.X);
+        min.Y = std::min(min.Y, coord.Y);
+        max.X = std::max(max.X, coord.X);
+        max.Y = std::max(max.Y, coord.Y);
+    }
+}
+
+
 struct RowCol {
     size_t Row;
     size_t Col;
@@ -46,6 +75,62 @@ struct RowCol {
 struct RowColHash {
     size_t operator()(const RowCol& rc) const {
         return rc.Row ^ rc.Col;
+    }
+};
+
+constexpr void GetLimits(const std::vector<RowCol>& coords, RowCol& min, RowCol& max) {
+    min.Row = 9999;
+    min.Col = 9999;
+    max.Row = 0;
+    max.Col = 0;
+
+    for (const auto& coord : coords) {
+        min.Row = std::min(min.Row, coord.Row);
+        min.Col = std::min(min.Col, coord.Col);
+        max.Row = std::max(max.Row, coord.Row);
+        max.Col = std::max(max.Col, coord.Col);
+    }
+}
+
+template<typename T>
+struct Vec3 {
+    T X;
+    T Y;
+    T Z;
+
+    constexpr bool operator==(const Vec3<T>& v) const = default;
+    constexpr Vec3<T> operator+(const Vec3<T>& v) {
+        Vec3<T> result;
+        result.X = X + v.X;
+        result.Y = Y + v.Y;
+        result.Z = Z + v.Z;
+        return result;
+    }
+
+    constexpr void operator+=(const Vec3<T>& v) {
+        X += v.X;
+        Y += v.Y;
+        Z += v.Z;
+    }
+
+    constexpr Vec3<T> operator-(const Vec3<T>&v) {
+        Vec3<T> result;
+        result.X = X - v.X;
+        result.Y = Y - v.Y;
+        result.Z = Z - v.Z;
+        return result;
+    }
+    constexpr void operator-=(const Vec3<T>& v) {
+        X -= v.X;
+        Y -= v.Y;
+        Z -= v.Z;
+    }
+};
+
+template<typename T>
+struct Vec3Hash {
+    size_t operator()(const Vec3<T> v) const {
+        return v.X ^ v.Y ^ v.Z;
     }
 };
 
@@ -67,6 +152,15 @@ constexpr size_t MDistance(const RowCol& lhs, const RowCol& rhs) {
     size_t result = 0;
     result += (lhs.Row < rhs.Row ? rhs.Row - lhs.Row : lhs.Row - rhs.Row);
     result += (lhs.Col < rhs.Col ? rhs.Col - lhs.Col : lhs.Col - rhs.Col);
+    return result;
+}
+
+template<typename T>
+constexpr T MDistance(const Vec3<T> lhs, const Vec3<T> rhs) {
+    T result = 0;
+    result += (lhs.X < rhs.X ? rhs.X - lhs.X : lhs.X - rhs.X);
+    result += (lhs.Y < rhs.Y ? rhs.Y - lhs.Y : lhs.Y - rhs.Y);
+    result += (lhs.Z < rhs.Z ? rhs.Z - lhs.Z : lhs.Z - rhs.Z);
     return result;
 }
 

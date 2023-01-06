@@ -59,7 +59,7 @@ namespace Constexpr {
 
     template<typename T>
     constexpr bool ParseNumber(std::string_view input, T& result, typename std::enable_if_t<!std::is_signed_v<T>, bool> = true) {
-        u32 place = 1;
+        T place = 1;
         if (input[0] == '-') {
             return false;
         }

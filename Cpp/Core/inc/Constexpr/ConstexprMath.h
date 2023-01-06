@@ -362,4 +362,59 @@ namespace Constexpr {
     static_assert(!Eval(20, 40, "=="));
     static_assert(!Eval(20, 20, "!="));
 
+    namespace detail {
+        enum struct Orientation {Linear, Clockwise, CounterClockwise};
+        //    template<typename T, typename std::enable_if_t<std::is_signed_v<T>, bool> = true>
+
+        template<typename Point>
+        constexpr Orientation GetOrientation(Point p, Point q, Point r) {
+            static_assert(Point{ -1, -1 }.X < 0);
+
+            auto val = (q.Y - p.Y) * (r.X - q.X) - (q.X - p.X) * (r.Y - q.Y);
+            return val == 0 ? Orientation::Linear :
+                val < 0 ? Orientation::CounterClockwise : Orientation::Clockwise;
+        }
+    }
+
+    template<typename Point>
+    constexpr std::vector<Point> GetConvexHull(const std::vector<Point>& points) {
+        if (points.size() < 3) return {};
+        std::vector<Point> hull;
+        size_t leftMost = 0;
+        for (auto i = 1; i < points.size(); i++) {
+            if (points[i].X < points[leftMost].X) {
+                leftMost = i;
+            }
+        }
+
+        size_t p = leftMost;
+        size_t q = 0;
+
+        do {
+            hull.push_back(points[p]);
+            q = (p + 1) % points.size();
+            for (auto i = 0; i < points.size(); i++) {
+                if (detail::GetOrientation(points[p], points[i], points[q]) == detail::Orientation::CounterClockwise) {
+                    q = i;
+                }
+            }
+
+            p = q;
+        } while (p != leftMost);
+
+        return hull;
+    }
+
+    namespace Tests {
+        struct Point { 
+            int X; 
+            int Y; 
+            constexpr bool operator==(const Point& other) const {
+                return X == other.X && Y == other.Y;
+            }
+        };
+
+        static_assert(GetConvexHull(std::vector<Point>{ {0, 3}, { 2, 2 }, { 1, 1 }, { 2, 1 }, { 3, 0 }, { 0, 0 }, { 3, 3 }}) == std::vector<Point>{ {0, 3}, { 0, 0 }, { 3, 0 }, { 3, 3 }});
+    
+    }
 }
