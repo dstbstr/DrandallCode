@@ -2,6 +2,9 @@
 
 #include "Platform/Types.h"
 
+template<typename T>
+std::string ToString(T input);
+
 struct Coord {
     s32 X;
     s32 Y;
@@ -17,6 +20,11 @@ struct CoordHash {
     }
 };
 
+template<>
+inline std::string ToString(Coord coord) {
+    return "{" + ToString(coord.X) + "," + ToString(coord.Y) + "}";
+}
+
 struct UCoord {
     u32 X;
     u32 Y;
@@ -30,6 +38,11 @@ struct UCoordHash {
         return c.X ^ c.Y;
     }
 };
+
+template<>
+inline std::string ToString(UCoord coord) {
+    return "{" + ToString(coord.X) + "," + ToString(coord.Y) + "}";
+}
 
 constexpr void GetLimits(const std::vector<UCoord>& coords, UCoord& min, UCoord& max) {
     min.X = 9999;
@@ -77,6 +90,11 @@ struct RowColHash {
         return rc.Row ^ rc.Col;
     }
 };
+
+template<>
+inline std::string ToString(RowCol rc) {
+    return "Row: " + ToString(rc.Row) + " Col: " + ToString(rc.Col);
+}
 
 constexpr void GetLimits(const std::vector<RowCol>& coords, RowCol& min, RowCol& max) {
     min.Row = 9999;
