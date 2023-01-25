@@ -152,6 +152,52 @@ struct Vec3Hash {
     }
 };
 
+template<typename T>
+struct Vec4 {
+    T X;
+    T Y;
+    T Z;
+    T W;
+
+    constexpr bool operator==(const Vec4<T>& v) const = default;
+    constexpr Vec4<T> operator+(const Vec4<T>& v) {
+        Vec4<T> result;
+        result.X = X + v.X;
+        result.Y = Y + v.Y;
+        result.Z = Z + v.Z;
+        result.W = W + v.W;
+        return result;
+    }
+
+    constexpr void operator+=(const Vec4<T>& v) {
+        X += v.X;
+        Y += v.Y;
+        Z += v.Z;
+        W += v.W;
+    }
+
+    constexpr Vec4<T> operator-(const Vec4<T>& v) {
+        Vec4<T> result;
+        result.X = X - v.X;
+        result.Y = Y - v.Y;
+        result.Z = Z - v.Z;
+        result.W = W - v.W;
+        return result;
+    }
+    constexpr void operator-=(const Vec4<T>& v) {
+        X -= v.X;
+        Y -= v.Y;
+        Z -= v.Z;
+        W -= v.W;
+    }
+};
+template<typename T>
+struct Vec4Hash {
+    size_t operator()(const Vec4<T> v) const {
+        return v.X ^ v.Y ^ v.Z ^ v.W;
+    }
+};
+
 constexpr s32 MDistance(const Coord& lhs, const Coord& rhs) {
     s32 result = 0;
     result += (lhs.X < rhs.X ? rhs.X - lhs.X : lhs.X - rhs.X);
@@ -179,6 +225,16 @@ constexpr T MDistance(const Vec3<T> lhs, const Vec3<T> rhs) {
     result += (lhs.X < rhs.X ? rhs.X - lhs.X : lhs.X - rhs.X);
     result += (lhs.Y < rhs.Y ? rhs.Y - lhs.Y : lhs.Y - rhs.Y);
     result += (lhs.Z < rhs.Z ? rhs.Z - lhs.Z : lhs.Z - rhs.Z);
+    return result;
+}
+
+template<typename T>
+constexpr T MDistance(const Vec4<T> lhs, const Vec4<T> rhs) {
+    T result = 0;
+    result += (lhs.X < rhs.X ? rhs.X - lhs.X : lhs.X - rhs.X);
+    result += (lhs.Y < rhs.Y ? rhs.Y - lhs.Y : lhs.Y - rhs.Y);
+    result += (lhs.Z < rhs.Z ? rhs.Z - lhs.Z : lhs.Z - rhs.Z);
+    result += (lhs.W < rhs.W ? rhs.W - lhs.W : lhs.W - rhs.W);
     return result;
 }
 
