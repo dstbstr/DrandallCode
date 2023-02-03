@@ -9,11 +9,13 @@
 #include <unordered_set>
 #include <exception>
 #include <functional>
+#include <iostream>
 
 #include "Platform/Types.h"
 #include "Utils.h"
 #include "Coord.h"
 #include "Utilities/StringUtils.h"
+#include "Utilities/Format.h"
 
 #include "Constexpr/ConstexprCollections.h"
 #include "Constexpr/ConstexprMath.h"
@@ -60,4 +62,23 @@ constexpr void Move(UCoord& pos, Direction facing) {
     case Right: pos.X++; return;
     default:break;
     }
+}
+
+template<typename Key, typename Value, typename Hash = std::hash<Key>>
+void PrintMap(const std::unordered_map<Key, Value, Hash>& map, std::function<char(const Key&, const Value&)> iconFn, char defaultIcon) {
+    Key min, max;
+    GetLimitsFromMap(map, min, max);
+    for (auto row = min.Y; row <= max.Y; row++) {
+        for (auto col = min.X; col <= max.X; col++) {
+            Key key = { col, row };
+            char icon = defaultIcon;
+            if (map.find(key) != map.end()) {
+                Value val = map.at(key);
+                icon = iconFn(key, val);
+            }
+            std::cout << icon;
+        }
+        std::cout << '\n';
+    }
+    std::cout << '\n';
 }

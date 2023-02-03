@@ -96,6 +96,68 @@ inline std::string ToString(RowCol rc) {
     return "Row: " + ToString(rc.Row) + " Col: " + ToString(rc.Col);
 }
 
+template<typename T, typename Start, typename End>
+constexpr void GetLimits(Start start, End end, T& min, T& max) {
+    min.X = std::numeric_limits<decltype(min.X)>::max();
+    min.Y = std::numeric_limits<decltype(min.Y)>::max();
+    max.X = std::numeric_limits<decltype(max.X)>::min();
+    max.Y = std::numeric_limits<decltype(max.Y)>::min();
+
+    while (start != end) {
+        min.X = std::min(min.X, start->X);
+        min.Y = std::min(min.Y, start->Y);
+        max.X = std::max(max.X, start->X);
+        max.Y = std::max(max.Y, start->Y);
+        start++;
+    }
+}
+
+template<typename Start, typename End>
+constexpr void GetLimits(Start start, End end, RowCol& min, RowCol& max) {
+    min.Row = std::numeric_limits<decltype(min.Row)>::max();
+    min.Col = std::numeric_limits<decltype(min.Col)>::max();
+    max.Row = std::numeric_limits<decltype(max.Row)>::min();
+    max.Col = std::numeric_limits<decltype(max.Col)>::min();
+
+    while (start != end) {
+        min.Row = std::min(min.Row, start->Row);
+        min.Col = std::min(min.Col, start->Col);
+        max.Row = std::max(max.Row, start->Row);
+        max.Col = std::max(max.Col, start->Col);
+        start++;
+    }
+}
+
+template<typename Key>
+void GetLimitsFromMap(const auto& map, Key& min, Key& max) {
+    min.X = std::numeric_limits<decltype(min.X)>::max();
+    min.Y = std::numeric_limits<decltype(min.Y)>::max();
+    max.X = std::numeric_limits<decltype(max.X)>::min();
+    max.Y = std::numeric_limits<decltype(max.Y)>::min();
+
+    for (const auto& kvp : map) {
+        min.X = std::min(min.X, kvp.first.X);
+        min.Y = std::min(min.Y, kvp.first.Y);
+        max.X = std::max(max.X, kvp.first.X);
+        max.Y = std::max(max.Y, kvp.first.Y);
+    }
+}
+
+void GetLimitsFromMap(const auto& map, RowCol& min, RowCol& max) {
+    min.Row = std::numeric_limits<decltype(min.Row)>::max();
+    min.Col = std::numeric_limits<decltype(min.Col)>::max();
+    max.Row = std::numeric_limits<decltype(max.Row)>::min();
+    max.Col = std::numeric_limits<decltype(max.Col)>::min();
+
+    for (const auto& kvp : map) {
+        min.Row = std::min(min.Row, kvp.first.Row);
+        min.Col = std::min(min.Col, kvp.first.Col);
+        max.Row = std::max(max.Row, kvp.first.Row);
+        max.Col = std::max(max.Col, kvp.first.Col);
+    }
+}
+
+/*
 constexpr void GetLimits(const std::vector<RowCol>& coords, RowCol& min, RowCol& max) {
     min.Row = 9999;
     min.Col = 9999;
@@ -109,12 +171,13 @@ constexpr void GetLimits(const std::vector<RowCol>& coords, RowCol& min, RowCol&
         max.Col = std::max(max.Col, coord.Col);
     }
 }
+*/
 
 template<typename T>
 struct Vec3 {
-    T X;
-    T Y;
-    T Z;
+    T X = 0;
+    T Y = 0;
+    T Z = 0;
 
     constexpr bool operator==(const Vec3<T>& v) const = default;
     constexpr Vec3<T> operator+(const Vec3<T>& v) {

@@ -46,6 +46,15 @@ namespace Constexpr {
     static_assert(Sqrt(-1) != Sqrt(-1)); // no way to test for NaN, but NaN != NaN
 
     template<typename T>
+    constexpr T Pow(T val, T pow) {
+        T result = val;
+        for (auto i = 1; i < pow; i++) {
+            result *= val;
+        }
+        return val;
+    }
+
+    template<typename T>
     constexpr T EuclideanModulo(T value, T modulus) {
         if (modulus == 0) return 0;
         T remainder = value % modulus;
@@ -79,7 +88,7 @@ namespace Constexpr {
         }
 
         std::vector<T> result{};
-        auto maxFactor = static_cast<T>(Sqrt(max + 1));
+        auto maxFactor = static_cast<T>(Sqrt(static_cast<double>(max) + 1));
         for (T prime = 2; prime <= maxFactor; prime++) {
             if (!candidates[prime]) continue;
             result.push_back(prime);
@@ -235,47 +244,66 @@ namespace Constexpr {
 
     namespace detail {
         template<typename T>
-        constexpr T FindLcm(std::vector<T> leftFactors, std::vector<T> rightFactors) {
+        constexpr T FindLcm(const std::vector<std::vector<T>>& factors) {
             T result = 1;
-            size_t leftIndex = 0;
-            size_t rightIndex = 0;
+            std::vector<size_t> indexes;
+            for (auto i = 0; i < factors.size(); i++) {
+                indexes.push_back(0);
+            }
 
-            while (leftIndex < leftFactors.size() && rightIndex < rightFactors.size()) {
-                auto left = leftFactors[leftIndex];
-                auto right = rightFactors[rightIndex];
-                if (left == right) {
-                    result *= left;
-                    leftIndex++;
-                    rightIndex++;
+            auto oneListDone = [&]() {
+                for (auto i = 0; i < indexes.size(); i++) {
+                    if (indexes[i] == factors[i].size()) {
+                        return true;
+                    }
                 }
-                else if (left < right) {
-                    result *= left;
-                    leftIndex++;
+                return false;
+            };
+
+            auto findMin = [](const std::vector<T>& vec) {
+                T min = std::numeric_limits<T>::max();
+                for (const auto val : vec) {
+                    min = std::min(min, val);
                 }
-                else {
-                    result *= right;
-                    rightIndex++;
+
+                return min;
+            };
+
+            std::vector<T> values;
+            while (!oneListDone()) {
+                values.clear();
+                for (auto i = 0; i < indexes.size(); i++) {
+                    values.push_back(factors[i][indexes[i]]);
+                }
+
+                auto min = findMin(values);
+
+                result *= min;
+                for (auto i = 0; i < indexes.size(); i++) {
+                    if (values[i] == min) {
+                        indexes[i]++;
+                    }
                 }
             }
 
-            if (leftIndex < leftFactors.size()) {
-                for (; leftIndex < leftFactors.size(); leftIndex++) {
-                    result *= leftFactors[leftIndex];
-                }
-            }
-            else if (rightIndex < rightFactors.size()) {
-                for (; rightIndex < rightFactors.size(); rightIndex++) {
-                    result *= rightFactors[rightIndex];
+            for (auto i = 0; i < indexes.size(); i++) {
+                for (auto index = indexes[i]; index < factors[i].size(); index++) {
+                    result *= factors[i][indexes[i]];
                 }
             }
 
             return result;
         }
+
+        template<typename T, typename... Args>
+        constexpr T FindLcm(Args... args) {
+            return detail::FindLcm<T>(std::vector<std::vector<T>>{std::forward<Args>(args)...});
+        }
     }
 
-    template<typename T>
-    constexpr T FindLcm(T lhs, T rhs) {
-        return detail::FindLcm(GetAllPrimeFactors(lhs), GetAllPrimeFactors(rhs));
+    template<typename T, typename... Args>
+    constexpr T FindLcm(Args&&... args) {
+        return detail::FindLcm<T>(GetAllPrimeFactors<T>(std::forward<Args>(args))...);
     }
 
     static_assert(FindLcm<u32>(60, 90) == 180);
@@ -287,7 +315,7 @@ namespace Constexpr {
 
     template<size_t Lhs, size_t Rhs, typename T>
     constexpr T FindLcm() {
-        return detail::FindLcm(GetAllPrimeFactors<Lhs, T>(), GetAllPrimeFactors<Rhs, T>());
+        return detail::FindLcm<T>(GetAllPrimeFactors<Lhs, T>(), GetAllPrimeFactors<Rhs, T>());
     }
 
     static_assert(FindLcm<60, 90, u32>() == 180);
@@ -364,7 +392,6 @@ namespace Constexpr {
 
     namespace detail {
         enum struct Orientation {Linear, Clockwise, CounterClockwise};
-        //    template<typename T, typename std::enable_if_t<std::is_signed_v<T>, bool> = true>
 
         template<typename Point>
         constexpr Orientation GetOrientation(Point p, Point q, Point r) {
@@ -373,6 +400,12 @@ namespace Constexpr {
             auto val = (q.Y - p.Y) * (r.X - q.X) - (q.X - p.X) * (r.Y - q.Y);
             return val == 0 ? Orientation::Linear :
                 val < 0 ? Orientation::CounterClockwise : Orientation::Clockwise;
+        }
+
+        template<typename Point>
+        constexpr bool IsOnSegment(Point p, Point q, Point r) {
+            return q.X <= std::max(p.X, r.X) && q.X >= std::min(p.X, r.X) &&
+                q.Y <= std::max(p.Y, r.Y) && q.Y >= std::min(p.Y, r.Y);
         }
     }
 
@@ -405,6 +438,34 @@ namespace Constexpr {
         return hull;
     }
 
+    template<typename Point>
+    constexpr bool DoIntersect(const Point& start1, const Point& end1, const Point& start2, const Point& end2) {
+        auto o1 = detail::GetOrientation(start1, end1, start2);
+        auto o2 = detail::GetOrientation(start1, end1, end2);
+        auto o3 = detail::GetOrientation(start2, end2, start1);
+        auto o4 = detail::GetOrientation(start2, end2, end1);
+            
+        if (o1 != o2 && o3 != o4) return true;
+        if (o1 == detail::Orientation::Linear && detail::IsOnSegment(start1, start2, end1)) return true;
+        if (o2 == detail::Orientation::Linear && detail::IsOnSegment(start1, end2, end1)) return true;
+        if (o3 == detail::Orientation::Linear && detail::IsOnSegment(start2, start1, end2)) return true;
+        if (o4 == detail::Orientation::Linear && detail::IsOnSegment(start2, end1, end2)) return true;
+        return false;
+    }
+
+    template<typename Point>
+    constexpr bool DoIntersect(const Point& start, const Point& end, const Point& point) {
+        auto dist = [](const Point& a, const Point& b) -> double {
+            double x = a.X < b.X ? (b.X - a.X) : (a.X - b.X);
+            double y = a.Y < b.Y ? (b.Y - a.Y) : (a.Y - b.Y);
+
+            return Constexpr::Sqrt((x * x) + (y * y));
+        };
+
+        return Constexpr::Abs(dist(start, end) - ((dist(start, point) + dist(end, point)))) < 0.000001;
+        //return dist(start, end) == (dist(start, point) + dist(end, point));
+    }
+
     namespace Tests {
         struct Point { 
             int X; 
@@ -415,6 +476,12 @@ namespace Constexpr {
         };
 
         static_assert(GetConvexHull(std::vector<Point>{ {0, 3}, { 2, 2 }, { 1, 1 }, { 2, 1 }, { 3, 0 }, { 0, 0 }, { 3, 3 }}) == std::vector<Point>{ {0, 3}, { 0, 0 }, { 3, 0 }, { 3, 3 }});
-    
+        static_assert(!DoIntersect<Point>({ 1, 1 }, { 10, 1 }, { 1, 2 }, { 10, 2 }));
+        static_assert(DoIntersect<Point>({ 10, 0 }, { 0, 10 }, { 0, 0 }, { 10, 10 }));
+        static_assert(!DoIntersect<Point>({ -5, -5 }, { 0, 0 }, { 1, 1 }, { 10, 10 }));
+
+        static_assert(DoIntersect<Point>({ 0, 0 }, { 2, 6 }, { 1, 3 }));
+        static_assert(DoIntersect<Point>({ 0, 0 }, { 3, 9 }, { 1, 3 }));
+        static_assert(!DoIntersect<Point>({ 0, 0 }, { 4, 9 }, { 1, 3 }));
     }
 }

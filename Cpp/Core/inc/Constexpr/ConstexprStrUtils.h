@@ -12,6 +12,46 @@ namespace Constexpr {
     static_assert(Strlen("a") == 1);
     static_assert(Strlen("") == 0);
 
+    template<typename T>
+    constexpr std::string ToString(T val, typename std::enable_if_t<std::is_signed_v<T>, bool> = true) {
+        bool negate = val < 0;
+        if (negate) {
+            val = -val;
+        }
+
+        std::string result;
+        while (val > 10) {
+            result.push_back('0' + (val % 10));
+            val /= 10;
+        }
+        result.push_back('0' + (val % 10));
+        if (negate) {
+            result.push_back('-');
+        }
+
+        std::reverse(result.begin(), result.end());
+        return result;
+    }
+
+    template<typename T>
+    constexpr std::string ToString(T val, typename std::enable_if_t<std::is_unsigned_v<T>, bool> = true) {
+        //1234 % 10 = 4
+        //1234 / 10 = 123 % 10 = 3
+        std::string result;
+        while (val > 10) {
+            result.push_back('0' + (val % 10));
+            val /= 10;
+        }
+        result.push_back('0' + (val % 10));
+
+        std::reverse(result.begin(), result.end());
+        return result;
+    }
+
+    static_assert(Constexpr::ToString(1234) == "1234");
+    static_assert(Constexpr::ToString(-1234) == "-1234");
+
+
     constexpr std::vector<std::string_view> Split(std::string_view input, std::string_view delimiter) {
         size_t last = 0;
         size_t next = 0;
@@ -36,8 +76,8 @@ namespace Constexpr {
 
     template<typename T>
     constexpr bool ParseNumber(std::string_view input, T& result, typename std::enable_if_t<std::is_signed_v<T>, bool> = true) {
-        u32 place = 1;
-        u32 pos = input[0] == '-' ? 1 : 0;
+        T place = 1;
+        size_t pos = input[0] == '-' ? 1 : 0;
 
         result = 0;
         for (size_t i = input.size() - 1; i != pos; i--) {
@@ -88,6 +128,7 @@ namespace Constexpr {
         static_assert(TestParseNumber<u32>("1234", 1234));
         static_assert(TestParseNumber<s32>("-1234", -1234));
         static_assert(TestParseNumber<u64>("123454321", 123454321));
+        static_assert(TestParseNumber<s64>("1234567654321", 1234567654321));
 
         static_assert(TestParseNumber("42", 42));
         static_assert(TestParseNumber("-42", -42));

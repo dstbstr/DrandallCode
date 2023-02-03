@@ -16,16 +16,17 @@ namespace StrUtil {
         }
     }
 
-    template<class... Args>
-    std::string _FormatImpl(const std::string fmt, Args&&... args) {
-        std::unique_ptr<char[]> buffer(new char[2048]);
-        _snprintf_s(buffer.get(), 2048, _TRUNCATE, fmt.c_str(), std::forward<Args>(args)...);
-        return std::string(buffer.get());
+    namespace detail {
+        template<class... Args>
+        std::string _FormatImpl(const std::string fmt, Args&&... args) {
+            std::unique_ptr<char[]> buffer(new char[2048]);
+            _snprintf_s(buffer.get(), 2048, _TRUNCATE, fmt.c_str(), std::forward<Args>(args)...);
+            return std::string(buffer.get());
+        }
     }
-
     template<class... Args>
     std::string Format(const std::string fmt, Args&&... args) {
-        return _FormatImpl(fmt, StringForward(std::forward<Args>(args))...);
+        return detail::_FormatImpl(fmt, StringForward(std::forward<Args>(args))...);
     }
 } // namespace StrUtil
 #pragma warning(pop)
