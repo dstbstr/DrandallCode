@@ -17,6 +17,7 @@
 #include "Utilities/StringUtils.h"
 #include "Utilities/Format.h"
 
+#include "Constexpr/ConstexprBits.h"
 #include "Constexpr/ConstexprCollections.h"
 #include "Constexpr/ConstexprMath.h"
 #include "Constexpr/ConstexprStrUtils.h"
