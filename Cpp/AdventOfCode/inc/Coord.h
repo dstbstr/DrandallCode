@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Platform/Types.h"
+#include <string>
 
 template<typename T>
 std::string ToString(T input);

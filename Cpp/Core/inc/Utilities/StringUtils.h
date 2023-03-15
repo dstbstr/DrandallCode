@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <charconv>
 #include <locale>
 #include <sstream>
 #include <string>
@@ -13,15 +14,50 @@
 #include <unordered_set>
 #include <vector>
 
+template<typename T>
+inline std::string ToString(T input) {
+    static_assert(std::is_integral_v<T>, "ToString not specialized for Type");
+    auto buf = std::unique_ptr<char[]>(new char[20]);
+    for (auto i = 0; i < 20; i++) {
+        buf[i] = 0;
+    }
+    std::to_chars(buf.get(), buf.get() + 20, input);
+    return std::string(buf.get());
+}
+
+template<>
+inline std::string ToString(const std::string& input) {
+    return input;
+}
+template<>
+inline std::string ToString(const std::string_view& input) {
+    return std::string(input);
+}
+template<typename TElement>
+inline std::string ToString(const std::vector<TElement>& input) {
+    std::stringstream stream;
+    for (const auto& i : input) {
+        stream << ToString(i) << ", ";
+    }
+    auto str = stream.str();
+
+    if (str.empty()) {
+        return "";
+    }
+
+    return str.substr(0, str.size() - 2);
+}
+
 namespace StrUtil {
     template<typename Collection>
     std::string JoinVec(std::string&& delimiter, Collection&& input) {
         std::stringstream stream;
         bool first = true;
-        for(auto it = input.begin(); it != input.end(); it++) {
-            if(first) {
+        for (auto it = input.begin(); it != input.end(); it++) {
+            if (first) {
                 first = false;
-            } else {
+            }
+            else {
                 stream << delimiter;
             }
             stream << *it;
@@ -34,10 +70,11 @@ namespace StrUtil {
     std::string JoinVec(std::string&& delimiter, Collection const& input) {
         std::stringstream stream;
         bool first = true;
-        for(auto it = input.begin(); it != input.end(); it++) {
-            if(first) {
+        for (auto it = input.begin(); it != input.end(); it++) {
+            if (first) {
                 first = false;
-            } else {
+            }
+            else {
                 stream << delimiter;
             }
             stream << *it;

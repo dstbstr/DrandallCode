@@ -89,10 +89,7 @@ void Step(std::bitset<1'000'000>& tape, size_t& cursor, State& state) {
     default: break;
     }
 }
-/*
-Begin in state A.
-Perform a diagnostic checksum after 12667664 steps.
-*/
+
 auto PartOne(const std::vector<std::string>&) {
     State state = State::A;
     size_t cursor = 500'000;

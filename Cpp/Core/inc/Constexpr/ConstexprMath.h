@@ -55,6 +55,70 @@ namespace Constexpr {
     }
 
     template<typename T>
+    constexpr T MulMod(T lhs, T rhs, T mod) {
+        static_assert(std::is_unsigned_v<T>, "MulMod depends on unsigned types");
+
+        T result = 0;
+        T temp;
+        T two = 2;
+        T one = 1;
+        T zero = 0;
+        if (rhs >= mod) {
+            if (mod > std::numeric_limits<T>::max() / two) rhs -= mod;
+            else rhs %= mod;
+        }
+        while (lhs != zero) {
+            if (lhs % two == one) {
+                if (rhs >= mod - result) result -= mod;
+                result += rhs;
+            }
+            lhs >>= 1;
+
+            temp = rhs;
+            if (rhs >= mod - rhs) temp -= mod;
+            rhs += temp;
+        }
+
+        return result;
+    }
+    static_assert(MulMod(3u, 5u, 20u) == 15u);
+    static_assert(MulMod(3u, 5u, 7u) == 1u);
+
+    template<typename T>
+    constexpr T ModPow(T base, T exp, T mod) {
+        static_assert(!std::is_floating_point_v<T>, "Type must not be floating point");
+        const T zero = 0;
+        const T one = 1;
+        const T two = 2;
+        if (mod <= zero) throw("Divide by zero");
+        if (mod == one) return zero;
+
+        T result = one;
+        base %= mod;
+        while (exp > zero) {
+            if (exp % two == one) {
+                if constexpr (std::is_unsigned_v<T>) {
+                    result = MulMod(result, base, mod);
+                }
+                else {
+                    result = (result * base) % mod;
+                }
+            }
+            exp >>= one;
+            if constexpr (std::is_unsigned_v<T>) {
+                base = MulMod(base, base, mod);
+            }
+            else {
+                base = (base * base) % mod;
+            }
+        }
+
+        return result;
+    }
+    static_assert(ModPow(2, 3, 5) == 3); //2^3 == 8 % 5 == 3
+
+
+    template<typename T>
     constexpr T EuclideanModulo(T value, T modulus) {
         if (modulus == 0) return 0;
         T remainder = value % modulus;
@@ -106,8 +170,8 @@ namespace Constexpr {
         return result;
     }
 
-    static_assert(GetPrimes<u32>(10) == std::vector<u32>{2, 3, 5, 7});
-    static_assert(GetPrimes<u32>(7) == std::vector<u32>{2, 3, 5, 7});
+    static_assert(GetPrimes<size_t>(10) == std::vector<size_t>{2, 3, 5, 7});
+    static_assert(GetPrimes<size_t>(7) == std::vector<size_t>{2, 3, 5, 7});
 
     template<size_t Max, typename T>
     constexpr std::vector<T> GetPrimes() {
@@ -135,8 +199,8 @@ namespace Constexpr {
         return result;
     }
 
-    static_assert(GetPrimes<10, u32>() == std::vector<u32>{2, 3, 5, 7});
-    static_assert(GetPrimes<7, u32>() == std::vector<u32>{2, 3, 5, 7});
+    static_assert(GetPrimes<10, size_t>() == std::vector<size_t>{2, 3, 5, 7});
+    static_assert(GetPrimes<7, size_t>() == std::vector<size_t>{2, 3, 5, 7});
 
     template<typename T>
     constexpr std::vector<T> GetUniquePrimeFactors(T value) {
@@ -153,8 +217,8 @@ namespace Constexpr {
         return result;
     }
 
-    static_assert(GetUniquePrimeFactors<u32>(10) == std::vector<u32>{2, 5});
-    static_assert(GetUniquePrimeFactors<u32>(7) == std::vector<u32>{7});
+    static_assert(GetUniquePrimeFactors<size_t>(10) == std::vector<size_t>{2, 5});
+    static_assert(GetUniquePrimeFactors<size_t>(7) == std::vector<size_t>{7});
 
     template<size_t Value, typename T>
     constexpr std::vector<T> GetUniquePrimeFactors() {
@@ -172,8 +236,8 @@ namespace Constexpr {
         return result;
     }
 
-    static_assert(GetUniquePrimeFactors<10, u32>() == std::vector<u32>{2, 5});
-    static_assert(GetUniquePrimeFactors<7, u32>() == std::vector<u32>{7});
+    static_assert(GetUniquePrimeFactors<10, size_t>() == std::vector<size_t>{2, 5});
+    static_assert(GetUniquePrimeFactors<7, size_t>() == std::vector<size_t>{7});
 
     template<typename T>
     constexpr std::vector<T> GetAllPrimeFactors(T value) {
@@ -192,8 +256,8 @@ namespace Constexpr {
         return result;
     }
 
-    static_assert(GetAllPrimeFactors<u32>(16) == std::vector<u32>{2, 2, 2, 2});
-    static_assert(GetAllPrimeFactors<u32>(7) == std::vector<u32>{7});
+    static_assert(GetAllPrimeFactors<size_t>(16) == std::vector<size_t>{2, 2, 2, 2});
+    static_assert(GetAllPrimeFactors<size_t>(7) == std::vector<size_t>{7});
 
     template<size_t Value, typename T>
     constexpr std::vector<T> GetAllPrimeFactors() {
@@ -213,14 +277,15 @@ namespace Constexpr {
         return result;
     }
 
-    static_assert(GetAllPrimeFactors<16, u32>() == std::vector<u32>{2, 2, 2, 2});
-    static_assert(GetAllPrimeFactors<7, u32>() == std::vector<u32>{7});
+    static_assert(GetAllPrimeFactors<16, size_t>() == std::vector<size_t>{2, 2, 2, 2});
+    static_assert(GetAllPrimeFactors<7, size_t>() == std::vector<size_t>{7});
 
-    constexpr std::vector<u32> GetDivisors(u32 input) {
-        auto last = static_cast<u32>(Sqrt(input));
-        auto result = std::vector<u32>{};
+    template<typename T, std::enable_if_t<std::is_integral_v<T>, int> = 0>
+    constexpr std::vector<T> GetDivisors(T input) {
+        auto last = static_cast<T>(Sqrt(input));
+        auto result = std::vector<T>{};
 
-        for (u32 i = 1; i < last; i++) {
+        for (T i = 1; i < last; i++) {
             if (input % i == 0) {
                 result.push_back(i);
                 result.push_back(input / i);
@@ -238,9 +303,9 @@ namespace Constexpr {
         return result;
     }
 
-    static_assert(GetDivisors(24) == std::vector<u32>{1, 24, 2, 12, 3, 8, 4, 6});
-    static_assert(GetDivisors(9) == std::vector<u32>{1, 9, 3});
-    static_assert(GetDivisors(1) == std::vector<u32>{1});
+    static_assert(GetDivisors(24) == std::vector<int>{1, 24, 2, 12, 3, 8, 4, 6});
+    static_assert(GetDivisors(9) == std::vector<int>{1, 9, 3});
+    static_assert(GetDivisors(1) == std::vector<int>{1});
 
     namespace detail {
         template<typename T>
@@ -306,21 +371,21 @@ namespace Constexpr {
         return detail::FindLcm<T>(GetAllPrimeFactors<T>(std::forward<Args>(args))...);
     }
 
-    static_assert(FindLcm<u32>(60, 90) == 180);
-    static_assert(FindLcm<u32>(90, 60) == 180);
-    static_assert(FindLcm<u32>(3, 5) == 15);
-    static_assert(FindLcm<u32>(5, 3) == 15);
-    static_assert(FindLcm<u32>(12, 16) == 48);
-    static_assert(FindLcm<u32>(16, 12) == 48);
+    static_assert(FindLcm<size_t>(60, 90) == 180);
+    static_assert(FindLcm<size_t>(90, 60) == 180);
+    static_assert(FindLcm<size_t>(3, 5) == 15);
+    static_assert(FindLcm<size_t>(5, 3) == 15);
+    static_assert(FindLcm<size_t>(12, 16) == 48);
+    static_assert(FindLcm<size_t>(16, 12) == 48);
 
     template<size_t Lhs, size_t Rhs, typename T>
     constexpr T FindLcm() {
         return detail::FindLcm<T>(GetAllPrimeFactors<Lhs, T>(), GetAllPrimeFactors<Rhs, T>());
     }
 
-    static_assert(FindLcm<60, 90, u32>() == 180);
-    static_assert(FindLcm<3, 5, u32>() == 15);
-    static_assert(FindLcm<12, 16, u32>() == 48);
+    static_assert(FindLcm<60, 90, size_t>() == 180);
+    static_assert(FindLcm<3, 5, size_t>() == 15);
+    static_assert(FindLcm<12, 16, size_t>() == 48);
 
     template<size_t Verts, typename T>
     constexpr void FloydWarshall(std::array<std::array<T, Verts>, Verts>& table) {
@@ -333,9 +398,20 @@ namespace Constexpr {
         }
     }
 
+    template<typename T>
+    constexpr void FloydWarshall(std::vector<std::vector<T>>& table) {
+        for (size_t i = 0; i < table.size(); i++) {
+            for (size_t x = 0; x < table.size(); x++) {
+                for (size_t y = 0; y < table[0].size(); y++) {
+                    table[x][y] = std::min(table[x][y], table[x][i] + table[i][y]);
+                }
+            }
+        }
+    }
+
     namespace ConstexprTests {
-        constexpr bool TestFloydWarshall(size_t x, size_t y, u32 expectedValue) {
-            std::array<std::array<u32, 4>, 4> graph = { {
+        constexpr bool TestFloydWarshall(size_t x, size_t y, size_t expectedValue) {
+            std::array<std::array<size_t, 4>, 4> graph = { {
                 { 0, 5, 99, 10 },
                 { 99, 0, 3, 99 },
                 { 99, 99, 0, 1} ,
@@ -463,7 +539,6 @@ namespace Constexpr {
         };
 
         return Constexpr::Abs(dist(start, end) - ((dist(start, point) + dist(end, point)))) < 0.000001;
-        //return dist(start, end) == (dist(start, point) + dist(end, point));
     }
 
     namespace Tests {
@@ -484,4 +559,44 @@ namespace Constexpr {
         static_assert(DoIntersect<Point>({ 0, 0 }, { 3, 9 }, { 1, 3 }));
         static_assert(!DoIntersect<Point>({ 0, 0 }, { 4, 9 }, { 1, 3 }));
     }
+
+    template<typename T>
+    constexpr T MultiplicativeInverse(T a, T n) {
+        static_assert(T(-1) < T(0), "MultiplicativeInverse requires signed numbers");
+        T t = 0;
+        T newT = 1;
+        T r = n;
+        T newR = a;
+
+        const T zero = 0;
+        const T one = 1;
+
+        while (newR != zero) {
+            auto q = r / newR;
+            t -= q * newT;
+            r -= q * newR;
+            std::swap(t, newT);
+            std::swap(r, newR);
+        }
+
+        if (r != one) {
+            return 0; //inverse does not exist
+        }
+
+        if (t < zero) {
+            t += n;
+        }
+
+        return t;
+    }
+
+    //ax + by = gcd(a,b)
+    //ax + my = 1
+    //ax = 1 (mod m)
+    //a = 3, M = 11, output == 4
+    //(4*3) % 11 = 1
+    static_assert(MultiplicativeInverse(3, 5) == 2); //(3 * 2) % 5 == 1
+    static_assert(MultiplicativeInverse(3, 11) == 4); //(3 * 4) % 11 = 1
+    static_assert(MultiplicativeInverse(3, 7) == 5); //(3 * 5) % 7 == 1
+
 }

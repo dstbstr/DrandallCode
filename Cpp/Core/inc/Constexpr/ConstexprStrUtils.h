@@ -125,15 +125,15 @@ namespace Constexpr {
             return success && actual == expected;
         }
 
-        static_assert(TestParseNumber<u32>("1234", 1234));
-        static_assert(TestParseNumber<s32>("-1234", -1234));
-        static_assert(TestParseNumber<u64>("123454321", 123454321));
-        static_assert(TestParseNumber<s64>("1234567654321", 1234567654321));
+        static_assert(TestParseNumber<unsigned int>("1234", 1234));
+        static_assert(TestParseNumber<int>("-1234", -1234));
+        static_assert(TestParseNumber<size_t>("123454321", 123454321));
+        static_assert(TestParseNumber<long long>("1234567654321", 1234567654321));
 
         static_assert(TestParseNumber("42", 42));
         static_assert(TestParseNumber("-42", -42));
-        static_assert(TestParseNumber("0", u32(0)));
-        static_assert(!TestParseNumber("-1", s32(1)));
+        static_assert(TestParseNumber("0", unsigned int(0)));
+        static_assert(!TestParseNumber("-1", int(1)));
         static_assert(!TestParseNumber("abc", 0));
     }
 

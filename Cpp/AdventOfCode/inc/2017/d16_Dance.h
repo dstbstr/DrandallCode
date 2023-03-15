@@ -37,7 +37,6 @@ constexpr void ApplyMove(std::string& dancers, std::string_view move) {
     }
 }
 
-//ogenlicadmpbjkhf is wrong
 auto PartOne(const std::string& startingDancers, const std::string& line) {
     std::string dancers = startingDancers;
     auto split = Constexpr::Split(line, ",");

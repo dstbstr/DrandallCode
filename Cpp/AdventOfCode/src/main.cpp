@@ -1,5 +1,4 @@
-#include "2019/d18_CaveDoors.h"
-//#include "2016/Scrambler.h"
+#include "2019/d22_SpaceCards.h"
 
 #include "Utilities/StringUtils.h"
 #include "Utilities/ScopedTimer.h"
@@ -22,7 +21,7 @@ std::vector<std::string> ReadInputFile() {
 
     std::string line;
     while(std::getline(stream, line)) {
-        result.push_back(StrUtil::Trim(line));
+        result.push_back(line);
     }
 
     return result;
@@ -45,8 +44,7 @@ void Check() {
 int main(int, char**) {
     auto timer = ScopedTimer();
 
-    //Check();
+    Check();
     RunAgainstInput();
     return 0;
 }
-

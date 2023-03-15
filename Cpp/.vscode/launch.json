@@ -57,7 +57,7 @@
             "name": "AdventOfCode",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/bin/Debug/AdventOfCode.exe",
+            "program": "${workspaceFolder}/Build/VS/2022/AdventOfCode/Debug/AdventOfCode.exe",
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],

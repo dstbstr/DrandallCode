@@ -2,36 +2,6 @@
 
 #include "Common.h"
 
-enum Direction {Up, Right, Down, Left};
-
-constexpr Direction TurnRight(Direction current) {
-    return static_cast<Direction>((current + 1) % 4);
-}
-constexpr Direction TurnLeft(Direction current) {
-    return static_cast<Direction>((4 + (current - 1)) % 4);
-}
-constexpr Direction TurnAround(Direction current) {
-    return static_cast<Direction>((current + 2) % 4);
-}
-static_assert(TurnRight(Up) == Right);
-static_assert(TurnLeft(Up) == Left);
-static_assert(TurnRight(Left) == Up);
-static_assert(TurnLeft(Left) == Down);
-static_assert(TurnAround(Up) == Down);
-static_assert(TurnAround(Down) == Up);
-static_assert(TurnAround(Left) == Right);
-static_assert(TurnAround(Right) == Left);
-
-constexpr void Move(Coord& pos, Direction facing) {
-    switch (facing) {
-    case Up: pos.Y--; return;
-    case Down: pos.Y++; return;
-    case Left: pos.X--; return;
-    case Right: pos.X++; return;
-    default:break;
-    }
-}
-
 std::unordered_set<Coord, CoordHash> ParseInput(const std::vector<std::string>& lines) {
     std::unordered_set<Coord, CoordHash> result;
     for (size_t row = 0; row < lines.size(); row++) {
