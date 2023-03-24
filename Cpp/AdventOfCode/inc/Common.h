@@ -27,6 +27,15 @@ using namespace std::string_literals;
 
 enum Direction { Up, Right, Down, Left };
 
+constexpr std::string ToString(Direction dir) {
+    switch (dir) {
+    case Up: return "Up"; break;
+    case Right: return "Right"; break;
+    case Down: return "Down"; break;
+    case Left: return "Left"; break;
+    default: return "Unknown"; break;
+    }
+}
 constexpr Direction TurnRight(Direction current) {
     return static_cast<Direction>((current + 1) % 4);
 }

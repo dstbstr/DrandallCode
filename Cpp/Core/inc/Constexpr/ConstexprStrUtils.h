@@ -13,10 +13,13 @@ namespace Constexpr {
     static_assert(Strlen("") == 0);
 
     template<typename T>
-    constexpr std::string ToString(T val, typename std::enable_if_t<std::is_signed_v<T>, bool> = true) {
-        bool negate = val < 0;
-        if (negate) {
-            val = -val;
+    constexpr std::string ToString(T val) {
+        bool negate = false;
+        if constexpr (std::is_signed_v<T>) {
+            if (val < 0) {
+                negate = true;
+                val = -val;
+            }
         }
 
         std::string result;
@@ -33,24 +36,8 @@ namespace Constexpr {
         return result;
     }
 
-    template<typename T>
-    constexpr std::string ToString(T val, typename std::enable_if_t<std::is_unsigned_v<T>, bool> = true) {
-        //1234 % 10 = 4
-        //1234 / 10 = 123 % 10 = 3
-        std::string result;
-        while (val > 10) {
-            result.push_back('0' + (val % 10));
-            val /= 10;
-        }
-        result.push_back('0' + (val % 10));
-
-        std::reverse(result.begin(), result.end());
-        return result;
-    }
-
     static_assert(Constexpr::ToString(1234) == "1234");
     static_assert(Constexpr::ToString(-1234) == "-1234");
-
 
     constexpr std::vector<std::string_view> Split(std::string_view input, std::string_view delimiter) {
         size_t last = 0;
@@ -75,10 +62,9 @@ namespace Constexpr {
     static_assert(Split("abc", " ").size() == 1);
 
     template<typename T>
-    constexpr bool ParseNumber(std::string_view input, T& result, typename std::enable_if_t<std::is_signed_v<T>, bool> = true) {
+    constexpr bool ParseNumber(std::string_view input, T& result) {
         T place = 1;
-        size_t pos = input[0] == '-' ? 1 : 0;
-
+        size_t pos = input[0] == '-' || input[0] == '+' ? 1 : 0;
         result = 0;
         for (size_t i = input.size() - 1; i != pos; i--) {
             if (input[i] < '0' || input[i] > '9') {
@@ -87,32 +73,19 @@ namespace Constexpr {
             result += (input[i] - '0') * place;
             place *= 10;
         }
+        if (input[pos] < '0' || input[pos] > '9') return false;
+
         result += (input[pos] - '0') * place;
-#pragma warning(push)
-#pragma warning(disable:4146)
-        if (input[0] == '-') {
-            result = -result;
+        if constexpr (std::is_signed_v<T>) {
+            if (input[0] == '-') {
+                result = -result;
+            }
         }
-#pragma warning(pop)
-        return true;
-    }
-
-    template<typename T>
-    constexpr bool ParseNumber(std::string_view input, T& result, typename std::enable_if_t<!std::is_signed_v<T>, bool> = true) {
-        T place = 1;
-        if (input[0] == '-') {
-            return false;
-        }
-
-        result = 0;
-        for (size_t i = input.size() - 1; i != 0; i--) {
-            if (input[i] < '0' || input[i] > '9') {
+        else {
+            if (input[0] == '-') {
                 return false;
             }
-            result += (input[i] - '0') * place;
-            place *= 10;
         }
-        result += (input[0] - '0') * place;
 
         return true;
     }

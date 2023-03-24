@@ -2,6 +2,7 @@
 
 #include "Platform/Types.h"
 #include <string>
+#include <ostream>
 
 template<typename T>
 std::string ToString(T input);
@@ -13,7 +14,13 @@ struct Coord {
     constexpr bool operator==(const Coord& c) const {
         return this->X == c.X && this->Y == c.Y;
     }
+
+    friend std::ostream& operator<<(std::ostream& stream, const Coord& coord) {
+        stream << "{" << coord.X << "," << coord.Y << "}";
+        return stream;
+    }
 };
+
 
 struct CoordHash {
     size_t operator()(const Coord& c) const {
@@ -31,6 +38,11 @@ struct UCoord {
     u32 Y;
     constexpr bool operator==(const UCoord& c) const {
         return this->X == c.X && this->Y == c.Y;
+    }
+    
+    friend std::ostream& operator<<(std::ostream& stream, const UCoord& coord) {
+        stream << "{" << coord.X << "," << coord.Y << "}";
+        return stream;
     }
 };
 
@@ -83,6 +95,10 @@ struct RowCol {
     constexpr bool operator<(const RowCol& rc) const {
         return Row < rc.Row ? true : Row > rc.Row ? false :
             Col < rc.Col ? true : false;
+    }
+    friend std::ostream& operator<<(std::ostream& stream, const RowCol& rc) {
+        stream << "Row: " << rc.Row << " Col: " << rc.Col;
+        return stream;
     }
 };
 
@@ -158,22 +174,6 @@ void GetLimitsFromMap(const auto& map, RowCol& min, RowCol& max) {
     }
 }
 
-/*
-constexpr void GetLimits(const std::vector<RowCol>& coords, RowCol& min, RowCol& max) {
-    min.Row = 9999;
-    min.Col = 9999;
-    max.Row = 0;
-    max.Col = 0;
-
-    for (const auto& coord : coords) {
-        min.Row = std::min(min.Row, coord.Row);
-        min.Col = std::min(min.Col, coord.Col);
-        max.Row = std::max(max.Row, coord.Row);
-        max.Col = std::max(max.Col, coord.Col);
-    }
-}
-*/
-
 template<typename T>
 struct Vec3 {
     T X = 0;
@@ -206,6 +206,11 @@ struct Vec3 {
         X -= v.X;
         Y -= v.Y;
         Z -= v.Z;
+    }
+
+    friend std::ostream& operator<<(std::ostream& stream, const Vec3<T>& vec) {
+        stream << "<" << vec.X << "," << vec.Y << "," << vec.Z << ">";
+        return stream;
     }
 };
 
@@ -254,6 +259,12 @@ struct Vec4 {
         Z -= v.Z;
         W -= v.W;
     }
+
+    friend std::ostream& operator<<(std::ostream& stream, const Vec4<T>& vec) {
+        stream << "<" << vec.X << "," << vec.Y << "," << vec.Z << "," << vec.W << ">";
+        return stream;
+    }
+
 };
 template<typename T>
 struct Vec4Hash {

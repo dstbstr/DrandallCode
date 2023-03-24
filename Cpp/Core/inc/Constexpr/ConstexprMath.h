@@ -5,26 +5,13 @@
 
 namespace Constexpr {
     template<typename T>
-    constexpr auto Sum(const T& container) {
-        auto result = 0;
-        for (auto e : container) {
-            result += e;
+    constexpr T Abs(T t) {
+        if constexpr (std::is_signed_v<T>) {
+            return t < 0 ? -t : t;
         }
-
-        return result;
-    }
-
-    static_assert(Sum(std::vector{ 1,2,3 }) == 6);
-    static_assert(Sum(std::array{ -1, -2, -3 }) == -6);
-
-    template<typename T, typename std::enable_if_t<std::is_signed_v<T>, bool> = true>
-    constexpr T Abs(T t) {
-        return t < 0 ? -t : t;
-    }
-
-    template<typename T, typename std::enable_if_t<!std::is_signed_v<T>, bool> = true>
-    constexpr T Abs(T t) {
-        return t;
+        else {
+            return t;
+        }
     }
 
     static_assert(Abs(3) == 3);
@@ -47,12 +34,17 @@ namespace Constexpr {
 
     template<typename T>
     constexpr T Pow(T val, T pow) {
+        if (pow == 0) return 1;
+
         T result = val;
         for (auto i = 1; i < pow; i++) {
             result *= val;
         }
-        return val;
+        return result;
     }
+
+    static_assert(Pow(2, 0) == 1);
+    static_assert(Pow(2, 4) == 16);
 
     template<typename T>
     constexpr T MulMod(T lhs, T rhs, T mod) {
@@ -280,8 +272,10 @@ namespace Constexpr {
     static_assert(GetAllPrimeFactors<16, size_t>() == std::vector<size_t>{2, 2, 2, 2});
     static_assert(GetAllPrimeFactors<7, size_t>() == std::vector<size_t>{7});
 
-    template<typename T, std::enable_if_t<std::is_integral_v<T>, int> = 0>
+    template<typename T>
     constexpr std::vector<T> GetDivisors(T input) {
+        static_assert(std::is_integral_v<T>, "GetDivisors only works with integral types");
+
         auto last = static_cast<T>(Sqrt(input));
         auto result = std::vector<T>{};
 
