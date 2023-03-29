@@ -98,7 +98,7 @@ u32 PartTwo(const std::vector<std::string>& lines) {
     };
 
     auto neighborFunc = [&map, &limits, &goal](const UCoord& pos) {
-        auto neighbors = Get4Neighbors(pos, limits);
+        auto neighbors = GetDirectNeighbors(pos, limits);
         std::vector<UCoord> result;
         std::copy_if(neighbors.begin(), neighbors.end(), std::back_inserter(result), [&map, &pos, &goal](const UCoord& next) {
             return next != goal && map.at(next).Used <= map.at(pos).Size;

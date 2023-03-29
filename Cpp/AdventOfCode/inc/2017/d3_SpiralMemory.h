@@ -52,7 +52,7 @@ std::unordered_map<Coord, u32, CoordHash> WriteSummingSpiral(const std::unordere
     result[spiral.at(1)] = 1;
     for (auto key = 2; key < spiral.size(); key++) {
         auto coord = spiral.at(key);
-        auto neighbors = Get8Neighbors(coord, max, min);
+        auto neighbors = GetAllNeighbors(coord, max, min);
         u32 value = 0;
         for (auto neighbor : neighbors) {
             if (result.find(neighbor) != result.end()) {

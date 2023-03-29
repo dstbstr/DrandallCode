@@ -62,7 +62,7 @@ constexpr void FloodFill(Grid& grid, const RowCol& start) {
         auto pos = current.back();
         current.pop_back();
         grid[pos.Row][pos.Col] = false;
-        auto neighbors = Get4Neighbors(pos, limits);
+        auto neighbors = GetDirectNeighbors(pos, limits);
         std::copy_if(neighbors.begin(), neighbors.end(), std::back_inserter(current), [&grid](const RowCol& rc) {
             return grid[rc.Row][rc.Col];
             });

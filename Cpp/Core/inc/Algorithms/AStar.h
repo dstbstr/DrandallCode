@@ -6,13 +6,13 @@
 #include <algorithm>
 #include <queue>
 
-#include "Platform/Types.h"
+#include "Constexpr/ConstexprGeometry.h"
 
 namespace AStarPrivate {
     template<typename T>
     struct MinimalPath {
-        u32 Known = 10000;
-        u32 Forcast = 10000;
+        size_t Known = 10000;
+        size_t Forcast = 10000;
         T Val;
 
         MinimalPath() {}
@@ -25,8 +25,8 @@ namespace AStarPrivate {
 
     template<typename T>
     struct MaximalPath {
-        u32 Known = 10000;
-        u32 Forcast = 10000;
+        size_t Known = 10000;
+        size_t Forcast = 10000;
         T Val;
 
         MaximalPath() {}
@@ -39,9 +39,9 @@ namespace AStarPrivate {
 
     template<typename T, class THash, typename State>
     std::vector<T> AStar(T start,
-        std::function<u32(const T&, const T&)> costFunc,
+        std::function<size_t(const T&, const T&)> costFunc,
         std::function<bool(const T&)> isCompleteFunc,
-        std::function<u32(const T&)> heuristicFunc,
+        std::function<size_t(const T&)> heuristicFunc,
         std::function<std::vector<T>(const T&)> neighborFunc) {
 
         std::unordered_set<T, THash> seen{};
@@ -100,9 +100,9 @@ namespace AStarPrivate {
 
 template<typename T, class THash = std::hash<T>>
 std::vector<T> AStarMin(T start,
-    std::function<u32(const T&, const T&)> costFunc,
+    std::function<size_t(const T&, const T&)> costFunc,
     std::function<bool(const T&)> isCompleteFunc,
-    std::function<u32(const T&)> heuristicFunc,
+    std::function<size_t(const T&)> heuristicFunc,
     std::function<std::vector<T>(const T&)> neighborFunc) {
     
     return AStarPrivate::AStar<T, THash, AStarPrivate::MinimalPath<T>>(start, costFunc, isCompleteFunc, heuristicFunc, neighborFunc);
@@ -112,16 +112,16 @@ template<typename T, class THash = std::hash<T>>
 std::vector<T> AStarMin(T start, T end, std::function<std::vector<T>(const T&)> neighborFunc) {
     auto costFunc = [](const T&, const T&) {return 1; };
     auto isComplete = [&end](const T& pos) { return pos == end; };
-    auto h = [&end](const T& pos) { return static_cast<u32>(MDistance(pos, end)); };
+    auto h = [&end](const T& pos) { return static_cast<size_t>(MDistance(pos, end)); };
 
     return AStarPrivate::AStar<T, THash, AStarPrivate::MinimalPath<T>>(start, costFunc, isComplete, h, neighborFunc);
 }
 
 template<typename T, class THash = std::hash<T>>
 std::vector<T> AStarMax(T start,
-    std::function<u32(const T&, const T&)> costFunc,
+    std::function<size_t(const T&, const T&)> costFunc,
     std::function<bool(const T&)> isCompleteFunc,
-    std::function<u32(const T&)> heuristicFunc,
+    std::function<size_t(const T&)> heuristicFunc,
     std::function<std::vector<T>(const T&)> neighborFunc) {
 
     return AStarPrivate::AStar<T, THash, AStarPrivate::MaximalPath<T>>(start, costFunc, isCompleteFunc, heuristicFunc, neighborFunc);
@@ -131,7 +131,7 @@ template<typename T, class THash = std::hash<T>>
 std::vector<T> AStarMax(T start, T end, std::function<std::vector<T>(const T&)> neighborFunc) {
     auto costFunc = [](const T&, const T&) {return 1; };
     auto isComplete = [&end](const T& pos) { return pos == end; };
-    auto h = [&end](const T& pos) { return static_cast<u32>(MDistance(pos, end)); };
+    auto h = [&end](const T& pos) { return static_cast<size_t>(MDistance(pos, end)); };
 
     return AStarPrivate::AStar<T, THash, AStarPrivate::MaximalPath<T>>(start, costFunc, isComplete, h, neighborFunc);
 }

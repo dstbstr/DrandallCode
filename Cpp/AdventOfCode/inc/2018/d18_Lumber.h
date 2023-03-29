@@ -24,7 +24,7 @@ constexpr std::vector<GroundType> GetNeighbors(size_t row, size_t col, const Map
     std::vector<GroundType> result;
     RowCol pos = { row, col };
     RowCol max = { Rows - 1, Cols - 1 };
-    auto neighbors = Get8Neighbors(pos, max);
+    auto neighbors = GetAllNeighbors(pos, max);
 
     for (const auto& neighbor : neighbors) {
         result.push_back(map[neighbor.Row][neighbor.Col]);

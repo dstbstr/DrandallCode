@@ -52,7 +52,7 @@ auto PartOne(const std::string& line) {
             pos = { col, row };
             if (!map.at(pos)) continue;
 
-            auto neighbors = Get4Neighbors(pos, max, min);
+            auto neighbors = GetDirectNeighbors(pos, max, min);
             bool isIntersection = true;
             for (auto neighbor : neighbors) {
                 if (!map.at(neighbor)) {

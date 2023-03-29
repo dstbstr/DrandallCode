@@ -2,6 +2,7 @@
 
 #include "Common.h"
 #include "BigInt.h"
+//#include "external/bigint.h"
 
 constexpr void NewStack(std::vector<u64>& deck) {
     std::reverse(deck.begin(), deck.end());

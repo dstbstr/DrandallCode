@@ -75,7 +75,7 @@ using DistanceMap = std::unordered_map<RowCol, std::unordered_map<RowCol, size_t
 size_t FindDistance(const RowCol& start, const RowCol& end, const WalkingMap& walkingMap, const RowCol& limit) {
 
     auto n = [&](RowCol pos) {
-        auto neighbors = Get4Neighbors(pos, limit);
+        auto neighbors = GetDirectNeighbors(pos, limit);
         std::vector<RowCol> result;
         std::copy_if(neighbors.begin(), neighbors.end(), std::back_inserter(result), [&](const RowCol& n) {
             return walkingMap.contains(n);

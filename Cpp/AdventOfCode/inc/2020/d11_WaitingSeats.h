@@ -50,7 +50,7 @@ constexpr Grid Next(const Grid& current) {
             }
 
             RowCol pos = { row, col };
-            auto neighbors = Get8Neighbors(pos, limits);
+            auto neighbors = GetAllNeighbors(pos, limits);
             std::vector<State> neighborStates;
             for (const auto& neighbor : neighbors) {
                 neighborStates.push_back(current[neighbor.Row][neighbor.Col]);

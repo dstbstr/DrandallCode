@@ -82,7 +82,7 @@ void PrintMap(const Map& map) {
 
 std::vector<Coord> GetNeighbors(const Map& map, Coord pos, Coord min, Coord max) {
     std::vector<Coord> result;
-    auto neighbors = Get4Neighbors(pos, max, min);
+    auto neighbors = GetDirectNeighbors(pos, max, min);
     std::copy_if(neighbors.begin(), neighbors.end(), std::back_inserter(result), [&](const Coord& n) {
         return map.at(n) != Wall;
         });

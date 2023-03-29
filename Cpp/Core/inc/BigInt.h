@@ -487,8 +487,5 @@ public:
 std::string ToString(const BigInt& bigInt);
 
 namespace BigIntTests {
-    bool Run() {
-        if (BigInt(-3) + 5 != 2) return false;
-        return true;
-    }
+    bool Run();
 }

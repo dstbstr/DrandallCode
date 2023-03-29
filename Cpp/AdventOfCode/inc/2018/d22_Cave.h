@@ -124,7 +124,7 @@ u32 FindShortestPath(const GroundMap& map, RowCol target) {
         return result + static_cast<u32>(MDistance(santa.Pos, target));
     };
     auto neighborFunc = [&](const Santa& santa) -> std::vector<Santa> {
-        auto neighbors = Get4Neighbors(santa.Pos, limits);
+        auto neighbors = GetDirectNeighbors(santa.Pos, limits);
 
         std::vector<Santa> result;
         for (const auto& neighbor : neighbors) {

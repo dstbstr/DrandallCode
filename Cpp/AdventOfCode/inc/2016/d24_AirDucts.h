@@ -63,7 +63,7 @@ u32 FindPathLength(const std::vector<RowCol> targets, const Walls& walls, const 
         return static_cast<u32>(MDistance(pos, currentTarget));
     };
     auto neighborFunc = [&walls, &limits](const RowCol& pos) {
-        auto neighbors = Get4Neighbors(pos, limits);
+        auto neighbors = GetDirectNeighbors(pos, limits);
         std::vector<RowCol> result;
         std::copy_if(neighbors.begin(), neighbors.end(), std::back_inserter(result), [&walls](const RowCol& rc) {
             return !walls[rc.Row][rc.Col];

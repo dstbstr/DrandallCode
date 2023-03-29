@@ -12,15 +12,14 @@
 #include <iostream>
 
 #include "Platform/Types.h"
-#include "Utils.h"
-#include "Coord.h"
 #include "Utilities/StringUtils.h"
 #include "Utilities/Format.h"
 
+#include "Constexpr/ConstexprBits.h"
 #include "Constexpr/ConstexprCollections.h"
+#include "Constexpr/ConstexprGeometry.h"
 #include "Constexpr/ConstexprMath.h"
 #include "Constexpr/ConstexprStrUtils.h"
-#include "Constexpr/ConstexprBits.h"
 
 using namespace std::string_view_literals;
 using namespace std::string_literals;
@@ -91,4 +90,21 @@ void PrintMap(const std::unordered_map<Key, Value, Hash>& map, std::function<cha
         std::cout << '\n';
     }
     std::cout << '\n';
+}
+
+constexpr std::vector<std::vector<std::string>> SplitInputIntoGroups(const std::vector<std::string>& lines) {
+    std::vector<std::vector<std::string>> result;
+    std::vector<std::string> group;
+    for (const auto& line : lines) {
+        if (line.empty()) {
+            result.push_back(group);
+            group.clear();
+        }
+        else {
+            group.push_back(line);
+        }
+    }
+
+    result.push_back(group);
+    return result;
 }

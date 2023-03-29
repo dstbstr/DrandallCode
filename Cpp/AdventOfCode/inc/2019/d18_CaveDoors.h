@@ -27,7 +27,7 @@ void ParseMap(const std::vector<std::string>& lines, Map& outMap, DoorMap& outDo
 size_t GetPathDistance(const Map& map, const RowCol& start, const RowCol& end, const u32 keys, const RowCol& limit) {
     auto n = [&](const RowCol& pos) {
         std::vector<RowCol> result;
-        auto possible = Get4Neighbors(pos, limit);
+        auto possible = GetDirectNeighbors(pos, limit);
         std::copy_if(possible.cbegin(), possible.cend(), std::back_inserter(result), [&](const RowCol& toPos) {
             auto c = map.at(toPos);
         if (c == '.' || c == '@' || std::islower(c)) return true;
@@ -81,7 +81,7 @@ auto PartOne(const std::vector<std::string>& lines) {
             return current.Steps;
         }
 
-        auto neighbors = Get4Neighbors(current.Pos, limit);
+        auto neighbors = GetDirectNeighbors(current.Pos, limit);
         for (const auto& neighbor : neighbors) {
             if (seen.contains(std::make_tuple(neighbor.Row, neighbor.Col, current.Keys))) continue;
 

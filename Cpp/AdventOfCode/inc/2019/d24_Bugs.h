@@ -23,7 +23,7 @@ constexpr size_t CountNeighborBugs(const RowCol& pos, const Grid& current) {
         return current[pos.Row][pos.Col];
     };
 
-    auto neighbors = Get4Neighbors(pos, Max);
+    auto neighbors = GetDirectNeighbors(pos, Max);
     return std::count_if(neighbors.cbegin(), neighbors.cend(), countBugs);
 }
 

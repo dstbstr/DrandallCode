@@ -277,6 +277,10 @@ constexpr void RunUntilInteract(std::vector<s64>& instructions, Args& args) {
     }
 }
 
-constexpr bool NeedsInput(const std::vector<s64>& instructions, Args& args) {
+constexpr bool HasConsumedAllInput(const Args& args) {
+    return args.CurrentInput >= args.Inputs.size() - 1;
+}
+
+constexpr bool NeedsInput(const std::vector<s64>& instructions, const Args& args) {
     return instructions[args.Ip] % 100 == OpCode::Set;
 }

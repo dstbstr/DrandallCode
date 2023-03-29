@@ -1,8 +1,9 @@
 #pragma once
-
-#include "Platform/Types.h"
 #include <string>
 #include <ostream>
+
+#include "Platform/Types.h"
+#include "Constexpr/ConstexprMath.h"
 
 template<typename T>
 std::string ToString(T input);
@@ -39,7 +40,7 @@ struct UCoord {
     constexpr bool operator==(const UCoord& c) const {
         return this->X == c.X && this->Y == c.Y;
     }
-    
+
     friend std::ostream& operator<<(std::ostream& stream, const UCoord& coord) {
         stream << "{" << coord.X << "," << coord.Y << "}";
         return stream;
@@ -84,7 +85,6 @@ constexpr void GetLimits(const std::vector<Coord>& coords, Coord& min, Coord& ma
         max.Y = std::max(max.Y, coord.Y);
     }
 }
-
 
 struct RowCol {
     size_t Row;
@@ -195,7 +195,7 @@ struct Vec3 {
         Z += v.Z;
     }
 
-    constexpr Vec3<T> operator-(const Vec3<T>&v) {
+    constexpr Vec3<T> operator-(const Vec3<T>& v) {
         Vec3<T> result;
         result.X = X - v.X;
         result.Y = Y - v.Y;
@@ -273,15 +273,15 @@ struct Vec4Hash {
     }
 };
 
-constexpr s32 MDistance(const Coord& lhs, const Coord& rhs) {
-    s32 result = 0;
+constexpr size_t MDistance(const Coord& lhs, const Coord& rhs) {
+    size_t result = 0;
     result += (lhs.X < rhs.X ? rhs.X - lhs.X : lhs.X - rhs.X);
     result += (lhs.Y < rhs.Y ? rhs.Y - lhs.Y : lhs.Y - rhs.Y);
     return result;
 }
 
-constexpr u32 MDistance(const UCoord& lhs, const UCoord& rhs) {
-    u32 result = 0;
+constexpr size_t MDistance(const UCoord& lhs, const UCoord& rhs) {
+    size_t result = 0;
     result += (lhs.X < rhs.X ? rhs.X - lhs.X : lhs.X - rhs.X);
     result += (lhs.Y < rhs.Y ? rhs.Y - lhs.Y : lhs.Y - rhs.Y);
     return result;
@@ -295,8 +295,8 @@ constexpr size_t MDistance(const RowCol& lhs, const RowCol& rhs) {
 }
 
 template<typename T>
-constexpr T MDistance(const Vec3<T> lhs, const Vec3<T> rhs) {
-    T result = 0;
+constexpr size_t MDistance(const Vec3<T> lhs, const Vec3<T> rhs) {
+    size_t result = 0;
     result += (lhs.X < rhs.X ? rhs.X - lhs.X : lhs.X - rhs.X);
     result += (lhs.Y < rhs.Y ? rhs.Y - lhs.Y : lhs.Y - rhs.Y);
     result += (lhs.Z < rhs.Z ? rhs.Z - lhs.Z : lhs.Z - rhs.Z);
@@ -304,8 +304,8 @@ constexpr T MDistance(const Vec3<T> lhs, const Vec3<T> rhs) {
 }
 
 template<typename T>
-constexpr T MDistance(const Vec4<T> lhs, const Vec4<T> rhs) {
-    T result = 0;
+constexpr size_t MDistance(const Vec4<T> lhs, const Vec4<T> rhs) {
+    size_t result = 0;
     result += (lhs.X < rhs.X ? rhs.X - lhs.X : lhs.X - rhs.X);
     result += (lhs.Y < rhs.Y ? rhs.Y - lhs.Y : lhs.Y - rhs.Y);
     result += (lhs.Z < rhs.Z ? rhs.Z - lhs.Z : lhs.Z - rhs.Z);
@@ -313,7 +313,7 @@ constexpr T MDistance(const Vec4<T> lhs, const Vec4<T> rhs) {
     return result;
 }
 
-constexpr std::vector<Coord> Get4Neighbors(const Coord& pos, const Coord& max, const Coord& min = { 0, 0 }) {
+constexpr std::vector<Coord> GetDirectNeighbors(const Coord& pos, const Coord& max, const Coord& min = { 0, 0 }) {
     std::vector<Coord> result;
     if (pos.X > min.X) result.push_back({ pos.X - 1, pos.Y });
     if (pos.Y > min.Y) result.push_back({ pos.X, pos.Y - 1 });
@@ -322,7 +322,7 @@ constexpr std::vector<Coord> Get4Neighbors(const Coord& pos, const Coord& max, c
     return result;
 }
 
-constexpr std::vector<UCoord> Get4Neighbors(const UCoord& pos, const UCoord& max, const UCoord& min = { 0, 0 }) {
+constexpr std::vector<UCoord> GetDirectNeighbors(const UCoord& pos, const UCoord& max, const UCoord& min = { 0, 0 }) {
     std::vector<UCoord> result;
     if (pos.X > min.X) result.push_back({ pos.X - 1, pos.Y });
     if (pos.Y > min.Y) result.push_back({ pos.X, pos.Y - 1 });
@@ -331,7 +331,7 @@ constexpr std::vector<UCoord> Get4Neighbors(const UCoord& pos, const UCoord& max
     return result;
 }
 
-constexpr std::vector<RowCol> Get4Neighbors(const RowCol& pos, const RowCol& max, const RowCol& min = { 0, 0 }) {
+constexpr std::vector<RowCol> GetDirectNeighbors(const RowCol& pos, const RowCol& max, const RowCol& min = { 0, 0 }) {
     std::vector<RowCol> result;
     if (pos.Row > min.Row) result.push_back({ pos.Row - 1, pos.Col });
     if (pos.Col > min.Col) result.push_back({ pos.Row, pos.Col - 1 });
@@ -340,8 +340,8 @@ constexpr std::vector<RowCol> Get4Neighbors(const RowCol& pos, const RowCol& max
     return result;
 }
 
-constexpr std::vector<Coord> Get8Neighbors(const Coord& pos, const Coord& max, const Coord& min = { 0, 0 }) {
-    std::vector<Coord> result = Get4Neighbors(pos, max, min);
+constexpr std::vector<Coord> GetAllNeighbors(const Coord& pos, const Coord& max, const Coord& min = { 0, 0 }) {
+    std::vector<Coord> result = GetDirectNeighbors(pos, max, min);
 
     if (pos.X > min.X) {
         if (pos.Y > min.Y) result.push_back({ pos.X - 1, pos.Y - 1 });
@@ -354,8 +354,8 @@ constexpr std::vector<Coord> Get8Neighbors(const Coord& pos, const Coord& max, c
     return result;
 }
 
-constexpr std::vector<UCoord> Get8Neighbors(const UCoord& pos, const UCoord& max, const UCoord& min = { 0, 0 }) {
-    std::vector<UCoord> result = Get4Neighbors(pos, max, min);
+constexpr std::vector<UCoord> GetAllNeighbors(const UCoord& pos, const UCoord& max, const UCoord& min = { 0, 0 }) {
+    std::vector<UCoord> result = GetDirectNeighbors(pos, max, min);
 
     if (pos.X > min.X) {
         if (pos.Y > min.Y) result.push_back({ pos.X - 1, pos.Y - 1 });
@@ -368,8 +368,8 @@ constexpr std::vector<UCoord> Get8Neighbors(const UCoord& pos, const UCoord& max
     return result;
 }
 
-constexpr std::vector<RowCol> Get8Neighbors(const RowCol& pos, const RowCol& max, const RowCol& min = { 0, 0 }) {
-    std::vector<RowCol> result = Get4Neighbors(pos, max, min);
+constexpr std::vector<RowCol> GetAllNeighbors(const RowCol& pos, const RowCol& max, const RowCol& min = { 0, 0 }) {
+    std::vector<RowCol> result = GetDirectNeighbors(pos, max, min);
 
     if (pos.Row > min.Row) {
         if (pos.Col > min.Col) result.push_back({ pos.Row - 1, pos.Col - 1 });
@@ -380,4 +380,161 @@ constexpr std::vector<RowCol> Get8Neighbors(const RowCol& pos, const RowCol& max
         if (pos.Col < max.Col) result.push_back({ pos.Row + 1, pos.Col + 1 });
     }
     return result;
+}
+
+template<typename T>
+constexpr std::vector<Vec3<T>> GetDirectNeighbors(const Vec3<T>& pos) {
+    std::vector<Vec3<T>> result;
+    result.push_back({ pos.X - 1, pos.Y, pos.Z });
+    result.push_back({ pos.X + 1, pos.Y, pos.Z });
+    result.push_back({ pos.X, pos.Y - 1, pos.Z });
+    result.push_back({ pos.X, pos.Y + 1, pos.Z });
+    result.push_back({ pos.X, pos.Y, pos.Z - 1 });
+    result.push_back({ pos.X, pos.Y, pos.Z + 1 });
+    return result;
+}
+
+template<typename T>
+constexpr std::vector<Vec3<T>> GetAllNeighbors(const Vec3<T>& pos) {
+    std::vector<Vec3<T>> result;
+    for (auto x = -1; x < 2; x++) {
+        for (auto y = -1; y < 2; y++) {
+            for (auto z = -1; z < 2; z++) {
+                result.push_back({ pos.X + x, pos.Y + y, pos.Z + z });
+            }
+        }
+    }
+
+    result.erase(std::remove(result.begin(), result.end(), pos));
+    return result;
+}
+
+template<typename T>
+constexpr std::vector<Vec4<T>> GetAllNeighbors(const Vec4<T>& pos) {
+    std::vector<Vec4<T>> result;
+    for (int x = -1; x < 2; x++) {
+        for (int y = -1; y < 2; y++) {
+            for (int z = -1; z < 2; z++) {
+                for (int w = -1; w < 2; w++) {
+                    result.push_back({ pos.X + x, pos.Y + y, pos.Z + z, pos.W + w });
+                }
+            }
+        }
+    }
+
+    result.erase(std::remove(result.begin(), result.end(), pos));
+    return result;
+}
+
+template<typename T>
+constexpr void GetLimits(const auto& collection, Vec3<T>& outMinValues, Vec3<T>& outMaxValues) {
+    T minX = std::numeric_limits<T>::max();
+    T minY = minX;
+    T minZ = minX;
+    T maxX = std::numeric_limits<T>::min();
+    T maxY = maxX;
+    T maxZ = maxX;
+
+    for (const auto& point : collection) {
+        minX = std::min(minX, point.X);
+        minY = std::min(minY, point.Y);
+        minZ = std::min(minZ, point.Z);
+        maxX = std::max(maxX, point.X);
+        maxY = std::max(maxY, point.Y);
+        maxZ = std::max(maxZ, point.Z);
+    }
+
+    outMinValues = { minX, minY, minZ };
+    outMaxValues = { maxX, maxY, maxZ };
+}
+
+template<typename T>
+constexpr void GetLimits(const auto& collection, Vec4<T>& outMinValues, Vec4<T>& outMaxValues) {
+    T minX = std::numeric_limits<T>::max();
+    T minY = minX;
+    T minZ = minX;
+    T minW = minX;
+    T maxX = std::numeric_limits<T>::min();
+    T maxY = maxX;
+    T maxZ = maxX;
+    T maxW = maxX;
+
+    for (const auto& point : collection) {
+        minX = std::min(minX, point.X);
+        minY = std::min(minY, point.Y);
+        minZ = std::min(minZ, point.Z);
+        minW = std::min(minW, point.W);
+
+        maxX = std::max(maxX, point.X);
+        maxY = std::max(maxY, point.Y);
+        maxZ = std::max(maxZ, point.Z);
+        maxW = std::max(maxW, point.W);
+    }
+
+    outMinValues = { minX, minY, minZ, minW };
+    outMaxValues = { maxX, maxY, maxZ, maxW };
+}
+
+namespace Constexpr {
+    enum struct Orientation { Linear, Clockwise, CounterClockwise };
+
+    template<typename Point>
+    constexpr Orientation GetOrientation(Point p, Point q, Point r) {
+        static_assert(Point{ -1, -1 }.X < 0, "GetOrientation requires signed types");
+
+        auto val = (q.Y - p.Y) * (r.X - q.X) - (q.X - p.X) * (r.Y - q.Y);
+        return val == 0 ? Orientation::Linear :
+            val < 0 ? Orientation::CounterClockwise : Orientation::Clockwise;
+    }
+
+    template<typename Point>
+    constexpr bool IsOnSegment(Point p, Point q, Point r) {
+        return q.X <= std::max(p.X, r.X) && q.X >= std::min(p.X, r.X) &&
+            q.Y <= std::max(p.Y, r.Y) && q.Y >= std::min(p.Y, r.Y);
+    }
+
+    template<typename Point>
+    constexpr bool DoIntersect(const Point& start1, const Point& end1, const Point& start2, const Point& end2) {
+        auto o1 = GetOrientation(start1, end1, start2);
+        auto o2 = GetOrientation(start1, end1, end2);
+        auto o3 = GetOrientation(start2, end2, start1);
+        auto o4 = GetOrientation(start2, end2, end1);
+
+        if (o1 != o2 && o3 != o4) return true;
+        if (o1 == Orientation::Linear && IsOnSegment(start1, start2, end1)) return true;
+        if (o2 == Orientation::Linear && IsOnSegment(start1, end2, end1)) return true;
+        if (o3 == Orientation::Linear && IsOnSegment(start2, start1, end2)) return true;
+        if (o4 == Orientation::Linear && IsOnSegment(start2, end1, end2)) return true;
+        return false;
+    }
+
+    template<typename Point>
+    constexpr bool DoIntersect(const Point& start, const Point& end, const Point& point) {
+        auto dist = [](const Point& a, const Point& b) -> double {
+            double x = a.X < b.X ? (b.X - a.X) : (a.X - b.X);
+            double y = a.Y < b.Y ? (b.Y - a.Y) : (a.Y - b.Y);
+
+            return Constexpr::Sqrt((x * x) + (y * y));
+        };
+
+        return Constexpr::Abs(dist(start, end) - ((dist(start, point) + dist(end, point)))) < 0.000001;
+    }
+
+    namespace Tests {
+        struct Point {
+            int X;
+            int Y;
+            constexpr bool operator==(const Point& other) const {
+                return X == other.X && Y == other.Y;
+            }
+        };
+
+        static_assert(!DoIntersect<Point>({ 1, 1 }, { 10, 1 }, { 1, 2 }, { 10, 2 }));
+        static_assert(DoIntersect<Point>({ 10, 0 }, { 0, 10 }, { 0, 0 }, { 10, 10 }));
+        static_assert(!DoIntersect<Point>({ -5, -5 }, { 0, 0 }, { 1, 1 }, { 10, 10 }));
+
+        static_assert(DoIntersect<Point>({ 0, 0 }, { 2, 6 }, { 1, 3 }));
+        static_assert(DoIntersect<Point>({ 0, 0 }, { 3, 9 }, { 1, 3 }));
+        static_assert(!DoIntersect<Point>({ 0, 0 }, { 4, 9 }, { 1, 3 }));
+    }
 }

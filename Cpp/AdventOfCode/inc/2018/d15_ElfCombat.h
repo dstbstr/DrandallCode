@@ -54,7 +54,7 @@ public:
     }
 
     std::vector<RowCol> GetAvailableNeighbors(RowCol pos) const {
-        auto neighbors = Get4Neighbors(pos, GetLimits());
+        auto neighbors = GetDirectNeighbors(pos, GetLimits());
         std::vector<RowCol> result;
         std::copy_if(neighbors.begin(), neighbors.end(), std::back_inserter(result), [&](RowCol potential) {
             return IsAvailable(potential);
