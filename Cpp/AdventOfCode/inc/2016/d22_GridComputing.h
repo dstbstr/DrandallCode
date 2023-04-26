@@ -61,7 +61,7 @@ u32 PartOne(const std::vector<std::string>& lines) {
 }
 
 u32 PartTwo(const std::vector<std::string>& lines) {
-    std::unordered_map<UCoord, Dir, UCoordHash> map;
+    std::unordered_map<UCoord, Dir> map;
     UCoord origin{ 0, 0 };
     UCoord emptyDir{ 0, 0 };
     UCoord limits{ 0, 0 };
@@ -106,12 +106,12 @@ u32 PartTwo(const std::vector<std::string>& lines) {
         return result;
     };
 
-    auto optimalPath = AStar<UCoord, UCoordHash>(goal, costFunc, compareFunc, isAtTarget, heuristic, neighborFunc);
+    auto optimalPath = AStar<UCoord>(goal, costFunc, compareFunc, isAtTarget, heuristic, neighborFunc);
     u32 steps = 0;
 
     for(auto i = 1; i < optimalPath.size(); i++) {
         target = optimalPath[i];
-        auto path = AStar<UCoord, UCoordHash>(emptyDir, costFunc, compareFunc, isAtTarget, heuristic, neighborFunc);
+        auto path = AStar<UCoord>(emptyDir, costFunc, compareFunc, isAtTarget, heuristic, neighborFunc);
         steps += static_cast<u32>(path.size());
         emptyDir = optimalPath[i - 1];
         goal = optimalPath[i];

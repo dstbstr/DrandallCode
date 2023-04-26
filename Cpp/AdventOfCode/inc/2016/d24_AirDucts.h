@@ -45,7 +45,7 @@ RowCol FindStart(const std::vector<std::string>& lines) {
 }
 
 u32 FindPathLength(const std::vector<RowCol> targets, const Walls& walls, const RowCol& start) {
-    static std::unordered_map<RowCol, std::unordered_map<RowCol, u32, RowColHash>, RowColHash> cache;
+    static std::unordered_map<RowCol, std::unordered_map<RowCol, u32>> cache;
 
     RowCol currentTarget = { 0, 0 };
     RowCol limits = { walls.size(), walls[0].size() };
@@ -76,7 +76,7 @@ u32 FindPathLength(const std::vector<RowCol> targets, const Walls& walls, const 
     for (const auto& target : targets) {
         currentTarget = target;
         if (cache.find(begin) == cache.end() || cache.at(begin).find(currentTarget) == cache.at(begin).end()) {
-            auto path = AStar<RowCol, RowColHash>(begin, costFunc, compareFunc, isCompleteFunc, heuristicFunc, neighborFunc);
+            auto path = AStar<RowCol>(begin, costFunc, compareFunc, isCompleteFunc, heuristicFunc, neighborFunc);
             cache[begin][currentTarget] = static_cast<u32>(path.size() - 1);
         }
         result += cache.at(begin).at(currentTarget);

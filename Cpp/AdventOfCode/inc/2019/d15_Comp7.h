@@ -7,7 +7,7 @@
 enum Dir {North = 1, South = 2, West = 3, East = 4};
 enum Status {Wall = 0, Moved = 1, Reached = 2};
 
-using Map = std::unordered_map<Coord, Status, CoordHash>;
+using Map = std::unordered_map<Coord, Status>;
 
 constexpr s64 Consumed = -9919;
 
@@ -77,7 +77,7 @@ void PrintMap(const Map& map) {
         return status == Wall ? '#' : status == Moved ? '.' : 'T';
     };
 
-    PrintMap<Coord, Status, CoordHash>(map, toStr, ' ');
+    PrintMap<Coord, Status>(map, toStr, ' ');
 }
 
 std::vector<Coord> GetNeighbors(const Map& map, Coord pos, Coord min, Coord max) {
@@ -106,7 +106,7 @@ u32 GetShortestPath(const Map& map, Coord target) {
     auto neighbors = [&](const Coord& pos) {
         return GetNeighbors(map, pos, min, max);
     };
-    return static_cast<u32>(AStarMin<Coord, CoordHash>(start, costFunc, isCompleteFunc, h, neighbors).size() - 1);
+    return static_cast<u32>(AStarMin<Coord>(start, costFunc, isCompleteFunc, h, neighbors).size() - 1);
 }
 
 auto PartOne(const std::string& line) {
@@ -121,7 +121,7 @@ auto PartOne(const std::string& line) {
 
 u32 FloodFill(const Map& map, Coord start) {
     u32 result = 0;
-    std::unordered_set<Coord, CoordHash> seen;
+    std::unordered_set<Coord> seen;
     std::vector<Coord> current;
     std::vector<Coord> next;
     current.push_back(start);

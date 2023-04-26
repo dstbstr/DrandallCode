@@ -4,7 +4,7 @@
 #include "Comp.h"
 
 auto GetPainting(std::vector<s64>& instructions, bool startOnBlack) {
-    std::unordered_map<Coord, bool, CoordHash> painted;
+    std::unordered_map<Coord, bool> painted;
     Args args;
     args.Inputs.push_back(startOnBlack ? 0 : 1);
     args.Output = 99;

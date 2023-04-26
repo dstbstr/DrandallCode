@@ -5,7 +5,7 @@
 #include <bitset>
 #include <set>
 
-using Map = std::unordered_map<RowCol, char, RowColHash>;
+using Map = std::unordered_map<RowCol, char>;
 using DoorMap = std::unordered_map<char, RowCol>;
 
 void ParseMap(const std::vector<std::string>& lines, Map& outMap, DoorMap& outDoorMap, u32& outAllKeys) {
@@ -39,7 +39,7 @@ size_t GetPathDistance(const Map& map, const RowCol& start, const RowCol& end, c
         return result;
     };
 
-    auto path = AStarMin<RowCol, RowColHash>(start, end, n);
+    auto path = AStarMin<RowCol>(start, end, n);
     return path.empty() ? 0 : path.size() - 1;
 }
 
@@ -179,7 +179,7 @@ auto PartTwo(const std::vector<std::string>& lines) {
 
     size_t result = std::numeric_limits<size_t>::max();
     int tracker = 0;
-    std::unordered_map<History, size_t, HistoryHash> seen;
+    std::unordered_map<History, size_t> seen;
     std::vector<State> queue;
     queue.push_back({ startingPoints, 0, 0 });
     while (!queue.empty()) {

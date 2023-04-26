@@ -3,7 +3,7 @@
 #include "Common.h"
 
 using Map = std::vector<Coord>;
-using VisibilityMap = std::unordered_map<Coord, std::unordered_map<Coord, bool, CoordHash>, CoordHash>;
+using VisibilityMap = std::unordered_map<Coord, std::unordered_map<Coord, bool>>;
 
 constexpr Map ParseMap(const std::vector<std::string>& lines) {
     Map result;

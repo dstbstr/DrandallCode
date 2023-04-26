@@ -4,7 +4,7 @@
 #include "Comp.h"
 
 static constexpr s64 Consumed = -91234;
-using Map = std::unordered_map<Coord, bool, CoordHash>;
+using Map = std::unordered_map<Coord, bool>;
 
 constexpr std::string ReadOutput(std::vector<s64>& instructions) {
     Args args;

@@ -6,7 +6,7 @@ namespace LambdaUtils {
     using expander = int[];
 
     template<typename T, typename... Args>
-    inline void ForEach(T toCall, Args&&... args) {
+    constexpr inline void ForEach(T toCall, Args&&... args) {
         (void)expander{0, (void(toCall(std::forward<Args>(args))), 0)...};
     }
 

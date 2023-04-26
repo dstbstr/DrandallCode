@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Common.h"
-using Seen = std::unordered_set<Coord, CoordHash>;
-using StepMap = std::unordered_map<Coord, u32, CoordHash>;
+using Seen = std::unordered_set<Coord>;
+using StepMap = std::unordered_map<Coord, u32>;
 
 void ApplyMove(Coord& pos, Direction dir, u32 steps, Seen& seen) {
     seen.insert(pos);

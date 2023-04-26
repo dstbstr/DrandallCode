@@ -130,7 +130,7 @@ public:
             return GetAvailableNeighbors(pos);
         };
 
-        return AStar<RowCol, RowColHash>(fromPos, costFunc, AStarFuncs::TrySmallest, isCompleteFunc, heuristic, neighborFunc);
+        return AStar<RowCol>(fromPos, costFunc, AStarFuncs::TrySmallest, isCompleteFunc, heuristic, neighborFunc);
     }
 
     RowCol GetBestPos(const std::vector<RowCol>& neighbors, const std::vector<size_t>& distances) const {
@@ -195,7 +195,7 @@ public:
             return GetAvailableNeighbors(pos);
         };
 
-        return AStar<RowCol, RowColHash>(from.Pos, costFunc, AStarFuncs::TrySmallest, isCompleteFunc, heuristic, neighborFunc);
+        return AStar<RowCol>(from.Pos, costFunc, AStarFuncs::TrySmallest, isCompleteFunc, heuristic, neighborFunc);
     }
 
     RowCol GetFirstStep(size_t unitIndex, RowCol targetPos) {

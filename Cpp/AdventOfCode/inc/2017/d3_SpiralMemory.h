@@ -44,11 +44,11 @@ std::unordered_map<u32, Coord> CreateSpiral(u32 maxValue) {
     return result;
 }
 
-std::unordered_map<Coord, u32, CoordHash> WriteSummingSpiral(const std::unordered_map<u32, Coord>& spiral) {
+std::unordered_map<Coord, u32> WriteSummingSpiral(const std::unordered_map<u32, Coord>& spiral) {
     static const Coord min = { -1000, -1000 };
     static const Coord max = { 1000, 1000 };
 
-    std::unordered_map<Coord, u32, CoordHash> result;
+    std::unordered_map<Coord, u32> result;
     result[spiral.at(1)] = 1;
     for (auto key = 2; key < spiral.size(); key++) {
         auto coord = spiral.at(key);

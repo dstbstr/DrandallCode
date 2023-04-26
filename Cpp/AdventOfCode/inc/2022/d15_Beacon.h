@@ -185,7 +185,7 @@ Coord FindMissing(const std::vector<std::string>& lines, s32 min, s32 max) {
     std::sort(circles.begin(), circles.end(), [](const Circle& lhs, const Circle& rhs) {
         return lhs.Radius < rhs.Radius;
         });
-    std::unordered_set<Coord, CoordHash> candidates;
+    std::unordered_set<Coord> candidates;
     for (size_t i = 0; i < circles.size(); i++) {
         std::cout << "Checking circle " << (i + 1) << " of " << circles.size();
         candidates.clear();

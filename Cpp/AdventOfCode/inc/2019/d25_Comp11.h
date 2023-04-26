@@ -123,7 +123,7 @@ public:
     }
 };
 
-using CoordMap = std::unordered_map<Coord, Room, CoordHash>;
+using CoordMap = std::unordered_map<Coord, Room>;
 using NameMap = std::unordered_map<std::string, Room>;
 
 CoordMap GetCoordMap() {
@@ -204,7 +204,7 @@ void MoveTo(Droid& droid, const Room& to, const CoordMap& map) {
         return result;
     };
 
-    auto path = AStarMin<Coord, CoordHash>(droid.Pos, to.Pos, n);
+    auto path = AStarMin<Coord>(droid.Pos, to.Pos, n);
 
     for (auto i = 1; i < path.size(); ++i) {
         MoveAdjacent(droid, map.at(path[i - 1]), map.at(path[i]));

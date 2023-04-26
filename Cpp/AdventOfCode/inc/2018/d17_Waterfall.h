@@ -130,7 +130,7 @@ bool FloodFill(const UCoord& start, const Map& walls, Map& water) {
     static auto max = GetMax(walls);
 
     std::vector<UCoord> current;
-    std::unordered_set<UCoord, UCoordHash> seen;
+    std::unordered_set<UCoord> seen;
     current.push_back(start);
     seen.insert(start);
     bool filled = false;
@@ -168,7 +168,7 @@ size_t CountRunoff(UCoord& start, const Map& walls, const Map& water) {
     static auto min = GetMin(walls);
 
     std::vector<UCoord> current;
-    std::unordered_set<UCoord, UCoordHash> seen;
+    std::unordered_set<UCoord> seen;
     current.push_back(start);
 
     while (!current.empty()) {

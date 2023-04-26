@@ -21,7 +21,7 @@ namespace AStarTests {
             return MDistance(lhs, rhs);
         };
 
-        auto path = AStarMin<Coord, CoordHash>(n1, costFunc, complete, heuristic, neighborFunc);
+        auto path = AStarMin<Coord>(n1, costFunc, complete, heuristic, neighborFunc);
 
         if (path.size() != 3) return false;
         if (path[0] != n1) return false;

@@ -17,6 +17,11 @@ namespace Constexpr {
     static_assert(Abs(3) == 3);
     static_assert(Abs(-3) == 3);
 
+    template<typename T>
+    constexpr T AbsDistance(T lhs, T rhs) {
+        return lhs < rhs ? rhs - lhs : lhs - rhs;
+    }
+
     namespace Detail {
         constexpr double SqrtImpl(double x, double curr, double prev) {
             return curr == prev ? curr : SqrtImpl(x, 0.5 * (curr + x / curr), curr);

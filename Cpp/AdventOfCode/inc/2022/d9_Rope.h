@@ -105,7 +105,7 @@ void PrintKnots(const std::vector<Coord>& knots, u32 xSize, u32 ySize) {
 }
 
 u32 CountUniqueTailPositions(const std::vector<std::string>& lines, size_t knotCount) {
-    std::unordered_set<Coord, CoordHash> seen;
+    std::unordered_set<Coord> seen;
     std::vector<Coord> knots;
     for (auto i = 0; i < knotCount; i++) {
         knots.push_back({ 0, 0 });

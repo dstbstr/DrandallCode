@@ -45,7 +45,7 @@ void AddNextMoves(UCoord location, std::vector<UCoord>& next) {
 }
 
 u32 Bfs(u32 key, UCoord target) {
-    std::unordered_set<UCoord, UCoordHash> seen;
+    std::unordered_set<UCoord> seen;
     u32 depth = 0;
     std::vector<UCoord> moves;
     moves.push_back({ 1, 1 });
@@ -74,7 +74,7 @@ u32 Bfs(u32 key, UCoord target) {
 }
 
 u32 FindUniquePositions(u32 key, u32 maxSteps) {
-    std::unordered_set<UCoord, UCoordHash> seen;
+    std::unordered_set<UCoord> seen;
     u32 depth = 0;
     std::vector<UCoord> moves;
     moves.push_back({ 1, 1 });

@@ -10,6 +10,8 @@
 #include <exception>
 #include <functional>
 #include <iostream>
+#include <numeric>
+
 
 #include "Platform/Types.h"
 #include "Utilities/StringUtils.h"
@@ -106,5 +108,17 @@ constexpr std::vector<std::vector<std::string>> SplitInputIntoGroups(const std::
     }
 
     result.push_back(group);
+    return result;
+}
+
+template<typename T>
+constexpr std::vector<T> ParseLineAsNumbers(const std::string& line, std::string delimiter = ",") {
+    std::vector<T> result;
+    auto split = Constexpr::Split(line, delimiter);
+    for (const auto& s : split) {
+        T num;
+        Constexpr::ParseNumber(s, num);
+        result.push_back(num);
+    }
     return result;
 }

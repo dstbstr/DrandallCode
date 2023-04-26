@@ -22,12 +22,19 @@ struct Coord {
     }
 };
 
-
+template<>
+struct std::hash<Coord> {
+    std::size_t operator()(const Coord& c) const {
+        return c.X ^ c.Y;
+    }
+};
+/*
 struct CoordHash {
     size_t operator()(const Coord& c) const {
         return c.X ^ c.Y;
     }
 };
+*/
 
 template<>
 inline std::string ToString(Coord coord) {
@@ -47,11 +54,19 @@ struct UCoord {
     }
 };
 
+template<>
+struct std::hash<UCoord> {
+    std::size_t operator()(const UCoord& c) const {
+        return c.X ^ c.Y;
+    }
+};
+/*
 struct UCoordHash {
     size_t operator()(const UCoord& c) const {
         return c.X ^ c.Y;
     }
 };
+*/
 
 template<>
 inline std::string ToString(UCoord coord) {
@@ -102,11 +117,19 @@ struct RowCol {
     }
 };
 
+template<>
+struct std::hash<RowCol> {
+    std::size_t operator()(const RowCol& rc) const {
+        return rc.Row ^ rc.Col;
+    }
+};
+/*
 struct RowColHash {
     size_t operator()(const RowCol& rc) const {
         return rc.Row ^ rc.Col;
     }
 };
+*/
 
 template<>
 inline std::string ToString(RowCol rc) {
@@ -215,11 +238,20 @@ struct Vec3 {
 };
 
 template<typename T>
+struct std::hash<Vec3<T>> {
+    std::size_t operator()(const Vec3<T> v) const {
+        return v.X ^ v.Y ^ v.Z;
+    }
+};
+/*
+template<typename T>
 struct Vec3Hash {
     size_t operator()(const Vec3<T> v) const {
         return v.X ^ v.Y ^ v.Z;
     }
 };
+*/
+
 
 template<typename T>
 struct Vec4 {
@@ -519,6 +551,82 @@ namespace Constexpr {
 
         return Constexpr::Abs(dist(start, end) - ((dist(start, point) + dist(end, point)))) < 0.000001;
     }
+
+    template<typename Matrix, typename Func>
+    constexpr void ApplyToMatrixIndex(Matrix& matrix, Func func) {
+        for (size_t row = 0; row < matrix.size(); row++) {
+            for (size_t col = 0; col < matrix[row].size(); col++) {
+                func(row, col);
+            }
+        }
+    }
+
+    template<typename Matrix, typename Func>
+    constexpr void ApplyToMatrixValue(Matrix& matrix, Func func) {
+        for (auto& row : matrix) {
+            for (auto& val : row) {
+                func(val);
+            }
+        }
+    }
+    
+    template<typename Matrix, typename Func>
+    constexpr void ApplyToMatrix3D(Matrix& matrix, Func func) {
+        for (size_t row = 0; row < matrix.size(); row++) {
+            for (size_t col = 0; col < matrix[row].size(); col++) {
+                for (size_t dep = 0; dep < matrix[row][col].size(); dep++) {
+                    func(row, col, dep);
+                }
+            }
+        }
+    }
+
+    template<typename Matrix>
+    [[nodiscard]] constexpr Matrix FlipX(const Matrix& matrix) {
+        auto result = matrix;
+        size_t n = matrix.size() - 1;
+        ApplyToMatrixIndex(matrix, [&](size_t row, size_t col) {
+            result[row][col] = matrix[n - row][col];
+            });
+        return result;
+    }
+
+    static_assert(FlipX(std::vector<std::vector<int>>{ {1, 2}, { 3, 4 }}) == std::vector<std::vector<int>> { {3, 4}, { 1, 2 }});
+    static_assert(FlipX(std::vector<std::vector<int>>{ {1, 2, 3}, { 4, 5, 6 }, { 7, 8, 9 }}) == std::vector<std::vector<int>>{ {7, 8, 9}, { 4, 5, 6 }, { 1, 2, 3 }});
+
+    template<typename Matrix>
+    [[nodiscard]] constexpr Matrix FlipY(const Matrix& matrix) {
+        auto result = matrix;
+        size_t n = matrix[0].size() - 1;
+        ApplyToMatrixIndex(matrix, [&](size_t row, size_t col) {
+            result[row][col] = matrix[row][n - col];
+            });
+
+        return result;
+    }
+
+    static_assert(FlipY(std::vector<std::vector<int>>{ {1, 2}, { 3, 4 }}) == std::vector<std::vector<int>>{ {2, 1}, { 4, 3 }});
+    static_assert(FlipY(std::vector<std::vector<int>>{ {1, 2, 3}, { 4, 5, 6 }, { 7, 8, 9 }}) == std::vector<std::vector<int>>{ {3, 2, 1}, { 6, 5, 4 }, { 9, 8, 7 }});
+
+    template<typename Matrix>
+    [[nodiscard]] constexpr Matrix Rotate(const Matrix& matrix) {
+        auto result = matrix;
+        size_t n = matrix.size() - 1;
+        ApplyToMatrixIndex(matrix, [&](size_t row, size_t col) {
+            result[row][col] = matrix[n - col][row];
+            });
+
+        return result;
+    }
+
+    static_assert(Rotate(std::vector<std::vector<int>>{
+        {1, 2, 3},
+        { 4, 5, 6 },
+        { 7, 8, 9 }}) == std::vector<std::vector<int>> {
+            {7, 4, 1},
+            { 8, 5, 2 },
+            { 9, 6, 3 }
+    });
 
     namespace Tests {
         struct Point {

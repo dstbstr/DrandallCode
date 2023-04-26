@@ -189,7 +189,7 @@ std::vector<RowCol> GetNeighbors(const RowCol& pos, const RowCol& exit, const Ro
 }
 
 u32 Travel(const Blizzard& blizzard, RowCol start, RowCol exit, RowCol limits, u32 startTime) {
-    std::unordered_map<RowCol, std::vector<u32>, RowColHash> openTimePoints;
+    std::unordered_map<RowCol, std::vector<u32>> openTimePoints;
     for (auto i = 0; i < 400; i++) {
         auto open = GetOpenPositions(GetBlizzardAtTime(blizzard, i + startTime));
         openTimePoints[start].push_back(i + startTime);
@@ -200,8 +200,8 @@ u32 Travel(const Blizzard& blizzard, RowCol start, RowCol exit, RowCol limits, u
     }
 
     std::vector<RowCol> current = { start };
-    std::unordered_set<RowCol, RowColHash> next;
-    std::unordered_map<RowCol, RowCol, RowColHash> moveFrom;
+    std::unordered_set<RowCol> next;
+    std::unordered_map<RowCol, RowCol> moveFrom;
 
     while (true) {
         //std::cout << "Minute " << startTime << "\n";

@@ -90,6 +90,46 @@ namespace Constexpr {
         return true;
     }
 
+    constexpr void ReplaceAll(std::string& original, const std::string& toFind, const std::string& replacement) {
+        size_t index = 0;
+        size_t length = toFind.length();
+
+        while (true) {
+            index = original.find(toFind, index);
+            if (index == toFind.npos) break;
+            original.replace(index, length, replacement);
+        }
+    }
+
+    constexpr std::string ReplaceAllCopy(const std::string& original, const std::string& toFind, const std::string& replacement) {
+        std::string result = original;
+        ReplaceAll(result, toFind, replacement);
+        return result;
+    }
+
+    constexpr void RemoveAllOf(std::string& original, char toFind) {
+        original.erase(std::remove(original.begin(), original.end(), toFind), original.end());
+    }
+
+    constexpr void RemoveAllOf(std::string& original, const std::string& toFind) {
+        for (auto c : toFind) {
+            RemoveAllOf(original, c);
+        }
+    }
+
+
+    constexpr std::string RemoveAllOfCopy(const std::string& original, char toFind) {
+        std::string result = original;
+        RemoveAllOf(result, toFind);
+        return result;
+    }
+
+    constexpr std::string RemoveAllOfCopy(const std::string& original, const std::string& toFind) {
+        std::string result = original;
+        RemoveAllOf(result, toFind);
+        return result;
+    }
+
     namespace ContexprTests {
         template<typename T>
         constexpr bool TestParseNumber(const std::string& str, T expected) {
@@ -108,6 +148,13 @@ namespace Constexpr {
         static_assert(TestParseNumber("0", unsigned int(0)));
         static_assert(!TestParseNumber("-1", int(1)));
         static_assert(!TestParseNumber("abc", 0));
-    }
 
+        static_assert(ReplaceAllCopy("abc", "a", "") == "bc");
+        static_assert(ReplaceAllCopy("aaa", "a", "b") == "bbb");
+        static_assert(ReplaceAllCopy("abbabbabb", "bb", "c") == "acacac");
+
+        static_assert(RemoveAllOfCopy("abcabcabc", "cb") == "aaa");
+        static_assert(RemoveAllOfCopy("abcabcabc", std::string("cb")) == "aaa");
+        static_assert(RemoveAllOfCopy("abcabcabc", 'b') == "acacac");
+    }
 }

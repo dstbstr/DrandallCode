@@ -7,7 +7,7 @@
 enum struct TileType {Empty, Wall, Block, Paddle, Ball};
 
 struct Game {
-    std::unordered_map<Coord, TileType, CoordHash> Board;
+    std::unordered_map<Coord, TileType> Board;
     s64 Score = 0;
 };
 

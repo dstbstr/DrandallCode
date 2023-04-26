@@ -62,7 +62,7 @@ template<size_t Rows, size_t Cols>
 auto PartTwo(const std::string& line) {
     auto layers = BuildLayers<Rows, Cols>(line);
 
-    std::unordered_map<RowCol, Pixel, RowColHash> image;
+    std::unordered_map<RowCol, Pixel> image;
 
     for (size_t layer = 0; layer < layers.size(); layer++) {
         for (size_t row = 0; row < Rows; row++) {

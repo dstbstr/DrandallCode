@@ -2,8 +2,8 @@
 
 #include "Common.h"
 
-std::unordered_set<Coord, CoordHash> ParseInput(const std::vector<std::string>& lines) {
-    std::unordered_set<Coord, CoordHash> result;
+std::unordered_set<Coord> ParseInput(const std::vector<std::string>& lines) {
+    std::unordered_set<Coord> result;
     for (size_t row = 0; row < lines.size(); row++) {
         for (size_t col = 0; col < lines[row].size(); col++) {
             if (lines[row][col] == '#') {
@@ -42,8 +42,8 @@ auto PartOne(const std::vector<std::string>& lines, u32 iterations) {
 
 auto PartTwo(const std::vector<std::string>& lines, u32 iterations) {
     auto infected = ParseInput(lines);
-    std::unordered_set<Coord, CoordHash> weakened{};
-    std::unordered_set<Coord, CoordHash> flagged{};
+    std::unordered_set<Coord> weakened{};
+    std::unordered_set<Coord> flagged{};
     Direction facing = Up;
     Coord currentPos;
     currentPos.Y = static_cast<s32>(lines.size() / 2);

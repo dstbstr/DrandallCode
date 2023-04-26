@@ -5,8 +5,8 @@
 #include "Common.h"
 #include "AStar.h"
 
-using WalkingMap = std::unordered_set<RowCol, RowColHash>;
-using PortalMap = std::unordered_map<RowCol, RowCol, RowColHash>;
+using WalkingMap = std::unordered_set<RowCol>;
+using PortalMap = std::unordered_map<RowCol, RowCol>;
 
 void ParseInput(const std::vector<std::string>& lines, WalkingMap& outWalkingMap, PortalMap& outPortalMap, RowCol& outEntrance, RowCol& outExit) {
     RowCol origin = { 0, 0 };
@@ -70,7 +70,7 @@ void ParseInput(const std::vector<std::string>& lines, WalkingMap& outWalkingMap
     }
 }
 
-using DistanceMap = std::unordered_map<RowCol, std::unordered_map<RowCol, size_t, RowColHash>, RowColHash>;
+using DistanceMap = std::unordered_map<RowCol, std::unordered_map<RowCol, size_t>>;
 
 size_t FindDistance(const RowCol& start, const RowCol& end, const WalkingMap& walkingMap, const RowCol& limit) {
 
@@ -83,7 +83,7 @@ size_t FindDistance(const RowCol& start, const RowCol& end, const WalkingMap& wa
         return result;
     };
 
-    auto path = AStarMin<RowCol, RowColHash>(start, end, n);
+    auto path = AStarMin<RowCol>(start, end, n);
     return path.empty() ? 0 : path.size() - 1;
 }
 

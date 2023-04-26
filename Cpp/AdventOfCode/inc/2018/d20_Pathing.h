@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-using Grid = std::unordered_map<Coord, std::vector<Coord>, CoordHash>;
+using Grid = std::unordered_map<Coord, std::vector<Coord>>;
 
 void Connect(Coord& a, const Coord& b, Grid& grid) {
     grid[a].push_back(b);
@@ -34,7 +34,7 @@ auto PartOne(const std::string& line) {
     Grid grid{};
     Recurse(line, index, { 0, 0 }, grid);
 
-    std::unordered_set<Coord, CoordHash> visited;
+    std::unordered_set<Coord> visited;
     std::queue<std::pair<Coord, int>> queue;
     queue.push({ {0, 0}, 0 });
     auto longest = 0;
@@ -57,7 +57,7 @@ auto PartTwo(const std::string& line) {
     Grid grid{};
     Recurse(line, index, { 0, 0 }, grid);
 
-    std::unordered_set<Coord, CoordHash> visited;
+    std::unordered_set<Coord> visited;
     std::queue<std::pair<Coord, int>> queue;
     queue.push({ {0, 0}, 0 });
     auto overTarget = 0;
