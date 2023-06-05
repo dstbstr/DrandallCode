@@ -127,8 +127,9 @@ namespace Constexpr {
     constexpr size_t FromBase26(std::string_view str) {
         auto pow = 1;
         size_t result = 0;
+        auto ToLower = [](char c) { return c <= 'Z' ? c + 32 : c; };
         for (auto it = str.rbegin(); it != str.rend(); it++) {
-            result += (*it - 'a' + 1) * pow;
+            result += (ToLower(*it) - 'a' + 1) * pow;
             pow *= 26;
         }
 

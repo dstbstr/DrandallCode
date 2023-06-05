@@ -4,6 +4,7 @@
 
 #include "Platform/Types.h"
 #include "Constexpr/ConstexprMath.h"
+#include "Constexpr/ConstexprStrUtils.h"
 
 template<typename T>
 std::string ToString(T input);
@@ -14,6 +15,20 @@ struct Coord {
 
     constexpr bool operator==(const Coord& c) const {
         return this->X == c.X && this->Y == c.Y;
+    }
+
+    constexpr bool operator<(const Coord& c) const {
+        return X == c.X ? Y < c.Y : X < c.X;
+    }
+
+    constexpr Coord& operator+=(const Coord& c) {
+        X += c.X;
+        Y += c.Y;
+        return *this;
+    }
+    constexpr Coord& operator+(const Coord& c) {
+        Coord result{ X, Y };
+        return result += c;
     }
 
     friend std::ostream& operator<<(std::ostream& stream, const Coord& coord) {
@@ -28,17 +43,17 @@ struct std::hash<Coord> {
         return c.X ^ c.Y;
     }
 };
-/*
-struct CoordHash {
-    size_t operator()(const Coord& c) const {
-        return c.X ^ c.Y;
-    }
-};
-*/
 
 template<>
 inline std::string ToString(Coord coord) {
     return "{" + ToString(coord.X) + "," + ToString(coord.Y) + "}";
+}
+
+namespace Constexpr {
+    template<>
+    constexpr std::string ToString(Coord coord) {
+        return "{" + Constexpr::ToString(coord.X) + "," + Constexpr::ToString(coord.Y) + "}";
+    }
 }
 
 struct UCoord {
@@ -46,6 +61,9 @@ struct UCoord {
     u32 Y;
     constexpr bool operator==(const UCoord& c) const {
         return this->X == c.X && this->Y == c.Y;
+    }
+    constexpr bool operator<(const UCoord& c) const {
+        return X == c.X ? Y < c.Y : X < c.X;
     }
 
     friend std::ostream& operator<<(std::ostream& stream, const UCoord& coord) {
@@ -60,22 +78,22 @@ struct std::hash<UCoord> {
         return c.X ^ c.Y;
     }
 };
-/*
-struct UCoordHash {
-    size_t operator()(const UCoord& c) const {
-        return c.X ^ c.Y;
-    }
-};
-*/
 
 template<>
 inline std::string ToString(UCoord coord) {
     return "{" + ToString(coord.X) + "," + ToString(coord.Y) + "}";
 }
 
+namespace Constexpr {
+    template<>
+    constexpr std::string ToString(UCoord coord) {
+        return "{" + Constexpr::ToString(coord.X) + "," + Constexpr::ToString(coord.Y) + "}";
+    }
+}
+
 constexpr void GetLimits(const std::vector<UCoord>& coords, UCoord& min, UCoord& max) {
-    min.X = 9999;
-    min.Y = 9999;
+    min.X = 999999;
+    min.Y = 999999;
     max.X = 0;
     max.Y = 0;
 
@@ -87,11 +105,17 @@ constexpr void GetLimits(const std::vector<UCoord>& coords, UCoord& min, UCoord&
     }
 }
 
+constexpr std::pair<UCoord, UCoord> GetLimits(const std::vector<UCoord>& coords) {
+    UCoord min, max;
+    GetLimits(coords, min, max);
+    return std::make_pair(min, max);
+}
+
 constexpr void GetLimits(const std::vector<Coord>& coords, Coord& min, Coord& max) {
-    min.X = 9999;
-    min.Y = 9999;
-    max.X = 0;
-    max.Y = 0;
+    min.X = 999999;
+    min.Y = 999999;
+    max.X = -999999;
+    max.Y = -999999;
 
     for (const auto& coord : coords) {
         min.X = std::min(min.X, coord.X);
@@ -99,6 +123,11 @@ constexpr void GetLimits(const std::vector<Coord>& coords, Coord& min, Coord& ma
         max.X = std::max(max.X, coord.X);
         max.Y = std::max(max.Y, coord.Y);
     }
+}
+constexpr std::pair<Coord, Coord> GetLimits(const std::vector<Coord>& coords) {
+    Coord min, max;
+    GetLimits(coords, min, max);
+    return std::make_pair(min, max);
 }
 
 struct RowCol {
@@ -112,8 +141,11 @@ struct RowCol {
             Col < rc.Col ? true : false;
     }
     friend std::ostream& operator<<(std::ostream& stream, const RowCol& rc) {
-        stream << "Row: " << rc.Row << " Col: " << rc.Col;
+        stream << "{" << rc.Row << "," << rc.Col << "}";
         return stream;
+    }
+    constexpr RowCol operator-(const RowCol& rc) const {
+        return RowCol{ Row - rc.Row, Col - rc.Col };
     }
 };
 
@@ -123,17 +155,17 @@ struct std::hash<RowCol> {
         return rc.Row ^ rc.Col;
     }
 };
-/*
-struct RowColHash {
-    size_t operator()(const RowCol& rc) const {
-        return rc.Row ^ rc.Col;
-    }
-};
-*/
 
 template<>
 inline std::string ToString(RowCol rc) {
-    return "Row: " + ToString(rc.Row) + " Col: " + ToString(rc.Col);
+    return "{" + ToString(rc.Row) + "," + ToString(rc.Col) + "}";
+}
+
+namespace Constexpr {
+    template<>
+    constexpr std::string ToString(RowCol rc) {
+        return "{" + Constexpr::ToString(rc.Row) + "," + Constexpr::ToString(rc.Col) + "}";
+    }
 }
 
 template<typename T, typename Start, typename End>
@@ -199,36 +231,41 @@ void GetLimitsFromMap(const auto& map, RowCol& min, RowCol& max) {
 
 template<typename T>
 struct Vec3 {
-    T X = 0;
-    T Y = 0;
-    T Z = 0;
+    T X = {};
+    T Y = {};
+    T Z = {};
 
     constexpr bool operator==(const Vec3<T>& v) const = default;
-    constexpr Vec3<T> operator+(const Vec3<T>& v) {
-        Vec3<T> result;
-        result.X = X + v.X;
-        result.Y = Y + v.Y;
-        result.Z = Z + v.Z;
-        return result;
-    }
 
-    constexpr void operator+=(const Vec3<T>& v) {
+    constexpr Vec3<T> operator+=(const Vec3<T>& v) {
         X += v.X;
         Y += v.Y;
         Z += v.Z;
+        return *this;
+    }
+    constexpr Vec3<T> operator+(const Vec3<T>& v) const {
+        Vec3<T> result = *this;
+        return result += v;
     }
 
-    constexpr Vec3<T> operator-(const Vec3<T>& v) {
-        Vec3<T> result;
-        result.X = X - v.X;
-        result.Y = Y - v.Y;
-        result.Z = Z - v.Z;
-        return result;
-    }
-    constexpr void operator-=(const Vec3<T>& v) {
+    constexpr Vec3<T>& operator-=(const Vec3<T>& v) {
         X -= v.X;
         Y -= v.Y;
         Z -= v.Z;
+
+        return *this;
+    }
+
+    constexpr Vec3<T> operator-(const Vec3<T>& v) const {
+        Vec3<T> result = *this;
+        return result -= v;
+    }
+
+    constexpr bool operator<(const Vec3<T>& v) const {
+        return X != v.X ? X < v.X :
+            Y != v.Y ? Y < v.Y :
+            Z != v.Z ? Z < v.Z :
+            false;
     }
 
     friend std::ostream& operator<<(std::ostream& stream, const Vec3<T>& vec) {
@@ -238,58 +275,65 @@ struct Vec3 {
 };
 
 template<typename T>
+inline std::string ToString(Vec3<T> vec) {
+    return "<" + ToString(vec.X) + "," + ToString(vec.Y) + "," + ToString(vec.Z) + ">";
+}
+
+namespace Constexpr {
+    template<typename T>
+    constexpr std::string ToString(Vec3<T> vec) {
+        return "<" + Constexpr::ToString(vec.X) + "," + Constexpr::ToString(vec.Y) + "," + Constexpr::ToString(vec.Z) + ">";
+    }
+}
+
+template<typename T>
 struct std::hash<Vec3<T>> {
     std::size_t operator()(const Vec3<T> v) const {
         return v.X ^ v.Y ^ v.Z;
     }
 };
-/*
-template<typename T>
-struct Vec3Hash {
-    size_t operator()(const Vec3<T> v) const {
-        return v.X ^ v.Y ^ v.Z;
-    }
-};
-*/
 
 
 template<typename T>
 struct Vec4 {
-    T X;
-    T Y;
-    T Z;
-    T W;
+    T X = {};
+    T Y = {};
+    T Z = {};
+    T W = {};
 
     constexpr bool operator==(const Vec4<T>& v) const = default;
-    constexpr Vec4<T> operator+(const Vec4<T>& v) {
-        Vec4<T> result;
-        result.X = X + v.X;
-        result.Y = Y + v.Y;
-        result.Z = Z + v.Z;
-        result.W = W + v.W;
-        return result;
-    }
-
-    constexpr void operator+=(const Vec4<T>& v) {
+    constexpr Vec4<T>& operator+=(const Vec4<T>& v) {
         X += v.X;
         Y += v.Y;
         Z += v.Z;
         W += v.W;
+        return *this;
     }
 
-    constexpr Vec4<T> operator-(const Vec4<T>& v) {
-        Vec4<T> result;
-        result.X = X - v.X;
-        result.Y = Y - v.Y;
-        result.Z = Z - v.Z;
-        result.W = W - v.W;
-        return result;
+    constexpr Vec4<T> operator+(const Vec4<T>& v) const {
+        Vec4<T> result = *this;
+        return result += v;
     }
-    constexpr void operator-=(const Vec4<T>& v) {
+
+    constexpr Vec4<T> operator-=(const Vec4<T>& v) {
         X -= v.X;
         Y -= v.Y;
         Z -= v.Z;
         W -= v.W;
+        return *this;
+    }
+
+    constexpr Vec4<T> operator-(const Vec4<T>& v) const {
+        Vec4<T> result = *this;
+        return result -= v;
+    }
+
+    constexpr bool operator<(const Vec4<T>& v) const {
+        return X != v.X ? X < v.X :
+            Y != v.Y ? Y < v.Y :
+            Z != v.Z ? Z < v.Z :
+            W != v.W ? W < v.W :
+            false;
     }
 
     friend std::ostream& operator<<(std::ostream& stream, const Vec4<T>& vec) {
@@ -298,9 +342,22 @@ struct Vec4 {
     }
 
 };
+
 template<typename T>
-struct Vec4Hash {
-    size_t operator()(const Vec4<T> v) const {
+inline std::string ToString(Vec4<T> vec) {
+    return "<" + ToString(vec.X) + "," + ToString(vec.Y) + "," + ToString(vec.Z) + "," + ToString(vec.W) + ">";
+}
+
+namespace Constexpr {
+    template<typename T>
+    constexpr std::string ToString(Vec4<T> vec) {
+        return "<" + Constexpr::ToString(vec.X) + "," + Constexpr::ToString(vec.Y) + "," + Constexpr::ToString(vec.Z) + "," + Constexpr::ToString(vec.W) + ">";
+    }
+}
+
+template<typename T>
+struct std::hash<Vec4<T>> {
+    std::size_t operator()(const Vec3<T> v) const {
         return v.X ^ v.Y ^ v.Z ^ v.W;
     }
 };
@@ -328,21 +385,19 @@ constexpr size_t MDistance(const RowCol& lhs, const RowCol& rhs) {
 
 template<typename T>
 constexpr size_t MDistance(const Vec3<T> lhs, const Vec3<T> rhs) {
-    size_t result = 0;
-    result += (lhs.X < rhs.X ? rhs.X - lhs.X : lhs.X - rhs.X);
-    result += (lhs.Y < rhs.Y ? rhs.Y - lhs.Y : lhs.Y - rhs.Y);
-    result += (lhs.Z < rhs.Z ? rhs.Z - lhs.Z : lhs.Z - rhs.Z);
-    return result;
+    return static_cast<size_t>(
+        Constexpr::AbsDistance(lhs.X, rhs.X) +
+        Constexpr::AbsDistance(lhs.Y, rhs.Y) +
+        Constexpr::AbsDistance(lhs.Z, rhs.Z));
 }
 
 template<typename T>
 constexpr size_t MDistance(const Vec4<T> lhs, const Vec4<T> rhs) {
-    size_t result = 0;
-    result += (lhs.X < rhs.X ? rhs.X - lhs.X : lhs.X - rhs.X);
-    result += (lhs.Y < rhs.Y ? rhs.Y - lhs.Y : lhs.Y - rhs.Y);
-    result += (lhs.Z < rhs.Z ? rhs.Z - lhs.Z : lhs.Z - rhs.Z);
-    result += (lhs.W < rhs.W ? rhs.W - lhs.W : lhs.W - rhs.W);
-    return result;
+    return static_cast<size_t>(
+        Constexpr::AbsDistance(lhs.X, rhs.X) +
+        Constexpr::AbsDistance(lhs.Y, rhs.Y) +
+        Constexpr::AbsDistance(lhs.Z, rhs.Z) +
+        Constexpr::AbsDistance(lhs.W, rhs.W));
 }
 
 constexpr std::vector<Coord> GetDirectNeighbors(const Coord& pos, const Coord& max, const Coord& min = { 0, 0 }) {

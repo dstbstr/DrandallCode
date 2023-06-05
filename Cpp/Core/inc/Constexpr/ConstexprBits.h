@@ -73,4 +73,18 @@ namespace Constexpr {
     static_assert(WithToggle(1, 0) == 0);
     static_assert(WithToggle(0, 1) == 2);
     static_assert(WithToggle(2, 1) == 0);
+
+    template<typename T, char TrueVal = '1', char FalseVal = '0'>
+    constexpr T FromBinary(const std::string& binary) {
+        T mul = 1;
+        T result = 0;
+        for (int i = static_cast<int>(binary.size() - 1); i >= 0; i--) {
+            result += mul * (binary[i] == TrueVal);
+            mul *= 2;
+        }
+        return result;
+    }
+
+    static_assert(FromBinary<u32>("1011") == 11);
+    static_assert(FromBinary<size_t, '#', '.'>("#.##") == 11);
 }

@@ -12,6 +12,15 @@ namespace Constexpr {
     static_assert(Strlen("a") == 1);
     static_assert(Strlen("") == 0);
 
+    constexpr bool IsDigit(char c) {
+        return c >= '0' && c <= '9';
+    }
+
+    static_assert(IsDigit('3'));
+    static_assert(!IsDigit('A'));
+    static_assert(IsDigit('0'));
+    static_assert(IsDigit('9'));
+
     template<typename T>
     constexpr std::string ToString(T val) {
         bool negate = false;
@@ -23,7 +32,7 @@ namespace Constexpr {
         }
 
         std::string result;
-        while (val > 10) {
+        while (val >= 10) {
             result.push_back('0' + (val % 10));
             val /= 10;
         }
@@ -36,6 +45,7 @@ namespace Constexpr {
         return result;
     }
 
+    static_assert(Constexpr::ToString(10) == "10");
     static_assert(Constexpr::ToString(1234) == "1234");
     static_assert(Constexpr::ToString(-1234) == "-1234");
 
