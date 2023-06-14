@@ -72,7 +72,7 @@ constexpr std::vector<s64> Mix(const std::vector<s64>& numbers, std::vector<size
 
 //static_assert(Mix({ 1, 2, -3, 3, -2, 0, 4 }, {0, 1, 2, 3, 4, 5, 6}) == std::vector<s64>{1, 2, -3, 4, 0, 3, -2});
 
-s64 Solution(const std::vector<std::string>& lines, s64 key, s64 count) {
+constexpr s64 Solution(const std::vector<std::string>& lines, s64 key, s64 count) {
     auto numbers = ParseLines(lines);
     for (auto& number : numbers) {
         number *= key;

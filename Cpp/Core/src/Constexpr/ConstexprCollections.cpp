@@ -89,6 +89,29 @@ namespace Constexpr {
             return true;
         }
         static_assert(RangeBasedFor_WithValues_TraversesAllValues());
+
+        constexpr bool RangeBasedFor_WithReferences_TraversesAllValues() {
+            SmallMap<int, int> map;
+            map[1] = 1;
+            map[2] = 2;
+            map[3] = 3;
+
+            size_t totalElements = 0;
+            size_t sumOfKeys = 0;
+            size_t sumOfValues = 0;
+            for (const auto& [key, value] : map) {
+                totalElements++;
+                sumOfKeys += key;
+                sumOfValues += value;
+            }
+
+            if (totalElements != 3) return false;
+            if (sumOfKeys != 6) return false;
+            if (sumOfValues != 6) return false;
+            return true;
+
+        }
+        static_assert(RangeBasedFor_WithReferences_TraversesAllValues());
     }
 
     namespace ConstexprStackTests {

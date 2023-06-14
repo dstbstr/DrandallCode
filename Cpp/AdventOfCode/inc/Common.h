@@ -123,3 +123,82 @@ constexpr std::vector<T> ParseLineAsNumbers(const std::string& line, std::string
     }
     return result;
 }
+
+template<typename T>
+constexpr std::vector<T> ParseLines(const std::vector<std::string>& lines, auto parseFunc) {
+    std::vector<T> result;
+    for (const auto& line : lines) {
+        result.push_back(parseFunc(line));
+    }
+    return result;
+}
+
+constexpr auto RunAllReturnMax(const auto& collection, auto func, auto... args) {
+    //define best's type as whatever func returns when given an element of the collection, and the extra args
+    decltype(func(std::declval<decltype(collection.back())>(), args...)) best = {};
+
+    for (const auto& element : collection) {
+        best = std::max(best, func(element, args...));
+    }
+
+    return best;
+}
+
+constexpr auto RunAllReturnMin(const auto& collection, auto func, auto... args) {
+    decltype(func(std::declval<decltype(collection.back())>(), args...)) best = {};
+
+    for (const auto& element : collection) {
+        best = std::min(best, func(element, args...));
+    }
+
+    return best;
+}
+
+using SolutionFunc = std::function<std::string(const std::vector<std::string>&)>;
+std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, SolutionFunc>>>& GetSolutions();
+std::unordered_map<size_t, std::unordered_map<size_t, std::function<bool()>>>& GetTests();
+
+struct SolutionRegistrar {
+    SolutionRegistrar(size_t year, size_t day, size_t part, SolutionFunc solution) {
+        GetSolutions()[year][day][part] = solution;
+    }
+};
+
+struct TestRegistrar {
+    TestRegistrar(size_t year, size_t day, std::function<bool()> testFunc) {
+        GetTests()[year][day] = testFunc;
+    }
+};
+
+
+#define SOLUTION(_year, _day) namespace Year##_year##Day##_day
+#define PART_ONE() constexpr std::string PartOne(const std::vector<std::string>& lines)
+#define PART_TWO() constexpr std::string PartTwo(const std::vector<std::string>& lines)
+#define TESTS() constexpr bool Tests()
+
+#define DECLARE_SOLUTION(_year, _day) \
+    SOLUTION(_year, _day) { \
+    PART_ONE(); \
+    PART_TWO(); \
+    TESTS(); \
+    inline SolutionRegistrar reg_PartOne{_year, _day, 1, PartOne}; \
+    inline SolutionRegistrar reg_PartTwo{_year, _day, 2, PartTwo}; \
+    inline TestRegistrar reg_Tests{_year, _day, Tests}; \
+    }
+
+/*
+#define PART_ONE(_year, _day) \
+    constexpr std::string PartOne##_year##_##_day(const std::vector<std::string>&); \
+    SolutionRegistrar reg##_year##_##_day##_1{_year, _day, 1, PartOne##_year##_##_day}; \
+    constexpr std::string PartOne##_year##_##_day(const std::vector<std::string>& lines)
+
+#define PART_TWO(_year, _day) \
+    constexpr std::string PartTwo##_year##_##_day(const std::vector<std::string>&); \
+    SolutionRegistrar reg##_year##_##_day##_2{ _year, _day, 2, PartTwo##_year##_##_day }; \
+    constexpr std::string PartTwo##_year##_##_day(const std::vector<std::string>& lines)
+
+#define TESTS(_year, _day) \
+    constexpr bool Tests##_year##_##_day(); \
+    TestRegistrar reg##_year##_##_day{ _year, _day, Tests##_year##_##_day }; \
+    constexpr bool Tests##_year##_##_day()
+*/

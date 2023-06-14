@@ -118,16 +118,37 @@ namespace Constexpr {
         constexpr auto begin() {
             return mData.begin();
         }
+        constexpr auto begin() const {
+            return mData.begin();
+        }
         constexpr auto cbegin() const {
             return mData.cbegin();
         }
         constexpr auto end() {
             return mData.end();
         }
+        constexpr auto end() const {
+            return mData.end();
+        }
         constexpr auto cend() const {
             return mData.cend();
         }
 
+        constexpr std::vector<Key> GetKeys() const {
+            std::vector<Key> result;
+            for (const auto& [key, value] : mData) {
+                result.push_back(key);
+            }
+            return result;
+        }
+
+        constexpr std::vector<Value> GetValues() const {
+            std::vector<Value> result;
+            for (const auto& [key, value] : mData) {
+                result.push_back(value);
+            }
+            return result;
+        }
     private:
         std::vector<std::pair<Key, Value>> mData{};
 
@@ -144,7 +165,7 @@ namespace Constexpr {
         return map.begin();
     }
     template<typename Key, typename Value>
-    constexpr inline auto begin(const SmallMap<Key, Value>& map) {
+    constexpr inline auto cbegin(const SmallMap<Key, Value>& map) {
         return map.cbegin();
     }
     template<typename Key, typename Value>
@@ -152,7 +173,7 @@ namespace Constexpr {
         return map.end();
     }
     template<typename Key, typename Value>
-    constexpr inline auto end(const SmallMap<Key, Value>& map) {
+    constexpr inline auto cend(const SmallMap<Key, Value>& map) {
         return map.cend();
     }
 
@@ -242,9 +263,86 @@ namespace Constexpr {
         std::vector<T> mData;
     };
 
+    template<typename T>
+    class Set {
+    public:
+        constexpr Set() = default;
+        constexpr Set(const Set& other) :mData(other.mData) {}
+        constexpr Set(Set&& other) : mData(std::move(other.mData)) {}
+        constexpr Set& operator=(const Set& other) {
+            this->mData = other.mData;
+            return *this;
+        }
+        constexpr Set& operator=(Set&& other) {
+            this->mData = other.mData;
+            return *this;
+        }
+
+        constexpr bool insert(const T& val) {
+            if (contains(val)) {
+                return false;
+            }
+            
+            mData.push_back(val);
+            return true;
+        }
+
+        constexpr bool contains(const T& val) {
+            return std::find(mData.cbegin(), mData.cend(), val) != mData.cend();
+        }
+
+        constexpr bool is_empty() {
+            return mData.empty();
+        }
+        constexpr void clear() {
+            mData.clear();
+        }
+        constexpr std::size_t size() {
+            return mData.size();
+        }
+
+        constexpr auto begin() {
+            return mData.begin();
+        }
+        constexpr auto begin() const {
+            return mData.begin();
+        }
+        constexpr auto cbegin() const {
+            return mData.cbegin();
+        }
+        constexpr auto end() {
+            return mData.end();
+        }
+        constexpr auto end() const {
+            return mData.end();
+        }
+        constexpr auto cend() const {
+            return mData.cend();
+        }
+
+    private:
+        std::vector<T> mData;
+    };
+
+    template<typename T>
+    constexpr inline auto begin(Set<T>& set) {
+        return set.begin();
+    }
+    template<typename T>
+    constexpr inline auto cbegin(const Set<T>& set) {
+        return set.cbegin();
+    }
+    template<typename T>
+    constexpr inline auto end(Set<T>& set) {
+        return set.end();
+    }
+    template<typename T>
+    constexpr inline auto cend(const Set<T>& set) {
+        return set.cend();
+    }
+
     /*
     TODO:
-    set
     priority queue (used by A*)
     deque (Could improve queue?)
     */

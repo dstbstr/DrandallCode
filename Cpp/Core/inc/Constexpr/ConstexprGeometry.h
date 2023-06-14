@@ -10,8 +10,17 @@ template<typename T>
 std::string ToString(T input);
 
 struct Coord {
-    s32 X;
-    s32 Y;
+    s64 X{ 0 };
+    s64 Y{ 0 };
+
+    constexpr Coord() = default;
+    constexpr Coord(s64 x, s64 y) : X(x), Y(y) {}
+
+    constexpr Coord(std::string_view sv, std::string_view delimiter = ",") {
+        auto split = Constexpr::Split(sv, delimiter);
+        Constexpr::ParseNumber(split[0], X);
+        Constexpr::ParseNumber(split[1], Y);
+    }
 
     constexpr bool operator==(const Coord& c) const {
         return this->X == c.X && this->Y == c.Y;
@@ -57,8 +66,17 @@ namespace Constexpr {
 }
 
 struct UCoord {
-    u32 X;
-    u32 Y;
+    u64 X{ 0 };
+    u64 Y{ 0 };
+    constexpr UCoord() = default;
+    constexpr UCoord(u64 x, u64 y) : X(x), Y(y) {}
+
+    constexpr UCoord(std::string_view sv, std::string_view delimiter = ",") {
+        auto split = Constexpr::Split(sv, delimiter);
+        Constexpr::ParseNumber(split[0], X);
+        Constexpr::ParseNumber(split[1], Y);
+    }
+
     constexpr bool operator==(const UCoord& c) const {
         return this->X == c.X && this->Y == c.Y;
     }
@@ -235,6 +253,16 @@ struct Vec3 {
     T Y = {};
     T Z = {};
 
+    constexpr Vec3() = default;
+    constexpr Vec3(T x, T y, T z) : X(x), Y(y), Z(z) {}
+
+    constexpr Vec3(std::string_view sv, std::string_view delimiter = ",") {
+        auto split = Constexpr::Split(sv, delimiter);
+        Constexpr::ParseNumber(split[0], X);
+        Constexpr::ParseNumber(split[1], Y);
+        Constexpr::ParseNumber(split[2], Z);
+    }
+
     constexpr bool operator==(const Vec3<T>& v) const = default;
 
     constexpr Vec3<T> operator+=(const Vec3<T>& v) {
@@ -300,6 +328,17 @@ struct Vec4 {
     T Y = {};
     T Z = {};
     T W = {};
+
+    constexpr Vec4() = default;
+    constexpr Vec4(T x, T y, T z, T w) : X(x), Y(y), Z(z), W(w) {}
+
+    constexpr Vec4(std::string_view sv, std::string_view delimiter = ",") {
+        auto split = Constexpr::Split(sv, delimiter);
+        Constexpr::ParseNumber(split[0], X);
+        Constexpr::ParseNumber(split[1], Y);
+        Constexpr::ParseNumber(split[2], Z);
+        Constexpr::ParseNumber(split[3], W);
+    }
 
     constexpr bool operator==(const Vec4<T>& v) const = default;
     constexpr Vec4<T>& operator+=(const Vec4<T>& v) {

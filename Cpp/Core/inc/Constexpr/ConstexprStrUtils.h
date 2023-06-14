@@ -117,6 +117,18 @@ namespace Constexpr {
         return result;
     }
 
+    constexpr void ReplaceOne(std::string& original, const std::string& toFind, const std::string& replacement) {
+        size_t index = original.find(toFind, 0);
+        if (index != original.npos) {
+            original.replace(index, toFind.length(), replacement);
+        }
+    }
+
+    constexpr std::string ReplaceOneCopy(const std::string& original, const std::string& toFind, const std::string& replacement) {
+        std::string result = original;
+        ReplaceOne(result, toFind, replacement);
+        return result;
+    }
     constexpr void RemoveAllOf(std::string& original, char toFind) {
         original.erase(std::remove(original.begin(), original.end(), toFind), original.end());
     }

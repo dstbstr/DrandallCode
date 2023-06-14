@@ -1,24 +1,32 @@
 #pragma once
-
 #include "Common.h"
 
-auto PartOne(const std::vector<std::string>& lines) {
-    return lines.size();
-}
+namespace Year2015Day1 {
+    PART_ONE(2015, 1) {
+        size_t result = 0;
+        for (const auto& line : lines) {
 
-auto PartTwo(const std::vector<std::string>& lines) {
-    return lines.size();
-}
+        }
 
-std::string Run(const std::vector<std::string>& lines) {
-    return ToString(PartOne(lines));
-}
+        return Constexpr::ToString(result);
 
-bool RunTests() {
-    std::vector<std::string> lines = {
+    }
 
-    };
+    PART_TWO(2015, 1) {
+        size_t result = 0;
+        for (const auto& line : lines) {
 
-    if (PartOne(lines) != 0) return false;
-    return true;
+        }
+
+        return Constexpr::ToString(result);
+
+    }
+
+    TESTS(2015, 1) {
+        std::vector<std::string> lines = {
+
+        };
+
+        return lines.size() == 0;
+    }
 }

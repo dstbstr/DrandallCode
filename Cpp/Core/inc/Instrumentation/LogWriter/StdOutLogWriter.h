@@ -54,5 +54,13 @@ namespace Log {
         }
     };
 
+    struct MinimalStdOutLogWriter : public ILogListener {
+        MinimalStdOutLogWriter(Log::LogFilter filter = Log::LogFilter::MatchAll) : ILogListener(filter) {}
+
+        void WriteLog(const LogEvent& event) const override {
+            std::cout << event.Entry.Message << "\n";
+        }
+    };
+
 } // namespace Log
 #endif // __STDOUTLOGWRITER_H__
