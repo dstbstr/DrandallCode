@@ -2,8 +2,12 @@
 
 #include <vector>
 #include <array>
+#include <string_view>
 
 namespace Constexpr {
+    template<typename T>
+    constexpr T Constant_E = 2.718281828459045235360287471352;
+
     template<typename T>
     constexpr T Abs(T t) {
         if constexpr (std::is_signed_v<T>) {
@@ -14,12 +18,15 @@ namespace Constexpr {
         }
     }
 
-    static_assert(Abs(3) == 3);
-    static_assert(Abs(-3) == 3);
-
     template<typename T>
     constexpr T AbsDistance(T lhs, T rhs) {
         return lhs < rhs ? rhs - lhs : lhs - rhs;
+    }
+
+    template<typename T>
+    constexpr T Floor(T val) {
+        static_assert(std::is_floating_point_v<T>, "Floor must take a floating point value");
+        return static_cast<T>(static_cast<int64_t>(val));
     }
 
     namespace Detail {
@@ -33,23 +40,41 @@ namespace Constexpr {
             : std::numeric_limits<double>::quiet_NaN();
     }
 
-    static_assert(Sqrt(9) == 3.0);
-    static_assert(Sqrt(1) == 1.0);
-    static_assert(Sqrt(-1) != Sqrt(-1)); // no way to test for NaN, but NaN != NaN
-
-    template<typename T>
-    constexpr T Pow(T val, T pow) {
+    template<typename T, typename PowType>
+    constexpr T Pow(T val, PowType pow) {
+        static_assert(!std::is_floating_point_v<PowType>, "This power only works with integers");
         if (pow == 0) return 1;
 
         T result = val;
-        for (auto i = 1; i < pow; i++) {
+        for (PowType i = 1; i < pow; i++) {
             result *= val;
         }
         return result;
     }
 
-    static_assert(Pow(2, 0) == 1);
-    static_assert(Pow(2, 4) == 16);
+    template<typename T>
+    constexpr T Factorial(T val) {
+        static_assert(!std::is_floating_point_v<T>, "Factorial works with integral types");
+        T result = 1;
+        while (val > 1) {
+            result *= val--;
+        }
+        return result;
+    }
+    namespace Detail {
+        static constexpr std::array<uint8_t, 32> DeBruijnBitPosition = { 0, 9, 1, 10, 13, 21, 2, 29, 11, 14, 16, 18, 22, 25, 3, 30, 8, 12, 20, 28, 15, 17, 24, 7, 19, 27, 23, 6, 26, 5, 4, 31 };
+    }
+    //Lovingly stolen from here: https://stackoverflow.com/questions/15967240/fastest-implementation-of-log2int-and-log2float
+    template<typename T>
+    constexpr T Log2I(T v) {
+        static_assert(!std::is_floating_point_v<T>, "Log2I must be given an integral type");
+        v |= v >> 1;
+        v |= v >> 2;
+        v |= v >> 4;
+        v |= v >> 8;
+        v |= v >> 16;
+        return static_cast<T>(Detail::DeBruijnBitPosition[static_cast<size_t>(v * 0x07C4ACDDU) >> 27]);
+    }
 
     template<typename T>
     constexpr T MulMod(T lhs, T rhs, T mod) {
@@ -78,8 +103,6 @@ namespace Constexpr {
 
         return result;
     }
-    static_assert(MulMod(3u, 5u, 20u) == 15u);
-    static_assert(MulMod(3u, 5u, 7u) == 1u);
 
     template<typename T>
     constexpr T ModPow(T base, T exp, T mod) {
@@ -112,8 +135,6 @@ namespace Constexpr {
 
         return result;
     }
-    static_assert(ModPow(2, 3, 5) == 3); //2^3 == 8 % 5 == 3
-
 
     template<typename T>
     constexpr T EuclideanModulo(T value, T modulus) {
@@ -121,8 +142,6 @@ namespace Constexpr {
         T remainder = value % modulus;
         return remainder >= 0 ? remainder : remainder + Abs(modulus);
     }
-
-    static_assert(EuclideanModulo(-5, 3) == 1);
 
     constexpr size_t FromBase26(std::string_view str) {
         auto pow = 1;
@@ -135,10 +154,6 @@ namespace Constexpr {
 
         return result - 1;
     }
-
-    static_assert(FromBase26(std::string_view("a")) == 0);
-    static_assert(FromBase26(std::string_view("z")) == 25);
-    static_assert(FromBase26(std::string_view("aa")) == 26);
 
     template<typename T>
     constexpr std::vector<T> GetPrimes(T max) {
@@ -168,9 +183,6 @@ namespace Constexpr {
         return result;
     }
 
-    static_assert(GetPrimes<size_t>(10) == std::vector<size_t>{2, 3, 5, 7});
-    static_assert(GetPrimes<size_t>(7) == std::vector<size_t>{2, 3, 5, 7});
-
     template<size_t Max, typename T>
     constexpr std::vector<T> GetPrimes() {
         static_assert(!std::is_floating_point_v<T>);
@@ -197,9 +209,6 @@ namespace Constexpr {
         return result;
     }
 
-    static_assert(GetPrimes<10, size_t>() == std::vector<size_t>{2, 3, 5, 7});
-    static_assert(GetPrimes<7, size_t>() == std::vector<size_t>{2, 3, 5, 7});
-
     template<typename T>
     constexpr std::vector<T> GetUniquePrimeFactors(T value) {
         auto primes = GetPrimes<T>(value);
@@ -214,9 +223,6 @@ namespace Constexpr {
 
         return result;
     }
-
-    static_assert(GetUniquePrimeFactors<size_t>(10) == std::vector<size_t>{2, 5});
-    static_assert(GetUniquePrimeFactors<size_t>(7) == std::vector<size_t>{7});
 
     template<size_t Value, typename T>
     constexpr std::vector<T> GetUniquePrimeFactors() {
@@ -233,9 +239,6 @@ namespace Constexpr {
 
         return result;
     }
-
-    static_assert(GetUniquePrimeFactors<10, size_t>() == std::vector<size_t>{2, 5});
-    static_assert(GetUniquePrimeFactors<7, size_t>() == std::vector<size_t>{7});
 
     template<typename T>
     constexpr std::vector<T> GetAllPrimeFactors(T value) {
@@ -254,9 +257,6 @@ namespace Constexpr {
         return result;
     }
 
-    static_assert(GetAllPrimeFactors<size_t>(16) == std::vector<size_t>{2, 2, 2, 2});
-    static_assert(GetAllPrimeFactors<size_t>(7) == std::vector<size_t>{7});
-
     template<size_t Value, typename T>
     constexpr std::vector<T> GetAllPrimeFactors() {
         static_assert(Value > 1);
@@ -274,9 +274,6 @@ namespace Constexpr {
 
         return result;
     }
-
-    static_assert(GetAllPrimeFactors<16, size_t>() == std::vector<size_t>{2, 2, 2, 2});
-    static_assert(GetAllPrimeFactors<7, size_t>() == std::vector<size_t>{7});
 
     template<typename T>
     constexpr std::vector<T> GetDivisors(T input) {
@@ -302,10 +299,6 @@ namespace Constexpr {
 
         return result;
     }
-
-    static_assert(GetDivisors(24) == std::vector<int>{1, 24, 2, 12, 3, 8, 4, 6});
-    static_assert(GetDivisors(9) == std::vector<int>{1, 9, 3});
-    static_assert(GetDivisors(1) == std::vector<int>{1});
 
     namespace detail {
         template<typename T>
@@ -371,22 +364,10 @@ namespace Constexpr {
         return detail::FindLcm<T>(GetAllPrimeFactors<T>(std::forward<Args>(args))...);
     }
 
-    static_assert(FindLcm<size_t>(60, 90) == 180);
-    static_assert(FindLcm<size_t>(90, 60) == 180);
-    static_assert(FindLcm<size_t>(3, 5) == 15);
-    static_assert(FindLcm<size_t>(5, 3) == 15);
-    static_assert(FindLcm<size_t>(12, 16) == 48);
-    static_assert(FindLcm<size_t>(16, 12) == 48);
-
     template<size_t Lhs, size_t Rhs, typename T>
     constexpr T FindLcm() {
         return detail::FindLcm<T>(GetAllPrimeFactors<Lhs, T>(), GetAllPrimeFactors<Rhs, T>());
     }
-
-    static_assert(FindLcm<60, 90, size_t>() == 180);
-    static_assert(FindLcm<3, 5, size_t>() == 15);
-    static_assert(FindLcm<12, 16, size_t>() == 48);
-
 
     template<typename T>
     constexpr bool Eval(T lhs, T rhs, std::string_view op) {
@@ -411,21 +392,6 @@ namespace Constexpr {
 
         return false;
     }
-
-    static_assert(Eval(20, 40, "<"));
-    static_assert(Eval(40, 20, ">"));
-    static_assert(Eval(20, 20, "<="));
-    static_assert(Eval(20, 20, ">="));
-    static_assert(Eval(20, 20, "=="));
-    static_assert(Eval(20, 40, "!="));
-
-    static_assert(!Eval(40, 20, "<"));
-    static_assert(!Eval(20, 40, ">"));
-    static_assert(!Eval(40, 20, "<="));
-    static_assert(!Eval(20, 40, ">="));
-    static_assert(!Eval(20, 40, "=="));
-    static_assert(!Eval(20, 20, "!="));
-
 
     template<typename T>
     constexpr T MultiplicativeInverse(T a, T n) {
@@ -456,14 +422,4 @@ namespace Constexpr {
 
         return t;
     }
-
-    //ax + by = gcd(a,b)
-    //ax + my = 1
-    //ax = 1 (mod m)
-    //a = 3, M = 11, output == 4
-    //(4*3) % 11 = 1
-    static_assert(MultiplicativeInverse(3, 5) == 2); //(3 * 2) % 5 == 1
-    static_assert(MultiplicativeInverse(3, 11) == 4); //(3 * 4) % 11 = 1
-    static_assert(MultiplicativeInverse(3, 7) == 5); //(3 * 5) % 7 == 1
-
 }

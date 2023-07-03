@@ -80,6 +80,37 @@ public:
         negative = other.negative;
     }
 
+    constexpr std::string ToBinary() const {
+        auto running = *this;
+        std::string result;
+        while (running > 0) {
+            result += running.IsEven() ? "0" : "1";
+            running >>= 1;
+        }
+
+        std::reverse(result.begin(), result.end());
+        return result;
+    }
+
+    static constexpr BigInt FromBinary(const std::string& bin) {
+        BigInt result;
+        if (bin.empty()) return result;
+
+        BigInt factor = 1;
+        for (size_t i = bin.size() - 1; i > 0; i--) {
+            result += factor * (bin[i] == '1' ? 1 : 0);
+            factor *= 2;
+        }
+        result += factor * (bin[0] == '1' ? 1 : 0);
+
+        return result;
+    }
+
+    constexpr BigInt GetBitCount() const {
+        auto bin = this->ToBinary();
+        return std::count(bin.begin(), bin.end(), '1');
+    }
+
     constexpr BigInt& operator=(const BigInt& other) {
         digits = other.digits;
         negative = other.negative;
@@ -450,6 +481,120 @@ public:
         }
         return stream;
     }
+
+    friend constexpr BigInt& operator&=(BigInt& lhs, const BigInt& rhs) {
+        auto lBin = lhs.ToBinary();
+        auto rBin = rhs.ToBinary();
+        auto minSize = std::min(lBin.size(), rBin.size());
+        auto maxSize = std::max(lBin.size(), rBin.size());
+        size_t startA = lBin.size() - minSize;
+        size_t startB = rBin.size() - minSize;
+        std::string result = std::string(maxSize - minSize, '0');
+
+        for (auto i = 0; i < minSize; i++) {
+            result += ((lBin[startA + i] == '1') && (rBin[startB + i] == '1')) ? '1' : '0';
+        }
+        lhs = BigInt::FromBinary(result);
+        return lhs;
+    }
+
+    friend constexpr BigInt operator&(BigInt lhs, const BigInt& rhs) {
+        return lhs &= rhs;
+        /*
+        auto lBin = lhs.ToBinary();
+        auto rBin = rhs.ToBinary();
+        auto minSize = std::min(lBin.size(), rBin.size());
+        auto maxSize = std::max(lBin.size(), rBin.size());
+        size_t startA = lBin.size() - minSize;
+        size_t startB = rBin.size() - minSize;
+        std::string result = std::string(maxSize - minSize, '0');
+
+        for (auto i = 0; i < minSize; i++) {
+            result += ((lBin[startA + i] == '1') && (rBin[startB + i] == '1')) ? '1' : '0';
+        }
+        return BigInt::FromBinary(result);
+        */
+    }
+    friend constexpr BigInt& operator|=(BigInt& lhs, const BigInt& rhs) {
+        auto lBin = lhs.ToBinary();
+        auto rBin = rhs.ToBinary();
+        auto minSize = std::min(lBin.size(), rBin.size());
+        auto maxSize = std::max(lBin.size(), rBin.size());
+        size_t startA = lBin.size() - minSize;
+        size_t startB = rBin.size() - minSize;
+
+        std::string result = lBin.size() == maxSize ? lBin.substr(0, maxSize - minSize) : rBin.substr(0, maxSize - minSize);
+
+        for (auto i = 0; i < minSize; i++) {
+            result += ((lBin[startA + i] == '1') || (rBin[startB + i] == '1')) ? '1' : '0';
+        }
+        lhs = BigInt::FromBinary(result);
+        return lhs;
+    }
+
+    friend constexpr BigInt operator|(BigInt lhs, const BigInt& rhs) {
+        return lhs |= rhs;
+        /*
+        auto lBin = lhs.ToBinary();
+        auto rBin = rhs.ToBinary();
+        auto minSize = std::min(lBin.size(), rBin.size());
+        auto maxSize = std::max(lBin.size(), rBin.size());
+        size_t startA = lBin.size() - minSize;
+        size_t startB = rBin.size() - minSize;
+        
+        std::string result = lBin.size() == maxSize ? lBin.substr(0, maxSize - minSize) : rBin.substr(0, maxSize - minSize);
+
+        for (auto i = 0; i < minSize; i++) {
+            result += ((lBin[startA + i] == '1') || (rBin[startB + i] == '1')) ? '1' : '0';
+        }
+        return BigInt::FromBinary(result);
+        */
+    }
+
+    friend constexpr BigInt operator^=(BigInt& lhs, const BigInt& rhs) {
+        auto lBin = lhs.ToBinary();
+        auto rBin = rhs.ToBinary();
+        auto minSize = std::min(lBin.size(), rBin.size());
+        auto maxSize = std::max(lBin.size(), rBin.size());
+        size_t startA = lBin.size() - minSize;
+        size_t startB = rBin.size() - minSize;
+        std::string result = lBin.size() == maxSize ? lBin.substr(0, maxSize - minSize) : rBin.substr(0, maxSize - minSize);
+
+        for (auto i = 0; i < minSize; i++) {
+            result += (lBin[startA + i] != rBin[startB + i]) ? '1' : '0';
+        }
+        lhs = BigInt::FromBinary(result);
+        return lhs;
+    }
+    friend constexpr BigInt operator^(BigInt lhs, const BigInt& rhs) {
+        return lhs ^= rhs;
+        /*
+        auto lBin = lhs.ToBinary();
+        auto rBin = rhs.ToBinary();
+        auto minSize = std::min(lBin.size(), rBin.size());
+        auto maxSize = std::max(lBin.size(), rBin.size());
+        size_t startA = lBin.size() - minSize;
+        size_t startB = rBin.size() - minSize;
+        std::string result = lBin.size() == maxSize ? lBin.substr(0, maxSize - minSize) : rBin.substr(0, maxSize - minSize);
+
+        for (auto i = 0; i < minSize; i++) {
+            result += (lBin[startA + i] != rBin[startB + i]) ? '1' : '0';
+        }
+        return BigInt::FromBinary(result);
+        */
+    }
+
+    //This needs to know how big the BigInt should be, but there's no way to pass that information in
+    // I.E. ~0 shouldn't be 1
+    
+    //friend constexpr BigInt operator~(const BigInt& val) {
+    //    std::string result = val.ToBinary();
+    //    for (size_t i = 0; i < result.size(); i++) {
+    //        result[i] = result[i] == '1' ? '0' : '1';
+    //    }
+
+    //    return BigInt::FromBinary(result);
+    //}
 
     constexpr bool is_ull() const {
         return !negative && *this <= std::numeric_limits<unsigned long long>::max();

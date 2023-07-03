@@ -4,6 +4,7 @@
 #include <array>
 #include <string>
 #include <ranges>
+#include <algorithm>
 
 namespace Constexpr {
     template<typename R>
@@ -255,7 +256,7 @@ namespace Constexpr {
         constexpr void clear() {
             mData.clear();
         }
-        constexpr std::size_t size() {
+        constexpr std::size_t size() const {
             return mData.size();
         }
 
@@ -264,6 +265,50 @@ namespace Constexpr {
     };
 
     template<typename T>
+    struct PriorityQueue {
+        constexpr PriorityQueue() = default;
+        constexpr PriorityQueue(const PriorityQueue& other) : mData(other.mData) {}
+        constexpr PriorityQueue(PriorityQueue&& other) : mData(std::move(other.mData)) {}
+        PriorityQueue& operator=(const PriorityQueue& other) {
+            mData = other.mData;
+            return *this;
+        }
+        PriorityQueue& operator=(PriorityQueue&& other) {
+            mData = other.mData;
+            return *this;
+        }
+
+        constexpr void push(T val) {
+            mData.push_back(val);
+        }
+
+        constexpr T top() const {
+            if (mData.empty()) throw "Reading empty queue";
+            std::sort(mData.begin(), mData.end());
+            return mData.back();
+        }
+        constexpr void pop() {
+            if (mData.empty()) throw "Popped empty queue";
+            std::sort(mData.begin(), mData.end());
+            mData.pop_back();
+        }
+
+        constexpr bool empty() const {
+            return mData.empty();
+        }
+        constexpr void clear() {
+            mData.clear();
+        }
+        constexpr std::size_t size() const {
+            return mData.size();
+        }
+
+    private:
+        mutable std::vector<T> mData;
+    };
+
+
+    template<typename T, typename THash = std::hash<T>>
     class Set {
     public:
         constexpr Set() = default;
@@ -287,11 +332,17 @@ namespace Constexpr {
             return true;
         }
 
+        constexpr void insert(const auto& begin, const auto& end) {
+            for (auto it = begin; it != end; it++) {
+                insert(*it);
+            }
+        }
+
         constexpr bool contains(const T& val) {
             return std::find(mData.cbegin(), mData.cend(), val) != mData.cend();
         }
 
-        constexpr bool is_empty() {
+        constexpr bool empty() {
             return mData.empty();
         }
         constexpr void clear() {
@@ -343,7 +394,6 @@ namespace Constexpr {
 
     /*
     TODO:
-    priority queue (used by A*)
     deque (Could improve queue?)
     */
 }

@@ -27,53 +27,9 @@
 using namespace std::string_view_literals;
 using namespace std::string_literals;
 
-enum Direction { Up, Right, Down, Left };
-
-constexpr std::string ToString(Direction dir) {
-    switch (dir) {
-    case Up: return "Up"; break;
-    case Right: return "Right"; break;
-    case Down: return "Down"; break;
-    case Left: return "Left"; break;
-    default: return "Unknown"; break;
-    }
-}
-constexpr Direction TurnRight(Direction current) {
-    return static_cast<Direction>((current + 1) % 4);
-}
-constexpr Direction TurnLeft(Direction current) {
-    return static_cast<Direction>((4 + (current - 1)) % 4);
-}
-constexpr Direction TurnAround(Direction current) {
-    return static_cast<Direction>((current + 2) % 4);
-}
-static_assert(TurnRight(Up) == Right);
-static_assert(TurnLeft(Up) == Left);
-static_assert(TurnRight(Left) == Up);
-static_assert(TurnLeft(Left) == Down);
-static_assert(TurnAround(Up) == Down);
-static_assert(TurnAround(Down) == Up);
-static_assert(TurnAround(Left) == Right);
-static_assert(TurnAround(Right) == Left);
-
-constexpr void Move(Coord& pos, Direction facing) {
-    switch (facing) {
-    case Up: pos.Y--; return;
-    case Down: pos.Y++; return;
-    case Left: pos.X--; return;
-    case Right: pos.X++; return;
-    default:break;
-    }
-}
-
-constexpr void Move(UCoord& pos, Direction facing) {
-    switch (facing) {
-    case Up: pos.Y--; return;
-    case Down: pos.Y++; return;
-    case Left: pos.X--; return;
-    case Right: pos.X++; return;
-    default:break;
-    }
+static inline std::vector<std::string> _logs;
+constexpr std::vector<std::string>& GET_LOGS() {
+    return _logs;
 }
 
 template<typename Key, typename Value, typename Hash = std::hash<Key>>
@@ -125,10 +81,10 @@ constexpr std::vector<T> ParseLineAsNumbers(const std::string& line, std::string
 }
 
 template<typename T>
-constexpr std::vector<T> ParseLines(const std::vector<std::string>& lines, auto parseFunc) {
+constexpr std::vector<T> ParseLines(const std::vector<std::string>& lines, auto parseFunc, auto... args) {
     std::vector<T> result;
     for (const auto& line : lines) {
-        result.push_back(parseFunc(line));
+        result.push_back(parseFunc(line, args...));
     }
     return result;
 }
@@ -185,20 +141,3 @@ struct TestRegistrar {
     inline SolutionRegistrar reg_PartTwo{_year, _day, 2, PartTwo}; \
     inline TestRegistrar reg_Tests{_year, _day, Tests}; \
     }
-
-/*
-#define PART_ONE(_year, _day) \
-    constexpr std::string PartOne##_year##_##_day(const std::vector<std::string>&); \
-    SolutionRegistrar reg##_year##_##_day##_1{_year, _day, 1, PartOne##_year##_##_day}; \
-    constexpr std::string PartOne##_year##_##_day(const std::vector<std::string>& lines)
-
-#define PART_TWO(_year, _day) \
-    constexpr std::string PartTwo##_year##_##_day(const std::vector<std::string>&); \
-    SolutionRegistrar reg##_year##_##_day##_2{ _year, _day, 2, PartTwo##_year##_##_day }; \
-    constexpr std::string PartTwo##_year##_##_day(const std::vector<std::string>& lines)
-
-#define TESTS(_year, _day) \
-    constexpr bool Tests##_year##_##_day(); \
-    TestRegistrar reg##_year##_##_day{ _year, _day, Tests##_year##_##_day }; \
-    constexpr bool Tests##_year##_##_day()
-*/
