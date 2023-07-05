@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="Resources">
+	<DisplayString>{{ Mins={Minerals[0]},{Minerals[1]},{Minerals[2]},{Minerals[3]} Bots={Bots[0]},{Bots[1]},{Bots[2]},{Bots[3]} }}</DisplayString>
+  </Type>
+</AutoVisualizer>

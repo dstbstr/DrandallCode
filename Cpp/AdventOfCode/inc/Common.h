@@ -81,6 +81,17 @@ constexpr std::vector<T> ParseLineAsNumbers(const std::string& line, std::string
 }
 
 template<typename T>
+constexpr std::vector<T> ParseLinesAsNumbers(const std::vector<std::string>& lines) {
+    std::vector<T> result;
+    for (const auto& s : lines) {
+        T num;
+        Constexpr::ParseNumber(s, num);
+        result.push_back(num);
+    }
+    return result;
+}
+
+template<typename T>
 constexpr std::vector<T> ParseLines(const std::vector<std::string>& lines, auto parseFunc, auto... args) {
     std::vector<T> result;
     for (const auto& line : lines) {

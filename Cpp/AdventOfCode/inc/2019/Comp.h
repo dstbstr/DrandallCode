@@ -158,7 +158,7 @@ constexpr bool Apply(std::vector<s64>& instructions, Args& args) {
 }
 
 
-bool ApplyDebug(std::vector<s64>& instructions, Args& args) {
+inline bool ApplyDebug(std::vector<s64>& instructions, Args& args) {
     OpCode op;
     std::vector<ParamMode> modes;
     detail::ParseInstruction(instructions[args.Ip], op, modes);
