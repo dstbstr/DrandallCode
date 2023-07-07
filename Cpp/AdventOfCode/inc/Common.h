@@ -101,6 +101,15 @@ constexpr auto ParseLines(const std::vector<std::string>& lines, auto parseFunc,
     return result;
 }
 
+constexpr auto ParseLinesWithIndex(const std::vector<std::string>& lines, auto parseFunc) {
+    using T = decltype(parseFunc("", 0));
+    std::vector<T> result;
+    for (size_t i = 0; i < lines.size(); i++) {
+        result.push_back(parseFunc(lines[i], i));
+    }
+    return result;
+}
+
 constexpr auto RunAllReturnMax(const auto& collection, auto func, auto... args) {
     //define best's type as whatever func returns when given an element of the collection, and the extra args
     decltype(func(std::declval<decltype(collection.back())>(), args...)) best = {};

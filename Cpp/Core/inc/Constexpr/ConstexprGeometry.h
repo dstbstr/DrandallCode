@@ -265,7 +265,7 @@ struct Vec3 {
 
     constexpr bool operator==(const Vec3<T>& v) const = default;
 
-    constexpr Vec3<T> operator+=(const Vec3<T>& v) {
+    constexpr Vec3<T>& operator+=(const Vec3<T>& v) {
         X += v.X;
         Y += v.Y;
         Z += v.Z;
@@ -287,6 +287,48 @@ struct Vec3 {
     constexpr Vec3<T> operator-(const Vec3<T>& v) const {
         Vec3<T> result = *this;
         return result -= v;
+    }
+
+    constexpr Vec3<T>& operator*=(const T& s) {
+        X *= s;
+        Y *= s;
+        Z *= s;
+        return *this;
+    }
+    constexpr Vec3<T>& operator*=(const Vec3<T>& v) {
+        X *= v.X;
+        Y *= v.Y;
+        Z *= v.Z;
+        return *this;
+    }
+    constexpr Vec3<T> operator*(const T s) const {
+        Vec3<T> result = *this;
+        return result *= s;
+    }
+    constexpr Vec3<T> operator*(const Vec3<T>& v) const {
+        Vec3<T> result = *this;
+        return result *= v;
+    }
+
+    constexpr Vec3<T>& operator/=(const T& s) {
+        X /= s;
+        Y /= s;
+        Z /= s;
+        return *this;
+    }
+    constexpr Vec3<T>& operator/=(const Vec3<T>& v) {
+        X /= v.X;
+        Y /= v.Y;
+        Z /= v.Z;
+        return *this;
+    }
+    constexpr Vec3<T> operator/(const T& s) const {
+        auto result = *this;
+        return result /= s;
+    }
+    constexpr Vec3<T> operator/(const Vec3<T>& v) const {
+        auto result = *this;
+        return result /= v;
     }
 
     constexpr bool operator<(const Vec3<T>& v) const {
@@ -660,6 +702,14 @@ namespace Constexpr {
         for (auto& row : matrix) {
             for (auto& val : row) {
                 func(val);
+            }
+        }
+    }
+
+    constexpr void ApplyToMatrixValueConst(const auto& matrix, auto func) {
+        for (const auto& row : matrix) {
+            for (const auto& value : row) {
+                func(value);
             }
         }
     }

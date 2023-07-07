@@ -2,22 +2,7 @@
 #include "Facing.h"
 
 SOLUTION(2017, 19) {
-    using Grid = std::vector<std::vector<char>>;
-
-    constexpr Grid ParseGrid(const std::vector<std::string>&lines) {
-        Grid result;
-
-        for (size_t row = 0; row < lines.size(); row++) {
-            std::vector<char> line;
-            for (auto c : lines[row]) {
-                line.push_back(c);
-            }
-
-            result.push_back(line);
-        }
-
-        return result;
-    }
+    using Grid = std::vector<std::string>;
 
     constexpr RowCol FindStartPos(const std::string & firstLine) {
         for (size_t col = 0; col < firstLine.size(); col++) {
@@ -107,15 +92,14 @@ SOLUTION(2017, 19) {
         return true;
     }
 
-    auto Part1(const std::vector<std::string>&lines) {
+    PART_ONE() {
         auto pos = FindStartPos(lines[0]);
-        auto grid = ParseGrid(lines);
         Facing facing = Down;
         std::string result;
         char currentSquare;
 
-        while (Move(pos, facing, grid)) {
-            currentSquare = grid[pos.Row][pos.Col];
+        while (Move(pos, facing, lines)) {
+            currentSquare = lines[pos.Row][pos.Col];
             if (currentSquare >= 'A' && currentSquare <= 'Z') {
                 result += currentSquare;
             }
@@ -124,24 +108,18 @@ SOLUTION(2017, 19) {
         return result;
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
+    PART_TWO() {
         auto pos = FindStartPos(lines[0]);
-        auto grid = ParseGrid(lines);
         Facing facing = Down;
         u32 steps = 1;
-        while (Move(pos, facing, grid)) {
+        while (Move(pos, facing, lines)) {
             steps++;
         }
 
-        return steps;
+        return Constexpr::ToString(steps);
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
+    TESTS() {
         std::vector<std::string> lines = {
             "     |          ",
             "     |  +--+    ",
@@ -151,20 +129,9 @@ SOLUTION(2017, 19) {
             "     +B-+  +--+ "
         };
 
-        if (Part1(lines) != "ABCDEF") return false;
-        if (Part2(lines) != 38) return false;
-        return true;
-    }
+        if (PartOne(lines) != "ABCDEF") return false;
+        if (PartTwo(lines) != "38") return false;
 
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }
