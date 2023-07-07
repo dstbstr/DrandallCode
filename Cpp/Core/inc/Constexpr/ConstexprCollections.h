@@ -61,6 +61,20 @@ namespace Constexpr {
 
     static_assert(TestFlatten());
 
+    constexpr auto Without(auto collection, const auto& toRemove) {
+        std::erase_if(collection, [&](const auto& e) {
+            return std::find(toRemove.begin(), toRemove.end(), e) != toRemove.end();
+            });
+        return collection;
+    }
+
+    constexpr auto Within(auto collection, const auto& toKeep) {
+        std::erase_if(collection, [&](const auto& e) {
+            return std::find(toKeep.begin(), toKeep.end(), e) == toKeep.end();
+            });
+        return collection;
+    }
+
     template<typename Key, typename Value>
     class SmallMap {
     public:
@@ -269,6 +283,8 @@ namespace Constexpr {
         constexpr PriorityQueue() = default;
         constexpr PriorityQueue(const PriorityQueue& other) : mData(other.mData) {}
         constexpr PriorityQueue(PriorityQueue&& other) : mData(std::move(other.mData)) {}
+        constexpr PriorityQueue(const std::initializer_list<T>& initial) : mData(initial) {}
+
         PriorityQueue& operator=(const PriorityQueue& other) {
             mData = other.mData;
             return *this;
@@ -314,6 +330,8 @@ namespace Constexpr {
         constexpr Set() = default;
         constexpr Set(const Set& other) :mData(other.mData) {}
         constexpr Set(Set&& other) : mData(std::move(other.mData)) {}
+        constexpr Set(const std::initializer_list<T>& initial) { insert(initial.begin(), initial.end()); }
+
         constexpr Set& operator=(const Set& other) {
             this->mData = other.mData;
             return *this;

@@ -8,7 +8,7 @@ constexpr void FloydWarshall(std::array<std::array<T, Verts>, Verts>& table) {
     for (size_t i = 0; i < Verts; i++) {
         for (size_t x = 0; x < Verts; x++) {
             for (size_t y = 0; y < Verts; y++) {
-                table[x][y] = std::min(table[x][y], table[x][i] + table[i][y]);
+                table[x][y] = std::min<T>(table[x][y], table[x][i] + table[i][y]);
             }
         }
     }

@@ -4,6 +4,7 @@
 #include <vector>
 #include <array>
 #include <ostream>
+#include <algorithm>
 
 #include "Constexpr/ConstexprMath.h"
 #include "Constexpr/ConstexprStrUtils.h"
@@ -109,6 +110,18 @@ public:
     constexpr BigInt GetBitCount() const {
         auto bin = this->ToBinary();
         return std::count(bin.begin(), bin.end(), '1');
+    }
+
+    constexpr std::string ToString() const {
+        std::string result;
+        std::transform(digits.begin(), digits.end(), std::back_inserter(result), [](char c) {
+            return static_cast<char>('0' + c);
+            });
+        if (negative) {
+            result.push_back('-');
+        }
+        std::reverse(result.begin(), result.end());
+        return result;
     }
 
     constexpr BigInt& operator=(const BigInt& other) {
@@ -500,20 +513,6 @@ public:
 
     friend constexpr BigInt operator&(BigInt lhs, const BigInt& rhs) {
         return lhs &= rhs;
-        /*
-        auto lBin = lhs.ToBinary();
-        auto rBin = rhs.ToBinary();
-        auto minSize = std::min(lBin.size(), rBin.size());
-        auto maxSize = std::max(lBin.size(), rBin.size());
-        size_t startA = lBin.size() - minSize;
-        size_t startB = rBin.size() - minSize;
-        std::string result = std::string(maxSize - minSize, '0');
-
-        for (auto i = 0; i < minSize; i++) {
-            result += ((lBin[startA + i] == '1') && (rBin[startB + i] == '1')) ? '1' : '0';
-        }
-        return BigInt::FromBinary(result);
-        */
     }
     friend constexpr BigInt& operator|=(BigInt& lhs, const BigInt& rhs) {
         auto lBin = lhs.ToBinary();
@@ -534,21 +533,6 @@ public:
 
     friend constexpr BigInt operator|(BigInt lhs, const BigInt& rhs) {
         return lhs |= rhs;
-        /*
-        auto lBin = lhs.ToBinary();
-        auto rBin = rhs.ToBinary();
-        auto minSize = std::min(lBin.size(), rBin.size());
-        auto maxSize = std::max(lBin.size(), rBin.size());
-        size_t startA = lBin.size() - minSize;
-        size_t startB = rBin.size() - minSize;
-        
-        std::string result = lBin.size() == maxSize ? lBin.substr(0, maxSize - minSize) : rBin.substr(0, maxSize - minSize);
-
-        for (auto i = 0; i < minSize; i++) {
-            result += ((lBin[startA + i] == '1') || (rBin[startB + i] == '1')) ? '1' : '0';
-        }
-        return BigInt::FromBinary(result);
-        */
     }
 
     friend constexpr BigInt operator^=(BigInt& lhs, const BigInt& rhs) {
@@ -568,20 +552,6 @@ public:
     }
     friend constexpr BigInt operator^(BigInt lhs, const BigInt& rhs) {
         return lhs ^= rhs;
-        /*
-        auto lBin = lhs.ToBinary();
-        auto rBin = rhs.ToBinary();
-        auto minSize = std::min(lBin.size(), rBin.size());
-        auto maxSize = std::max(lBin.size(), rBin.size());
-        size_t startA = lBin.size() - minSize;
-        size_t startB = rBin.size() - minSize;
-        std::string result = lBin.size() == maxSize ? lBin.substr(0, maxSize - minSize) : rBin.substr(0, maxSize - minSize);
-
-        for (auto i = 0; i < minSize; i++) {
-            result += (lBin[startA + i] != rBin[startB + i]) ? '1' : '0';
-        }
-        return BigInt::FromBinary(result);
-        */
     }
 
     //This needs to know how big the BigInt should be, but there's no way to pass that information in
@@ -628,6 +598,7 @@ public:
         return result;
     }
 };
+
 
 std::string ToString(const BigInt& bigInt);
 

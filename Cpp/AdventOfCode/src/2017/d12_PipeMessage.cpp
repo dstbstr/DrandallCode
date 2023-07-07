@@ -1,51 +1,19 @@
 #include "2017/d12_PipeMessage.h"
+#include "Algorithms/FloodFill.h"
 
 SOLUTION(2017, 12) {
-    constexpr std::vector<std::vector<u32>> ParseLines(const std::vector<std::string>&lines) {
-        std::vector<std::vector<u32>> result;
-        for (const auto& line : lines) {
-            std::vector<u32> connections;
-            auto values = Constexpr::Split(Constexpr::Split(line, " <-> ")[1], ", ");
-            for (auto value : values) {
-                u32 num;
-                Constexpr::ParseNumber(value, num);
-                connections.push_back(num);
-            }
-            result.push_back(connections);
-        }
-
-        return result;
+    constexpr std::vector<u32> ParseLine(const std::string & line) {
+        auto rhs = std::string(Constexpr::Split(line, " <-> ")[1]);
+        return ParseLineAsNumbers<u32>(rhs, ", ");
     }
 
-    static_assert(ParseLines(std::vector<std::string>{ "0 <-> 2" }).size() == 1);
-    static_assert(ParseLines(std::vector<std::string>{ "0 <-> 2"})[0].size() == 1);
-    static_assert(ParseLines(std::vector<std::string>{ "0 <-> 2"})[0][0] == 2);
-    static_assert(ParseLines(std::vector<std::string>{ "2 <-> 0, 3, 4"})[0].size() == 3);
-    static_assert(ParseLines(std::vector<std::string>{ "2 <-> 0, 3, 4"})[0] == std::vector<u32>{0, 3, 4});
-
-    constexpr std::vector<u32> FindGroup(u32 root, const std::vector<std::vector<u32>>&connections) {
-        std::vector<u32> result;
-        std::vector<u32> toVisit = connections[root];
-        while (!toVisit.empty()) {
-            auto next = toVisit.back();
-            toVisit.pop_back();
-
-            if (std::find(result.begin(), result.end(), next) != result.end()) continue;
-            result.push_back(next);
-
-            std::copy(connections[next].begin(), connections[next].end(), std::back_inserter(toVisit));
-        }
-
-        return result;
+    PART_ONE() {
+        auto connections = ParseLines<std::vector<u32>>(lines, ParseLine);
+        return Constexpr::ToString(FloodFill(0, [&connections](u32 pipe) { return connections[pipe]; }).size());
     }
 
-    constexpr auto Part1(const std::vector<std::string>&lines) {
-        auto connections = ParseLines(lines);
-        return FindGroup(0, connections).size();
-    }
-
-    auto Part2(const std::vector<std::string>&lines) {
-        auto connections = ParseLines(lines);
+    PART_TWO() {
+        auto connections = ParseLines<std::vector<u32>>(lines, ParseLine);
         std::vector<u32> remainingGroups;
         for (auto i = 0; i < connections.size(); i++) {
             remainingGroups.push_back(i);
@@ -54,33 +22,21 @@ SOLUTION(2017, 12) {
         u32 groupCount = 0;
         while (!remainingGroups.empty()) {
             groupCount++;
-            auto group = FindGroup(remainingGroups.back(), connections);
+            auto group = FloodFill(remainingGroups.back(), [&connections](u32 pipe) { return connections[pipe]; });
             std::erase_if(remainingGroups, [&group](u32 val) {
                 return std::find(group.cbegin(), group.cend(), val) != group.cend();
                 });
         }
 
-        return groupCount;
-    }
-
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
+        return Constexpr::ToString(groupCount);
     }
 
     TESTS() {
+        static_assert(ParseLine("0 <-> 2").size() == 1);
+        static_assert(ParseLine("0 <-> 2")[0] == 2u);
+        static_assert(ParseLine("2 <-> 0, 3, 4").size() == 3);
+        static_assert(ParseLine("2 <-> 0, 3, 4") == std::vector<u32>{0, 3, 4});
+        
         return true;
     }
 }

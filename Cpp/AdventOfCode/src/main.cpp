@@ -29,21 +29,6 @@ std::vector<std::string> ReadInputFile(size_t year, size_t day) {
     return result;
 }
 
-/*
-void RunAgainstInput() {
-    auto lines = ReadInputFile(2015, 1);
-    std::cout << Run(lines) << "\n";
-}
-
-void Check() {
-    if(RunTests()) {
-        std::cout << "Tests Pass\n";
-    } else {
-        std::cout << "Tests Fail. :(\n";
-    }
-}
-*/
-
 bool Check(size_t year, size_t day) {
     if (!GetTests().contains(year) || !GetTests()[year].contains(day)) {
         return true;
@@ -87,24 +72,11 @@ void RunAll() {
     }
 }
 
-void RunLatest() {
-    auto& solutions = GetSolutions();
-    size_t maxYear = 0;
-    for (const auto& [year, days] : solutions) {
-        maxYear = std::max(maxYear, year);
-    }
-    size_t maxDay = 0;
-    for (const auto& [day, parts] : solutions[maxYear]) {
-        maxDay = std::max(maxDay, day);
-    }
-
-    RunOne(maxYear, maxDay);
-}
 
 int main(int, char**) {
     //RunAll();
-    RunYear(2015);
-    //RunOne(2015, 25);
+    //RunYear(2017);
+    RunOne(2017, 16);
     //RunLatest();
     return 0;
 }

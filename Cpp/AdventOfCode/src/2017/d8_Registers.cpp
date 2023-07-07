@@ -1,80 +1,84 @@
 #include "2017/d8_Registers.h"
 
 SOLUTION(2017, 8) {
-    using namespace std::string_view_literals;
+    using Regs = Constexpr::SmallMap<std::string, s32>;
 
-    static constexpr size_t RegisterCount = Constexpr::FromBase26("zzz"sv);
-
-    using Registers = std::array<s32, RegisterCount>;
-
-    constexpr bool EvaluateCondition(std::string_view condRegister, std::string_view comparison, std::string_view operand, const Registers & registers) {
-        auto regVal = registers[Constexpr::FromBase26(condRegister)];
+    constexpr auto GenInstruction(const std::string & line) {
+        auto s = Constexpr::Split(line, " ");
+        auto condRegister = std::string(s[4]);
+        auto op = std::string(s[5]);
+        auto compareStr = s[6];
+        
         s32 compareValue;
-        Constexpr::ParseNumber(operand, compareValue);
-        return Constexpr::Eval(regVal, compareValue, comparison);
-    }
+        Constexpr::ParseNumber(compareStr, compareValue);
 
-    constexpr void ApplyInstruction(const std::string & line, Registers & registers) {
-        auto split = Constexpr::Split(line, " ");
-        auto targetRegister = split[0];
-        auto command = split[1];
-        auto deltaStr = split[2];
-        auto condRegister = split[4];
-        auto comparison = split[5];
-        auto operand = split[6];
+        auto compFunc = [condRegister, op, compareValue](Regs& regs) {
+            auto lhs = regs[condRegister];
+            auto rhs = compareValue;
 
-        if (EvaluateCondition(condRegister, comparison, operand, registers)) {
-            s32 delta;
-            Constexpr::ParseNumber(deltaStr, delta);
-            if (command == "inc") {
-                registers[Constexpr::FromBase26(targetRegister)] += delta;
+            if (op == "<") return lhs < rhs;
+            else if (op == "<=") return lhs <= rhs;
+            else if (op == "==") return lhs == rhs;
+            else if (op == ">=") return lhs >= rhs;
+            else if (op == ">") return lhs > rhs;
+            else if (op == "!=") return lhs != rhs;
+            throw "Unhandled operator";
+        };
+
+        auto targetRegister = std::string(s[0]);
+        auto command = s[1];
+        auto deltaStr = s[2];
+
+        s32 delta;
+        Constexpr::ParseNumber(deltaStr, delta);
+        if (command == "dec") {
+            delta = -delta;
+        }
+
+        return [targetRegister, delta, compFunc](Regs& regs) {
+            if (compFunc(regs)) {
+                regs[targetRegister] += delta;
             }
-            else {
-                registers[Constexpr::FromBase26(targetRegister)] -= delta;
-            }
-        }
+        };
     }
 
-    constexpr auto Part1(const std::vector<std::string>&lines) {
-        Registers regs;
-        regs.fill(0);
-        for (const auto& line : lines) {
-            ApplyInstruction(line, regs);
-        }
-
-        return Constexpr::FindMax(regs);
-    }
-
-    static_assert(Part1({ "b inc 5 if a > 1", "a inc 1 if b < 5", "c dec -10 if a >= 1", "c inc -20 if c == 10" }) == 1);
-
-    constexpr auto Part2(const std::vector<std::string>&lines) {
-        Registers regs;
-        regs.fill(0);
-        s32 max = 0;
-        for (const auto& line : lines) {
-            ApplyInstruction(line, regs);
-            max = std::max(max, Constexpr::FindMax(regs));
-        }
-
-        return max;
-    }
-
-    static_assert(Part2({ "b inc 5 if a > 1", "a inc 1 if b < 5", "c dec -10 if a >= 1", "c inc -20 if c == 10" }) == 10);
-
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
+    constexpr s32 GetMaxElement(const Regs& regs) {
+        auto values = regs.GetValues();
+        return *std::max_element(values.begin(), values.end());
     }
 
     PART_ONE() {
-        return lines[0];
+        using Inst = decltype(GenInstruction(""));
+        auto instructions = ParseLines<Inst>(lines, GenInstruction);
+
+        Regs regs;
+
+        for (const auto& inst : instructions) {
+            inst(regs);
+        }
+
+        return Constexpr::ToString(GetMaxElement(regs));
     }
 
     PART_TWO() {
-        return lines[0];
+        using Inst = decltype(GenInstruction(""));
+        auto instructions = ParseLines<Inst>(lines, GenInstruction);
+
+        Regs regs;
+        s32 max = 0;
+        for (const auto& inst : instructions) {
+            inst(regs);
+            max = std::max(max, GetMaxElement(regs));
+        }
+
+        return Constexpr::ToString(max);
     }
+    
 
     TESTS() {
+        static_assert(PartOne({ "b inc 5 if a > 1", "a inc 1 if b < 5", "c dec -10 if a >= 1", "c inc -20 if c == 10" }) == "1");
+        static_assert(PartTwo({ "b inc 5 if a > 1", "a inc 1 if b < 5", "c dec -10 if a >= 1", "c inc -20 if c == 10" }) == "10");
+
         return true;
     }
 }

@@ -4,6 +4,8 @@
 #include <array>
 #include <string>
 
+#include "Constexpr/ConstexprStrUtils.h"
+
 namespace Constexpr {
     template<typename Collection>
     constexpr std::string JoinVec(std::string&& delimiter, Collection&& input) {
@@ -12,7 +14,12 @@ namespace Constexpr {
         for (const auto& elem : input) {
             if (first) first = false;
             else result += delimiter;
-            result += elem;
+            if constexpr (std::is_same_v<decltype(elem), const std::string&>) {
+                result += elem;
+            }
+            else {
+                result += Constexpr::ToString(elem);
+            }
         }
 
         return result;
@@ -25,7 +32,12 @@ namespace Constexpr {
         for (const auto& elem : input) {
             if (first) first = false;
             else result += delimiter;
-            result += elem;
+            if constexpr (std::is_same_v<decltype(elem), const std::string&>) {
+                result += elem;
+            }
+            else {
+                result += Constexpr::ToString(elem);
+            }
         }
 
         return result;

@@ -316,7 +316,7 @@ namespace Constexpr {
 
 template<typename T>
 struct std::hash<Vec3<T>> {
-    std::size_t operator()(const Vec3<T> v) const {
+    std::size_t operator()(const Vec3<T>& v) const {
         return v.X ^ v.Y ^ v.Z;
     }
 };
@@ -396,7 +396,7 @@ namespace Constexpr {
 
 template<typename T>
 struct std::hash<Vec4<T>> {
-    std::size_t operator()(const Vec3<T> v) const {
+    std::size_t operator()(const Vec4<T>& v) const {
         return v.X ^ v.Y ^ v.Z ^ v.W;
     }
 };
@@ -637,8 +637,8 @@ namespace Constexpr {
     template<typename Point>
     constexpr bool DoIntersect(const Point& start, const Point& end, const Point& point) {
         auto dist = [](const Point& a, const Point& b) -> double {
-            double x = a.X < b.X ? (b.X - a.X) : (a.X - b.X);
-            double y = a.Y < b.Y ? (b.Y - a.Y) : (a.Y - b.Y);
+            double x = static_cast<double>(a.X < b.X ? (b.X - a.X) : (a.X - b.X));
+            double y = static_cast<double>(a.Y < b.Y ? (b.Y - a.Y) : (a.Y - b.Y));
 
             return Constexpr::Sqrt((x * x) + (y * y));
         };

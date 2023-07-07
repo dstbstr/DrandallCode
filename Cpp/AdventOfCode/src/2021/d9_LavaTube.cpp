@@ -53,9 +53,8 @@ SOLUTION(2021, 9) {
             for (size_t col = 0; col < nums[row].size(); col++) {
                 if (nums[row][col] == 9) continue;
                 RowCol rc{ row, col };
-                std::vector<RowCol> region;
 
-                FloodFill<RowCol>(rc, region, n);
+                auto region = FloodFill<RowCol>(rc, n);
                 sizes.push_back(region.size());
                 for (const auto& pos : region) {
                     nums[pos.Row][pos.Col] = 9;

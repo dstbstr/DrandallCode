@@ -1,22 +1,10 @@
 #include "2017/d14_Defrag.h"
 #include "2017/KnotHash.h"
+#include "Algorithms/FloodFill.h"
 
 #include <bitset>
 
 SOLUTION(2017, 14) {
-    auto Part1(const std::string & key) {
-        u32 used = 0;
-        for (auto i = 0; i < 128; i++) {
-            std::string toHash = key + "-" + ToString(i);
-            auto hash = KnotHash::Hash(toHash);
-            for (auto value : hash) {
-                used += std::popcount(value);
-            }
-        }
-
-        return used;
-    }
-
     using Grid = std::vector<std::vector<bool>>;
 
     constexpr Grid CreateGrid(const std::string & key) {
@@ -27,10 +15,11 @@ SOLUTION(2017, 14) {
             std::vector<bool> line;
 
             for (auto value : hash) {
-                std::bitset<8> bits{ value };
-                for (auto index = 0; index < 8; index++) {
-                    line.push_back(bits[7 - index]);
+                for (size_t bit = 7; bit > 0; bit--) {
+                    auto mask = 1u << bit;
+                    line.push_back((value & mask) == mask);
                 }
+                line.push_back((value & 1) == 1);
             }
 
             result.push_back(line);
@@ -51,7 +40,7 @@ SOLUTION(2017, 14) {
 
         return false;
     }
-
+    
     constexpr void FloodFill(Grid & grid, const RowCol & start) {
         auto limits = RowCol{ 127, 127 };
         std::vector<RowCol> current;
@@ -67,39 +56,53 @@ SOLUTION(2017, 14) {
                 });
         }
     }
+    
+    PART_ONE() {
+        const auto& key = lines[0];
+        u32 used = 0;
+        for (auto i = 0; i < 128; i++) {
+            std::string toHash = key + "-" + ToString(i);
+            auto hash = KnotHash::Hash(toHash);
+            for (auto value : hash) {
+                used += std::popcount(value);
+            }
+        }
 
-    auto Part2(const std::string & line) {
-        u32 groups = 0;
-        auto grid = CreateGrid(line);
+        return Constexpr::ToString(used);
+    }
+
+    PART_TWO() {
+        auto grid = CreateGrid(lines[0]);
         auto pos = RowCol{ 0, 0 };
+        /*
+        std::vector<RowCol> allPoints;
+        for (size_t row = 0; row < grid.size(); row++) {
+            for (size_t col = 0; col < grid.at(row).size(); col++) {
+                if (grid[row][col]) {
+                    allPoints.push_back({ row, col });
+                }
+            }
+        }
+
+        auto groups = GetAllFloodFillGroups<RowCol>(allPoints, [](const RowCol& rc) { return GetDirectNeighbors(rc, { 127, 127 }); });
+        return Constexpr::ToString(groups.size());
+        */
+        ///this version is faster, but would prefer to not have 2 FloodFill methods floating around
+        
+        u32 groups = 0;
         while (FindGroupStart(grid, pos)) {
             groups++;
             FloodFill(grid, pos);
         }
 
-        return groups;
-    }
-
-    std::string Run(const std::vector<std::string>&) {
-        //return Constexpr::ToString(Part1("hfdlxzhv"));
-        return Constexpr::ToString(Part2("hfdlxzhv"));
-    }
-
-    bool RunTests() {
-        //if (Part1("flqrgnkx") != 8108) return false;
-        if (Part2("flqrgnkx") != 1242) return false;
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
+        return Constexpr::ToString(groups);
     }
 
     TESTS() {
+        std::vector<std::string> lines = { "flqrgnkx" };
+        if(PartOne(lines) != "8108") return false;
+        if(PartTwo(lines) != "1242") return false;
+        
         return true;
     }
 }

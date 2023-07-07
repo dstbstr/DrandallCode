@@ -14,6 +14,9 @@ static_assert(0 == BigInt(0), "0 != 0");
 static_assert(BigInt("123'456") == BigInt("123456"), "123'456 != 123456");
 static_assert(BigInt(12345) == BigInt("12345"), "12345 != 12345");
 
+static_assert(BigInt(123).ToString() == "123");
+static_assert(BigInt("-123").ToString() == "-123");
+
 static_assert(BigInt(7).ToBinary() == "111");
 static_assert(BigInt(8).ToBinary() == "1000");
 

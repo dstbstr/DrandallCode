@@ -3,12 +3,12 @@
 SOLUTION(2017, 7) {
 
     struct Node {
-        std::string Name;
-        u32 Weight;
-        std::vector<std::string> Carrying;
+        std::string Name = "";
+        u32 Weight = 0;
+        std::vector<std::string> Carrying{};
     };
 
-    using Map = std::unordered_map<std::string, Node>;
+    using Map = Constexpr::SmallMap<std::string, Node>;
 
     constexpr Node ParseNode(const std::string & line) {
         auto split = Constexpr::Split(line, " ");
@@ -27,12 +27,7 @@ SOLUTION(2017, 7) {
         return node;
     }
 
-    static_assert(ParseNode("ab (42)").Name == "ab");
-    static_assert(ParseNode("ab (42)").Weight == 42);
-    static_assert(ParseNode("ab (42) -> bc, cd").Carrying.size() == 2);
-    static_assert(ParseNode("ab (42) -> bc, cd").Carrying[0] == "bc");
-
-    u32 GetWeight(const Map & map, const std::string name) {
+    constexpr u32 GetWeight(const Map & map, const std::string name) {
         u32 weight = map.at(name).Weight;
         for (auto child : map.at(name).Carrying) {
             weight += GetWeight(map, child);
@@ -45,12 +40,12 @@ SOLUTION(2017, 7) {
         auto copy = weights;
         std::sort(copy.begin(), copy.end());
 
-        if (copy[0] == copy[copy.size() - 1]) {
+        if (copy[0] == copy.back()) {
             return true;
         }
         u32 oddValue;
         if (copy[0] == copy[1]) {
-            oddValue = copy[copy.size() - 1];
+            oddValue = copy.back();
         }
         else {
             oddValue = copy[0];
@@ -72,12 +67,7 @@ SOLUTION(2017, 7) {
         return actualOddIndex == expectedOddIndex;
     }
 
-    static_assert(TestAllMatch({ 1, 1, 1 }, true, 0));
-    static_assert(TestAllMatch({ 0, 1, 1 }, false, 0));
-    static_assert(TestAllMatch({ 1, 0, 1 }, false, 1));
-    static_assert(TestAllMatch({ 1, 1, 0 }, false, 2));
-
-    Map ParseMap(const std::vector<std::string>&lines) {
+    constexpr Map ParseMap(const std::vector<std::string>&lines) {
         Map result;
         for (const auto& line : lines) {
             auto node = ParseNode(line);
@@ -87,8 +77,8 @@ SOLUTION(2017, 7) {
         return result;
     }
 
-    std::string FindRoot(const Map & map) {
-        auto carriedBy = std::unordered_map<std::string, std::string>{};
+    constexpr std::string FindRoot(const Map & map) {
+        auto carriedBy = Constexpr::SmallMap<std::string, std::string>{};
         for (const auto& [name, node] : map) {
             for (const auto& carry : node.Carrying) {
                 carriedBy[carry] = name;
@@ -104,12 +94,12 @@ SOLUTION(2017, 7) {
         throw std::logic_error("Not found");
     }
 
-    auto Part1(const std::vector<std::string>&lines) {
+    PART_ONE() {
         auto map = ParseMap(lines);
         return FindRoot(map);
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
+    PART_TWO() {
         auto map = ParseMap(lines);
         auto tower = FindRoot(map);
         s32 delta = 0;
@@ -121,7 +111,7 @@ SOLUTION(2017, 7) {
             }
             size_t oddIndex;
             if (AllMatch(weights, oddIndex)) {
-                return map[tower].Weight + delta;
+                return Constexpr::ToString(map.at(tower).Weight + delta);
             }
             else {
                 if (oddIndex == 0) {
@@ -137,12 +127,17 @@ SOLUTION(2017, 7) {
         throw std::logic_error("Not Found");
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return PartOne(lines);
-        return Constexpr::ToString(Part2(lines));
-    }
+    TESTS() {
+        static_assert(ParseNode("ab (42)").Name == "ab");
+        static_assert(ParseNode("ab (42)").Weight == 42);
+        static_assert(ParseNode("ab (42) -> bc, cd").Carrying.size() == 2);
+        static_assert(ParseNode("ab (42) -> bc, cd").Carrying[0] == "bc");
+        
+        static_assert(TestAllMatch({ 1, 1, 1 }, true, 0));
+        static_assert(TestAllMatch({ 0, 1, 1 }, false, 0));
+        static_assert(TestAllMatch({ 1, 0, 1 }, false, 1));
+        static_assert(TestAllMatch({ 1, 1, 0 }, false, 2));
 
-    bool RunTests() {
         std::vector<std::string> lines = {
             "pbga (66)",
             "xhth (57)",
@@ -159,20 +154,9 @@ SOLUTION(2017, 7) {
             "cntj (57)"
         };
 
-        //if (Part1(lines) != "tknk") return false;
-        if (Part2(lines) != 60) return false;
-        return true;
-    }
+        if(PartOne(lines) != "tknk") return false;
+        if(PartTwo(lines) != "60") return false;
 
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }
