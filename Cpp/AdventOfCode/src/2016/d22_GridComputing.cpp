@@ -34,7 +34,7 @@ SOLUTION(2016, 22) {
 
     PART_ONE() {
         auto skipOne = std::vector<std::string>{ lines.begin() + 1, lines.end() };
-        auto dirs = ParseLines<Dir>(skipOne, ParseLine);
+        auto dirs = ParseLines(skipOne, ParseLine);
 
         u32 fitCount = 0;
         for (auto i = 0; i < dirs.size() - 1; i++) {
@@ -48,9 +48,7 @@ SOLUTION(2016, 22) {
     }
     PART_TWO() {
         Constexpr::SmallMap<UCoord, Dir> map;
-
         
-        //std::unordered_map<UCoord, Dir> map;
         UCoord origin{ 0, 0 };
         UCoord emptyDir{ 0, 0 };
         UCoord limits{ 0, 0 };

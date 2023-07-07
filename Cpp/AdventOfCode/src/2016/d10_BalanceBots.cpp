@@ -73,8 +73,7 @@ SOLUTION(2016, 10) {
     }
 
     constexpr void Impl(const std::vector<std::string>& lines, std::vector<Bot>& outBots, std::vector<size_t>& outBins) {
-        using Inst = decltype(GenInstruction(""));
-        auto instructions = ParseLines<Inst>(lines, GenInstruction);
+        auto instructions = ParseLines(lines, GenInstruction);
 
         outBots.resize(lines.size());
         outBins.resize(lines.size());

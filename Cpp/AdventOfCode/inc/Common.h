@@ -91,8 +91,9 @@ constexpr std::vector<T> ParseLinesAsNumbers(const std::vector<std::string>& lin
     return result;
 }
 
-template<typename T>
-constexpr std::vector<T> ParseLines(const std::vector<std::string>& lines, auto parseFunc, auto... args) {
+//Returns a vector of whatever parseFunc returns, when given a string and any extra args
+constexpr auto ParseLines(const std::vector<std::string>& lines, auto parseFunc, auto... args) {
+    using T = decltype(parseFunc("", args...));
     std::vector<T> result;
     for (const auto& line : lines) {
         result.push_back(parseFunc(line, args...));

@@ -35,7 +35,7 @@ SOLUTION(2016, 15) {
         return result;
     }
     PART_ONE() {
-        auto discs = ParseLines<Disc>(lines, ParseDisc);
+        auto discs = ParseLines(lines, ParseDisc);
 
         return Constexpr::ToString(BestSpin(discs));
         
@@ -43,7 +43,7 @@ SOLUTION(2016, 15) {
     PART_TWO() {
         auto copy = lines;
         copy.push_back("Disc #7 has 11 positions; at time=0, it is at position 0.");
-        auto discs = ParseLines<Disc>(copy, ParseDisc);
+        auto discs = ParseLines(copy, ParseDisc);
 
         return Constexpr::ToString(BestSpin(discs));
     }

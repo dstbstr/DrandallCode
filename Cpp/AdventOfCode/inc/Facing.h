@@ -8,20 +8,20 @@ enum Direction {North, East, South, West};
 
 constexpr std::string ToString(Facing facing) {
     switch (facing) {
-    case Up: return "Up";
-    case Right: return "Right";
-    case Down: return "Down";
-    case Left: return "Left";
+    case Facing::Up: return "Up";
+    case Facing::Right: return "Right";
+    case Facing::Down: return "Down";
+    case Facing::Left: return "Left";
     default: return "Unknown";
     }
 }
 
 constexpr std::string ToString(Direction dir) {
     switch (dir) {
-    case North: return "North";
-    case East: return "East";
-    case South: return "South";
-    case West: return "West";
+    case Direction::North: return "North";
+    case Direction::East: return "East";
+    case Direction::South: return "South";
+    case Direction::West: return "West";
     default: return "Unknown";
     }
 }

@@ -67,7 +67,7 @@ SOLUTION(2016, 4) {
     PART_ONE() {
         
         u32 result = 0;
-        auto rooms = ParseLines<Room>(lines, ParseRoom);
+        auto rooms = ParseLines(lines, ParseRoom);
         for (const auto& room : rooms) {
             result += room.Id * IsReal(room);
         }

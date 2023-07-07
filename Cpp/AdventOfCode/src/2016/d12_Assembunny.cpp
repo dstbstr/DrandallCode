@@ -43,8 +43,7 @@ SOLUTION(2016, 12) {
     }
 
     constexpr void Execute(const std::vector<std::string>& lines, std::vector<s32>& regs) {
-        using Inst = decltype(GenInstruction(""));
-        auto instructions = ParseLines<Inst>(lines, GenInstruction);
+        auto instructions = ParseLines(lines, GenInstruction);
         size_t ip = 0;
 
         while (ip < instructions.size()) {

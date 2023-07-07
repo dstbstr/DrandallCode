@@ -95,8 +95,7 @@ SOLUTION(2016, 23) {
         size_t ip = 0;
         auto code = lines;
         auto regs = std::vector<s32>{ reg0, 0, 0, 0 };
-        using Inst = decltype(GenInstruction("", 0ull));
-        auto exe = ParseLines<Inst>(lines, GenInstruction, lines.size());
+        auto exe = ParseLines(lines, GenInstruction, lines.size());
         auto toggles = std::vector<size_t>(lines.size());
 
         while (ip < code.size()) {

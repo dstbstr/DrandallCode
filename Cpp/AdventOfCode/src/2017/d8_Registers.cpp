@@ -48,8 +48,7 @@ SOLUTION(2017, 8) {
     }
 
     PART_ONE() {
-        using Inst = decltype(GenInstruction(""));
-        auto instructions = ParseLines<Inst>(lines, GenInstruction);
+        auto instructions = ParseLines(lines, GenInstruction);
 
         Regs regs;
 
@@ -61,8 +60,7 @@ SOLUTION(2017, 8) {
     }
 
     PART_TWO() {
-        using Inst = decltype(GenInstruction(""));
-        auto instructions = ParseLines<Inst>(lines, GenInstruction);
+        auto instructions = ParseLines(lines, GenInstruction);
 
         Regs regs;
         s32 max = 0;

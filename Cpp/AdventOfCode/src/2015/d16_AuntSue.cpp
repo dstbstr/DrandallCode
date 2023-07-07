@@ -69,7 +69,8 @@ SOLUTION(2015, 16) {
     }
 
     constexpr size_t Solve(const std::vector<std::string>& lines, auto match) {
-        auto sues = ParseLines<Sue>(lines, ParseSue);
+        //auto sues = ParseLines<Sue>(lines, ParseSue);
+        auto sues = ParseLines(lines, ParseSue);
         for (size_t i = 0; i < sues.size(); i++) {
             if (match(sues[i])) return i + 1;
         }

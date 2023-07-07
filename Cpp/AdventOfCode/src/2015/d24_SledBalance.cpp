@@ -25,12 +25,6 @@ SOLUTION(2015, 24) {
         return result;
     }
 
-    constexpr u32 ParseWeight(const std::string& line) {
-        u32 weight;
-        Constexpr::ParseNumber(line, weight);
-        return weight;
-    }
-
     constexpr bool Recurse(const std::vector<u32>&weights, u32 index, u32 remainingWeight, std::vector<u32>&outResult, u32 initialWeight) {
         if (remainingWeight == 0) {
             return true;
@@ -82,12 +76,12 @@ SOLUTION(2015, 24) {
     }
 
     PART_ONE() {
-        auto weights = ParseLines<u32>(lines, ParseWeight);
+        auto weights = ParseLinesAsNumbers<u32>(lines);
         return Constexpr::ToString(FindMinimalEntanglement(weights, 3));
     }
 
     PART_TWO() {
-        auto weights = ParseLines<u32>(lines, ParseWeight);
+        auto weights = ParseLinesAsNumbers<u32>(lines);
         return Constexpr::ToString(FindMinimalEntanglement(weights, 4));
     }
     TESTS() {

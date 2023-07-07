@@ -72,11 +72,11 @@ SOLUTION(2015, 15) {
     }
 
     PART_ONE() {
-        auto ings = ParseLines<Ing>(lines, ParseIng);
+        auto ings = ParseLines(lines, ParseIng);
         return Constexpr::ToString(Recurse(ings, {}, 0, false));
     }
     PART_TWO() {
-        auto ings = ParseLines<Ing>(lines, ParseIng);
+        auto ings = ParseLines(lines, ParseIng);
         return Constexpr::ToString(Recurse(ings, {}, 0, true));
     }
     TESTS() {
