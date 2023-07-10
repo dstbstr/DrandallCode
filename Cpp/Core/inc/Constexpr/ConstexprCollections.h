@@ -356,8 +356,12 @@ namespace Constexpr {
             }
         }
 
-        constexpr bool contains(const T& val) {
+        constexpr bool contains(const T& val) const {
             return std::find(mData.cbegin(), mData.cend(), val) != mData.cend();
+        }
+
+        constexpr void erase(const T& val) {
+            mData.erase(std::remove(mData.begin(), mData.end(), val), mData.end());
         }
 
         constexpr bool empty() {
