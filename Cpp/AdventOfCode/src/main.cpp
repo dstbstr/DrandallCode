@@ -51,6 +51,12 @@ void RunOne(size_t year, size_t day) {
     for (const auto& [part, func] : GetSolutions()[year][day]) {
         auto partTime = ScopedTimer();
         std::cout << "Part " << part << ": " << func(lines) << "\n";
+
+        if (!GET_LOGS().empty()) {
+            std::cout << "## Logs ##\n";
+            std::cout << Constexpr::JoinVec("\n", GET_LOGS());
+            GET_LOGS().clear();
+        }
     }
     std::cout << "\n";
 }

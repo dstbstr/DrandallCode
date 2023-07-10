@@ -1,239 +1,228 @@
 #include "2017/d21_FractalArt.h"
 
 SOLUTION(2017, 21) {
-    using Pattern = std::vector<std::vector<bool>>;
-
-    constexpr std::string ToString(const Pattern & pattern) {
-        std::string result;
-        for (const auto& row : pattern) {
-            for (const auto& col : row) {
-                result += (col ? '#' : '.');
-            }
-            result += '\n';
-        }
-        return result;
-    }
-
-    constexpr Pattern ParsePattern(std::string_view line) {
-        Pattern result;
-        auto split = Constexpr::Split(line, "/");
-        for (auto row : split) {
-            std::vector<bool> r;
-            for (auto c : row) {
-                r.push_back(c == '#');
-            }
-            result.push_back(r);
-        }
-
-        return result;
-    }
-
-    constexpr std::vector<Pattern> GetTransforms(const Pattern & input) {
-       
-        auto transpose = [](const Pattern& p) {
-            Pattern result = p;
-            const auto rows = p.size();
-            const auto cols = p[0].size();
-
-            for (size_t row = 0; row < rows; row++) {
-                for (size_t col = 0; col < cols; col++) {
-                    result[col][row] = p[rows - row - 1][cols - col - 1];
-                }
-            }
-            return result;
-        };
-        auto flip = [](const Pattern& p) {
-            Pattern result = p;
-            size_t size = p.size();
-            for (size_t row = 0; row < size; row++) {
-                for (size_t col = 0; col < size; col++) {
-                    result[row][col] = p[row][size - col - 1];
-                }
-            }
-            return result;
-        };
-
-        std::vector<Pattern> result;
-        result.push_back(input);
-
-        for (auto i = 0; i < 4; i++) {
-            result.push_back(transpose(result.back()));
-            result.push_back(flip(result.back()));
-        }
-
-        return result;
-    }
-
-    using InputMap = Constexpr::SmallMap<std::string, std::vector<Pattern>>;
-    using OutputMap = Constexpr::SmallMap<std::string, Pattern>;
-
-    constexpr InputMap ParsePatternInputs(const std::vector<std::string>& lines) {
-        InputMap result;
-        for (const auto& line : lines) {
-            auto s = Constexpr::Split(line, " => ");
-            auto key = std::string(s[0]);
-            auto pattern = ParsePattern(s[0]);
-            result[key] = GetTransforms(pattern);
-        }
-
-        return result;
-    }
-
-    constexpr OutputMap ParsePatternOutputs(const std::vector<std::string>&lines) {
-        OutputMap result;
-
-        for (const auto& line : lines) {
-            auto s = Constexpr::Split(line, " => ");
-            auto key = std::string(s[0]);
-            auto input = ParsePattern(s[0]);
-            auto output = ParsePattern(s[1]);
-            result[key] = output;
-        }
-
-        return result;
-    }
-
-    constexpr std::vector<std::vector<Pattern>> GetChunks(const Pattern& pattern) {
-        std::vector<std::vector<Pattern>> result;
-        if (pattern.size() % 2 == 0) {
-            for (auto row = 0; row < pattern.size(); row += 2) {
-                std::vector<Pattern> chunkRow;
-                for (auto col = 0; col < pattern.size(); col += 2) {
-                    Pattern chunk;
-                    chunk.push_back({ pattern.at(row).begin() + col, pattern.at(row).begin() + col + 2 });
-                    chunk.push_back({ pattern.at(row + 1).begin() + col, pattern.at(row + 1).begin() + col + 2 });
-                    chunkRow.push_back(chunk);
-                }
-                result.push_back(chunkRow);
-            }
-        }
-        else {
-            for (auto row = 0; row < pattern.size(); row += 3) {
-                std::vector<Pattern> chunkRow;
-                for (auto col = 0; col < pattern.size(); col += 3) {
-                    Pattern chunk;
-                    chunk.push_back({ pattern.at(row).begin() + col, pattern.at(row).begin() + col + 3 });
-                    chunk.push_back({ pattern.at(row + 1).begin() + col, pattern.at(row + 1).begin() + col + 3 });
-                    chunk.push_back({ pattern.at(row + 2).begin() + col, pattern.at(row + 2).begin() + col + 3 });
-                    chunkRow.push_back(chunk);
-                }
-                result.push_back(chunkRow);
-            }
-        }
-        return result;
-    }
-
-    constexpr void UpdateChunk(Pattern& chunk, const InputMap& inputPatterns, const OutputMap& outputPatterns) {
-        std::string matchedPattern;
-        for (const auto& [key, transforms] : inputPatterns) {
-            if (transforms[0].size() != chunk[0].size()) continue;
-            for (const auto& transform : transforms) {
-                if (chunk == transform) {
-                    chunk = outputPatterns.at(key);
-                    return;
-                }
-            }
-        }
-    }
-
-    constexpr Pattern CombineChunks(const std::vector<std::vector<Pattern>>& chunks) {
-        Pattern result;
-        for (const auto& chunkRow : chunks) {
-            for (size_t currentRow = 0; currentRow < chunkRow[0].size(); currentRow++) {
-                std::vector<bool> patternRow;
-                for (const auto& chunk : chunkRow) {
-                    for (size_t col = 0; col < chunk.size(); col++) {
-                        patternRow.push_back(chunk[currentRow][col]);
-                    }
-                }
-                result.push_back(patternRow);
-            }
-        }
-        return result;
-    }
-
     static constexpr auto Start = ".#./..#/###";
+
     /*
-    auto Part1(const std::vector<std::string>&lines, size_t iterations) {
-        auto inputPatterns = ParsePatternInputs(lines);
-        auto outputPatterns = ParsePatternOutputs(lines);
+    12 => 31
+    34    42
 
-        auto pattern = ParsePattern(Start);
-
-        for (auto i = 0; i < iterations; i++) {
-            //std::cout << ToString(pattern) << '\n';
-
-            auto chunks = GetChunks(pattern);
-            for (auto& chunkRow : chunks) {
-                for (auto& chunk : chunkRow) {
-                    UpdateChunk(chunk, inputPatterns, outputPatterns);
-                }
-            }
-
-            pattern = CombineChunks(chunks);
-        }
-
-        u32 count = 0;
-        Constexpr::ApplyToRowCol(pattern, [&](size_t row, size_t col) {
-            count += pattern[row][col];
-            });
-        return count;
-    }
-
-    auto Part2(const std::vector<std::string>&lines) {
-        return lines.size();
-    }
-
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines, 5));
-        return Constexpr::ToString(Part1(lines, 18));
-    }
-
-    bool RunTests() {
-        std::vector<std::string> lines = {
-            "../.# => ##./#../...",
-            ".#./..#/### => #..#/..../..../#..#"
-        };
-
-        if (Part1(lines, 2) != 12) return false;
-        return true;
-    }
+    123    741
+    456 => 852
+    789    963
     */
 
-    constexpr auto Solve(const std::vector<std::string>& lines, size_t iterations) {
-        auto inputPatterns = ParsePatternInputs(lines);
-        auto outputPatterns = ParsePatternOutputs(lines);
+    constexpr std::string Rotate(std::string_view in) {
+        if (in.size() == 5) {
+            return std::string({ in[3], in[0], in[2], in[4], in[1] });
+        }
+        return std::string({ in[8], in[4], in[0], in[3], in[9], in[5], in[1], in[3], in[10], in[6], in[2] });
+    }
 
-        auto pattern = ParsePattern(Start);
+    /*
+    12 => 21
+    34    43
+
+    123    321
+    456 => 654
+    789    987
+    */
+    constexpr std::string Flip(std::string_view in) {
+        if (in.size() == 5) {
+            return std::string({ in[1], in[0], in[2], in[4], in[3] });
+        }
+        return std::string({ in[2], in[1], in[0], in[3], in[6], in[5], in[4], in[7], in[10], in[9], in[8] });
+    }
+
+    using Transforms = Constexpr::SmallMap<std::string, std::string>;
+
+    constexpr Transforms GetTransforms(const std::vector<std::string>& lines) {
+        Transforms result;
+        for (const auto& line : lines) {
+            auto s = Constexpr::Split(line, " => ");
+            auto key = std::string(s[0]);
+            auto transform = std::string(s[1]);
+
+            std::vector<std::string> keys {key};
+            for (auto i = 0; i < 4; i++) {
+                keys.push_back(Rotate(keys.back()));
+            }
+            keys.push_back(Flip(keys.back()));
+            for (auto i = 0; i < 4; i++) {
+                keys.push_back(Rotate(keys.back()));
+            }
+
+            for (const auto& k : keys) {
+                result[k] = transform;
+            }
+        }
+        return result;
+    }
+
+    constexpr std::vector<std::string> Split(const std::string& grid) {
+        std::vector<std::string> result;
+        auto separator = '/';
+        
+        if (grid.size() == 5) { //2x2 => 1 2x2
+            return { grid };
+        }
+        if (grid.size() == 11) { //3x3 => 1 3x3
+            return { grid };
+        }
+        else if (grid.size() == 19) { //4x4 => 4 2x2
+            //0123/5678/0123/5678
+            return {
+                std::string{grid[0], grid[1], separator, grid[5], grid[6]},
+                std::string{grid[2], grid[3], separator, grid[7], grid[8]},
+                std::string{grid[10], grid[11], separator, grid[15], grid[16]},
+                std::string{grid[12], grid[13], separator, grid[17], grid[18]}
+            };
+        }
+        else if(grid.size() == 41) { //6x6 => 9 2x2
+            //012345/789012/456789/123456/890123/567890
+            return {
+                std::string{grid[0], grid[1], separator, grid[7], grid[8]},
+                std::string{grid[2], grid[3], separator, grid[9], grid[10]},
+                std::string{grid[4], grid[5], separator, grid[11], grid[12]},
+
+                std::string{grid[14], grid[15], separator, grid[21], grid[22]},
+                std::string{grid[16], grid[17], separator, grid[23], grid[24]},
+                std::string{grid[18], grid[19], separator, grid[25], grid[26]},
+
+                std::string{grid[28], grid[29], separator, grid[35], grid[36]},
+                std::string{grid[30], grid[31], separator, grid[37], grid[38]},
+                std::string{grid[32], grid[33], separator, grid[39], grid[40]}
+            };
+        }
+        else {
+            return {}; //
+        }
+    }
+
+    constexpr std::string Combine4x2x2(const std::vector<std::string>& chunks) {
+        /*
+        ".#/#.",
+        "../##",
+        "#./.#",
+        "##/##"
+         =>
+
+        ".#../#.##/#.##/.###"
+        */
+        std::string result;
+        result.reserve(19);
+        result += chunks[0].substr(0, 2);
+        result += chunks[1].substr(0, 2);
+        result += "/";
+
+        result += chunks[0].substr(3, 2);
+        result += chunks[1].substr(3, 2);
+        result += "/";
+
+        result += chunks[2].substr(0, 2);
+        result += chunks[3].substr(0, 2);
+        result += "/";
+
+        result += chunks[2].substr(3, 2);
+        result += chunks[3].substr(3, 2);
+
+        return result;
+    }
+    constexpr std::string Combine4x3x3(const std::vector<std::string>& chunks) {
+        /*
+        "..#/#.#/.##"
+        "#../.#./..."
+        "##./#../##."
+        "##./..#/#.#"
+        
+        =>
+        "..##../#.#.#./.##.../##.##./#....#/##.#.#"
+        
+        */
+
+        std::string result;
+        result.reserve(36);
+
+        result += chunks[0].substr(0, 3);
+        result += chunks[1].substr(0, 3);
+        result += "/";
+
+        result += chunks[0].substr(4, 3);
+        result += chunks[1].substr(4, 3);
+        result += "/";
+
+        result += chunks[0].substr(8, 3);
+        result += chunks[1].substr(8, 3);
+        result += "/";
+
+        result += chunks[2].substr(0, 3);
+        result += chunks[3].substr(0, 3);
+        result += "/";
+
+        result += chunks[2].substr(4, 3);
+        result += chunks[3].substr(4, 3);
+        result += "/";
+
+        result += chunks[2].substr(8, 3);
+        result += chunks[3].substr(8, 3);
+        
+        return result;
+    }
+
+    constexpr std::string Combine(const std::vector<std::string>& chunks) {
+        if (chunks.size() == 1) {
+            return chunks[0];
+        }
+        else if (chunks.size() == 4) {
+            if (chunks[0].size() == 5) {
+                return Combine4x2x2(chunks);
+            }
+            else {
+                return Combine4x3x3(chunks);
+            }
+        }
+        return "";
+    }
+
+    constexpr std::vector<std::string> Next(const std::string& pattern, const Transforms& transforms) {
+        auto s = Split(pattern);
+        std::vector<std::string> result;
+        for (const auto& v : s) {
+            result.push_back(transforms.at(v));
+        }
+        if (result.size() == 1 || result.size() == 9) {
+            return result;
+        }
+        else {
+            return { Combine(result) };
+        }
+    }
+
+    constexpr auto Solve(const std::vector<std::string>& lines, size_t iterations) {
+        auto transforms = GetTransforms(lines);
+
+        Constexpr::SmallMap<std::string, std::vector<std::string>> cache{};
+        std::vector<std::string> q{Start};
+        std::vector<std::string> next;
 
         for (auto i = 0; i < iterations; i++) {
-            auto chunks = GetChunks(pattern);
-            for (auto& chunkRow : chunks) {
-                for (auto& chunk : chunkRow) {
-                    UpdateChunk(chunk, inputPatterns, outputPatterns);
-                }
+            for (const auto& pattern : q) {
+                auto n = cache.contains(pattern) ? cache.at(pattern) : Next(pattern, transforms);
+                cache[pattern] = n;
+                std::copy(n.begin(), n.end(), std::back_inserter(next));
             }
-
-            pattern = CombineChunks(chunks);
+            q = next;
+            next.clear();
         }
 
-        u32 count = 0;
-        Constexpr::ApplyToMatrixValueConst(pattern, [&count](bool v) { count += v; });
-        return count;
+        size_t result = 0;
+        for (const auto& pattern : q) {
+            result += std::count(pattern.begin(), pattern.end(), '#');
+        }
+        return result;
     }
+
     PART_ONE() {
-        /*
-        Constexpr::ApplyToRowCol(pattern, [&](size_t row, size_t col) {
-            count += pattern[row][col];
-            });
-        */
-        /*
-        for (size_t row = 0; row < pattern.size(); row++) {
-            for (size_t col = 0; col < pattern[row].size(); col++) {
-                count += pattern[row][col];
-            }
-        }
-        */
         return Constexpr::ToString(Solve(lines, 5));
     }
 
