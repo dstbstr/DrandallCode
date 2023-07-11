@@ -2,20 +2,16 @@
 SOLUTION(2018, 4) {
 
     struct DateTime {
-        u8 Month;
-        u8 Day;
-        u8 Hour;
-        u8 Minute;
+        u8 Month{ 0 };
+        u8 Day{ 0 };
+        u8 Hour{ 0 };
+        u8 Minute{ 0 };
 
         constexpr bool operator<(const DateTime& other) const {
-            if (Month < other.Month) return true;
-            if (Month > other.Month) return false;
-            if (Day < other.Day) return true;
-            if (Day > other.Day) return false;
-            if (Hour < other.Hour) return true;
-            if (Hour > other.Hour) return false;
-            if (Minute < other.Minute) return true;
-            return false;
+            return Month != other.Month ? Month < other.Month :
+                Day != other.Day ? Day < other.Day :
+                Hour != other.Hour ? Hour < other.Hour :
+                Minute < other.Minute;
         }
 
         constexpr bool operator==(const DateTime& other) const {
@@ -31,6 +27,10 @@ SOLUTION(2018, 4) {
         u32 GuardId = 0;
         DateTime EventTime;
         Action EventAction;
+
+        constexpr bool operator<(const Event& other) const {
+            return EventTime < other.EventTime;
+        }
     };
 
     constexpr DateTime ParseDateTime(const std::string & dtString) {
@@ -46,11 +46,6 @@ SOLUTION(2018, 4) {
 
         return result;
     }
-
-    static_assert(ParseDateTime("1518-10-05 00:56").Month == 10);
-    static_assert(ParseDateTime("1518-10-05 00:56").Day == 5);
-    static_assert(ParseDateTime("1518-10-05 00:56").Hour == 0);
-    static_assert(ParseDateTime("1518-10-05 00:56").Minute == 56);
 
     constexpr Event ParseEvent(const std::string & line) {
         auto dtString = line.substr(1, line.find(']') - 1);
@@ -69,38 +64,15 @@ SOLUTION(2018, 4) {
         return event;
     }
 
-    static_assert(ParseEvent("[1518-11-01 00:00] Guard #10 begins shift").EventTime == DateTime{ 11, 1, 0, 0 });
-    static_assert(ParseEvent("[1518-11-01 00:00] Guard #10 begins shift").GuardId == 10);
-    static_assert(ParseEvent("[1518-11-01 00:00] Guard #10 begins shift").EventAction == Action::Start);
-    static_assert(ParseEvent("[1518-10-05 00:56] falls asleep").EventTime == DateTime{ 10, 5, 0, 56 });
-    static_assert(ParseEvent("[1518-10-05 00:56] falls asleep").EventAction == Action::Sleep);
-    static_assert(ParseEvent("[1518-05-09 00:32] wakes up").EventAction == Action::Awake);
-
-    constexpr std::vector<Event> ParseEvents(const std::vector<std::string>&lines) {
-        std::vector<Event> result;
-        for (const auto& line : lines) {
-            result.push_back(ParseEvent(line));
-        }
-
-        std::sort(result.begin(), result.end(), [](const Event& lhs, const Event& rhs) {
-            return lhs.EventTime < rhs.EventTime;
-            });
-
-        return result;
-    }
-
-    void PopulateSleepData(const std::vector<std::string>&lines, std::unordered_map<u32, u32>&guardSleepAmounts, std::unordered_map<u32, std::array<u8, 60>>&guardSleepTimes) {
-        auto events = ParseEvents(lines);
+    constexpr void PopulateSleepData(const std::vector<Event>& events, Constexpr::SmallMap<u32, u32>& guardSleepAmounts, Constexpr::SmallMap<u32, std::array<u8, 60>>& guardSleepTimes) {
         u32 currentGuard = 0;
         DateTime sleepStart;
-
         auto UpdateSleepTimes = [&](DateTime sleepStop) {
             for (auto minute = sleepStart.Minute; (minute % 60) != sleepStop.Minute; minute++) {
                 guardSleepAmounts[currentGuard]++;
                 guardSleepTimes[currentGuard][minute]++;
             }
         };
-
         for (const auto& event : events) {
             switch (event.EventAction) {
             case Action::Start: currentGuard = event.GuardId; break;
@@ -111,10 +83,12 @@ SOLUTION(2018, 4) {
         }
     }
 
-    auto Part1(const std::vector<std::string>&lines) {
-        std::unordered_map<u32, u32> guardSleepAmounts{};
-        std::unordered_map<u32, std::array<u8, 60>> guardSleepTimes{};
-        PopulateSleepData(lines, guardSleepAmounts, guardSleepTimes);
+    PART_ONE() {
+        Constexpr::SmallMap<u32, u32> guardSleepAmounts{};
+        Constexpr::SmallMap<u32, std::array<u8, 60>> guardSleepTimes{};
+        auto events = ParseLines(lines, ParseEvent);
+        std::sort(events.begin(), events.end());
+        PopulateSleepData(events, guardSleepAmounts, guardSleepTimes);
 
         u32 mostSleep = 0;
         u32 sleepiestGuard = 0;
@@ -135,13 +109,16 @@ SOLUTION(2018, 4) {
             }
         }
 
-        return resultMinute * sleepiestGuard;
+        return Constexpr::ToString(resultMinute * sleepiestGuard);
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
-        std::unordered_map<u32, u32> guardSleepAmounts{};
-        std::unordered_map<u32, std::array<u8, 60>> guardSleepTimes{};
-        PopulateSleepData(lines, guardSleepAmounts, guardSleepTimes);
+    PART_TWO() {
+        Constexpr::SmallMap<u32, u32> guardSleepAmounts{};
+        Constexpr::SmallMap<u32, std::array<u8, 60>> guardSleepTimes{};
+        auto events = ParseLines(lines, ParseEvent);
+        std::sort(events.begin(), events.end());
+
+        PopulateSleepData(events, guardSleepAmounts, guardSleepTimes);
 
         u32 resultGuardId = 0;
         u32 resultMinute = 0;
@@ -156,15 +133,22 @@ SOLUTION(2018, 4) {
             }
         }
 
-        return resultMinute * resultGuardId;
+        return Constexpr::ToString(resultMinute * resultGuardId);
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
+    TESTS() {
+        static_assert(ParseDateTime("1518-10-05 00:56").Month == 10);
+        static_assert(ParseDateTime("1518-10-05 00:56").Day == 5);
+        static_assert(ParseDateTime("1518-10-05 00:56").Hour == 0);
+        static_assert(ParseDateTime("1518-10-05 00:56").Minute == 56);
 
-    bool RunTests() {
+        static_assert(ParseEvent("[1518-11-01 00:00] Guard #10 begins shift").EventTime == DateTime{ 11, 1, 0, 0 });
+        static_assert(ParseEvent("[1518-11-01 00:00] Guard #10 begins shift").GuardId == 10);
+        static_assert(ParseEvent("[1518-11-01 00:00] Guard #10 begins shift").EventAction == Action::Start);
+        static_assert(ParseEvent("[1518-10-05 00:56] falls asleep").EventTime == DateTime{ 10, 5, 0, 56 });
+        static_assert(ParseEvent("[1518-10-05 00:56] falls asleep").EventAction == Action::Sleep);
+        static_assert(ParseEvent("[1518-05-09 00:32] wakes up").EventAction == Action::Awake);
+
         std::vector<std::string> lines = {
             "[1518-11-01 00:00] Guard #10 begins shift",
             "[1518-11-01 00:05] falls asleep",
@@ -185,20 +169,10 @@ SOLUTION(2018, 4) {
             "[1518-11-05 00:55] wakes up"
         };
 
-        if (Part1(lines) != 240) return false;
-        if (Part2(lines) != 4455) return false;
+        if (PartOne(lines) != "240") return false;
+        if (PartTwo(lines) != "4455") return false;
         return true;
-    }
 
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }

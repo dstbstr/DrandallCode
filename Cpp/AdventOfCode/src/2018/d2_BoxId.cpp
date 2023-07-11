@@ -10,38 +10,12 @@ SOLUTION(2018, 2) {
             counts[c - 'a']++;
         }
         for (auto i = 0; i < counts.size(); i++) {
-            if (counts[i] == 2) outHasTwos = true;
-            if (counts[i] == 3) outHasThrees = true;
+            outHasTwos |= counts[i] == 2;
+            outHasThrees |= counts[i] == 3;
         }
     }
 
-    constexpr bool TestHasTwosAndThrees(const std::string & line, bool expectedTwos, bool expectedThrees) {
-        bool hasTwos = false;
-        bool hasThrees = false;
-        HasTwosAndThrees(line, hasTwos, hasThrees);
-
-        return hasTwos == expectedTwos && hasThrees == expectedThrees;
-    }
-
-    static_assert(TestHasTwosAndThrees("abcdef", false, false));
-    static_assert(TestHasTwosAndThrees("abcd", false, false));
-    static_assert(TestHasTwosAndThrees("aacd", true, false));
-    static_assert(TestHasTwosAndThrees("aaad", false, true));
-
-    auto Part1(const std::vector<std::string>&lines) {
-        u32 twos = 0;
-        u32 threes = 0;
-        for (const auto& line : lines) {
-            bool hasTwos, hasThrees = false;
-            HasTwosAndThrees(line, hasTwos, hasThrees);
-            if (hasTwos) twos++;
-            if (hasThrees) threes++;
-        }
-
-        return twos * threes;
-    }
-
-    constexpr bool OffByOne(const std::string & lhs, const std::string & rhs) {
+    constexpr bool OffByOne(const std::string& lhs, const std::string& rhs) {
         u32 deltas = 0;
         for (size_t i = 0; i < lhs.size(); i++) {
             deltas += lhs[i] != rhs[i];
@@ -49,27 +23,48 @@ SOLUTION(2018, 2) {
         return deltas == 1;
     }
 
-    static_assert(OffByOne("abc", "adc"));
-    static_assert(!OffByOne("abcd", "efgh"));
+    PART_ONE() {
+        u32 twos = 0;
+        u32 threes = 0;
+        for (const auto& line : lines) {
+            bool hasTwos, hasThrees = false;
+            HasTwosAndThrees(line, hasTwos, hasThrees);
+            twos += hasTwos;
+            threes += hasThrees;
+        }
 
-    auto Part2(const std::vector<std::string>&input) {
-        std::vector<std::string> lines = input;
-        std::sort(lines.begin(), lines.end());
-        for (auto i = 0; i < lines.size() - 1; i++) {
-            if (OffByOne(lines[i], lines[i + 1])) {
-                return lines[i] + '\n' + lines[i + 1];
+        return Constexpr::ToString(twos * threes);
+    }
+
+    PART_TWO() {
+        auto copy = lines;
+        std::sort(copy.begin(), copy.end());
+        for (auto i = 0; i < copy.size() - 1; i++) {
+            if (OffByOne(copy[i], copy[i + 1])) {
+                return copy[i] + '\n' + copy[i + 1];
             }
         }
 
         return ""s;
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Part2(lines);
+    constexpr bool TestHasTwosAndThrees(const std::string& line, bool expectedTwos, bool expectedThrees) {
+        bool hasTwos = false;
+        bool hasThrees = false;
+        HasTwosAndThrees(line, hasTwos, hasThrees);
+
+        return hasTwos == expectedTwos && hasThrees == expectedThrees;
     }
 
-    bool RunTests() {
+    TESTS() {
+        static_assert(TestHasTwosAndThrees("abcdef", false, false));
+        static_assert(TestHasTwosAndThrees("abcd", false, false));
+        static_assert(TestHasTwosAndThrees("aacd", true, false));
+        static_assert(TestHasTwosAndThrees("aaad", false, true));
+
+        static_assert(OffByOne("abc", "adc"));
+        static_assert(!OffByOne("abcd", "efgh"));
+        
         std::vector<std::string> lines = {
             "abcdef",
             "bababc",
@@ -80,19 +75,8 @@ SOLUTION(2018, 2) {
             "ababab"
         };
 
-        if (Part1(lines) != 12) return false;
-        return true;
-    }
+        if (PartOne(lines) != "12") return false;
 
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }

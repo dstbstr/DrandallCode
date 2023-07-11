@@ -2,13 +2,13 @@
 SOLUTION(2018, 3) {
 
     struct Rect {
-        u32 Id;
-        UCoord TopLeft;
-        UCoord BottomRight;
+        u32 Id{ 0 };
+        UCoord TopLeft{ 0, 0 };
+        UCoord BottomRight{ 0, 0 };
     };
 
     //#123 @ 3,2: 5x4
-    constexpr Rect ParseLine(const std::string & line) {
+    constexpr Rect ParseRect(const std::string & line) {
         auto split = Constexpr::Split(line, " ");
         Rect result;
         Constexpr::ParseNumber(split[0].substr(1), result.Id);
@@ -27,25 +27,16 @@ SOLUTION(2018, 3) {
     }
 
     constexpr bool Intersects(const Rect & lhs, const Rect & rhs) {
-        if (lhs.BottomRight.Y < rhs.TopLeft.Y || rhs.BottomRight.Y < lhs.TopLeft.Y) {
-            return false;
-        }
-        else if (lhs.BottomRight.X < rhs.TopLeft.X || lhs.TopLeft.X > rhs.BottomRight.X) {
-            return false;
-        }
-        else {
-            return true;
-        }
+        return lhs.BottomRight.Y >= rhs.TopLeft.Y &&
+            rhs.BottomRight.Y >= lhs.TopLeft.Y &&
+            lhs.BottomRight.X >= rhs.TopLeft.X &&
+            lhs.TopLeft.X <= rhs.BottomRight.X;
     }
 
-    static_assert(Intersects(ParseLine("#1 @ 1,3: 4x4"), ParseLine("#2 @ 3,1: 4x4")));
+    PART_ONE() {
+        auto rects = ParseLines(lines, ParseRect);
 
-    auto Part1(const std::vector<std::string>&lines) {
-        std::vector<Rect> rects;
-        for (const auto& line : lines) {
-            rects.push_back(ParseLine(line));
-        }
-        auto fabric = std::make_unique<std::array<std::array<u32, 1001>, 1001>>();
+        auto fabric = new std::array<std::array<u32, 1001>, 1001>();
 
         for (const auto& rect : rects) {
             for (auto x = rect.TopLeft.X; x <= rect.BottomRight.X; x++) {
@@ -55,23 +46,16 @@ SOLUTION(2018, 3) {
             }
         }
 
-        u32 count = 0;
-        for (auto x = 0; x < fabric->size(); x++) {
-            for (auto y = 0; y < (*fabric)[0].size(); y++) {
-                if ((*fabric)[x][y] > 1) {
-                    count++;
-                }
-            }
-        }
+        auto count = std::accumulate(fabric->begin(), fabric->end(), 0ull, [](size_t running, const auto& row) { 
+            return running + std::count_if(row.begin(), row.end(), [](u32 v) { return v > 1; }); 
+        });
+        delete fabric;
+        return Constexpr::ToString(count);
 
-        return count;
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
-        std::vector<Rect> rects;
-        for (const auto& line : lines) {
-            rects.push_back(ParseLine(line));
-        }
+    PART_TWO() {
+        auto rects = ParseLines(lines, ParseRect);
 
         for (auto i = 0; i < rects.size(); i++) {
             bool found = false;
@@ -83,41 +67,22 @@ SOLUTION(2018, 3) {
                 }
             }
             if (!found) {
-                return rects[i].Id;
+                return Constexpr::ToString(rects[i].Id);
             }
         }
-
-        return 0u;
+        return "Not Found";
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
+    TESTS() {
+        static_assert(Intersects(ParseRect("#1 @ 1,3: 4x4"), ParseRect("#2 @ 3,1: 4x4")));
         std::vector<std::string> lines = {
             "#1 @ 1,3: 4x4",
             "#2 @ 3,1: 4x4",
             "#3 @ 5,5: 2x2"
         };
 
-        auto r1 = ParseLine(lines[0]);
-        auto r2 = ParseLine(lines[1]);
-        if (!Intersects(r1, r2)) return false;
-        //if (Part1(lines) != 0) return false;
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
+        auto rects = ParseLines(lines, ParseRect);
+        if (!Intersects(rects[0], rects[1])) return false;
         return true;
     }
 }

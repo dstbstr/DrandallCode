@@ -81,8 +81,8 @@ void RunAll() {
 
 int main(int, char**) {
     //RunAll();
-    RunYear(2017);
-    //RunOne(2017, 25);
+    //RunYear(2018);
+    RunOne(2018, 4);
     //RunLatest();
     return 0;
 }

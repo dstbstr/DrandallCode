@@ -1,70 +1,46 @@
 #include "2018/d1_Calibrate.h"
 SOLUTION(2018, 1) {
 
-constexpr std::vector<s32> ParseDeltas(const std::vector<std::string>& lines) {
-    std::vector<s32> result;
-    for (const auto& line : lines) {
-        s32 number;
-        if (line[0] == '+') {
-            Constexpr::ParseNumber(line.substr(1), number);
-        }
-        else {
-            Constexpr::ParseNumber(line, number);
-        }
-        result.push_back(number);
-    }
-
-    return result;
-}
-
-auto Part1(const std::vector<std::string>& lines) {
-    auto deltas = ParseDeltas(lines);
-    return std::accumulate(deltas.begin(), deltas.end(), 0);
-}
-
-auto Part2(const std::vector<std::string>& lines) {
-    auto deltas = ParseDeltas(lines);
-    std::unordered_set<s32> seen;
-    s32 frequency = 0;
-    size_t currentDelta = 0;
-
-    while (true) {
-        if (seen.find(frequency) != seen.end()) {
-            return frequency;
-        }
-        seen.insert(frequency);
-        frequency += deltas[currentDelta++];
-        if (currentDelta == deltas.size()) {
-            currentDelta = 0;
-        }
-    }
-    
-    return 0;
-}
-
-std::string Run(const std::vector<std::string>& lines) {
-    //return Constexpr::ToString(Part1(lines));
-    return Constexpr::ToString(Part2(lines));
-}
-
-bool RunTests() {
-    std::vector<std::string> lines = {
-
-    };
-
-    if (Part1(lines) != 0) return false;
-    return true;
-}
-
     PART_ONE() {
-        return lines[0];
+        auto deltas = ParseLinesAsNumbers<s32>(lines);
+        return Constexpr::ToString(std::accumulate(deltas.begin(), deltas.end(), 0));
     }
 
     PART_TWO() {
-        return lines[0];
+        auto deltas = ParseLinesAsNumbers<s32>(lines);
+        std::vector<s32> frequencies {0};
+        for (auto i = 0; i < deltas.size(); i++) {
+            frequencies.push_back(frequencies.back() + deltas[i]);
+        }
+
+        auto shift = frequencies.back();
+        Constexpr::SmallMap<s32, std::vector<s32>> mods;
+        //the last value in frequencies is the first value in the second row
+        for (size_t i = 0; i < frequencies.size() - 1; i++) {
+            auto v = frequencies[i];
+            mods[v % shift].push_back(v);
+        }
+
+        s32 bestDelta = std::numeric_limits<s32>::max();
+        s64 bestKey = 0;
+
+        for (auto& [key, values] : mods) {
+            std::sort(values.begin(), values.end());
+            for (size_t i = 0; i < values.size() - 1; i++) {
+                auto delta = values[i + 1] - values[i];
+                if (delta < bestDelta) {
+                    bestDelta = delta;
+                    bestKey = values[i + 1];
+                }
+            }
+        }
+
+        return Constexpr::ToString(bestKey);
     }
 
     TESTS() {
+        static_assert(PartTwo({ "+10000000", "-9999999" }) == "10000000");
+
         return true;
     }
 }
