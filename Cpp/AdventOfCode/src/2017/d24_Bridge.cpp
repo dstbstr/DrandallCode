@@ -1,29 +1,20 @@
 #include "2017/d24_Bridge.h"
 
 SOLUTION(2017, 24) {
-    constexpr std::vector<UCoord> ParsePieces(const std::vector<std::string>&lines) {
-        std::vector<UCoord> result;
-        for (const auto& line : lines) {
-            auto split = Constexpr::Split(line, "/");
-            UCoord coord;
-            Constexpr::ParseNumber(split[0], coord.X);
-            Constexpr::ParseNumber(split[1], coord.Y);
-            result.push_back(coord);
-        }
-
+    constexpr UCoord ParsePiece(const std::string & line) {
+        auto s = Constexpr::Split(line, "/");
+        UCoord result;
+        Constexpr::ParseNumber(s[0], result.X);
+        Constexpr::ParseNumber(s[1], result.Y);
+        
         return result;
     }
 
-    constexpr u64 CalculateStrength(const std::vector<UCoord>&pieces) {
-        u64 result = 0;
-        for (const auto& piece : pieces) {
-            result += piece.X + piece.Y;
-        }
-
-        return result;
+    constexpr size_t CalculateStrength(const std::vector<UCoord>&pieces) {
+        return std::accumulate(pieces.begin(), pieces.end(), 0ull, [](size_t running, UCoord piece) {return running + piece.X + piece.Y; });
     }
 
-    size_t Dfs(size_t pieceNeeded, std::vector<UCoord> pieces, size_t currentStrength) {
+    constexpr size_t Dfs(size_t pieceNeeded, std::vector<UCoord> pieces, size_t currentStrength) {
         size_t best = currentStrength;
 
         for (auto i = 0; i < pieces.size(); i++) {
@@ -39,12 +30,7 @@ SOLUTION(2017, 24) {
         return best;
     }
 
-    auto Part1(const std::vector<std::string>&lines) {
-        auto pieces = ParsePieces(lines);
-        return Dfs(0, pieces, 0);
-    }
-
-    std::vector<UCoord> FindLongestBridge(size_t pieceNeeded, std::vector<UCoord> pieces, std::vector<UCoord> currentBridge) {
+    constexpr std::vector<UCoord> FindLongestBridge(size_t pieceNeeded, std::vector<UCoord> pieces, std::vector<UCoord> currentBridge) {
         std::vector<UCoord> result = currentBridge;
 
         for (auto i = 0; i < pieces.size(); i++) {
@@ -66,17 +52,17 @@ SOLUTION(2017, 24) {
         return result;
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
-        auto pieces = ParsePieces(lines);
-        return CalculateStrength(FindLongestBridge(0, pieces, {}));
+    PART_ONE() {
+        auto pieces = ParseLines(lines, ParsePiece);
+        return Constexpr::ToString(Dfs(0, pieces, 0));
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
+    PART_TWO() {
+        auto pieces = ParseLines(lines, ParsePiece);
+        return Constexpr::ToString(CalculateStrength(FindLongestBridge(0, pieces, {})));
     }
 
-    bool RunTests() {
+    TESTS() {
         std::vector<std::string> lines = {
             "0/2",
             "2/2",
@@ -88,21 +74,9 @@ SOLUTION(2017, 24) {
             "9/10"
         };
 
-        if (Part1(lines) != 31) return false;
-        if (Part2(lines) != 19) return false;
+        if (PartOne(lines) != "31") return false;
+        if (PartTwo(lines) != "19") return false;
 
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }

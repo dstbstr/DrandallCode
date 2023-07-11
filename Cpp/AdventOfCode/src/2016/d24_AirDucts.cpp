@@ -71,7 +71,7 @@ SOLUTION(2016, 24) {
         return result;
     }
 
-    u32 Solve(const std::vector<std::string>& lines, bool extendTargets) {
+    constexpr u32 Solve(const std::vector<std::string>& lines, bool extendTargets) {
         auto walls = FindWalls(lines);
         auto targets = FindTargets(lines);
         auto start = FindStart(lines);

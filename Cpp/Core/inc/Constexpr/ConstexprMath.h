@@ -160,7 +160,7 @@ namespace Constexpr {
         static_assert(!std::is_floating_point_v<T>);
         std::vector<bool> candidates{};
         candidates.reserve(max + 1);
-        for (size_t i = 0; i < max + 1; i++) {
+        for (T i = 0; i < max + 1; i++) {
             candidates.push_back(true);
         }
 
@@ -169,7 +169,7 @@ namespace Constexpr {
         for (T prime = 2; prime <= maxFactor; prime++) {
             if (!candidates[prime]) continue;
             result.push_back(prime);
-            for (size_t factor = static_cast<size_t>(prime * prime); factor < max + 1; factor += prime) {
+            for (T factor = prime * prime; factor < max + 1; factor += prime) {
                 candidates[factor] = false;
             }
         }
