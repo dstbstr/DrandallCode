@@ -1,71 +1,98 @@
 #include "2018/d9_Marbles.h"
 
 SOLUTION(2018, 9) {
-    constexpr void InsertMarble(std::vector<u32>&marbles, size_t & currentIndex, u32 value) {
-        auto targetIndex = (currentIndex + 2) % marbles.size();
-        marbles.insert(marbles.begin() + targetIndex, value);
-        currentIndex = targetIndex;
-    }
 
-    constexpr u32 ScorePoints(std::vector<u32>&marbles, size_t & currentIndex) {
-        auto targetIndex = (marbles.size() + currentIndex - 7) % marbles.size();
-        auto value = marbles[targetIndex];
-        marbles.erase(marbles.begin() + targetIndex);
-        currentIndex = targetIndex;
-        return value;
-    }
+    template<size_t PlayerCount, size_t MaxValue>
+    constexpr size_t Play() {
+        auto* ringPtr = new Constexpr::Ring<size_t, MaxValue>();
+        auto& ring = *ringPtr;
 
-    //Really slow for big numbers.  Maybe find all the 23s, and add in all the 'removed' marbles?
-    constexpr u32 PlayRound(u32 players, u32 maxValue) {
-        std::vector<u32> marbles;
-        marbles.push_back(0);
-        marbles.reserve(maxValue);
+        std::array<size_t, PlayerCount> elves{};
+        ring.push_front(0);
 
-        std::vector<u32> playerScores;
-        for (u32 i = 0; i < players; i++) {
-            playerScores.push_back(0);
-        }
-
-        size_t currentIndex = 0;
-        for (u32 i = 1; i <= maxValue; i++) {
-            if (i % 23 == 0) {
-                playerScores[i % players] += i;
-                playerScores[i % players] += ScorePoints(marbles, currentIndex);
+        for (size_t marble = 1; marble <= MaxValue; marble++) {
+            if (marble % 23 == 0) {
+                ring.rotate(-7);
+                elves[marble % PlayerCount] += marble + ring.front();
+                ring.pop_front();
             }
             else {
-                InsertMarble(marbles, currentIndex, i);
+                ring.rotate(2);
+                ring.push_front(marble);
             }
         }
 
-        return Constexpr::FindMax(playerScores);
+        delete ringPtr;
+        return Constexpr::FindMax(elves);
     }
 
-    static_assert(PlayRound(9, 25) == 32);
+    constexpr size_t Play2(size_t playerCount, size_t maxValue) {
+        auto* ringPtr = new Constexpr::VecRing<size_t>{ maxValue };
+        auto& ring = *ringPtr;
 
-    std::string Run(const std::vector<std::string>&) {
-        //return Constexpr::ToString(PlayRound(476, 71657));
-        return Constexpr::ToString(PlayRound(476, 7165700));
+        std::vector<size_t> elves;
+        elves.resize(playerCount);
+        ring.push_front(0);
+
+        for (size_t marble = 1; marble <= maxValue; marble++) {
+            if (marble % 23 == 0) {
+                ring.rotate(-7);
+                elves[marble % playerCount] += marble + ring.front();
+                ring.pop_front();
+            }
+            else {
+                ring.rotate(2);
+                ring.push_front(marble);
+            }
+        }
+
+        delete ringPtr;
+        return Constexpr::FindMax(elves);
+
     }
-
-    bool RunTests() {
-        if (PlayRound(10, 1618) != 8317) return false;
-        if (PlayRound(13, 7999) != 146373) return false;
-        if (PlayRound(17, 1104) != 2764) return false;
-        if (PlayRound(21, 6111) != 54718) return false;
-        if (PlayRound(30, 5807) != 37305) return false;
-
-        return true;
+    //476 players; last marble is worth 71657 points
+    constexpr void ParseInput(const std::string& line, size_t& players, size_t& maxValue) {
+        auto s = Constexpr::Split(line, " ");
+        Constexpr::ParseNumber(s[0], players);
+        Constexpr::ParseNumber(s[6], maxValue);
     }
 
     PART_ONE() {
-        return lines[0];
+        //this version is slower, but doesn't hard code the input
+        size_t players, maxValue;
+        ParseInput(lines[0], players, maxValue);
+        return Constexpr::ToString(Play2(players, maxValue));
+        /*
+        (void)lines;
+        return Constexpr::ToString(Play<476, 71657>());
+        */
     }
 
     PART_TWO() {
-        return lines[0];
+        size_t players, maxValue;
+        ParseInput(lines[0], players, maxValue);
+        return Constexpr::ToString(Play2(players, maxValue * 100));
+        /*
+        (void)lines;
+        return Constexpr::ToString(Play<476, 7165700>());
+        */
     }
 
     TESTS() {
+        static_assert (Play<9, 25>() == 32);
+        static_assert (Play<10, 1618>() == 8317);
+        static_assert (Play<13, 7999>() == 146373);
+        static_assert (Play<17, 1104>() == 2764);
+        static_assert (Play<21, 6111>() == 54718);
+        static_assert (Play<30, 5807>() == 37305);
+
+        static_assert (Play2(9, 25) == 32);
+        static_assert (Play2(10, 1618) == 8317);
+        static_assert (Play2(13, 7999) == 146373);
+        static_assert (Play2(17, 1104) == 2764);
+        static_assert (Play2(21, 6111) == 54718);
+        static_assert (Play2(30, 5807) == 37305);
+
         return true;
     }
 }

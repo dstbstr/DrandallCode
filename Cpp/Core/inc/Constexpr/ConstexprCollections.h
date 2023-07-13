@@ -414,8 +414,158 @@ namespace Constexpr {
         return set.cend();
     }
 
-    /*
-    TODO:
-    deque (Could improve queue?)
-    */
+    template<typename T, size_t Capacity = 1024>
+    struct Ring {
+        constexpr void push_front(T val) {
+            if (mHead == Unset) {
+                mHead = 0;
+                mTail = 0;
+            }
+            else {
+                mHead = (mHead + Capacity - 1) % Capacity;
+            }
+            mData[mHead] = val;
+        }
+
+        constexpr void push_back(T val) {
+            if (mHead == Unset) {
+                mHead = 0;
+                mTail = 0;
+            }
+            else {
+                mTail = (mTail + 1) % Capacity;
+            }
+            mData[mTail] = val;
+        }
+        constexpr void pop_front() {
+            if (mHead == mTail) {
+                mHead = Unset;
+                mTail = Unset;
+            }
+            else {
+                mHead = (mHead + 1) % Capacity;
+            }
+        }
+        constexpr void pop_back() {
+            if (mHead == mTail) {
+                mHead = Unset;
+                mTail = Unset;
+            }
+            else {
+                mTail = (mTail + Capacity - 1) % Capacity;
+            }
+        }
+        constexpr T front() const {
+            return mData[mHead];
+        }
+        constexpr T back() const {
+            return mData[mTail];
+        }
+
+        constexpr bool is_empty() const {
+            return mHead == Unset;
+        }
+
+        constexpr void rotate(int amount) {
+            if (amount < 0) {
+                for (auto i = 0; i < -amount; i++) {
+                    push_front(back());
+                    pop_back();
+                }
+            }
+            else {
+                for (auto i = 0; i < amount; i++) {
+                    push_back(front());
+                    pop_front();
+                }
+            }
+        }
+
+    private:
+        size_t Unset = Capacity + 1;
+        size_t mHead{ Unset };
+        size_t mTail{ Unset };
+        std::array<T, Capacity> mData{};
+    };
+
+    template<typename T>
+    struct VecRing {
+        constexpr VecRing(size_t capacity) {
+            mData.resize(capacity);
+            mCapacity = capacity;
+        }
+
+        constexpr void push_front(T val) {
+            if (mHead == Unset) {
+                mHead = 0;
+                mTail = 0;
+            }
+            else {
+                mHead = (mHead + mCapacity - 1) % mCapacity;
+            }
+            mData[mHead] = val;
+        }
+
+        constexpr void push_back(T val) {
+            if (mHead == Unset) {
+                mHead = 0;
+                mTail = 0;
+            }
+            else {
+                mTail = (mTail + 1) % mCapacity;
+            }
+            mData[mTail] = val;
+        }
+        constexpr void pop_front() {
+            if (mHead == mTail) {
+                mHead = Unset;
+                mTail = Unset;
+            }
+            else {
+                mHead = (mHead + 1) % mCapacity;
+            }
+        }
+        constexpr void pop_back() {
+            if (mHead == mTail) {
+                mHead = Unset;
+                mTail = Unset;
+            }
+            else {
+                mTail = (mTail + mCapacity - 1) % mCapacity;
+            }
+        }
+        constexpr T front() const {
+            return mData[mHead];
+        }
+        constexpr T back() const {
+            return mData[mTail];
+        }
+
+        constexpr bool is_empty() const {
+            return mHead == Unset;
+        }
+
+        constexpr void rotate(int amount) {
+            if (amount < 0) {
+                for (auto i = 0; i < -amount; i++) {
+                    push_front(back());
+                    pop_back();
+                }
+            }
+            else {
+                for (auto i = 0; i < amount; i++) {
+                    push_back(front());
+                    pop_front();
+                }
+            }
+        }
+
+    private:
+        size_t Unset = std::numeric_limits<size_t>::max();
+        size_t mHead{ Unset };
+        size_t mTail{ Unset };
+        size_t mCapacity{ 0 };
+        std::vector<T> mData;
+    };
+
 }

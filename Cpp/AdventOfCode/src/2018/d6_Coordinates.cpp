@@ -1,15 +1,6 @@
 #include "2018/d6_Coordinates.h"
 
 SOLUTION(2018, 6) {
-    constexpr Coord ParseLine(const std::string & line) {
-        auto split = Constexpr::Split(line, ", ");
-        Coord result;
-        Constexpr::ParseNumber(split[0], result.X);
-        Constexpr::ParseNumber(split[1], result.Y);
-
-        return result;
-    }
-
     constexpr std::vector<u32> FindAreas(const std::vector<Coord>&coords, s32 area) {
         std::vector<u32> result;
         std::fill_n(std::back_inserter(result), coords.size(), 0u);
@@ -42,10 +33,20 @@ SOLUTION(2018, 6) {
         return result;
     }
 
-    auto Part1(const std::vector<std::string>&lines) {
+    constexpr bool IsInRegion(const Coord & pos, std::vector<Coord> targets, s32 maxDistance) {
+        size_t totalDistance = 0;
+        for (const auto& target : targets) {
+            totalDistance += MDistance(pos, target);
+            if (totalDistance >= maxDistance) return false;
+        }
+
+        return true;
+    }
+
+    PART_ONE() {
         std::vector<Coord> coords;
         for (const auto& line : lines) {
-            coords.push_back(ParseLine(line));
+            coords.push_back(Coord(line));
         }
 
         auto areas = FindAreas(coords, 400);
@@ -60,23 +61,15 @@ SOLUTION(2018, 6) {
             }
         }
 
-        return maxArea;
+        return Constexpr::ToString(maxArea);
     }
 
-    constexpr bool IsInRegion(const Coord & pos, std::vector<Coord> targets, s32 maxDistance) {
-        size_t totalDistance = 0;
-        for (const auto& target : targets) {
-            totalDistance += MDistance(pos, target);
-            if (totalDistance >= maxDistance) return false;
-        }
+    PART_TWO() {
+        const s32 maxDistance = 10'000;
 
-        return true;
-    }
-
-    auto Part2(const std::vector<std::string>&lines, s32 maxDistance) {
         std::vector<Coord> coords;
         for (const auto& line : lines) {
-            coords.push_back(ParseLine(line));
+            coords.push_back(Coord(line));
         }
 
         u32 count = 0;
@@ -88,15 +81,10 @@ SOLUTION(2018, 6) {
             }
         }
 
-        return count;
+        return Constexpr::ToString(count);
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines, 10'000));
-    }
-
-    bool RunTests() {
+    TESTS() {
         std::vector<std::string> lines = {
             "1, 1",
             "1, 6",
@@ -106,20 +94,8 @@ SOLUTION(2018, 6) {
             "8, 9"
         };
 
-        if (Part1(lines) != 17) return false;
-        if (Part2(lines, 32) != 16) return false;
-        return true;
-    }
+        if (PartOne(lines) != "17") return false;
 
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }

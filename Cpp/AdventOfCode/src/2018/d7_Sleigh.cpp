@@ -52,7 +52,17 @@ SOLUTION(2018, 7) {
         }
     }
 
-    auto Part1(const std::vector<std::string>&lines) {
+    constexpr bool TickWorkers(std::vector<u32>&workers) {
+        bool hasWorker = false;
+        for (auto& worker : workers) {
+            worker = std::max(0u, worker - 1);
+            if (worker == 0) hasWorker = true;
+        }
+
+        return hasWorker;
+    }
+
+    PART_ONE() {
         std::array<u32, 26> requirements;
         std::array<bool, 26> existance;
         BuildMap(lines, requirements, existance);
@@ -72,22 +82,12 @@ SOLUTION(2018, 7) {
         return result;
     }
 
-    constexpr bool TickWorkers(std::vector<u32>&workers) {
-        bool hasWorker = false;
-        for (auto& worker : workers) {
-            worker = std::max(0u, worker - 1);
-            if (worker == 0) hasWorker = true;
-        }
-
-        return hasWorker;
-    }
-
-    auto Part2(const std::vector<std::string>&lines, u32 workers, u32 minimumTime) {
+    PART_TWO() {
         std::array<u32, 26> requirements;
         std::array<bool, 26> existance;
         BuildMap(lines, requirements, existance);
         u32 totalSeconds = 0;
-        u32 availableWorkers = workers;
+        u32 availableWorkers = 5;
         std::array<u32, 26> inFlightWork;
         inFlightWork.fill(0);
 
@@ -105,7 +105,7 @@ SOLUTION(2018, 7) {
             while (availableWorkers > 0) {
                 auto next = FindNext(existance, requirements);
                 if (next != -1) {
-                    inFlightWork[next] = next + minimumTime + 1;
+                    inFlightWork[next] = next + 60 + 1;
                     availableWorkers--;
                 }
                 else {
@@ -124,15 +124,10 @@ SOLUTION(2018, 7) {
         }
 
         auto remaining = Constexpr::FindMax(inFlightWork);
-        return totalSeconds + remaining;
+        return Constexpr::ToString(totalSeconds + remaining);
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines, 5, 60));
-    }
-
-    bool RunTests() {
+    TESTS() {
         std::vector<std::string> lines = {
             "Step C must be finished before step A can begin.",
             "Step C must be finished before step F can begin.",
@@ -143,20 +138,8 @@ SOLUTION(2018, 7) {
             "Step F must be finished before step E can begin."
         };
 
-        if (Part1(lines) != "CABDFE") return false;
-        if (Part2(lines, 2, 0) != 15) return false;
-        return true;
-    }
+        if (PartOne(lines) != "CABDFE") return false;
 
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }

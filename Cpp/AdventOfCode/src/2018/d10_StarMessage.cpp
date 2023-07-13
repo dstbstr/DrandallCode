@@ -32,7 +32,7 @@ SOLUTION(2018, 10) {
         return result;
     }
 
-    constexpr void TickStars(std::vector<Star>&stars, size_t ticks) {
+    constexpr void TickStars(std::vector<Star>&stars, size_t ticks = 1) {
         for (auto& star : stars) {
             star.Pos.X += star.Vel.X * ticks;
             star.Pos.Y += star.Vel.Y * ticks;
@@ -51,43 +51,29 @@ SOLUTION(2018, 10) {
     }
 
     constexpr bool HasStar(const std::vector<Star>&stars, Coord pos) {
-        for (const auto& star : stars) {
-            if (star.Pos == pos) {
-                return true;
-            }
-        }
-
-        return false;
+        return std::any_of(stars.begin(), stars.end(), [&pos](const Star& star) { return star.Pos == pos; });
     }
 
-    bool PrintStarsIfFits(const std::vector<Star>&stars) {
+    constexpr bool PrintStarsIfFits(const std::vector<Star>& stars, std::string& outResult) {
         Coord min, max;
         GetLimits(stars, min, max);
         if (Constexpr::Abs(max.Y - min.Y) > 10) return false;
         if (Constexpr::Abs(max.X - min.X) > 100) return false;
 
+        outResult.push_back('\n');
         for (auto y = min.Y; y <= max.Y; y++) {
             for (auto x = min.X; x <= max.X; x++) {
                 Coord pos = { x, y };
-                if (HasStar(stars, pos)) {
-                    std::cout << '#';
-                }
-                else {
-                    std::cout << '.';
-                }
+                outResult.push_back(HasStar(stars, pos) ? '#' : '.');
             }
-            std::cout << '\n';
+            outResult.push_back('\n');
         }
 
-        std::cout << '\n';
         return true;
     }
 
-    auto Part1(const std::vector<std::string>&lines) {
-        std::vector<Star> stars;
-        for (const auto& line : lines) {
-            stars.push_back(ParseLine(line));
-        }
+    constexpr auto Solve(const std::vector<std::string>& lines, std::string& outMessage) {
+        auto stars = ParseLines(lines, ParseLine);
 
         size_t seconds = 0;
         if (stars[0].Vel.X > 0) {
@@ -95,12 +81,8 @@ SOLUTION(2018, 10) {
             TickStars(stars, seconds);
         }
 
-        bool printed = false;
         while (true) {
-            if (PrintStarsIfFits(stars)) {
-                printed = true;
-            }
-            else if (printed) {
+            if (PrintStarsIfFits(stars, outMessage)) {
                 break;
             }
 
@@ -108,63 +90,18 @@ SOLUTION(2018, 10) {
             seconds++;
         }
 
-        return seconds - 1;
-    }
-
-    auto Part2(const std::vector<std::string>&lines) {
-        return lines.size();
-    }
-
-    std::string Run(const std::vector<std::string>&lines) {
-        return Constexpr::ToString(Part1(lines));
-    }
-
-    bool RunTests() {
-        std::vector<std::string> lines = {
-            "position=< 9,  1> velocity=< 0,  2>",
-            "position=< 7,  0> velocity=<-1,  0>",
-            "position=< 3, -2> velocity=<-1,  1>",
-            "position=< 6, 10> velocity=<-2, -1>",
-            "position=< 2, -4> velocity=< 2,  2>",
-            "position=<-6, 10> velocity=< 2, -2>",
-            "position=< 1,  8> velocity=< 1, -1>",
-            "position=< 1,  7> velocity=< 1,  0>",
-            "position=<-3, 11> velocity=< 1, -2>",
-            "position=< 7,  6> velocity=<-1, -1>",
-            "position=<-2,  3> velocity=< 1,  0>",
-            "position=<-4,  3> velocity=< 2,  0>",
-            "position=<10, -3> velocity=<-1,  1>",
-            "position=< 5, 11> velocity=< 1, -2>",
-            "position=< 4,  7> velocity=< 0, -1>",
-            "position=< 8, -2> velocity=< 0,  1>",
-            "position=<15,  0> velocity=<-2,  0>",
-            "position=< 1,  6> velocity=< 1,  0>",
-            "position=< 8,  9> velocity=< 0, -1>",
-            "position=< 3,  3> velocity=<-1,  1>",
-            "position=< 0,  5> velocity=< 0, -1>",
-            "position=<-2,  2> velocity=< 2,  0>",
-            "position=< 5, -2> velocity=< 1,  2>",
-            "position=< 1,  4> velocity=< 2,  1>",
-            "position=<-2,  7> velocity=< 2, -2>",
-            "position=< 3,  6> velocity=<-1, -1>",
-            "position=< 5,  0> velocity=< 1,  0>",
-            "position=<-6,  0> velocity=< 2,  0>",
-            "position=< 5,  9> velocity=< 1, -2>",
-            "position=<14,  7> velocity=<-2,  0>",
-            "position=<-3,  6> velocity=< 2, -1>"
-        };
-
-        Part1(lines);
-
-        return true;
+        return seconds;
     }
 
     PART_ONE() {
-        return lines[0];
+        std::string result;
+        Solve(lines, result);
+        return result;
     }
 
     PART_TWO() {
-        return lines[0];
+        std::string ignored;
+        return Constexpr::ToString(Solve(lines, ignored));
     }
 
     TESTS() {

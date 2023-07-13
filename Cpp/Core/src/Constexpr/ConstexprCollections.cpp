@@ -255,4 +255,54 @@ namespace Constexpr {
         }
         static_assert(IsEmpty_AfterClearing_ReturnsTrue());
     }
+
+    namespace RingTests {
+        constexpr bool TestRing() {
+            Ring<size_t> ring;
+            if (!ring.is_empty()) return false;
+
+            ring.push_back(5);
+            ring.push_back(10);
+
+            if (ring.back() != 10) return false;
+            ring.pop_back();
+            if (ring.back() != 5) return false;
+
+            ring.push_front(15);
+            if (ring.front() != 15) return false;
+            ring.pop_front();
+            if (ring.front() != ring.back()) return false;
+
+            ring.pop_front();
+            if (!ring.is_empty()) return false;
+
+            return true;
+        }
+
+        static_assert(TestRing);
+
+        constexpr bool TestVecRing() {
+            VecRing<size_t> ring{1024};
+            if (!ring.is_empty()) return false;
+
+            ring.push_back(5);
+            ring.push_back(10);
+
+            if (ring.back() != 10) return false;
+            ring.pop_back();
+            if (ring.back() != 5) return false;
+
+            ring.push_front(15);
+            if (ring.front() != 15) return false;
+            ring.pop_front();
+            if (ring.front() != ring.back()) return false;
+
+            ring.pop_front();
+            if (!ring.is_empty()) return false;
+
+            return true;
+        }
+
+        static_assert(TestVecRing());
+    }
 }

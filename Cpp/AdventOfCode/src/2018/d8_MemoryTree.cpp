@@ -2,7 +2,7 @@
 #include <queue>
 
 SOLUTION(2018, 8) {
-    u32 SumMetadata(std::queue<u32>&numbers) {
+    constexpr u32 SumMetadata(Constexpr::Queue<u32>& numbers) {
         auto children = numbers.front();
         numbers.pop();
         auto metadata = numbers.front();
@@ -21,7 +21,7 @@ SOLUTION(2018, 8) {
         return result;
     }
 
-    u32 GetNodeValue(std::queue<u32>&numbers) {
+    constexpr u32 GetNodeValue(Constexpr::Queue<u32>& numbers) {
         auto children = numbers.front();
         numbers.pop();
         auto metadata = numbers.front();
@@ -54,8 +54,8 @@ SOLUTION(2018, 8) {
         return value;
     }
 
-    std::queue<u32> GetNumbers(const std::vector<std::string>&lines) {
-        std::queue<u32> numbers;
+    constexpr Constexpr::Queue<u32> GetNumbers(const std::vector<std::string>&lines) {
+        Constexpr::Queue<u32> numbers;
         auto split = Constexpr::Split(lines[0], " ");
         for (auto sv : split) {
             u32 num;
@@ -66,40 +66,25 @@ SOLUTION(2018, 8) {
         return numbers;
     }
 
-    auto Part1(const std::vector<std::string>&lines) {
+    PART_ONE() {
         auto numbers = GetNumbers(lines);
-        return SumMetadata(numbers);
+        return Constexpr::ToString(SumMetadata(numbers));
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
+    PART_TWO() {
         auto numbers = GetNumbers(lines);
-        return GetNodeValue(numbers);
+        return Constexpr::ToString(GetNodeValue(numbers));
+
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
+    TESTS() {
         std::vector<std::string> lines = {
             "2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2"
         };
 
-        if (Part1(lines) != 138) return false;
-        if (Part2(lines) != 66) return false;
-        return true;
-    }
+        if (PartOne(lines) != "138") return false;
+        if (PartTwo(lines) != "66") return false;
 
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }
