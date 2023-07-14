@@ -14,10 +14,10 @@ namespace AStarPrivate {
     struct MinimalPath {
         size_t Known = 10000;
         size_t Forcast = 10000;
-        T Val;
+        T Val{};
 
-        MinimalPath() {}
-        explicit MinimalPath(T t) : Val(t) {}
+        constexpr MinimalPath() {}
+        constexpr explicit MinimalPath(T t) : Val(t) {}
 
         constexpr bool operator<(const MinimalPath& other) const {
             return other.Forcast < Forcast;
@@ -28,10 +28,10 @@ namespace AStarPrivate {
     struct MaximalPath {
         size_t Known = 10000;
         size_t Forcast = 10000;
-        T Val;
+        T Val{};
 
-        MaximalPath() {}
-        explicit MaximalPath(T t) : Val(t) {}
+        constexpr MaximalPath() {}
+        constexpr explicit MaximalPath(T t) : Val(t) {}
 
         constexpr bool operator<(const MaximalPath& other) const {
             return Forcast < other.Forcast;

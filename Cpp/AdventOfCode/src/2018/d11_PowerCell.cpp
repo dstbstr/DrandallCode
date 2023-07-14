@@ -12,10 +12,6 @@ SOLUTION(2018, 11) {
         return hundreds - 5;
     }
 
-    static_assert(CalculatePower({ 3, 5 }, 8) == 4);
-    static_assert(CalculatePower({ 122, 79 }, 57) == -5);
-    static_assert(CalculatePower({ 217,196 }, 39) == 0);
-
     using Grid = std::array<std::array<s16, 301>, 301>;
 
     constexpr Grid FillGrid(u32 serialNumber) {
@@ -58,17 +54,24 @@ SOLUTION(2018, 11) {
         }
     }
 
-    auto Part1(u32 serialNumber) {
-        auto grid = FillGrid(serialNumber);
+    constexpr Grid GetGrid(const std::vector<std::string>& lines) {
+        u32 serialNumber;
+        Constexpr::ParseNumber(lines[0], serialNumber);
+        return FillGrid(serialNumber);
+    }
+
+    PART_ONE() {
+        auto grid = GetGrid(lines);
         s32 best;
         UCoord bestCoord;
         GetBest(grid, 3, bestCoord, best);
 
-        return bestCoord;
+        return Constexpr::ToString(bestCoord);
     }
 
-    auto Part2(u32 serialNumber) {
-        auto grid = FillGrid(serialNumber);
+    PART_TWO() {
+        auto grid = GetGrid(lines);
+
         s32 overallBest = 0;
         UCoord overallBestCoord{ 0, 0 };
         u32 bestSize = 0;
@@ -87,29 +90,14 @@ SOLUTION(2018, 11) {
             }
         }
 
-        std::string result = ToString(overallBestCoord.X) + "," + ToString(overallBestCoord.Y) + "," + ToString(bestSize) + "\n";
-        return result;
-    }
-
-    std::string Run(const std::vector<std::string>&) {
-        //return Constexpr::ToString(Part1(5468));
-        return Part2(5468);
-    }
-
-    bool RunTests() {
-        if (Part1(18) != UCoord{33, 45}) return false;
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
+        return Constexpr::ToString(Vec3<size_t>{overallBestCoord.X, overallBestCoord.Y, bestSize});
     }
 
     TESTS() {
+        static_assert(CalculatePower({ 3, 5 }, 8) == 4);
+        static_assert(CalculatePower({ 122, 79 }, 57) == -5);
+        static_assert(CalculatePower({ 217,196 }, 39) == 0);
+        
         return true;
     }
 }

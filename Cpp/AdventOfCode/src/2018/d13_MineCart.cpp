@@ -21,10 +21,10 @@ SOLUTION(2018, 13) {
     }
 
     struct Cart {
-        Facing CurrentFacing;
-        UCoord Pos;
-        Facing IntersectionAction;
-        bool IsDead;
+        Facing CurrentFacing{ Up };
+        UCoord Pos{ 0, 0 };
+        Facing IntersectionAction{ Up };
+        bool IsDead{ false };
     };
 
     using Grid = std::vector<std::vector<TrackType>>;
@@ -45,8 +45,8 @@ SOLUTION(2018, 13) {
 
     constexpr std::vector<Cart> GetCarts(const std::vector<std::string>&lines) {
         std::vector<Cart> result;
-        for (u32 row = 0; row < lines.size(); row++) {
-            for (u32 col = 0; col < lines[row].size(); col++) {
+        for (size_t row = 0; row < lines.size(); row++) {
+            for (size_t col = 0; col < lines[row].size(); col++) {
                 auto c = lines[row][col];
                 if (!(c == '<' || c == '>' || c == '^' || c == 'v')) continue;
 
@@ -76,45 +76,6 @@ SOLUTION(2018, 13) {
         }
 
         return false;
-    }
-
-    void PrintState(const Grid & grid, const std::vector<Cart>&carts) {
-        system("cls"); //yuck
-        for (u32 row = 0; row < grid.size(); row++) {
-            for (u32 col = 0; col < grid[row].size(); col++) {
-                auto pos = UCoord{ col, row };
-
-                char spot = '?';
-                bool hasCart = false;
-                for (const auto& cart : carts) {
-                    if (cart.Pos == pos) {
-                        hasCart = true;
-                        switch (cart.CurrentFacing) {
-                        case Up: spot = '^'; break;
-                        case Down: spot = 'v'; break;
-                        case Left: spot = '<'; break;
-                        case Right: spot = '>'; break;
-                        }
-                    }
-                }
-                if (!hasCart) {
-                    switch (grid[row][col]) {
-                    case TrackType::None: spot = ' '; break;
-                    case TrackType::CurveLeft: spot = '\\'; break;
-                    case TrackType::CurveRight: spot = '/'; break;
-                    case TrackType::Intersection: spot = '+'; break;
-                    case TrackType::Horizontal: spot = '-'; break;
-                    case TrackType::Verticle: spot = '|'; break;
-                    }
-                }
-
-                std::cout << spot;
-            }
-            std::cout << '\n';
-        }
-        std::cout << '\n';
-
-        getchar();
     }
 
     constexpr void UpdateFacing(const Grid & grid, Cart & cart) {
@@ -165,19 +126,6 @@ SOLUTION(2018, 13) {
         }
     }
 
-    auto Part1(const std::vector<std::string>&lines) {
-        auto grid = ParseGrid(lines);
-        auto carts = GetCarts(lines);
-
-        UCoord result;
-        while (!HasCollision(carts, result)) {
-            //PrintState(grid, carts);
-            Tick(grid, carts, result);
-        }
-
-        return result;
-    }
-
     constexpr void RemoveCrash(std::vector<Cart>&carts, UCoord pos) {
         for (auto& cart : carts) {
             if (cart.Pos == pos) {
@@ -202,8 +150,19 @@ SOLUTION(2018, 13) {
         }
     }
 
+    PART_ONE() {
+        auto grid = ParseGrid(lines);
+        auto carts = GetCarts(lines);
 
-    auto Part2(const std::vector<std::string>&lines) {
+        UCoord result;
+        while (!HasCollision(carts, result)) {
+            Tick(grid, carts, result);
+        }
+
+        return Constexpr::ToString(result);
+    }
+
+    PART_TWO() {
         auto grid = ParseGrid(lines);
         auto carts = GetCarts(lines);
 
@@ -213,29 +172,24 @@ SOLUTION(2018, 13) {
 
         for (const auto& cart : carts) {
             if (!cart.IsDead) {
-                return cart.Pos;
+                return Constexpr::ToString(cart.Pos);
             }
         }
 
-        return UCoord{ 0, 0 };
+        return "Not Found";
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
+    TESTS() {
         std::vector<std::string> lines = {
-            R"(/->-\        )",
-            R"(|   |  /----\)",
-            R"(| /-+--+-\  |)",
-            R"(| | |  | v  |)",
-            R"(\-+-/  \-+--/)",
-            R"(  \------/   )"
-        };
+                R"(/->-\        )",
+                R"(|   |  /----\)",
+                R"(| /-+--+-\  |)",
+                R"(| | |  | v  |)",
+                R"(\-+-/  \-+--/)",
+                R"(  \------/   )"
+            };
 
-        if (Part1(lines) != UCoord{ 7, 3 }) return false;
+        if (PartOne(lines) != "{7,3}") return false;
 
         lines = {
             R"(/>-<\  )",
@@ -247,20 +201,8 @@ SOLUTION(2018, 13) {
             R"(  \<->/)"
         };
 
-        if (Part2(lines) != UCoord{ 6, 4 }) return false;
+        if (PartTwo(lines) != "{6,4}") return false;
 
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }

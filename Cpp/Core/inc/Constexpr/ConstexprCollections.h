@@ -75,6 +75,11 @@ namespace Constexpr {
         return collection;
     }
 
+    constexpr auto Where(auto collection, auto Pred) {
+        std::erase_if(collection, [&](const auto& e) { return !Pred(e); });
+        return collection;
+    }
+
     template<typename Key, typename Value>
     class SmallMap {
     public:

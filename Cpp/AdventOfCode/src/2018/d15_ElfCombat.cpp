@@ -2,439 +2,295 @@
 #include "Algorithms/AStar.h"
 
 SOLUTION(2018, 15) {
-    constexpr auto BookOrder = [](const RowCol& lhs, const RowCol& rhs) -> bool {
-        if (lhs.Row != rhs.Row) return lhs.Row < rhs.Row;
-        return lhs.Col < rhs.Col;
-    };
 
-    enum struct UnitType { Goblin, Elf };
-    struct Unit {
-        RowCol Pos;
-        s32 Hp = 200;
-        UnitType Type;
-        s32 Attack = 3;
+    using Grid = std::vector<std::string>;
+    using Hp = Constexpr::SmallMap<RowCol, s32>;
 
-        constexpr bool operator<(const Unit& other) const {
-            if (Pos.Row != other.Pos.Row) return Pos.Row < other.Pos.Row;
-            return Pos.Col < other.Pos.Col;
-        }
-    };
+    constexpr std::vector<RowCol> GetTargets(const Grid & grid, const RowCol unit, const std::vector<RowCol> units) {
+        char opposing = grid[unit.Row][unit.Col] == 'E' ? 'G' : 'E';
+        return Constexpr::Where(units, [&](const auto& u) { return grid[u.Row][u.Col] == opposing; });
+    }
 
-    class Grid {
-    public:
-        Grid(const std::vector<std::string>& lines, u32 elfPower) {
-            for (size_t row = 0; row < lines.size(); row++) {
-                std::vector<bool> gridLine;
-                for (size_t col = 0; col < lines[row].size(); col++) {
-                    auto c = lines[row][col];
-                    gridLine.push_back(c == '.');
-                    if (c == 'G' || c == 'E') {
-                        Unit unit;
-                        unit.Pos = { row, col };
-                        unit.Type = (c == 'G' ? UnitType::Goblin : UnitType::Elf);
-                        if (unit.Type == UnitType::Elf) {
-                            unit.Attack = elfPower;
-                        }
-                        units.push_back(unit);
-                    }
-                }
-                grid.push_back(gridLine);
+    constexpr bool TryFindMoveTarget(const Grid & grid, RowCol limits, const RowCol unit, const std::vector<RowCol>& targets, RowCol& outTarget, RowCol& outFirstStep) {
+        for (const auto& rc : targets) {
+            if (MDistance(unit, rc) == 1) {
+                outTarget = rc;
+                outFirstStep = unit;
+                return true;
             }
         }
 
-        void SortUnits() {
-            std::sort(units.begin(), units.end());
-        }
-
-        size_t GetUnitCount() const {
-            return units.size();
-        }
-
-        std::vector<RowCol> GetAvailableNeighbors(RowCol pos) const {
-            auto neighbors = GetDirectNeighbors(pos, GetLimits());
+        auto openSpaces = [&]() {
             std::vector<RowCol> result;
-            std::copy_if(neighbors.begin(), neighbors.end(), std::back_inserter(result), [&](RowCol potential) {
-                return IsAvailable(potential);
-                });
-
-            return result;
-        }
-
-        bool IsAvailable(RowCol pos) const {
-            return grid[pos.Row][pos.Col];
-        }
-
-        bool IsDead(size_t unit) const {
-            return units[unit].Hp <= 0;
-        }
-
-        bool BattleOver() const {
-            bool hasGoblin = false;
-            bool hasElf = false;
-            for (const auto& unit : units) {
-                if (unit.Hp > 0) {
-                    if (unit.Type == UnitType::Elf) hasElf = true;
-                    else hasGoblin = true;
-                }
-
-                if (hasElf && hasGoblin) return false;
-            }
-
-            return !(hasElf && hasGoblin);
-        }
-
-        bool ElvesWin() const {
-            for (const auto& unit : units) {
-                if (unit.Type == UnitType::Elf && unit.Hp <= 0) return false;
-            }
-            return true;
-        }
-
-        u32 GetRemainingHp() const {
-            u32 remainingHp = 0;
-            for (const auto& unit : units) {
-                remainingHp += std::max(0, unit.Hp);
-            }
-
-            return remainingHp;
-        }
-
-        RowCol GetLimits() const {
-            static RowCol limits = { grid.size() - 1, grid[0].size() - 1 };
-            return limits;
-        }
-
-        std::vector<size_t> GetTargets(size_t unitIndex) const {
-            const auto& unit = units[unitIndex];
-            std::vector<size_t> result;
-            for (size_t i = 0; i < units.size(); i++) {
-                if (unit.Type != units[i].Type && units[i].Hp > 0) result.push_back(i);
+            for (const auto& rc : targets) {
+                auto neighbors = GetDirectNeighbors(rc, limits);
+                auto toKeep = Constexpr::Where(neighbors, [&](const auto u) { return grid[u.Row][u.Col] == '.'; });
+                std::copy(toKeep.begin(), toKeep.end(), std::back_inserter(result));
             }
             return result;
-        }
+        }();
 
-        std::vector<RowCol> GetPath(RowCol fromPos, RowCol target) const {
-            /*
-            auto isCompleteFunc = [&target](const RowCol& pos) {
-                return pos == target;
-            };
+        std::sort(openSpaces.begin(), openSpaces.end(), [&](const RowCol& lhs, const RowCol& rhs) {
+            return MDistance(unit, lhs) < MDistance(unit, rhs);
+            });
 
-            auto costFunc = [](const RowCol&, const RowCol&) { return 1; };
-            auto heuristic = [&](const RowCol& pos) {
-                return static_cast<u32>(MDistance(pos, target));
-            };
-            */
-
-            auto neighborFunc = [&](const RowCol& pos) {
-                return GetAvailableNeighbors(pos);
-            };
-
-            return AStarMin<RowCol>(fromPos, target, neighborFunc);
-            //return AStar<RowCol>(fromPos, costFunc, AStarFuncs::TrySmallest, isCompleteFunc, heuristic, neighborFunc);
-        }
-
-        RowCol GetBestPos(const std::vector<RowCol>& neighbors, const std::vector<size_t>& distances) const {
-            size_t minPositiveDistance = 9999;
-            for (auto distance : distances) {
-                if (distance > 0 && distance < minPositiveDistance) {
-                    minPositiveDistance = distance;
+        auto startingPoints = Constexpr::Where(GetDirectNeighbors(unit, limits), [&](const RowCol& rc) { return grid[rc.Row][rc.Col] == '.'; });
+            
+        size_t shortestPath = 999;
+        std::vector<std::vector<RowCol>> paths;
+        for (const auto& start : startingPoints) {
+            for (const auto& space : openSpaces) {
+                if (MDistance(start, space) > shortestPath) break;
+                auto path = AStarMin<RowCol>(start, space, [&](const RowCol& pos) {
+                    return Constexpr::Where(GetDirectNeighbors(pos, limits), [&](const RowCol& rc) { return grid[rc.Row][rc.Col] == '.'; });
+                    });
+                if (path.size() > 0) {
+                    paths.push_back(path);
+                    shortestPath = std::min(shortestPath, path.size());
                 }
             }
-
-            std::vector<RowCol> closest;
-            for (auto i = 0; i < distances.size(); i++) {
-                if (distances[i] == minPositiveDistance) {
-                    closest.push_back(neighbors[i]);
-                }
-            }
-
-            std::sort(closest.begin(), closest.end());
-            return closest[0];
         }
 
-        bool TryFindNearestTargetSquare(size_t unitIndex, RowCol& outPos) const {
-            auto targets = GetTargets(unitIndex);
-            if (targets.empty()) return false;
+        if (paths.empty()) return false;
 
-            std::vector<RowCol> neighbors;
-            for (size_t targetIndex : targets) {
-                auto n = GetAvailableNeighbors(units[targetIndex].Pos);
-                std::copy(n.begin(), n.end(), std::back_inserter(neighbors));
-            }
-            if (neighbors.empty()) return false;
-
-            std::vector<size_t> distances;
-            for (auto pos : neighbors) {
-                distances.push_back(GetPath(units[unitIndex].Pos, pos).size());
-            }
-
-            if (Constexpr::FindMax(distances) == 0) return false;
-            outPos = GetBestPos(neighbors, distances);
-            return true;
-        }
-
-
-        std::vector<RowCol> GetPath(size_t fromIndex, size_t toIndex) const {
-            const auto& to = units[toIndex];
-            const auto& from = units[fromIndex];
-
-            /*
-            auto isCompleteFunc = [&to](const RowCol& pos) {
-                return MDistance(to.Pos, pos) == 1;
-            };
-
-            auto costFunc = [](const RowCol&, const RowCol&) { return 1; };
-            auto heuristic = [&](const RowCol& pos) {
-                auto mDist = static_cast<u32>(MDistance(pos, to.Pos));
-                if (pos.Row > from.Pos.Row) mDist += 3;
-                if (pos.Col > from.Pos.Col) mDist += 2;
-                if (pos.Col < from.Pos.Col) mDist += 1;
-                return mDist;
-            };
-            */
-
-            auto neighborFunc = [&](const RowCol& pos) {
-                return GetAvailableNeighbors(pos);
-            };
-
-            return AStarMin<RowCol>(from.Pos, to.Pos, neighborFunc);
-            //return AStar<RowCol>(from.Pos, costFunc, AStarFuncs::TrySmallest, isCompleteFunc, heuristic, neighborFunc);
-        }
-
-        RowCol GetFirstStep(size_t unitIndex, RowCol targetPos) {
-            auto& unit = units[unitIndex];
-            auto neighbors = GetAvailableNeighbors(unit.Pos);
-            if (neighbors.size() == 1) {
-                return neighbors[0];
-            }
-
-            std::vector<size_t> distances;
-            for (auto pos : neighbors) {
-                distances.push_back(GetPath(pos, targetPos).size());
-            }
-
-            return GetBestPos(neighbors, distances);
-        }
-
-        void Move(size_t unitIndex, RowCol targetPos) {
-            auto& unit = units[unitIndex];
-            auto move = GetFirstStep(unitIndex, targetPos);
-            grid[unit.Pos.Row][unit.Pos.Col] = true;
-            grid[move.Row][move.Col] = false;
-            unit.Pos = move;
-        }
-
-        void Attack(size_t attackerIndex, size_t targetIndex) {
-            const auto& attacker = units[attackerIndex];
-            auto& target = units[targetIndex];
-            target.Hp -= attacker.Attack;
-            if (target.Hp <= 0) {
-                grid[target.Pos.Row][target.Pos.Col] = true;
-            }
-        }
-
-        bool GetTarget(size_t unitIndex, size_t& targetIndex) {
-            const auto& attackerPos = units[unitIndex].Pos;
-            std::vector<size_t> realTargets;
-            auto targets = GetTargets(unitIndex);
-            std::copy_if(targets.begin(), targets.end(), std::back_inserter(realTargets), [&](const size_t& targetIndex) {
-                return units[targetIndex].Hp > 0 && MDistance(attackerPos, units[targetIndex].Pos) == 1;
-                });
-
-            if (realTargets.empty()) return false;
-
-            std::sort(realTargets.begin(), realTargets.end(), [&](size_t lhs, size_t rhs) {
-                if (units[lhs].Hp != units[rhs].Hp) {
-                    return units[lhs].Hp < units[rhs].Hp;
-                }
-                return units[lhs] < units[rhs];
-                });
-
-            targetIndex = realTargets[0];
-            return true;
-        }
-
-        void PrintState() {
-            for (size_t row = 0; row < grid.size(); row++) {
-                for (size_t col = 0; col < grid[row].size(); col++) {
-                    RowCol pos = { row, col };
-                    char icon = (grid[row][col] ? '.' : '#');
-                    for (const auto& unit : units) {
-                        if (unit.Pos == pos && unit.Hp > 0) {
-                            icon = unit.Type == UnitType::Elf ? 'E' : 'G';
-                            break;
-                        }
-                    }
-
-                    std::cout << icon;
-                }
-                std::cout << '\n';
-            }
-            std::cout << '\n';
-        }
-
-    private:
-        std::vector<std::vector<bool>> grid;
-        std::vector<Unit> units;
-    };
-
-    bool TryMove(size_t unit, Grid & grid) {
-        RowCol targetPos;
-        if (!grid.TryFindNearestTargetSquare(unit, targetPos)) {
-            return false;
-        }
-        grid.Move(unit, targetPos);
+        std::sort(paths.begin(), paths.end(), [](const auto& lhs, const auto& rhs) { 
+            return lhs.size() != rhs.size() ?
+                lhs.size() < rhs.size() :
+                lhs.back() != rhs.back() ?
+                lhs.back() < rhs.back() :
+                lhs[0] < rhs[0];
+            });
+        
+        outTarget = paths[0].back();
+        outFirstStep = paths[0][0];
         return true;
     }
 
-    auto Battle(Grid & grid) {
-        const size_t unitCount = grid.GetUnitCount();
-        u32 rounds = 0;
-        bool battleOver = false;
+    constexpr RowCol FindAttackTarget(const Grid& grid, const Hp& hp, const RowCol& unit, const RowCol& limits) {
+        auto neighbors = GetDirectNeighbors(unit, limits);
+        std::sort(neighbors.begin(), neighbors.end());
+        size_t lowestLife = 999;
+        RowCol result{ 0, 0 };
+        for (const auto& n : neighbors) {
+            //let's not kill our friends
+            if (hp.contains(n) && grid[n.Row][n.Col] != grid[unit.Row][unit.Col] && hp.at(n) < lowestLife) {
+                lowestLife = hp.at(n);
+                result = n;
+            }
+        }
+        return result;
+    }
 
-        while (true) {
-            grid.SortUnits();
-            for (size_t unit = 0; unit < unitCount; unit++) {
-                if (grid.IsDead(unit)) continue;
-                size_t targetIndex = 0;
-                if (grid.GetTarget(unit, targetIndex)) {
-                    grid.Attack(unit, targetIndex);
+    constexpr bool TickRound(Grid& grid, Hp& hp, RowCol limits, s32 elfAttack) {
+        auto units = hp.GetKeys();
+        std::sort(units.begin(), units.end());
+        RowCol moveTarget;
+        RowCol firstStep;
+        bool canAttack = false;
+        char unitType = '.';
+
+        for (auto& unit : units) {
+            canAttack = false;
+            unitType = grid[unit.Row][unit.Col];
+            if (unitType == '.') continue;  //this unit has been killed
+            auto targets = GetTargets(grid, unit, units);
+            if (targets.empty()) return true; //battle over
+
+            if (TryFindMoveTarget(grid, limits, unit, targets, moveTarget, firstStep)) {
+                if (firstStep == unit) {
+                    canAttack = true;
                 }
                 else {
-                    if (TryMove(unit, grid)) {
-                        if (grid.GetTarget(unit, targetIndex)) {
-                            grid.Attack(unit, targetIndex);
-                        }
-                    }
-                    else if (grid.BattleOver()) {
-                        battleOver = true;
-                        break;
-                    }
+                    std::swap(grid[unit.Row][unit.Col], grid[firstStep.Row][firstStep.Col]);
+                    hp[firstStep] = hp[unit];
+                    hp.erase(unit);
+                    unit = firstStep;
+                    canAttack = firstStep == moveTarget;
                 }
             }
-            if (battleOver) break;
+            if (canAttack) {
+                auto attackTarget = FindAttackTarget(grid, hp, unit, limits);
+                hp[attackTarget] -= unitType == 'E' ? elfAttack : 3;
+                if (hp[attackTarget] <= 0) {
+                    hp.erase(attackTarget);
+                    grid[attackTarget.Row][attackTarget.Col] = '.';
+                }
+            }
+        }
+        return false;
+    }
+
+    constexpr std::pair<size_t, size_t> CountUnits(const Grid& grid) {
+        size_t elfCount = 0;
+        size_t goblinCount = 0;
+        for (const auto& line : grid) {
+            elfCount += std::count(line.begin(), line.end(), 'E');
+            goblinCount += std::count(line.begin(), line.end(), 'G');
+        }
+
+        return { elfCount, goblinCount };
+    }
+
+    constexpr std::string PrintState(const Grid& grid, const Hp& hp) {
+        std::string result;
+        for (size_t row = 0; row < grid.size(); row++) {
+            std::string rowMap;
+            std::string rowHp;
+            for (size_t col = 0; col < grid[row].size(); col++) {
+                rowMap.push_back(grid[row][col]);
+                RowCol rc = { row, col };
+                if (hp.contains(rc)) {
+                    rowHp += "(" + Constexpr::ToString(hp.at(rc)) + ") ";
+                }
+            }
+            result += rowMap + " " + rowHp + "\n";
+        }
+        return result;
+    }
+
+    constexpr size_t Battle(Grid& grid, Hp& hp, s32 elfAttack = 3) {
+        size_t rounds = 0;
+        auto [initialElves, initialGoblins] = CountUnits(grid);
+        RowCol limits = { grid.size() - 1, grid[0].size() - 1 };
+
+        while (true) {
+            auto battleCompleted = TickRound(grid, hp, limits, elfAttack);
+            if (elfAttack > 3) {
+                auto [elfCount, goblinCount] = CountUnits(grid);
+                if (elfCount < initialElves) return 0;
+            }
+            if (battleCompleted) break;
             rounds++;
         }
 
-        return rounds * grid.GetRemainingHp();
+        return rounds;
     }
+    
 
-    auto Part1(const std::vector<std::string>&lines) {
-        Grid grid(lines, 3);
-
-        std::cout << "Initial\n";
-        grid.PrintState();
-
-        auto result = Battle(grid);
-
-        std::cout << "Final\n";
-        grid.PrintState();
-        std::cout << '\n';
-
-        return result;
-    }
-
-    auto Part2(const std::vector<std::string>&lines) {
-        u32 result = 0;
-
-        for (auto i = 4; i < 20; i++) {
-            Grid grid(lines, i);
-            result = Battle(grid);
-
-            if (grid.ElvesWin()) {
-                break;
+    constexpr Hp GetHp(const Grid& grid) {
+        Hp hp;
+        Constexpr::ApplyToMatrixIndex(grid, [&](size_t row, size_t col) {
+            if (grid[row][col] >= 'A') {
+                hp[{row, col}] = 200;
             }
-        }
+        });
 
-        return result;
-    }
-
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
-        std::vector<std::string> lines = {
-            "#######",
-            "#.G...#",
-            "#...EG#",
-            "#.#.#G#",
-            "#..G#E#",
-            "#.....#",
-            "#######"
-        };
-        if (Part1(lines) != 27730) return false;
-
-        lines = {
-            "#######",
-            "#G..#E#",
-            "#E#E.E#",
-            "#G.##.#",
-            "#...#E#",
-            "#...E.#",
-            "#######"
-        };
-
-        if (Part1(lines) != 36334) return false;
-
-        lines = {
-            "#######",
-            "#E..EG#",
-            "#.#G.E#",
-            "#E.##E#",
-            "#G..#.#",
-            "#..E#.#",
-            "#######"
-        };
-        if (Part1(lines) != 39514) return false;
-
-        lines = {
-            "#######",
-            "#E.G#.#",
-            "#.#G..#",
-            "#G.#.G#",
-            "#G..#.#",
-            "#...E.#",
-            "#######"
-        };
-        if (Part1(lines) != 27755) return false;
-
-        lines = {
-            "#######",
-            "#.E...#",
-            "#.#..G#",
-            "#.###.#",
-            "#E#G#G#",
-            "#...#G#",
-            "#######"
-        };
-        if (Part1(lines) != 28944) return false;
-
-        lines = {
-            "#########",
-            "#G......#",
-            "#.E.#...#",
-            "#..##..G#",
-            "#...##..#",
-            "#...#...#",
-            "#.G...G.#",
-            "#.....G.#",
-            "#########"
-        };
-        if (Part1(lines) != 18740) return false;
-        return true;
+        return hp;
     }
 
     PART_ONE() {
-        return lines[0];
+        Grid grid = lines;
+        auto hp = GetHp(grid);
+        auto rounds = Battle(grid, hp);
+        auto hpValues = hp.GetValues();
+        auto remainingHp = std::accumulate(hpValues.begin(), hpValues.end(), 0);
+
+        return Constexpr::ToString(rounds * remainingHp);
     }
 
     PART_TWO() {
-        return lines[0];
+        auto initialGrid = lines;
+        auto initialHp = GetHp(initialGrid);
+        for (auto i = 15; i < 20; i++) {
+            Grid grid = initialGrid;
+            Hp hp = initialHp;
+            auto rounds = Battle(grid, hp, i);
+            if (rounds > 0) {
+                auto hpValues = hp.GetValues();
+                auto remainingHp = std::accumulate(hpValues.begin(), hpValues.end(), 0);
+                return Constexpr::ToString(rounds * remainingHp);
+            }
+        }
+        return "Not Found";
+    }
+
+    constexpr bool TestMove(const std::vector<std::string>& initial, const std::vector<std::string>& expected) {
+        auto grid = initial;
+        RowCol limits = { grid.size() - 1, grid[0].size() - 1 };
+        auto GetUnits = [&]() {
+            std::vector<RowCol> units;
+            Constexpr::ApplyToMatrixIndex(grid, [&](size_t row, size_t col) {
+                if (grid[row][col] >= 'A') {
+                    units.push_back({ row, col });
+                }
+                });
+            return units;
+        };
+        auto Move = [&](RowCol& from, RowCol to) {
+            std::swap(grid[from.Row][from.Col], grid[to.Row][to.Col]);
+            from = to;
+        };
+
+        auto units = GetUnits();
+        std::sort(units.begin(), units.end());
+        RowCol moveTarget, firstStep;
+        for (auto& unit : units) {
+            auto targets = GetTargets(grid, unit, units);
+            if (TryFindMoveTarget(grid, limits, unit, targets, moveTarget, firstStep)) {
+                Move(unit, firstStep);
+            }
+        }
+
+        return grid == expected;
+    }
+
+    constexpr bool TestBattle(const std::vector<std::string>& initial, const std::vector<std::string>& expected, const Hp& expectedHp, const size_t expectedRounds) {
+        Grid grid = initial;
+        auto hp = GetHp(grid);
+        auto rounds = Battle(grid, hp, 3);
+
+        if (rounds != expectedRounds) return false;
+        if (grid != expected) return false;
+        if (hp.size() != expectedHp.size()) return false;
+
+        for (const auto& [key, value] : expectedHp) {
+            if (!hp.contains(key)) return false;
+            if (hp.at(key) != value) return false;
+        }
+
+        return true;
     }
 
     TESTS() {
+        if (!TestMove({ "###", "#G#", "#.#", "#E#", "###" }, { "###", "#.#", "#G#", "#E#", "###" })) return false;
+        if (!TestMove({ "######", "#.E..#", "#.##.#", "#.##G#", "#G####", "######" }, { "######", "#..E.#", "#.##G#", "#G##.#", "#.####", "######" })) return false;
+
+        if(!TestBattle(
+            { "#######", "#.G...#", "#...EG#", "#.#.#G#", "#..G#E#", "#.....#","#######" },
+            { "#######", "#G....#", "#.G...#", "#.#.#G#", "#...#.#", "#....G#", "#######" },
+            { {{1,1}, 200}, {{2,2}, 131}, {{3,5}, 59}, {{5,5}, 200 }},
+            47)) return false;
+
+        if (!TestBattle(
+            { "#######", "#G..#E#", "#E#E.E#", "#G.##.#", "#...#E#", "#...E.#", "#######" },
+            { "#######", "#...#E#", "#E#...#", "#.E##.#", "#E..#E#", "#.....#", "#######" },
+            { {{1,5}, 200}, {{2,1}, 197}, {{3,2}, 185}, {{4,1}, 200}, {{4,5}, 200 } },
+            37)) return false;
+        
+        if (!TestBattle(
+            { "#######", "#E..EG#", "#.#G.E#", "#E.##E#", "#G..#.#", "#..E#.#", "#######" },
+            { "#######", "#.E.E.#", "#.#E..#", "#E.##.#", "#.E.#.#", "#...#.#", "#######" },
+            { {{1,2}, 164}, {{1,4}, 197}, {{2,3}, 200}, {{3,1}, 98}, {{4,2}, 200} },
+            46)) return false;
+
+        if (!TestBattle(
+            { "#######", "#E.G#.#", "#.#G..#", "#G.#.G#", "#G..#.#", "#...E.#", "#######" },
+            { "#######", "#G.G#.#", "#.#G..#", "#..#..#", "#...#G#", "#...G.#", "#######" },
+            { {{1,1}, 200}, {{1,3}, 98}, {{2,3}, 200}, {{4,5}, 95}, {{5,4}, 200} },
+            35)) return false;
+
+
+        if (!TestBattle(
+            { "#######", "#.E...#", "#.#..G#", "#.###.#", "#E#G#G#", "#...#G#", "#######" },
+            { "#######", "#.....#", "#.#G..#", "#.###.#", "#.#.#.#", "#G.G#G#", "#######" },
+            { {{2,3}, 200}, {{5,1}, 98}, {{5,3}, 38}, {{5,5}, 200} },
+            54)) return false;
+
+        if (!TestBattle(
+            { "#########", "#G......#", "#.E.#...#", "#..##..G#", "#...##..#", "#...#...#", "#.G...G.#", "#.....G.#", "#########" },
+            { "#########", "#.G.....#", "#G.G#...#", "#.G##...#", "#...##..#", "#.G.#...#", "#.......#", "#.......#", "#########" },
+            { {{1,2}, 137}, {{2,1}, 200}, {{2,3}, 200}, {{3,2}, 200}, {{5,2}, 200} },
+            20)) return false;
         return true;
     }
 }

@@ -78,11 +78,12 @@ void RunAll() {
     }
 }
 
+//maybe look closer at this for more shenanigans: https://stackoverflow.com/questions/410980/include-a-text-file-in-a-c-program-as-a-char
 
 int main(int, char**) {
     //RunAll();
     //RunYear(2018);
-    RunOne(2018, 11);
+    RunOne(2018, 15);
     //RunLatest();
     return 0;
 }

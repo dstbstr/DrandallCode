@@ -155,8 +155,7 @@ struct RowCol {
         return Row == rc.Row && Col == rc.Col;
     }
     constexpr bool operator<(const RowCol& rc) const {
-        return Row < rc.Row ? true : Row > rc.Row ? false :
-            Col < rc.Col ? true : false;
+        return Row != rc.Row ? Row < rc.Row : Col < rc.Col;
     }
     friend std::ostream& operator<<(std::ostream& stream, const RowCol& rc) {
         stream << "{" << rc.Row << "," << rc.Col << "}";
