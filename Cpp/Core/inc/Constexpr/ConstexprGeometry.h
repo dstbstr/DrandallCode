@@ -35,9 +35,19 @@ struct Coord {
         Y += c.Y;
         return *this;
     }
-    constexpr Coord& operator+(const Coord& c) {
+    constexpr Coord operator+(const Coord& c) {
         Coord result{ X, Y };
         return result += c;
+    }
+
+    constexpr Coord& operator-=(const Coord& c) {
+        X -= c.X;
+        Y -= c.Y;
+        return *this;
+    }
+    constexpr Coord operator-(const Coord& c) {
+        Coord result{ X, Y };
+        return result -= c;
     }
 
     friend std::ostream& operator<<(std::ostream& stream, const Coord& coord) {
@@ -82,6 +92,26 @@ struct UCoord {
     }
     constexpr bool operator<(const UCoord& c) const {
         return X == c.X ? Y < c.Y : X < c.X;
+    }
+
+    constexpr UCoord& operator+=(const UCoord& c) {
+        X += c.X;
+        Y += c.Y;
+        return *this;
+    }
+    constexpr UCoord operator+(const UCoord& c) {
+        UCoord result{ X, Y };
+        return result += c;
+    }
+
+    constexpr UCoord& operator-=(const UCoord& c) {
+        X -= c.X;
+        Y -= c.Y;
+        return *this;
+    }
+    constexpr UCoord operator-(const UCoord& c) {
+        UCoord result{ X, Y };
+        return result -= c;
     }
 
     friend std::ostream& operator<<(std::ostream& stream, const UCoord& coord) {
@@ -161,8 +191,23 @@ struct RowCol {
         stream << "{" << rc.Row << "," << rc.Col << "}";
         return stream;
     }
+    constexpr RowCol& operator+=(const RowCol& rc) {
+        Row += rc.Row;
+        Col += rc.Col;
+        return *this;
+    }
+    constexpr RowCol operator+(const RowCol& rc) const {
+        auto result = *this;
+        return result += rc;
+    }
+    constexpr RowCol& operator-=(const RowCol& rc) {
+        Row -= rc.Row;
+        Col -= rc.Col;
+        return *this;
+    }
     constexpr RowCol operator-(const RowCol& rc) const {
-        return RowCol{ Row - rc.Row, Col - rc.Col };
+        auto result = *this;
+        return result -= rc;
     }
 };
 

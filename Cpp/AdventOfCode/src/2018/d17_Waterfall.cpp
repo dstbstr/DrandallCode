@@ -3,240 +3,188 @@
 
 SOLUTION(2018, 17) {
     static constexpr size_t MaxX = 700;
-    static constexpr size_t MaxY = 2000;
+    static constexpr size_t MaxY = 1700;
+    using Map = std::array<std::array<char, MaxX>, MaxY>;
 
-    using Map = std::bitset<MaxY* MaxX>;
+    struct Wall {
+        size_t StartX{ 0 };
+        size_t EndX{ 0 };
+        size_t StartY{ 0 };
+        size_t EndY{ 0 };
+    };
 
-    void Fill(UCoord coord, Map & map) {
-        map[coord.Y * MaxX + coord.X] = true;
-    }
-
-    constexpr bool IsFilled(UCoord coord, const Map & map) {
-        return map[coord.Y * MaxX + coord.X];
-    }
-
-    constexpr UCoord GetMin(const Map & walls) {
-        UCoord min{ MaxX, MaxY };
-        for (u32 x = 0; x < MaxX; x++) {
-            for (u32 y = 0; y < MaxY; y++) {
-                UCoord pos = { x, y };
-                if (IsFilled(pos, walls)) {
-                    min.X = std::min(min.X, pos.X);
-                    min.Y = std::min(min.Y, pos.Y);
-                }
-            }
-        }
-
-        return min;
-    }
-
-    constexpr UCoord GetMax(const Map & walls) {
-        UCoord max{ 0, 0 };
-        for (u32 x = 0; x < MaxX; x++) {
-            for (u32 y = 0; y < MaxY; y++) {
-                UCoord pos = { x, y };
-                if (IsFilled(pos, walls)) {
-                    max.X = std::max(max.X, pos.X);
-                    max.Y = std::max(max.Y, pos.Y);
-                }
-            }
-        }
-
-        return max;
-    }
-
-    void ParseLine(const std::string & line, Map & map) {
+    constexpr Wall ParseWall(const std::string & line) {
         auto split = Constexpr::Split(line, ", ");
         auto lhs = Constexpr::Split(split[0], "=");
         auto rhs = Constexpr::Split(split[1], "=");
         auto range = Constexpr::Split(rhs[1], "..");
 
-        UCoord coord;
+        Wall wall;
         if (lhs[0][0] == 'x') {
-            Constexpr::ParseNumber(lhs[1], coord.X);
+            Constexpr::ParseNumber(lhs[1], wall.StartX);
+            wall.EndX = wall.StartX;
+            Constexpr::ParseNumber(range[0], wall.StartY);
+            Constexpr::ParseNumber(range[1], wall.EndY);
         }
         else {
-            Constexpr::ParseNumber(lhs[1], coord.Y);
+            Constexpr::ParseNumber(lhs[1], wall.StartY);
+            wall.EndY = wall.StartY;
+            Constexpr::ParseNumber(range[0], wall.StartX);
+            Constexpr::ParseNumber(range[1], wall.EndX);
         }
 
-        u32 start, end;
-        Constexpr::ParseNumber(range[0], start);
-        Constexpr::ParseNumber(range[1], end);
-        for (; start <= end; start++) {
-            if (rhs[0][0] == 'x') {
-                coord.X = start;
-            }
-            else {
-                coord.Y = start;
-            }
+        return wall;
+    }
 
-            Fill(coord, map);
+    constexpr void InitMap(const std::vector<std::string>&lines, Map & outMap) {
+        for (auto& row : outMap) {
+            std::fill(row.begin(), row.end(), '.');
+        }
+        auto walls = ParseLines(lines, ParseWall);
+        for (const auto& wall : walls) {
+            for (auto y = wall.StartY; y <= wall.EndY; y++) {
+                for (auto x = wall.StartX; x <= wall.EndX; x++) {
+                    outMap[y][x] = '#';
+                }
+            }
         }
     }
 
-    Map ParseLines(const std::vector<std::string>&lines) {
-        Map result;
-        for (const auto& line : lines) {
-            ParseLine(line, result);
+    constexpr std::pair<RowCol, RowCol> FindLimits(const Map& map) {
+        size_t minRow{ 999 }, maxRow{ 0 }, minCol{ 999 }, maxCol{ 0 };
+        for (size_t row = 0; row < map.size(); row++) {
+            for (size_t col = 0; col < map[row].size(); col++) {
+                if (map[row][col] != '.') {
+                    minRow = std::min(minRow, row);
+                    maxRow = std::max(maxRow, row);
+                    minCol = std::min(minCol, col);
+                    maxCol = std::max(maxCol, col);
+                }
+            }
         }
+
+        return std::make_pair<RowCol, RowCol>({minRow, minCol}, {maxRow, maxCol});
+    }
+
+    static std::string PreviousLogLine;
+    constexpr void PrintState(const Map& map) {
+        auto [min, max] = FindLimits(map);
+
+        std::vector<std::string> logLines;
+        for (size_t row = min.Row; row <= max.Row; row++) {
+            std::string logLine;
+            for (size_t col = min.Col; col <= max.Col; col++) {
+                logLine.push_back(map[row][col]);
+            }
+            logLines.push_back(logLine);
+        }
+
+        auto lines = Constexpr::JoinVec("\n", logLines);
+        PreviousLogLine = lines;
+        GET_LOGS().push_back(lines);
+    }
+
+    constexpr auto Solve(const std::vector<std::string>&lines) {
+        auto* mapPtr = new Map();
+        auto& map = *mapPtr;
+
+        InitMap(lines, map);
+        auto [min, max] = FindLimits(map);
+
+        auto start = RowCol{ 0, 500 };
+        std::vector<RowCol> current {start};
+        map[start.Row][start.Col] = '.';
+        auto down = RowCol{ 1, 0 };
+
+        while (!current.empty()) {
+            auto pos = current.back();
+            current.pop_back();
+
+            auto& dChar = map[pos.Row + 1][pos.Col];
+            auto dPos = pos + down;
+            if(dChar == '.') {
+                if (dPos.Row <= max.Row) {
+                    if (dPos.Row >= min.Row) {
+                        dChar = '|';
+                    }
+                    current.push_back(dPos);
+                }
+                continue;
+            }
+            else if (dChar == '|') continue;
+
+            auto Fill = [&](s8 delta, size_t limit) {
+                for (auto col = pos.Col; col != limit; col += delta) {
+                    auto& currChar = map[pos.Row][col];
+                    auto d = RowCol{ pos.Row + 1, col };
+                    auto& nextChar = map[d.Row][d.Col];
+                    if (currChar == '#') return true;
+
+                    currChar = '|';
+                    if (nextChar == '.') {
+                        nextChar = '|';
+                        current.push_back(d);
+                        return false;
+                    }
+                    else if (nextChar == '|') {
+                        return false;
+                    }
+                }
+                return false;
+            };
+
+            auto supported = Fill(-1, 0);
+            supported = Fill(1, 0) && supported;
+
+            if (supported) {
+                for (auto col = pos.Col; col > 0; col--) {
+                    auto n = RowCol{ pos.Row, col };
+                    if (map[n.Row][n.Col] != '#') {
+                        map[n.Row][n.Col] = '~';
+                    }
+                    else {
+                        break;
+                    }
+                }
+                for (auto col = pos.Col + 1; col < MaxX; col++) {
+                    auto n = RowCol{ pos.Row, col };
+                    if (map[n.Row][n.Col] != '#') {
+                        map[n.Row][n.Col] = '~';
+                    }
+                    else {
+                        break;
+                    }
+                }
+
+                current.push_back({ pos.Row - 1, pos.Col });
+            }
+            
+        }
+
+        std::pair<size_t, size_t> result;
+        for (const auto& row : map) {
+            result.first += std::count(row.begin(), row.end(), '~');
+            result.second += std::count(row.begin(), row.end(), '|');
+        }
+        delete mapPtr;
 
         return result;
     }
 
-    constexpr bool CanMove(const UCoord & pos, const Map & walls, const Map & water) {
-        if (pos.Y >= MaxY || pos.Y < 0 || pos.X == 0 || pos.X >= MaxX) return false;
-        return !IsFilled(pos, walls) && !IsFilled(pos, water);
+
+    PART_ONE() {
+        auto [lhs, rhs] = Solve(lines);
+
+        return Constexpr::ToString(lhs + rhs);
     }
 
-    constexpr bool CanStop(const UCoord & pos, const Map & walls, const Map & water) {
-        if (pos.X == 0 || pos.X == MaxX || pos.Y == 0 || pos.Y == MaxY) return false;
+    PART_TWO() {
+        auto [lhs, rhs] = Solve(lines);
 
-        bool right = false, left = false;
-        for (auto x = pos.X; x < MaxX; x++) {
-            if (IsFilled({ x, pos.Y }, walls)) {
-                right = true;
-                break;
-            }
-            else if (!IsFilled({ x, pos.Y + 1 }, walls) && !IsFilled({ x, pos.Y + 1 }, water)) {
-                return false;
-            }
-        }
-        if (!right) return false;
-        for (auto x = pos.X; x > 0; x--) {
-            if (IsFilled({ x, pos.Y }, walls)) {
-                left = true;
-                break;
-            }
-            else if (!IsFilled({ x, pos.Y + 1 }, walls) && !IsFilled({ x, pos.Y + 1 }, water)) {
-                return false;
-            }
-        }
-        return left;
+        return Constexpr::ToString(lhs);
     }
 
-    constexpr UCoord GoDown(const UCoord & pos) {
-        return { pos.X, pos.Y + 1 };
-    }
-    constexpr UCoord GoLeft(const UCoord & pos) {
-        return { pos.X - 1, pos.Y };
-    }
-    constexpr UCoord GoRight(const UCoord & pos) {
-        return { pos.X + 1, pos.Y };
-    }
-
-    bool FloodFill(const UCoord & start, const Map & walls, Map & water) {
-        static auto max = GetMax(walls);
-
-        std::vector<UCoord> current;
-        std::unordered_set<UCoord> seen;
-        current.push_back(start);
-        seen.insert(start);
-        bool filled = false;
-        while (!current.empty()) {
-            auto pos = current.back();
-            current.pop_back();
-            seen.insert(pos);
-            if (CanMove(GoDown(pos), walls, water)) {
-                if (pos.Y < max.Y) {
-                    current.push_back(GoDown(pos));
-                }
-            }
-            else {
-                if (CanStop(pos, walls, water)) {
-                    Fill(pos, water);
-                    filled = true;
-                }
-
-                auto left = GoLeft(pos);
-                auto right = GoRight(pos);
-                if (seen.find(left) == seen.end() && CanMove(left, walls, water)) {
-                    current.push_back(left);
-                }
-                if (seen.find(right) == seen.end() && CanMove(right, walls, water)) {
-                    current.push_back(right);
-                }
-            }
-        }
-
-        return filled;
-    }
-
-    size_t CountRunoff(UCoord & start, const Map & walls, const Map & water) {
-        static auto max = GetMax(walls);
-        static auto min = GetMin(walls);
-
-        std::vector<UCoord> current;
-        std::unordered_set<UCoord> seen;
-        current.push_back(start);
-
-        while (!current.empty()) {
-            auto pos = current.back();
-            current.pop_back();
-            if (pos.Y >= min.Y) {
-                seen.insert(pos);
-            }
-            if (CanMove(GoDown(pos), walls, water)) {
-                if (pos.Y < max.Y) {
-                    current.push_back(GoDown(pos));
-                }
-            }
-            else {
-                auto left = GoLeft(pos);
-                auto right = GoRight(pos);
-                if (seen.find(left) == seen.end() && CanMove(left, walls, water)) {
-                    current.push_back(left);
-                }
-                if (seen.find(right) == seen.end() && CanMove(right, walls, water)) {
-                    current.push_back(right);
-                }
-            }
-        }
-
-        return seen.size();
-    }
-
-    void PrintState(const Map & walls, const Map & water) {
-        auto min = GetMin(walls);
-        auto max = GetMax(walls);
-
-        for (auto y = min.Y; y <= max.Y; y++) {
-            for (auto x = min.X; x <= max.X; x++) {
-                UCoord pos = { x, y };
-                if (IsFilled(pos, walls)) std::cout << '#';
-                else if (IsFilled(pos, water)) std::cout << '~';
-                else std::cout << '.';
-            }
-            std::cout << '\n';
-        }
-        std::cout << '\n';
-    }
-
-    auto Part1(const std::vector<std::string>&lines) {
-        auto walls = ParseLines(lines);
-        Map water;
-        UCoord source = { 500, 0 };
-        while (FloodFill(source, walls, water)) {
-            //PrintState(walls, water);
-        }
-
-        return water.count() + CountRunoff(source, walls, water);
-    }
-
-    auto Part2(const std::vector<std::string>&lines) {
-        auto walls = ParseLines(lines);
-        Map water;
-        UCoord source = { 500, 0 };
-        while (FloodFill(source, walls, water));
-
-        return water.count();
-    }
-
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
+    TESTS() {
         std::vector<std::string> lines = {
             "x=495, y=2..7",
             "y=7, x=495..501",
@@ -248,19 +196,19 @@ SOLUTION(2018, 17) {
             "y=13, x=498..504"
         };
 
-        if (Part1(lines) != 57) return false;
-        return true;
-    }
+        if (PartOne(lines) != "57") return false;
+        if (PartTwo(lines) != "29") return false;
+        
+        lines = {
+            "x=499, y=3..4",
+            "y=4, x=499..501",
+            "x=501, y=3..4",
+            "x=494, y=6..8",
+            "y=8, x=494..506",
+            "x=506, y=6..8"
+        };
 
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
+        if (PartOne(lines) != "53") return false;
         return true;
     }
 }

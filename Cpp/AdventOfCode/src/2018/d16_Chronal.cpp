@@ -56,31 +56,19 @@ SOLUTION(2018, 16) {
         return result;
     }
 
-    constexpr bool TryParseTriplet(const std::vector<std::string>&lines, size_t & currentLine, Triplet & result) {
-        auto before = lines[currentLine++];
-        auto instruction = lines[currentLine++];
-        auto after = lines[currentLine++];
-        currentLine++;
-
-        if (before == "") return false;
-        result.Before = ParseRegisters(before);
-        result.After = ParseRegisters(after);
-        result.Instructions = ParseInstruction(instruction);
-
-        return true;
+    constexpr Triplet ParseTriplet(const std::vector<std::string>& lines) {
+        Triplet result;
+        result.Before = ParseRegisters(lines[0]);
+        result.Instructions = ParseInstruction(lines[1]);
+        result.After = ParseRegisters(lines[2]);
+        return result;
     }
 
-    constexpr std::vector<Triplet> GetAllTriplets(const std::vector<std::string>&lines) {
+    constexpr std::vector<Triplet> GetAllTriplets(const std::vector<std::vector<std::string>>& groups) {
         std::vector<Triplet> result;
-        size_t currentLine = 0;
-        while (true) {
-            Triplet triplet;
-            if (TryParseTriplet(lines, currentLine, triplet)) {
-                result.push_back(triplet);
-            }
-            else {
-                break;
-            }
+        for (const auto& group : groups) {
+            if (group.size() == 0) break;
+            result.push_back(ParseTriplet(group));
         }
 
         return result;
@@ -100,20 +88,7 @@ SOLUTION(2018, 16) {
         return result;
     }
 
-    auto Part1(const std::vector<std::string>&lines) {
-        u32 result = 0;
-
-        auto triplets = GetAllTriplets(lines);
-        for (const auto& triplet : triplets) {
-            if (GetMatchingCodes(triplet).size() > 2) {
-                result++;
-            }
-        }
-
-        return result;
-    }
-
-    constexpr void OnSingle(std::array<std::array<bool, 16>, 16>&remaining, std::array<size_t, 16>&remainingCounts, size_t opId) {
+    constexpr void OnSingle(std::array<std::array<bool, 16>, 16>&remaining, std::array<size_t, 16>& remainingCounts, size_t opId) {
         size_t opCode = 0;
         for (auto i = 0; i < 16; i++) {
             if (remaining[opId][i]) {
@@ -135,7 +110,7 @@ SOLUTION(2018, 16) {
         }
     }
 
-    constexpr Ops FindOps(const std::vector<Triplet>&triplets) {
+    constexpr Ops FindOps(const std::vector<Triplet>& triplets) {
         std::array<std::array<bool, 16>, 16> remaining;
         std::array<bool, 16> initial;
         initial.fill(true);
@@ -172,14 +147,9 @@ SOLUTION(2018, 16) {
         return result;
     }
 
-    constexpr s32 RunProgram(const std::vector<std::string>&lines, const Ops & ops) {
-        size_t currentLine = 0;
-        while (true) {
-            if (lines[currentLine++] == "" && lines[currentLine++] == "" && lines[currentLine++] == "") break;
-        }
-
+    constexpr s32 RunProgram(const std::vector<std::string>& lines, const Ops & ops) {
         Registers regs = { 0, 0, 0, 0 };
-        for (; currentLine < lines.size(); currentLine++) {
+        for (size_t currentLine = 0; currentLine < lines.size(); currentLine++) {
             auto [i, a, b, c] = ParseInstruction(lines[currentLine]);
             Apply(ops[i], a, b, c, regs);
         }
@@ -187,43 +157,34 @@ SOLUTION(2018, 16) {
         return regs[0];
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
-        auto triplets = GetAllTriplets(lines);
+    PART_ONE() {
+        auto groups = SplitInputIntoGroups(lines);
+        auto triplets = GetAllTriplets(groups);
+
+        auto res = std::count_if(triplets.begin(), triplets.end(), [](const Triplet& t) { return GetMatchingCodes(t).size() > 2; });
+        return Constexpr::ToString(res);
+    }
+
+    PART_TWO() {
+        auto groups = SplitInputIntoGroups(lines);
+        auto triplets = GetAllTriplets(groups);
         auto ops = FindOps(triplets);
 
-        return RunProgram(lines, ops);
+        return Constexpr::ToString(RunProgram(groups.back(), ops));
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
+    TESTS() {
         std::vector<std::string> lines = {
             "Before: [3, 2, 1, 1]",
             "9 2 1 2",
             "After:  [3, 2, 2, 1]"
         };
-        Triplet triplet;
-        size_t currentLine = 0;
-        if (!TryParseTriplet(lines, currentLine, triplet)) return false;
+        Triplet triplet = ParseTriplet(lines);
+        
         if (triplet.Before != Registers{ 3, 2, 1, 1 }) return false;
         if (triplet.After != Registers{ 3, 2, 2, 1 }) return false;
         if (triplet.Instructions != std::array<u8, 4>{9, 2, 1, 2}) return false;
 
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }
