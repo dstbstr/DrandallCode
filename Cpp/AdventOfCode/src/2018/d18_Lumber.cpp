@@ -1,136 +1,130 @@
 #include "2018/d18_Lumber.h"
+#include "Algorithms/FloydCycle.h"
 
 SOLUTION(2018, 18) {
-    enum struct GroundType { Open, Trees, Lumber };
+
+    /*
+    ______
+    _...._
+    _...._
+    _...._
+    _...._
+    ______
+    
+    _______....__....__....__...._______
+    TL = C - 7
+    T = C - 6
+    TR = C - 5
+    L = C - 1
+    R = C + 1
+    BL = C + 5
+    B = C + 6
+    BR = C + 7
+    
+    C = 7, TL = 0, T = 1, TR = 2 L = 6 R = 8 BL = 12 B = 13 BR = 14
+    {{}, {}, {}, {}, {}, {}, {}, {0, 1, 2, 6, 8, 12, 13, 14}, {1,2,3,7,9,13,14,15}, {2,3,4,8,10,14,15,16}, {3,4,5,9,11,15,16,17}, {}, {}, 
+    */
 
     template<size_t Rows, size_t Cols>
-    using Map = std::array<std::array<GroundType, Cols>, Rows>;
-
-    template<size_t Rows, size_t Cols>
-    constexpr Map<Rows, Cols> ParseMap(const std::vector<std::string>&lines) {
-        Map<Rows, Cols> result;
-        for (size_t row = 0; row < Rows; row++) {
-            for (size_t col = 0; col < Cols; col++) {
-                result[row][col] = lines[row][col] == '.' ? GroundType::Open :
-                    lines[row][col] == '|' ? GroundType::Trees : GroundType::Lumber;
-            }
+    constexpr std::array<std::array<size_t, 8>, Rows * Cols> BuildLookup() {
+        std::array<std::array<size_t, 8>, Rows * Cols> result;
+        for (size_t i = 0; i < Rows * Cols; i++) {
+            result[i] = { i - Cols - 1, i - Cols, i - Cols + 1, i - 1, i + 1, i + Cols - 1, i + Cols, i + Cols + 1 };
         }
         return result;
     }
 
-    template<size_t Rows, size_t Cols>
-    constexpr std::vector<GroundType> GetNeighbors(size_t row, size_t col, const Map<Rows, Cols>&map) {
-        std::vector<GroundType> result;
-        RowCol pos = { row, col };
-        RowCol max = { Rows - 1, Cols - 1 };
-        auto neighbors = GetAllNeighbors(pos, max);
+    constexpr auto LookupTableBig = BuildLookup<52, 52>();
+    constexpr auto LookupTableSmall = BuildLookup<12, 12>();
 
-        for (const auto& neighbor : neighbors) {
-            result.push_back(map[neighbor.Row][neighbor.Col]);
+    constexpr void Next(const std::string& src, std::string& dest, const std::array<size_t, 8>& indexes, size_t pos) {
+        auto n = std::string({ src[indexes[0]], src[indexes[1]], src[indexes[2]], src[indexes[3]], src[indexes[4]], src[indexes[5]], src[indexes[6]], src[indexes[7]] });
+        auto treeCount = std::count(n.begin(), n.end(), '|');
+        auto yardCount = std::count(n.begin(), n.end(), '#');
+
+        switch (src[pos]) {
+        case '.': dest[pos] = treeCount > 2 ? '|' : '.'; break;
+        case '|': dest[pos] = yardCount > 2 ? '#' : '|'; break;
+        case '#': dest[pos] = (treeCount && yardCount) ? '#' : '.'; break;
         }
+    }
+
+    constexpr void NextBig(const std::string& src, std::string& dest) {
+        for (size_t i = 1; i < 51; i++) {
+            for (size_t j = 1; j < 51; j++) {
+                auto pos = i * 52 + j;
+                Next(src, dest, LookupTableBig[pos], pos);
+            }
+        }
+    }
+
+    constexpr void NextSmall(const std::string& src, std::string& dest) {
+        for (size_t i = 1; i < 11; i++) {
+            for (size_t j = 1; j < 11; j++) {
+                auto pos = i * 12 + j;
+                Next(src, dest, LookupTableSmall[pos], pos);
+            }
+        }
+    }
+
+    constexpr size_t GetScore(const std::string& src) {
+        return std::count(src.begin(), src.end(), '|') * std::count(src.begin(), src.end(), '#');
+    }
+
+    constexpr std::string Flatten(const std::vector<std::string>& lines) {
+        std::string border(lines.size() + 2, '_');
+        std::string result = border;
+        result.reserve(52 * 52);
+        for (const auto& line : lines) {
+            result.push_back('_');
+            result += line;
+            result.push_back('_');
+        }
+        result += border;
         return result;
     }
 
-    constexpr GroundType GetNext(GroundType current, const std::vector<GroundType>&neighbors) {
-        auto countTrees = std::count_if(neighbors.begin(), neighbors.end(), [](GroundType g) { return g == GroundType::Trees; });
-        auto countLumber = std::count_if(neighbors.begin(), neighbors.end(), [](GroundType g) { return g == GroundType::Lumber; });
-
-        if (current == GroundType::Open && countTrees > 2) {
-            return GroundType::Trees;
-        }
-        else if (current == GroundType::Trees && countLumber > 2) {
-            return GroundType::Lumber;
-        }
-        else if (current == GroundType::Lumber && (countTrees == 0 || countLumber == 0)) {
-            return GroundType::Open;
-        }
-
-        return current;
-    }
-
-    template<size_t Rows, size_t Cols>
-    constexpr Map<Rows, Cols> TickMap(const Map<Rows, Cols>&map) {
-        Map<Rows, Cols> result;
-        for (size_t row = 0; row < Rows; row++) {
-            for (size_t col = 0; col < Cols; col++) {
-                auto neighbors = GetNeighbors(row, col, map);
-                result[row][col] = GetNext(map[row][col], neighbors);
-            }
-        }
-
-        return result;
-    }
-
-    template<size_t Rows, size_t Cols>
-    auto GetScore(const Map<Rows, Cols>&map) {
-        u32 trees = 0, lumber = 0;
-        for (size_t row = 0; row < Rows; row++) {
-            for (size_t col = 0; col < Cols; col++) {
-                if (map[row][col] == GroundType::Trees) trees++;
-                if (map[row][col] == GroundType::Lumber) lumber++;
-            }
-        }
-
-        return trees * lumber;
-    }
-
-    template<size_t Rows, size_t Cols>
-    auto Part1(const std::vector<std::string>&lines) {
-        auto map = ParseMap<Rows, Cols>(lines);
+    PART_ONE() {
+        auto src = Flatten(lines);
+        auto dest = src;
         for (auto i = 0; i < 10; i++) {
-            map = TickMap(map);
+            NextBig(src, dest);
+            std::swap(src, dest);
         }
 
-        return GetScore(map);
+        return Constexpr::ToString(GetScore(src));
     }
 
-    template<size_t Rows, size_t Cols>
-    void FindPeriod(Map<Rows, Cols>&map, size_t & current, size_t & period) {
-        std::unordered_set<size_t> seen;
-        size_t inARow = 0;
-        while (inARow < 5) {
-            current++;
-            map = TickMap(map);
-            auto score = GetScore(map);
-            if (seen.contains(score)) {
-                inARow++;
-            }
-            else {
-                inARow = 0;
-            }
-            seen.insert(score);
-        }
-
-        auto score = GetScore(map);
+    PART_TWO() {
+        auto src = Flatten(lines);
+        auto dest = src;
+        Constexpr::Set<std::string> seen;
+        size_t cycleStart = 0;
         while (true) {
-            current++;
-            period++;
-            map = TickMap(map);
-            if (GetScore(map) == score) {
-                break;
-            }
+            if (!seen.insert(src)) break;
+            NextBig(src, dest);
+            std::swap(src, dest);
+            cycleStart++;
         }
-    }
+        auto target = src;
+        size_t cycleSize = 0;
+        do {
+            NextBig(src, dest);
+            std::swap(src, dest);
+            cycleSize++;
+        } while (src != target);
 
-    template<size_t Rows, size_t Cols>
-    auto Part2(const std::vector<std::string>&lines) {
-        auto map = ParseMap<Rows, Cols>(lines);
-        size_t current = 0, period = 0;
-        FindPeriod(map, current, period);
-        auto remaining = 1'000'000'000 - current;
-        remaining %= period;
-        for (auto i = 0; i < remaining; i++) {
-            map = TickMap(map);
+        auto remaining = 1'000'000'000 - cycleStart;
+        remaining %= cycleSize;
+        for (auto i = 0u; i < remaining; i++) {
+            NextBig(src, dest);
+            std::swap(src, dest);
         }
-        return GetScore(map);
+
+        return Constexpr::ToString(GetScore(src));
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1<50, 50>(lines));
-        return Constexpr::ToString(Part2<50, 50>(lines));
-    }
-
-    bool RunTests() {
+    TESTS() {
         std::vector<std::string> lines = {
             ".#.#...|#.",
             ".....#|##|",
@@ -144,19 +138,93 @@ SOLUTION(2018, 18) {
             "...#.|..|."
         };
 
-        if (Part1<10, 10>(lines) != 1147) return false;
-        return true;
-    }
+        auto src = Flatten(lines);
+        auto dest = src;
+        for (auto i = 0; i < 10; i++) {
+            NextSmall(src, dest);
+            std::swap(src, dest);
+        }
+        
+        if (GetScore(src) != 1147) return false;
 
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }
+
+/*
+constexpr char NextState(char current, const std::vector<char>&neighbors) {
+    switch (current) {
+    case '.': return std::count(neighbors.begin(), neighbors.end(), '|') > 2 ? '|' : '.';
+    case '|': return std::count(neighbors.begin(), neighbors.end(), '#') > 2 ? '#' : '|';
+    case '#': return std::count(neighbors.begin(), neighbors.end(), '|') && std::count(neighbors.begin(), neighbors.end(), '#') ? '#' : '.';
+    }
+    return ' ';
+}
+
+constexpr std::vector<std::string> Next(const std::vector<std::string>& current, RowCol limits) {
+    std::vector<std::string> result = current;
+    for (size_t row = 0; row <= limits.Row; row++) {
+        for (size_t col = 0; col <= limits.Col; col++) {
+            RowCol rc{ row, col };
+            auto neighbors = GetAllNeighbors(rc, limits);
+            std::vector<char> n;
+            std::transform(neighbors.begin(), neighbors.end(), std::back_inserter(n), [&](RowCol pos) { return current[pos.Row][pos.Col]; });
+
+            result[row][col] = NextState(current[row][col], n);
+        }
+    }
+
+    return result;
+}
+
+constexpr size_t GetScore(const std::vector<std::string>&current) {
+    size_t trees{ 0 }, yards{ 0 };
+    for (const auto& row : current) {
+        trees += std::count(row.begin(), row.end(), '|');
+        yards += std::count(row.begin(), row.end(), '#');
+    }
+
+    return trees * yards;
+}
+
+PART_ONE() {
+    auto running = lines;
+    RowCol limits = { lines.size() - 1, lines[0].size() - 1 };
+    for (auto i = 0; i < 10; i++) {
+        running = Next(running, limits);
+    }
+    return Constexpr::ToString(GetScore(running));
+}
+
+PART_TWO() {
+    RowCol limits = { lines.size() - 1, lines[0].size() - 1 };
+    u32 cycleLength, cycleStart;
+    auto running = FloydCycle::FindCycle(lines, Next, cycleLength, cycleStart, limits);
+
+    auto remaining = 1'000'000'000 - cycleStart;
+    remaining %= cycleLength;
+
+    for (auto i = 0u; i < remaining; i++) {
+        running = Next(running, limits);
+    }
+    return Constexpr::ToString(GetScore(running));
+}
+
+TESTS() {
+    std::vector<std::string> lines = {
+        ".#.#...|#.",
+        ".....#|##|",
+        ".|..|...#.",
+        "..|#.....#",
+        "#.#|||#|#|",
+        "...#.||...",
+        ".|....|...",
+        "||...#|.#|",
+        "|.||||..|.",
+        "...#.|..|."
+    };
+
+    if (PartOne(lines) != "1147") return false;
+    return true;
+}
+*/
