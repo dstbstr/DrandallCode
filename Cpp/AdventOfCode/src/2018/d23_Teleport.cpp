@@ -6,58 +6,35 @@ SOLUTION(2018, 23) {
     struct Bot {
         Vec3<s32> Pos;
         s32 Radius;
+        constexpr bool operator<(const Bot& other) const {
+            return Radius < other.Radius;
+        }
     };
 
     constexpr Bot ParseBot(const std::string & line) {
-        auto openAngle = line.find("<");
-        auto closeAngle = line.find(">");
-        auto posStr = line.substr(openAngle + 1, closeAngle - openAngle - 1);
-        auto rStr = line.substr(closeAngle + 5);
-
-        auto split = Constexpr::Split(posStr, ",");
+        auto s0 = Constexpr::Split(line, "=<");
+        auto s1 = Constexpr::Split(s0[1], ">, r=");
+        auto s2 = Constexpr::Split(s1[0], ",");
+        
         Bot bot;
-        Constexpr::ParseNumber(split[0], bot.Pos.X);
-        Constexpr::ParseNumber(split[1], bot.Pos.Y);
-        Constexpr::ParseNumber(split[2], bot.Pos.Z);
-        Constexpr::ParseNumber(rStr, bot.Radius);
+        Constexpr::ParseNumber(s2[0], bot.Pos.X);
+        Constexpr::ParseNumber(s2[1], bot.Pos.Y);
+        Constexpr::ParseNumber(s2[2], bot.Pos.Z);
+        Constexpr::ParseNumber(s1[1], bot.Radius);
 
         return bot;
     }
 
-    static_assert(ParseBot("pos=<11,22,33>, r=44").Pos == Vec3<s32>{11, 22, 33});
-    static_assert(ParseBot("pos=<11,22,33>, r=44").Radius == 44);
-
-    constexpr std::vector<Bot> ParseLines(const std::vector<std::string>&lines) {
-        std::vector<Bot> result;
-        for (const auto& line : lines) {
-            result.push_back(ParseBot(line));
-        }
-
-        return result;
-    }
-
-    auto Part1(const std::vector<std::string>&lines) {
-        auto bots = ParseLines(lines);
-        Bot biggest = bots[0];
-        for (const auto& bot : bots) {
-            if (biggest.Radius < bot.Radius) {
-                biggest = bot;
-            }
-        }
-
-        u32 count = 0;
-        for (const auto& bot : bots) {
-            if (MDistance(bot.Pos, biggest.Pos) <= biggest.Radius) {
-                count++;
-            }
-        }
-
-        return count;
+    PART_ONE() {
+        auto bots = ParseLines(lines, ParseBot);
+        std::sort(bots.begin(), bots.end());
+        auto biggest = bots.back();
+        return Constexpr::ToString(std::count_if(bots.begin(), bots.end(), [&](const Bot& bot) { return MDistance(bot.Pos, biggest.Pos) <= biggest.Radius; }));
     }
 
     //Totally stole this solution.  Don't even know how it works
-    auto Part2(const std::vector<std::string>&lines) {
-        auto bots = ParseLines(lines);
+    PART_TWO() {
+        auto bots = ParseLines(lines, ParseBot);
         struct Data {
             s32 Distance;
             s8 E;
@@ -68,7 +45,7 @@ SOLUTION(2018, 23) {
         };
 
         Vec3<s32> origin = { 0, 0, 0 };
-        std::priority_queue<Data> queue;
+        Constexpr::PriorityQueue<Data> queue;
         for (const auto& bot : bots) {
             auto dist = static_cast<s32>(MDistance(bot.Pos, origin));
             queue.push({ std::max(0, dist - bot.Radius), 1 });
@@ -88,15 +65,13 @@ SOLUTION(2018, 23) {
             }
         }
 
-        return result;
+        return Constexpr::ToString(result);
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
+    TESTS() {
+        static_assert(ParseBot("pos=<11,22,33>, r=44").Pos == Vec3<s32>{11, 22, 33});
+        static_assert(ParseBot("pos=<11,22,33>, r=44").Radius == 44);
 
-    bool RunTests() {
         std::vector<std::string> lines = {
             "pos=<10,12,12>, r=2",
             "pos=<12,14,12>, r=2",
@@ -106,19 +81,7 @@ SOLUTION(2018, 23) {
             "pos=<10,10,10>, r=5"
         };
 
-        if (Part2(lines) != 36) return false;
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
+        if (PartTwo(lines) != "36") return false;
         return true;
     }
 }

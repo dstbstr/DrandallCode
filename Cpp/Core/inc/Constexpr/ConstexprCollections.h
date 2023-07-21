@@ -120,6 +120,14 @@ namespace Constexpr {
             return (*where).second;
         }
 
+        constexpr Value& at(const Key& key) {
+            auto where = FindByKey(key);
+            if (where == mData.cend()) {
+                throw "Key not found";
+            }
+            return (*where).second;
+        }
+
         constexpr bool is_empty() const {
             return mData.empty();
         }

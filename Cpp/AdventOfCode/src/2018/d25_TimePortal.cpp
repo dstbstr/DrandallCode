@@ -33,7 +33,7 @@ SOLUTION(2018, 25) {
         }
     };
 
-    auto Part1(const std::vector<std::string>&lines) {
+    PART_ONE() {
         std::vector<Constellation> constellations;
         for (const auto& line : lines) {
             auto star = ParseStar(line);
@@ -70,18 +70,15 @@ SOLUTION(2018, 25) {
             toRemove.clear();
         }
 
-        return constellations.size();
+        return Constexpr::ToString(constellations.size());
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
-        return lines.size();
+    PART_TWO() {
+        (void)lines;
+        return "Merry Christmas";
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        return Constexpr::ToString(Part1(lines));
-    }
-
-    bool RunTests() {
+    TESTS() {
         std::vector<std::string> lines = {
             "1,-1,-1,-2",
             "-2,-2,0,1",
@@ -95,19 +92,8 @@ SOLUTION(2018, 25) {
             "-1,-2,0,-2"
         };
 
-        if (Part1(lines) != 8) return false;
-        return true;
-    }
+        if (PartOne(lines) != "8") return false;
 
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }

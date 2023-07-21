@@ -40,9 +40,13 @@ namespace AStarPrivate {
 
     template<typename T, typename State>
     constexpr std::vector<T> AStar(T start, auto costFunc, auto doneFunc, auto hFunc, auto nFunc) {
-        Constexpr::BigSet<T> seen{};
-        Constexpr::BigMap<T, T> cameFrom{};
-        Constexpr::BigMap<T, State> state{};
+        //Constexpr::BigSet<T> seen{};
+        //Constexpr::BigMap<T, T> cameFrom{};
+        //Constexpr::BigMap<T, State> state{};
+        Constexpr::SmallSet<T> seen{};
+        Constexpr::SmallMap<T, T> cameFrom{};
+        Constexpr::SmallMap<T, State> state{};
+
         Constexpr::PriorityQueue<State> queue{};
 
         auto startState = State(start);

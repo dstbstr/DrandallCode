@@ -3,7 +3,6 @@
 SOLUTION(2018, 24) {
     enum struct DamageType { Unknown, Fire, Cold, Slashing, Bludgeoning, Radiation };
     enum struct Team { Immune, Infection };
-
     constexpr DamageType ParseDamageType(std::string_view str) {
         if (str == "fire") return DamageType::Fire;
         else if (str == "cold") return DamageType::Cold;
@@ -73,52 +72,63 @@ SOLUTION(2018, 24) {
         }
     };
 
-    Group ParseGroup(const std::string & line, Team team) {
-        static const auto numRegex = std::regex(R"(\d+)");
-        static const auto immunityRegex = std::regex(R"(immune to ([\w, ]+))");
-        static const auto weaknessRegex = std::regex(R"(weak to ([\w, ]+))");
-        static const auto damageTypeRegex = std::regex(R"((\w+) damage)");
-        static u32 groupId = 1;
+    /*
+    Immune System:
+5711 units each with 6662 hit points (immune to fire; weak to slashing) with an attack that does 9 bludgeoning damage at initiative 14
+2108 units each with 8185 hit points (weak to radiation, bludgeoning) with an attack that does 36 slashing damage at initiative 13
+1590 units each with 3940 hit points with an attack that does 24 cold damage at initiative 5
+2546 units each with 6960 hit points with an attack that does 25 slashing damage at initiative 2
+1084 units each with 3450 hit points (immune to bludgeoning) with an attack that does 27 slashing damage at initiative 11
+265 units each with 8223 hit points (immune to radiation, bludgeoning, cold) with an attack that does 259 cold damage at initiative 12
+6792 units each with 6242 hit points (immune to slashing; weak to bludgeoning, radiation) with an attack that does 9 slashing damage at initiative 18
+3336 units each with 12681 hit points (weak to slashing) with an attack that does 28 fire damage at initiative 6
+752 units each with 5272 hit points (immune to slashing; weak to bludgeoning, radiation) with an attack that does 69 radiation damage at initiative 4
+96 units each with 7266 hit points (immune to fire) with an attack that does 738 bludgeoning damage at initiative 8
+    */
+    constexpr Group ParseGroup(const std::string& line, Team team) {
+        std::string unitId = " units each with ";
+        std::string atkId = " with an attack that does ";
+        std::string initId = " damage at initiative ";
 
         Group result;
-        result.Id = groupId++;
         result.Team = team;
-        result.IsTargeted = false;
-        result.CurrentTarget = 0;
+        auto s0 = Constexpr::Split(line, unitId);
+        Constexpr::ParseNumber(s0[0], result.UnitCount);
+        auto s1 = Constexpr::Split(s0[1], " ");
+        Constexpr::ParseNumber(s1[0], result.UnitHp);
 
-        std::vector<std::string> numbers;
-        for (auto it = std::sregex_iterator(line.begin(), line.end(), numRegex); it != std::sregex_iterator(); ++it) {
-            numbers.push_back(it->str());
-        }
+        auto s2 = Constexpr::Split(line, atkId);
+        auto s3 = Constexpr::Split(s2[1], " ");
+        Constexpr::ParseNumber(s3[0], result.AttackDamage);
+        result.AttackType = ParseDamageType(s3[1]);
+        Constexpr::ParseNumber(s3.back(), result.Initiative);
 
-        Constexpr::ParseNumber(numbers[0], result.UnitCount);
-        Constexpr::ParseNumber(numbers[1], result.UnitHp);
-        Constexpr::ParseNumber(numbers[2], result.AttackDamage);
-        Constexpr::ParseNumber(numbers[3], result.Initiative);
+        auto s4 = Constexpr::Split(line, "(");
+        if (s4.size() == 1) return result;
+        auto s5 = Constexpr::Split(s4[1], ")");
 
-        std::smatch match;
-        if (std::regex_search(line, match, immunityRegex)) {
-            std::string immunities = match[1].str();
-            auto split = Constexpr::Split(immunities, ", ");
-            for (const auto& str : split) {
-                result.Immunities.push_back(ParseDamageType(str));
+        auto s6 = Constexpr::Split(s5[0], ";");
+
+        for (auto modifier : s6) {
+            auto words = Constexpr::RemoveAllOfCopy(std::string(modifier), ",");
+            auto s = Constexpr::Split(words, " ");
+            std::vector<DamageType> damageTypes;
+            for (auto i = 2; i < s.size(); i++) {
+                damageTypes.push_back(ParseDamageType(s[i]));
+            }
+            if (s[0] == "immune") {
+                std::copy(damageTypes.begin(), damageTypes.end(), std::back_inserter(result.Immunities));
+            }
+            else if (s[0] == "weak") {
+                std::copy(damageTypes.begin(), damageTypes.end(), std::back_inserter(result.Weaknesses));
             }
         }
-        if (std::regex_search(line, match, weaknessRegex)) {
-            std::string weaknesses = match[1].str();
-            auto split = Constexpr::Split(weaknesses, ", ");
-            for (const auto& str : split) {
-                result.Weaknesses.push_back(ParseDamageType(str));
-            }
-        }
-
-        std::regex_search(line, match, damageTypeRegex);
-        result.AttackType = ParseDamageType(match[1].str());
 
         return result;
     }
+    using Battle = Constexpr::SmallMap<u32, Group>;
 
-    bool IsBattleRunning(const std::unordered_map<u32, Group>&battle) {
+    constexpr bool IsBattleRunning(const Battle& battle) {
         bool hasImmune = false, hasInfection = false;
         for (const auto& [id, group] : battle) {
             if (group.IsAlive() && group.Team == Team::Immune) {
@@ -134,7 +144,7 @@ SOLUTION(2018, 24) {
         return false;
     }
 
-    Team FindWinner(const std::unordered_map<u32, Group>&battle) {
+    constexpr Team FindWinner(const Battle& battle) {
         for (const auto& [id, group] : battle) {
             if (group.IsAlive()) {
                 return group.Team;
@@ -144,7 +154,7 @@ SOLUTION(2018, 24) {
         return Team::Infection;
     }
 
-    void SelectTargets(std::vector<Group>&groups, std::unordered_map<u32, Group>&battle) {
+    constexpr void SelectTargets(std::vector<Group>&groups, Battle& battle) {
         for (const auto& group : groups) {
             auto TargetOrder = [group](const Group& lhs, const Group& rhs) {
                 auto lhsDamage = group.GetPotentialDamage(lhs);
@@ -175,7 +185,7 @@ SOLUTION(2018, 24) {
         }
     }
 
-    void AttackTargets(const std::vector<Group>&groups, std::unordered_map<u32, Group>&battle) {
+    constexpr void AttackTargets(const std::vector<Group>&groups, Battle& battle) {
         for (const auto& group : groups) {
             auto targetId = battle.at(group.Id).CurrentTarget;
             if (targetId == 0) continue;
@@ -183,7 +193,7 @@ SOLUTION(2018, 24) {
         }
     }
 
-    void ResolveRound(std::unordered_map<u32, Group>&battle) {
+    constexpr void ResolveRound(Battle& battle) {
         auto selectionOrder = [](const Group& lhs, const Group& rhs) {
             if (lhs.EffectivePower() == rhs.EffectivePower()) {
                 return rhs.Initiative < lhs.Initiative;
@@ -209,9 +219,10 @@ SOLUTION(2018, 24) {
         AttackTargets(groups, battle);
     }
 
-    std::unordered_map<u32, Group> GetBattle(const std::vector<std::string>&lines) {
-        std::unordered_map<u32, Group> battle;
+    constexpr Battle GetBattle(const std::vector<std::string>&lines) {
+        Battle battle;
         Team team = Team::Immune;
+        u32 groupId = 1;
         for (auto i = 1; i < lines.size(); i++) {
             if (lines[i] == "") {
                 team = Team::Infection;
@@ -219,30 +230,27 @@ SOLUTION(2018, 24) {
                 continue;
             }
             auto group = ParseGroup(lines[i], team);
+            group.Id = groupId++;
             battle[group.Id] = group;
         }
 
         return battle;
     }
 
-    u32 CountRemainingUnits(const std::unordered_map<u32, Group>&battle) {
-        u32 result = 0;
-        for (const auto& [id, group] : battle) {
-            result += group.UnitCount;
-        }
-        return result;
+    constexpr u32 CountRemainingUnits(const Battle& battle) {
+        return std::accumulate(battle.begin(), battle.end(), 0, [](u32 previous, auto& p) {return previous + p.second.UnitCount; });
     }
 
-    auto Part1(const std::vector<std::string>&lines) {
+    PART_ONE() {
         auto battle = GetBattle(lines);
         while (IsBattleRunning(battle)) {
             ResolveRound(battle);
         }
 
-        return CountRemainingUnits(battle);
+        return Constexpr::ToString(CountRemainingUnits(battle));
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
+    PART_TWO() {
         const auto initialBattle = GetBattle(lines);
 
         const int maxRounds = 5000;
@@ -265,19 +273,14 @@ SOLUTION(2018, 24) {
             }
 
             if (!IsBattleRunning(battle) && FindWinner(battle) == Team::Immune) {
-                return CountRemainingUnits(battle);
+                return Constexpr::ToString(CountRemainingUnits(battle));
             }
         }
 
         return 0u;
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
+    TESTS() {
         std::vector<std::string> lines = {
             "Immune System:",
             "17 units each with 5390 hit points (weak to radiation, bludgeoning) with an attack that does 4507 fire damage at initiative 2",
@@ -288,20 +291,9 @@ SOLUTION(2018, 24) {
             "4485 units each with 2961 hit points (immune to radiation; weak to fire, cold) with an attack that does 12 slashing damage at initiative 4"
         };
 
-        //if (Part1(lines) != 5216) return false;
-        if (Part2(lines) != 51) return false;
-        return true;
-    }
+        if (PartOne(lines) != "5216") return false;
+        if (PartTwo(lines) != "51") return false;
 
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }
