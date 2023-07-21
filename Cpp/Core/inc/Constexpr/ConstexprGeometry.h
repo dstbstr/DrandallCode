@@ -5,6 +5,7 @@
 #include "Platform/Types.h"
 #include "Constexpr/ConstexprMath.h"
 #include "Constexpr/ConstexprStrUtils.h"
+#include "Constexpr/ConstexprHash.h"
 
 template<typename T>
 std::string ToString(T input);
@@ -73,6 +74,11 @@ namespace Constexpr {
     constexpr std::string ToString(Coord coord) {
         return "{" + Constexpr::ToString(coord.X) + "," + Constexpr::ToString(coord.Y) + "}";
     }
+
+    template<>
+    constexpr size_t Hash(Coord coord) {
+        return Hash(coord.X) ^ Hash(coord.Y);
+    }
 }
 
 struct UCoord {
@@ -136,6 +142,11 @@ namespace Constexpr {
     template<>
     constexpr std::string ToString(UCoord coord) {
         return "{" + Constexpr::ToString(coord.X) + "," + Constexpr::ToString(coord.Y) + "}";
+    }
+
+    template<>
+    constexpr size_t Hash(UCoord coord) {
+        return Hash(coord.X) ^ Hash(coord.Y);
     }
 }
 
@@ -227,6 +238,11 @@ namespace Constexpr {
     template<>
     constexpr std::string ToString(RowCol rc) {
         return "{" + Constexpr::ToString(rc.Row) + "," + Constexpr::ToString(rc.Col) + "}";
+    }
+
+    template<>
+    constexpr size_t Hash(RowCol rc) {
+        return Hash(rc.Row) ^ Hash(rc.Col);
     }
 }
 
@@ -398,6 +414,11 @@ namespace Constexpr {
     constexpr std::string ToString(Vec3<T> vec) {
         return "<" + Constexpr::ToString(vec.X) + "," + Constexpr::ToString(vec.Y) + "," + Constexpr::ToString(vec.Z) + ">";
     }
+
+    template<typename T>
+    constexpr size_t Hash(Vec3<T> vec) {
+        return Hash(vec.X) ^ Hash(vec.Y) ^ Hash(vec.Z);
+    }
 }
 
 template<typename T>
@@ -478,6 +499,11 @@ namespace Constexpr {
     constexpr std::string ToString(Vec4<T> vec) {
         return "<" + Constexpr::ToString(vec.X) + "," + Constexpr::ToString(vec.Y) + "," + Constexpr::ToString(vec.Z) + "," + Constexpr::ToString(vec.W) + ">";
     }
+
+    template<typename T>
+    constexpr size_t Hash(Vec4<T> vec) {
+        return Hash(vec.X) ^ Hash(vec.Y) ^ Hash(vec.Z) ^ Hash(vec.W);
+    }
 }
 
 template<typename T>
@@ -549,6 +575,20 @@ constexpr std::vector<RowCol> GetDirectNeighbors(const RowCol& pos, const RowCol
     if (pos.Col > min.Col) result.push_back({ pos.Row, pos.Col - 1 });
     if (pos.Row < max.Row) result.push_back({ pos.Row + 1, pos.Col });
     if (pos.Col < max.Col) result.push_back({ pos.Row, pos.Col + 1 });
+    return result;
+}
+
+template<typename T>
+constexpr std::vector<Vec3<T>> GetDirectNeighbors(const Vec3<T>& pos, const Vec3<T>& max, const Vec3<T>& min = { 0, 0, 0 }) {
+    std::vector<Vec3<T>> result;
+    if (pos.X > min.X) result.push_back({ pos.X - 1, pos.Y, pos.Z });
+    if (pos.Y > min.Y) result.push_back({ pos.X, pos.Y - 1, pos.Z });
+    if (pos.Z > min.Z) result.push_back({ pos.X, pos.Y, pos.Z - 1 });
+
+    if (pos.X < max.X) result.push_back({ pos.X + 1, pos.Y, pos.Z });
+    if (pos.Y < max.Y) result.push_back({ pos.X, pos.Y + 1, pos.Z });
+    if (pos.Z < max.Z) result.push_back({ pos.X, pos.Y, pos.Z + 1 });
+
     return result;
 }
 

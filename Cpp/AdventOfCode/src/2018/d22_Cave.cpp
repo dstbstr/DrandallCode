@@ -1,189 +1,158 @@
 #include "2018/d22_Cave.h"
-#include "Algorithms/AStar.h"
 
 SOLUTION(2018, 22) {
     static constexpr u64 limit = 20183;
-    enum struct GroundType { Rocky, Wet, Narrow };
-    enum struct Equipment { None, Climbing, Torch };
+    static constexpr u64 RowMul = 48271;
+    static constexpr u64 ColMul = 16807;
+    static constexpr size_t Unset = limit * 2;
 
-    using Map = std::vector<std::vector<u64>>;
-    using GroundMap = std::vector<std::vector<GroundType>>;
-
-    constexpr u64 GetIndex(size_t row, size_t col, RowCol target, const Map & map, const std::vector<u64>&currentLine) {
-        if (row == 0 && col == 0) return 0;
-        else if (row == target.Row && col == target.Col) return 0;
-        else if (row == 0) return col * 16807;
-        else if (col == 0) return row * 48271;
-        else return map[row - 1][col] * currentLine.back();
+    constexpr size_t GetIndex(size_t row, size_t col, size_t up, size_t left) {
+        return (up != Unset) && (left != Unset) ? up * left : (col * ColMul) + (row * RowMul);
     }
+    constexpr std::vector<Vec3<size_t>> BuildMap(RowCol target, RowCol limits, size_t depth) {
+        std::vector<Vec3<size_t>> result;
+        std::vector<size_t> indexes;
 
-    constexpr Map BuildMap(RowCol target, RowCol limits, u32 depth) {
-        Map result;
         for (size_t row = 0; row <= limits.Row; row++) {
-            std::vector<u64> line;
             for (size_t col = 0; col <= limits.Col; col++) {
-                auto index = GetIndex(row, col, target, result, line);
-                line.push_back((index + depth) % limit);
+                auto up = row == 0 ? Unset : indexes[((row - 1) * (limits.Col + 1)) + col];
+                auto left = col == 0 ? Unset : indexes.back();
+                auto index = (depth + GetIndex(row, col, up, left)) % limit;
+                Vec3<size_t> pos = { col, row, (index % 3) + 1 };
+
+                result.push_back(pos);
+                indexes.push_back(index);
             }
-            result.push_back(line);
         }
+
+        result[target.Row * (limits.Col + 1) + target.Col].Z = 1;
         return result;
     }
 
-    GroundMap BuildGroundMap(const Map & map) {
-        GroundMap result;
-        for (size_t row = 0; row < map.size(); row++) {
-            std::vector<GroundType> line;
-            for (size_t col = 0; col < map[row].size(); col++) {
-                auto val = map[row][col] % 3;
-                line.push_back(val == 0 ? GroundType::Rocky : val == 1 ? GroundType::Wet : GroundType::Narrow);
-            }
-            result.push_back(line);
+    constexpr size_t GetRisk(const std::vector<Vec3<size_t>>& map) {
+        size_t result = 0;
+        for (const auto& pos : map) {
+            result += pos.Z;
         }
-
-        return result;
+        return result - map.size();
+    }
+    
+    constexpr size_t GetMapIndex(const Vec3<size_t>& pos, const Vec3<size_t>& limits) {
+        return (pos.Y * (limits.X + 1)) + pos.X;
     }
 
-    void PrintMap(GroundMap & map, RowCol target) {
-        for (size_t row = 0; row < map.size(); row++) {
-            for (size_t col = 0; col < map[row].size(); col++) {
-                auto val = map[row][col];
-                char icon = val == GroundType::Rocky ? '.' : val == GroundType::Wet ? '=' : '|';
-                if (row == 0 && col == 0) icon = 'M';
-                else if (row == target.Row && col == target.Col) icon = 'T';
-                std::cout << icon;
-            }
-            std::cout << '\n';
+    constexpr size_t GetMapIndex1(const Vec4<size_t>& pos, const Vec4<size_t>& limits) {
+        return (pos.Y * (limits.X + 1)) + pos.X;
+    }
+
+    std::string ToString(const std::vector<Vec3<size_t>>& map, RowCol target) {
+        std::string result;
+        result.reserve(map.size());
+
+        for (const auto& pos : map) {
+            if (pos.X == 0) result.push_back('\n');
+            char icon = pos.Z == 1 ? '.' : pos.Z == 2 ? '=' : '|';
+            if (pos.X == 0 && pos.Y == 0) icon = 'M';
+            else if (pos.X == target.Col && pos.Y == target.Row) icon = 'T';
+            result.push_back(icon);
         }
-        std::cout << '\n';
-    }
-
-    constexpr u32 GetRisk(GroundMap & map) {
-        u32 result = 0;
-        for (size_t row = 0; row < map.size(); row++) {
-            for (size_t col = 0; col < map[row].size(); col++) {
-                auto val = map[row][col];
-                result += (val == GroundType::Rocky ? 0 : val == GroundType::Wet ? 1 : 2);
-            }
-        }
-        return result;
-    }
-
-    auto Part1(RowCol target, u32 depth) {
-        auto map = BuildGroundMap(BuildMap(target, target, depth));
-        //PrintMap(map, target);
-        return GetRisk(map);
-    }
-
-    constexpr bool CanMove(GroundType groundType, Equipment held) {
-        switch (held) {
-        case Equipment::None: return groundType != GroundType::Rocky;
-        case Equipment::Torch: return groundType != GroundType::Wet;
-        case Equipment::Climbing: return groundType != GroundType::Narrow;
-        }
-        return true;
-    }
-
-    constexpr std::vector<Equipment> FindCommon(GroundType lhs, GroundType rhs) {
-        std::vector<Equipment> result;
-
-        if (CanMove(lhs, Equipment::None) && CanMove(rhs, Equipment::None)) result.push_back(Equipment::None);
-        if (CanMove(lhs, Equipment::Torch) && CanMove(rhs, Equipment::Torch)) result.push_back(Equipment::Torch);
-        if (CanMove(lhs, Equipment::Climbing) && CanMove(rhs, Equipment::Climbing)) result.push_back(Equipment::Climbing);
 
         return result;
     }
 
-    u32 FindShortestPath(const GroundMap & map, RowCol target) {
-        struct Santa {
-            RowCol Pos;
-            Equipment Held;
-            constexpr bool operator==(const Santa& other) const {
-                return Pos == other.Pos && Held == other.Held;
-            }
-        };
-        struct SantaHash {
-            size_t operator()(const Santa& s) const {
-                return s.Pos.Row ^ s.Pos.Col + static_cast<size_t>(s.Held);
-            }
-        };
-        RowCol limits = { map.size() - 1, map[0].size() - 1 };
-        Santa start = { { 0, 0 }, Equipment::Torch };
-        Santa end = { target, Equipment::Torch };
+    //STONE = 1, WET = 2, NARROW = 3
+    //NONE = 1, TORCH = 2, CLIMBING = 3
+    
+    //Allowed
+    //Z != equipment
 
-        auto costFunc = [&](const Santa& from, const Santa& to) {
-            return from.Held == to.Held ? 1 : 8;
-        };
-        auto isCompleteFunc = [end](const Santa& santa) {
-            return santa == end;
-        };
-        auto h = [target](const Santa& santa) {
-            u32 result = santa.Held == Equipment::Torch ? 0 : 7;
-            return result + static_cast<u32>(MDistance(santa.Pos, target));
-        };
-        auto neighborFunc = [&](const Santa& santa) -> std::vector<Santa> {
-            auto neighbors = GetDirectNeighbors(santa.Pos, limits);
+    //Shared
+    // 6 - lhs.Z - rhs.Z
 
-            std::vector<Santa> result;
-            for (const auto& neighbor : neighbors) {
-                auto currentGround = map[santa.Pos.Row][santa.Pos.Col];
-                auto nextGround = map[neighbor.Row][neighbor.Col];
-                for (const auto& equipment : FindCommon(currentGround, nextGround)) {
-                    result.push_back({ neighbor, equipment });
+    size_t Bfs(const std::vector<Vec3<size_t>>& map, RowCol target) {
+        Vec4<size_t> Horizontal = { 1, 0, 0, 0 };
+        Vec4<size_t> Vertical = { 0, 1, 0, 0 };
+        auto back = map.back();
+        Vec4<size_t> limits = { back.X, back.Y, back.Z, 3 };
+        Vec4<size_t> end = { target.Col, target.Row, 1, 2 };
+
+        using Entry = std::pair<size_t, Vec4<size_t>>;
+        std::vector<Entry> q{{0, { 0, 0, 1, 2 }}};
+        std::vector<Entry> next;
+        Constexpr::BigSet<Vec4<size_t>> seen;
+
+        size_t minute = 0;
+        while (true) {
+            for (const auto& [waiting, pos] : q) {
+                if (waiting > 0) {
+                    next.push_back({ {waiting - 1}, pos });
+                    continue;
                 }
-            }
+                if (pos == end) {
+                    return minute;
+                }
+                if (!seen.insert(pos)) continue;
 
-            return result;
-        };
+                std::vector<Vec3<size_t>> neighbors;
+                if (pos.Y > 0) neighbors.push_back(map[GetMapIndex1(pos - Vertical, limits)]);
+                if (pos.X > 0) neighbors.push_back(map[GetMapIndex1(pos - Horizontal, limits)]);
+                if (pos.Y < limits.Y) neighbors.push_back(map[GetMapIndex1(pos + Vertical, limits)]);
+                if (pos.X < limits.X) neighbors.push_back(map[GetMapIndex1(pos + Horizontal, limits)]);
 
-        //auto path = AStarMin<Santa, SantaHash>(start, costFunc, isCompleteFunc, h, neighborFunc);
-        auto path = AStarMin<Santa>(start, costFunc, isCompleteFunc, h, neighborFunc);
-        u32 result = 0;
-        Equipment previous = Equipment::Torch;
-        for (const auto& step : path) {
-            if (previous != step.Held) {
-                result += 7;
-                previous = step.Held;
+                for (auto& n : neighbors) {
+                    if (pos.W != n.Z) {
+                        next.push_back({ 0, { n.X, n.Y, n.Z, pos.W } }); //keep same tool
+                    }
+                    if (pos.Z == n.Z) {
+                        continue; //No need to switch
+                    }
+                    size_t commonTool = (6 - pos.Z) - n.Z;
+                    next.push_back({ 7, {n.X, n.Y, n.Z, commonTool } }); //switch to common tool
+                }
+
             }
-            result++;
+            minute++;
+            q = next;
+            next.clear();
         }
-
-        return result - 1; //doesn't cost a step to start
+        return minute;
     }
 
-    //infinite loop?  10 minutes in release...
-    auto Part2(RowCol target, u32 depth) {
-        RowCol buffer = { target.Row + 50, target.Col + 500 };
-        //RowCol buffer = { target.Row + 10, target.Col + 10 };
-        auto map = BuildGroundMap(BuildMap(target, buffer, depth));
-
-        return FindShortestPath(map, target);
-    }
-
-    std::string Run(const std::vector<std::string>&) {
-        RowCol target = { 760, 14 };
-        //return Constexpr::ToString(Part1(target, 7863));
-        return Constexpr::ToString(Part2(target, 7863));
-    }
-
-    bool RunTests() {
-        RowCol target = { 10, 10 };
-        //if (Part1(target, 510) != 114) return false;
-        if (Part2(target, 510) != 45) return false;
-        return true;
-    }
     //depth: 7863
-    //target: 14, 760
+    //target: 14,760
+    constexpr void GetTargetAndDepth(const std::vector<std::string>& lines, RowCol& outTarget, u32& outDepth) {
+        auto s1 = Constexpr::Split(lines[0], " ");
+        Constexpr::ParseNumber(s1[1], outDepth);
+
+        auto s2 = Constexpr::Split(lines[1], ": ");
+        auto xy = Constexpr::Split(s2[1], ",");
+        Constexpr::ParseNumber(xy[0], outTarget.Col);
+        Constexpr::ParseNumber(xy[1], outTarget.Row);
+    }
 
     PART_ONE() {
-        return lines[0];
+        RowCol target;
+        u32 depth;
+        GetTargetAndDepth(lines, target, depth);
+
+        auto map = BuildMap(target, target, depth);
+        return Constexpr::ToString(GetRisk(map));
     }
 
     PART_TWO() {
-        return lines[0];
+        RowCol target;
+        u32 depth;
+        GetTargetAndDepth(lines, target, depth);
+        RowCol buffer = { target.Row + 50, target.Col + 500 };
+        auto map = BuildMap(target, buffer, depth);
+        return Constexpr::ToString(Bfs(map, target)); //< 1 s
     }
 
     TESTS() {
+        RowCol target = { 10, 10 };
+        auto map = BuildMap(target, target, 510);
+        if (GetRisk(map) != 114) return false;
+
         return true;
     }
 }

@@ -1,119 +1,156 @@
 #include "2018/d21_Comp3.h"
 
 SOLUTION(2018, 21) {
-    using Registers = std::array<u64, 6>;
-    struct Instruction {
-        std::string_view Op;
-        u64 A;
-        u64 B;
-        u64 C;
+    using Regs = std::array<u64, 6>;
 
-        friend std::ostream& operator<<(std::ostream& os, const Instruction& inst) {
-            os << inst.Op << " " << inst.A << " " << inst.B << " " << inst.C;
-            return os;
-        }
-    };
+    enum struct Op { Addr, Addi, Mulr, Muli, Banr, Bani, Borr, Bori, Setr, Seti, Gtir, Gtrr, Gtri, Eqir, Eqri, Eqrr };
+    constexpr auto GenInst(const std::string & line) {
+        auto s = Constexpr::Split(line, " ");
+        auto opStr = s[0];
+        s32 a, b, c;
+        Constexpr::ParseNumber(s[1], a);
+        Constexpr::ParseNumber(s[2], b);
+        Constexpr::ParseNumber(s[3], c);
 
-    constexpr void Apply(const Instruction & inst, size_t ipReg, Registers & regs) {
-        if (inst.Op == "addr") regs[inst.C] = regs[inst.A] + regs[inst.B];
-        else if (inst.Op == "addi") regs[inst.C] = regs[inst.A] + inst.B;
-        else if (inst.Op == "mulr") regs[inst.C] = regs[inst.A] * regs[inst.B];
-        else if (inst.Op == "muli") regs[inst.C] = regs[inst.A] * inst.B;
-        else if (inst.Op == "banr") regs[inst.C] = regs[inst.A] & regs[inst.B];
-        else if (inst.Op == "bani") regs[inst.C] = regs[inst.A] & inst.B;
-        else if (inst.Op == "borr") regs[inst.C] = regs[inst.A] | regs[inst.B];
-        else if (inst.Op == "bori") regs[inst.C] = regs[inst.A] | inst.B;
-        else if (inst.Op == "setr") regs[inst.C] = regs[inst.A];
-        else if (inst.Op == "seti") regs[inst.C] = inst.A;
-        else if (inst.Op == "gtir") regs[inst.C] = inst.A > regs[inst.B] ? 1 : 0;
-        else if (inst.Op == "gtri") regs[inst.C] = regs[inst.A] > inst.B ? 1 : 0;
-        else if (inst.Op == "gtrr") regs[inst.C] = regs[inst.A] > regs[inst.B] ? 1 : 0;
-        else if (inst.Op == "eqir") regs[inst.C] = inst.A == regs[inst.B] ? 1 : 0;
-        else if (inst.Op == "eqri") regs[inst.C] = regs[inst.A] == inst.B ? 1 : 0;
-        else if (inst.Op == "eqrr") regs[inst.C] = regs[inst.A] == regs[inst.B] ? 1 : 0;
+        Op op;
+        if (opStr == "addr") op = Op::Addr;
+        else if (opStr == "addi") op = Op::Addi;
+        else if (opStr == "mulr") op = Op::Mulr;
+        else if (opStr == "muli") op = Op::Muli;
+        else if (opStr == "banr") op = Op::Banr;
+        else if (opStr == "bani") op = Op::Bani;
+        else if (opStr == "borr") op = Op::Borr;
+        else if (opStr == "bori") op = Op::Bori;
+        else if (opStr == "setr") op = Op::Setr;
+        else if (opStr == "seti") op = Op::Seti;
+        else if (opStr == "gtir") op = Op::Gtir;
+        else if (opStr == "gtrr") op = Op::Gtrr;
+        else if (opStr == "gtri") op = Op::Gtri;
+        else if (opStr == "eqir") op = Op::Eqir;
+        else if (opStr == "eqri") op = Op::Eqri;
+        else if (opStr == "eqrr") op = Op::Eqrr;
 
-        regs[ipReg]++;
-    }
-
-    constexpr std::vector<Instruction> ParseInstructions(const std::vector<std::string>&lines) {
-        std::vector<Instruction> instructions;
-        for (auto i = 1; i < lines.size(); i++) {
-            auto split = Constexpr::Split(lines[i], " ");
-            u64 a, b, c;
-            Constexpr::ParseNumber(split[1], a);
-            Constexpr::ParseNumber(split[2], b);
-            Constexpr::ParseNumber(split[3], c);
-            instructions.push_back({ split[0], a, b, c });
-        }
-
-        return instructions;
-    }
-
-    auto Part1(const std::vector<std::string>&lines) {
-        Registers regs{};
-        size_t ipReg;
-        Constexpr::ParseNumber(Constexpr::Split(lines[0], " ")[1], ipReg);
-        auto instructions = ParseInstructions(lines);
-
-        while (true) {
-            auto instruction = regs[ipReg];
-            if (instruction >= instructions.size()) break;
-            if (instruction == 28) {
-                return regs[4];
+        return [a, b, c, op](Regs& regs) {
+            switch (op) {
+            case Op::Addr: regs[c] = regs[a] + regs[b]; break;
+            case Op::Addi: regs[c] = regs[a] + b; break;
+            case Op::Mulr: regs[c] = regs[a] * regs[b]; break;
+            case Op::Muli: regs[c] = regs[a] * b; break;
+            case Op::Banr: regs[c] = regs[a] & regs[b]; break;
+            case Op::Bani: regs[c] = regs[a] & b; break;
+            case Op::Borr: regs[c] = regs[a] | regs[b]; break;
+            case Op::Bori: regs[c] = regs[a] | b; break;
+            case Op::Setr: regs[c] = regs[a]; break;
+            case Op::Seti: regs[c] = a; break;
+            case Op::Gtir: regs[c] = a > regs[b] ? 1 : 0; break;
+            case Op::Gtrr: regs[c] = regs[a] > regs[b] ? 1 : 0; break;
+            case Op::Gtri: regs[c] = regs[a] > b ? 1 : 0; break;
+            case Op::Eqir: regs[c] = a == regs[b] ? 1 : 0; break;
+            case Op::Eqri: regs[c] = regs[a] == b ? 1 : 0; break;
+            case Op::Eqrr: regs[c] = regs[a] == regs[b] ? 1 : 0; break;
             }
-            Apply(instructions[instruction], ipReg, regs);
-        }
-
-        return lines.size();
-    }
-
-    auto Part2(const std::vector<std::string>&lines) {
-        Registers regs{};
-        size_t ipReg;
-        Constexpr::ParseNumber(Constexpr::Split(lines[0], " ")[1], ipReg);
-        auto instructions = ParseInstructions(lines);
-        std::unordered_set<u64> seen;
-        u64 previous = 0;
-
-        while (true) {
-            auto instruction = regs[ipReg];
-            if (instruction >= instructions.size()) break;
-            if (instruction == 28) {
-                auto val = regs[4];
-                if (seen.contains(val)) {
-                    return previous;
-                }
-                seen.insert(val);
-                previous = val;
-
-                //std::cout << val << " (" << seen.size() << ")\n";
-            }
-            Apply(instructions[instruction], ipReg, regs);
-        }
-
-        return lines.size();
-    }
-
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
-        std::vector<std::string> lines = {
-
         };
+    }
 
-        if (Part1(lines) != 0) return false;
-        return true;
+    constexpr size_t GetIpReg(const std::string& line) {
+        auto s = Constexpr::Split(line, " ");
+        size_t result;
+        Constexpr::ParseNumber(s[1], result);
+        return result;
+    }
+
+
+    constexpr auto Mask = 0xFFFFFF;
+    constexpr u64 Step(u64 previous, u64 previousMask, u64 initialValue, u64 multiplier) {
+        previous |= previousMask;
+        u64 b = initialValue;
+        b = (b + (previous & 0xFF)) & Mask;
+        b = (b * multiplier) & Mask;
+        b = (b + ((previous >> 8) & 0xFF)) & Mask;
+        b = (b * multiplier) & Mask;
+        b = (b + ((previous >> 16) & 0xFF)) & Mask;
+        b = (b * multiplier) & Mask;
+        return b;
+    }
+
+    constexpr void GatherValues(const std::vector<std::string>& lines, u64& outPreviousMask, u64& outInitialValue, u64& outMultiplier) {
+        auto s1 = Constexpr::Split(lines[7], " ");
+        Constexpr::ParseNumber(s1[2], outPreviousMask);
+
+        auto s2 = Constexpr::Split(lines[8], " ");
+        Constexpr::ParseNumber(s2[1], outInitialValue);
+
+        auto s3 = Constexpr::Split(lines[12], " ");
+        Constexpr::ParseNumber(s3[2], outMultiplier);
     }
 
     PART_ONE() {
-        return lines[0];
+        u64 previousMask, initialValue, multiplier;
+        GatherValues(lines, previousMask, initialValue, multiplier);
+
+        return Constexpr::ToString(Step(0, previousMask, initialValue, multiplier));
+        /*
+        auto ipReg = GetIpReg(lines[0]);
+        Regs regs{};
+        size_t& ip = regs[ipReg];
+        std::vector<std::string> copy(lines.begin() + 1, lines.end());
+        auto inst = ParseLines(copy, GenInst);
+
+        while (true) {
+            if (ip >= inst.size()) break;
+            if (ip == 28) return Constexpr::ToString(regs[4]);
+            inst[ip](regs);
+            ip++;
+        }
+
+        return "Not Found";
+        */
     }
 
+
     PART_TWO() {
-        return lines[0];
+        u64 previousMask, initialValue, multiplier;
+        GatherValues(lines, previousMask, initialValue, multiplier);
+
+        Constexpr::SmallSet<u64> seen;
+        u64 n = 0;
+        u64 n2 = 0;
+        while (true) {
+            n2 = Step(n, previousMask, initialValue, multiplier);
+            if (!seen.insert(n2)) {
+                return Constexpr::ToString(n);
+            }
+            n = n2;
+        }
+        return "Not Found";
+        /*
+        auto ipReg = GetIpReg(lines[0]);
+        Regs regs{};
+        size_t& ip = regs[ipReg];
+        std::vector<std::string> copy(lines.begin() + 1, lines.end());
+        auto inst = ParseLines(copy, GenInst);
+
+        Constexpr::Set<u64> seen;
+        u64 previous = 0;
+        while (true) {
+            if (ip >= inst.size()) break;
+            if (ip == 28) {
+                auto val = regs[4];
+                auto newVal = Step(previous);
+                if (val != newVal) {
+                    break; //bummer
+                }
+                if (!seen.insert(val)) {
+                    return Constexpr::ToString(previous);
+                }
+                previous = val;
+            }
+            inst[ip](regs);
+            ip++;
+        }
+
+        return "Not Found";
+        */
     }
 
     TESTS() {

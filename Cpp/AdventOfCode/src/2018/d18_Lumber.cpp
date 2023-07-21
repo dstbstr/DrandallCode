@@ -1,5 +1,4 @@
 #include "2018/d18_Lumber.h"
-#include "Algorithms/FloydCycle.h"
 
 SOLUTION(2018, 18) {
 
@@ -98,7 +97,7 @@ SOLUTION(2018, 18) {
     PART_TWO() {
         auto src = Flatten(lines);
         auto dest = src;
-        Constexpr::Set<std::string> seen;
+        Constexpr::SmallSet<std::string> seen;
         size_t cycleStart = 0;
         while (true) {
             if (!seen.insert(src)) break;
@@ -152,6 +151,8 @@ SOLUTION(2018, 18) {
 }
 
 /*
+#include "Algorithms/FloydCycle.h"
+
 constexpr char NextState(char current, const std::vector<char>&neighbors) {
     switch (current) {
     case '.': return std::count(neighbors.begin(), neighbors.end(), '|') > 2 ? '|' : '.';

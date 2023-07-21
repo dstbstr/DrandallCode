@@ -18,7 +18,7 @@ SOLUTION(2016, 1) {
     }
 
     constexpr size_t FindTarget2(const std::string& directions) {
-        Constexpr::Set<Coord> seen;
+        Constexpr::SmallSet<Coord> seen;
         Direction facing = North;
         Coord pos{ 0, 0 };
         u32 distance;

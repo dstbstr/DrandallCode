@@ -2,15 +2,16 @@
 #include <queue>
 
 SOLUTION(2018, 20) {
-    using Grid = std::unordered_map<Coord, std::vector<Coord>>;
+    //using Grid = std::unordered_map<Coord, std::vector<Coord>>;
+    using Grid = Constexpr::SmallMap<Coord, std::vector<Coord>>;
 
-    void Connect(Coord & a, const Coord & b, Grid & grid) {
+    constexpr void Connect(Coord & a, const Coord & b, Grid & grid) {
         grid[a].push_back(b);
         grid[b].push_back(a);
         a = b;
     }
 
-    void Recurse(std::string_view chars, size_t & index, Coord pos, Grid & grid) {
+    constexpr void Recurse(std::string_view chars, size_t & index, Coord pos, Grid & grid) {
         auto origin = pos;
         auto& [x, y] = pos;
         while (true) {
@@ -79,18 +80,6 @@ SOLUTION(2018, 20) {
     }
 
     bool RunTests() {
-        /*
-        auto paths = GetSuffixes(regex);
-        if (std::find(paths.begin(), paths.end(), "ENNWSWWSSSEENEENNN") == paths.end()) return false;
-        if (std::find(paths.begin(), paths.end(), "ENNWSWWNEWSSSSEENEENNN") == paths.end()) return false;
-        if (std::find(paths.begin(), paths.end(), "ENNWSWWSSSEENWNSEEENNN") == paths.end()) return false;
-        if (std::find(paths.begin(), paths.end(), "ENNWSWWSSSEENEESWENNNN") == paths.end()) return false;
-        if (std::find(paths.begin(), paths.end(), "ENNWSWWNEWSSSSEENWNSEEENNN") == paths.end()) return false;
-        if (std::find(paths.begin(), paths.end(), "ENNWSWWNEWSSSSEENEESWENNNN") == paths.end()) return false;
-        if (std::find(paths.begin(), paths.end(), "ENNWSWWSSSEENWNSEEESWENNNN") == paths.end()) return false;
-        if (std::find(paths.begin(), paths.end(), "ENNWSWWNEWSSSSEENWNSEEESWENNNN") == paths.end()) return false;
-        if (paths.size() != 8) return false;
-        */
         if (Part1("^WNE$") != 3) return false;
         if (Part1("^ENWWW(NEEE|SSE(EE|N))$") != 10) return false;
         if (Part1("^ENNWSWW(NEWS|)SSSEEN(WNSE|)EE(SWEN|)NNN$") != 18) return false;
@@ -99,15 +88,50 @@ SOLUTION(2018, 20) {
         return true;
     }
 
+    constexpr size_t Solve(const std::vector<std::string>& lines, auto OnStep) {
+        size_t index = 1;
+        Grid grid{};
+        Coord origin = { 0, 0 };
+        Recurse(lines[0], index, origin, grid);
+
+        Constexpr::SmallSet<Coord> visited;
+        Constexpr::Queue<std::pair<Coord, int>> queue;
+        queue.push({ origin, 0 });
+
+        size_t result = 0;
+        while (!queue.is_empty()) {
+            auto [pos, length] = queue.front();
+            queue.pop();
+            if (visited.contains(pos)) continue;
+            visited.insert(pos);
+            OnStep(length, result);
+            for (auto neighbor : grid[pos]) {
+                queue.push({ neighbor, length + 1 });
+            }
+        }
+
+        return result;
+    }
     PART_ONE() {
-        return lines[0];
+        auto result = Solve(lines, [](size_t length, size_t& r) {
+            r = std::max(length, r);
+            });
+        return Constexpr::ToString(result);
     }
 
     PART_TWO() {
-        return lines[0];
+        auto result = Solve(lines, [](size_t length, size_t& r) {
+            r += length >= 1000;
+            });
+        return Constexpr::ToString(result);
     }
 
     TESTS() {
+        static_assert(PartOne({ "^WNE$" }) == "3");
+        static_assert(PartOne({"^ENWWW(NEEE|SSE(EE|N))$"}) == "10");
+        static_assert(PartOne({"^ENNWSWW(NEWS|)SSSEEN(WNSE|)EE(SWEN|)NNN$"}) == "18");
+        static_assert(PartOne({"^ESSWWN(E|NNENN(EESS(WNSE|)SSS|WWWSSSSE(SW|NNNE)))$"}) == "23");
+        static_assert(PartOne({ "^WSSEESWWWNW(S|NENNEEEENN(ESSSSW(NWSW|SSEN)|WSWWN(E|WWS(E|SS))))$" }) == "31");
         return true;
     }
 }

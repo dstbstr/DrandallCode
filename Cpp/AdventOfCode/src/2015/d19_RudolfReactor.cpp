@@ -15,7 +15,7 @@ SOLUTION(2015, 19) {
         reverseTransforms[to] = from;
     }
 
-    constexpr void ExtractMolecules(const std::string& initial, u32 strLen, const Transforms& transforms, Constexpr::Set<std::string>& outMolecules) {
+    constexpr void ExtractMolecules(const std::string& initial, u32 strLen, const Transforms& transforms, Constexpr::BigSet<std::string>& outMolecules) {
         for (size_t i = 0; i < initial.size(); i++) {
             auto candidate = initial.substr(i, strLen);
             if (transforms.contains(candidate)) {
@@ -50,7 +50,7 @@ SOLUTION(2015, 19) {
             ParseTransform(line, transforms, reverseTransforms);
         }
 
-        Constexpr::Set<std::string> molecules;
+        Constexpr::BigSet<std::string> molecules;
         ExtractMolecules(groups[1][0], 1, transforms, molecules);
         ExtractMolecules(groups[1][0], 2, transforms, molecules);
 

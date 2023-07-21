@@ -7,7 +7,7 @@
 //Returns all points filled
 template<typename T>
 constexpr std::vector<T> FloodFill(T start, auto NeighborFunc) {
-    Constexpr::Set<T> seen{ start };
+    Constexpr::SmallSet<T> seen{ start };
     std::vector<T> q{ start };
     std::vector<T> result;
 
@@ -33,11 +33,6 @@ constexpr std::vector<std::vector<T>> GetAllFloodFillGroups(std::vector<T> all, 
     auto n = [&](const T& t) {
         auto neighbors = neighborFunc(t);
         return Constexpr::Within(neighbors, all);
-        //std::vector<T> toKeep;
-        //std::copy_if(neighbors.begin(), neighbors.end(), std::back_inserter(toKeep), [&](const T& neighbor) {
-        //    return std::find(all.begin(), all.end(), neighbor) != all.end();
-        //    });
-        //return toKeep;
     };
 
     while (!all.empty()) {

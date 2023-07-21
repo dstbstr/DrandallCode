@@ -5,7 +5,7 @@
 SOLUTION(2015, 9) {
     using DistanceMap = Constexpr::SmallMap<std::string, Constexpr::SmallMap<std::string, size_t>>;
 
-    constexpr void ParseInput(const std::vector<std::string>& lines, DistanceMap& outDistances, Constexpr::Set<std::string>& outDestinations) {
+    constexpr void ParseInput(const std::vector<std::string>& lines, DistanceMap& outDistances, Constexpr::SmallSet<std::string>& outDestinations) {
         outDistances = {};
         outDestinations = {};
 
@@ -34,7 +34,7 @@ SOLUTION(2015, 9) {
 
     constexpr size_t Solve(const std::vector<std::string>& lines, bool min) {
         DistanceMap distances;
-        Constexpr::Set<std::string> destinations;
+        Constexpr::SmallSet<std::string> destinations;
         ParseInput(lines, distances, destinations);
 
         auto path = std::vector<std::string>{ destinations.cbegin(), destinations.cend() };

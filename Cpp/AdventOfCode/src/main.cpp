@@ -81,9 +81,10 @@ void RunAll() {
 //maybe look closer at this for more shenanigans: https://stackoverflow.com/questions/410980/include-a-text-file-in-a-c-program-as-a-char
 
 int main(int, char**) {
+    Constexpr::RunCollectionTests();
     //RunAll();
     //RunYear(2018);
-    RunOne(2018, 18);
+    RunOne(2018, 22);
     //RunLatest();
     return 0;
 }

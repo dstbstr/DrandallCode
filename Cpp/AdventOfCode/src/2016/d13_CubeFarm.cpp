@@ -37,8 +37,7 @@ SOLUTION(2016, 13) {
     }
 
     constexpr u32 Bfs(u32 key, UCoord target) {
-        //std::unordered_set<UCoord> seen;
-        Constexpr::Set<UCoord> seen;
+        Constexpr::SmallSet<UCoord> seen;
         u32 depth = 0;
         std::vector<UCoord> moves;
         moves.push_back({ 1, 1 });
@@ -54,7 +53,6 @@ SOLUTION(2016, 13) {
             }
             moves.clear();
             std::copy_if(next.begin(), next.end(), std::back_inserter(moves), [&](UCoord move) {
-                //return seen.find(move) == seen.end() && IsOpen(move, key);
                 return !seen.contains(move) && IsOpen(move, key);
                 });
 
@@ -68,8 +66,7 @@ SOLUTION(2016, 13) {
     }
 
     constexpr u32 FindUniquePositions(u32 key, u32 maxSteps) {
-        //std::unordered_set<UCoord> seen;
-        Constexpr::Set<UCoord> seen;
+        Constexpr::SmallSet<UCoord> seen;
         u32 depth = 0;
         std::vector<UCoord> moves;
         moves.push_back({ 1, 1 });
@@ -83,7 +80,6 @@ SOLUTION(2016, 13) {
             moves.clear();
             std::copy_if(next.begin(), next.end(), std::back_inserter(moves), [&](UCoord move) {
                 return !seen.contains(move) && IsOpen(move, key);
-                //return seen.find(move) == seen.end() && IsOpen(move, key);
                 });
 
             seen.insert(moves.begin(), moves.end());

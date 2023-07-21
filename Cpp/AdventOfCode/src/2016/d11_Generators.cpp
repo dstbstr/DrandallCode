@@ -261,7 +261,7 @@ SOLUTION(2016, 11) {
 
         std::vector<State> current = { initial };
         std::vector<State> next;
-        Constexpr::Set<size_t> seen;
+        Constexpr::SmallSet<size_t> seen;
         seen.insert(Hash(initial));
 
         u32 moveIndex = 0;

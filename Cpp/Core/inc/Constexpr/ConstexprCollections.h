@@ -6,6 +6,8 @@
 #include <ranges>
 #include <algorithm>
 
+#include "Constexpr/ConstexprHash.h"
+
 namespace Constexpr {
     template<typename R>
     concept nested_range = std::ranges::input_range<R> && std::ranges::range<std::ranges::range_reference_t<R>>;
@@ -197,6 +199,175 @@ namespace Constexpr {
         return map.cend();
     }
 
+    //template<typename Key, typename Value, size_t Capacity = 1'000'000, auto hash = Constexpr::Hash<Key>>
+    template<typename Key, typename Value, size_t Capacity = 1'000'000>
+    struct BigMap {
+        constexpr BigMap() {
+            MakeSentinel();
+            mData = new std::array<std::pair<Key, Value>, Capacity>();
+            /*
+            if constexpr (std::is_same_v<std::remove_cvref_t<Key>, std::string>) {
+                Sentinel = std::make_pair<Key, Value>("SentinelString", {});
+            }
+            else if constexpr (std::is_arithmetic_v<Key>) {
+                Sentinel = std::make_pair<Key, Value>(9919, {});
+            }
+            else {
+                Sentinel = std::make_pair<Key, Value>({}, {}); //bleh
+            }
+            */
+            mData->fill(Sentinel);
+        }
+
+        constexpr BigMap(const BigMap& other) : mData(other.mData), Sentinel(other.Sentinel) {}
+        constexpr BigMap(BigMap&& other) : mData(std::move(other.mData)), Sentinel(std::move(other.Sentinel)) {}
+        constexpr BigMap(const std::initializer_list<std::pair<Key, Value>>& initialState) {
+            MakeSentinel();
+            mData = new std::array<std::pair<Key, Value>, Capacity>();
+            mData->fill(Sentinel);
+            for (const auto& p : initialState) {
+                (*mData)[FindSlot(p.first)] = p;
+            }
+        }
+
+        constexpr ~BigMap() {
+            delete mData;
+        }
+
+        constexpr BigMap& operator=(const BigMap& other) {
+            *(this->mData) = (*other.mData);
+            return *this;
+        }
+        constexpr BigMap& operator=(BigMap&& other) {
+            *(this->mData) = (*other.mData);
+            return *this;
+        }
+
+        constexpr Value& operator[](const Key& key) {
+            auto slot = FindSlot(key);
+            if (!IsOccupied(slot)) {
+                (*mData)[slot] = std::make_pair(key, Value{});
+            }
+            return (*mData)[slot].second;
+        }
+
+        constexpr const Value& at(const Key& key) const {
+            auto slot = FindSlot(key);
+            if (!IsOccupied(slot)) {
+                throw "Key not found";
+            }
+            return (*mData)[slot].second;
+        }
+
+        constexpr bool is_empty() const {
+            return size() == 0;
+        }
+        constexpr size_t size() const {
+            return std::count_if(mData->begin(), mData->end(), [&](const std::pair<Key, Value>& p) { return p != Sentinel; });
+            //return GetValues().size();
+        }
+
+        constexpr void clear() {
+            mData->fill(Sentinel);
+        }
+        constexpr bool contains(const Key& key) const {
+            return IsOccupied(FindSlot(key));
+        }
+        constexpr size_t erase(const Key& key) {
+            auto slot = FindSlot(key);
+            if (!IsOccupied(slot)) return 0ull;
+            (*mData)[slot] = Sentinel;
+            for (size_t j = (slot + 1) % Capacity; j != slot; j = (j + 1) % Capacity) {
+                if (!IsOccupied(j)) return 1ull;
+                size_t k = FindSlot((*mData)[j].first);
+                //size_t k = Constexpr::Hash((*mData)[j].first) % Capacity;
+                if (slot <= j) {
+                    if ((slot < k) && (k <= j)) {
+                        continue;
+                    }
+                }
+                else {
+                    if ((slot < k) || (k <= j)) {
+                        continue;
+                    }
+                }
+
+                (*mData)[slot] = (*mData)[j];
+                (*mData)[j] = Sentinel;
+                slot = j;
+            }
+            //maybe warn that the map is full?
+            return 1ull;
+        }
+
+        constexpr auto begin() {
+            return mData->begin();
+        }
+        constexpr auto begin() const {
+            return mData->begin();
+        }
+        constexpr auto cbegin() const {
+            return mData->cbegin();
+        }
+        constexpr auto end() {
+            return mData->end();
+        }
+        constexpr auto end() const {
+            return mData->end();
+        }
+        constexpr auto cend() const {
+            return mData->cend();
+        }
+
+        constexpr std::vector<Key> GetKeys() const {
+            std::vector<Key> result;
+            for (const auto& p : *mData) {
+                if (p != Sentinel) {
+                    result.push_back(p.first);
+                }
+            }
+            return result;
+        }
+
+        constexpr std::vector<Value> GetValues() const {
+            std::vector<Value> result;
+            for (const auto& p : *mData) {
+                if (p != Sentinel) {
+                    result.push_back(p.second);
+                }
+            }
+            return result;
+        }
+    private:
+        std::array<std::pair<Key, Value>, Capacity>* mData{};
+        std::pair<Key, Value> Sentinel;
+
+        constexpr void MakeSentinel() {
+            if constexpr (std::is_same_v<std::remove_cvref_t<Key>, std::string>) {
+                Sentinel = std::make_pair<Key, Value>("SentinelString", {});
+            }
+            else if constexpr (std::is_arithmetic_v<Key>) {
+                Sentinel = std::make_pair<Key, Value>(9919, {});
+            }
+            else {
+                Sentinel = std::make_pair<Key, Value>({}, {}); //bleh
+            }
+        }
+
+        constexpr size_t FindSlot(const Key& key) const {
+            //size_t i = hash(key) % Capacity;
+            size_t i = Constexpr::Hash(key) % Capacity;
+            while ((*mData)[i].first != Sentinel.first && (*mData)[i].first != key) {
+                i = (i + 1) % Capacity;
+            }
+            return i;
+        };
+
+        constexpr bool IsOccupied(size_t slot) const {
+            return (*mData)[slot].first != Sentinel.first;
+        }
+    };
+
     template<typename T>
     class Stack {
     public:
@@ -246,6 +417,8 @@ namespace Constexpr {
         constexpr Queue() = default;
         constexpr Queue(const Queue& other) : mData(other.mData) {}
         constexpr Queue(Queue&& other) : mData(std::move(other.mData)) {}
+        constexpr Queue(T initial) : mData(initial) {}
+
         Queue& operator=(const Queue& other) {
             mData = other.mData;
             return *this;
@@ -301,16 +474,23 @@ namespace Constexpr {
 
         constexpr void push(T val) {
             mData.push_back(val);
+            mSorted = false;
         }
 
         constexpr T top() const {
             if (mData.empty()) throw "Reading empty queue";
-            std::sort(mData.begin(), mData.end());
+            if (!mSorted) {
+                std::sort(mData.begin(), mData.end());
+                mSorted = true;
+            }
             return mData.back();
         }
         constexpr void pop() {
             if (mData.empty()) throw "Popped empty queue";
-            std::sort(mData.begin(), mData.end());
+            if (!mSorted) {
+                std::sort(mData.begin(), mData.end());
+                mSorted = true;
+            }
             mData.pop_back();
         }
 
@@ -326,27 +506,32 @@ namespace Constexpr {
 
     private:
         mutable std::vector<T> mData;
+        mutable bool mSorted{ false };
     };
 
 
-    template<typename T, typename THash = std::hash<T>>
-    class Set {
+    template<typename T>
+    class SmallSet {
     public:
-        constexpr Set() = default;
-        constexpr Set(const Set& other) :mData(other.mData) {}
-        constexpr Set(Set&& other) : mData(std::move(other.mData)) {}
-        constexpr Set(const std::initializer_list<T>& initial) { insert(initial.begin(), initial.end()); }
+        constexpr SmallSet() = default;
+        constexpr SmallSet(const SmallSet& other) :mData(other.mData) {}
+        constexpr SmallSet(SmallSet&& other) : mData(std::move(other.mData)) {}
+        constexpr SmallSet(const std::initializer_list<T>& initial) { insert(initial.begin(), initial.end()); }
 
-        constexpr Set& operator=(const Set& other) {
+        constexpr SmallSet& operator=(const SmallSet& other) {
             this->mData = other.mData;
             return *this;
         }
-        constexpr Set& operator=(Set&& other) {
+        constexpr SmallSet& operator=(SmallSet&& other) {
             this->mData = other.mData;
             return *this;
         }
 
         constexpr bool insert(const T& val) {
+            if (mData.size() >= mNextSort) {
+                std::sort(mData.begin(), mData.end());
+                mNextSort *= 4;
+            }
             if (contains(val)) {
                 return false;
             }
@@ -399,23 +584,186 @@ namespace Constexpr {
         }
 
     private:
+        size_t mNextSort{ 512 };
         std::vector<T> mData;
     };
 
     template<typename T>
-    constexpr inline auto begin(Set<T>& set) {
+    constexpr inline auto begin(SmallSet<T>& set) {
         return set.begin();
     }
     template<typename T>
-    constexpr inline auto cbegin(const Set<T>& set) {
+    constexpr inline auto cbegin(const SmallSet<T>& set) {
         return set.cbegin();
     }
     template<typename T>
-    constexpr inline auto end(Set<T>& set) {
+    constexpr inline auto end(SmallSet<T>& set) {
         return set.end();
     }
     template<typename T>
-    constexpr inline auto cend(const Set<T>& set) {
+    constexpr inline auto cend(const SmallSet<T>& set) {
+        return set.cend();
+    }
+
+    //template<typename T, size_t Capacity = 1'000'000, auto hash = Constexpr::Hash<T>>
+    template<typename T, size_t Capacity = 1'000'000>
+    class BigSet {
+    public:
+        constexpr BigSet() {
+            MakeSentinel();
+            mData = new std::array<T, Capacity>();
+            mData->fill(Sentinel);
+        }
+        constexpr BigSet(const BigSet& other) {
+            mData = new std::array<T, Capacity>();
+            *mData = *other.mData;
+            Sentinel = other.Sentinel;
+        }
+
+        constexpr BigSet(BigSet&& other) {
+            mData = std::move(other.mData);
+            Sentinel = other.Sentinel;
+        }
+
+        constexpr BigSet(const std::initializer_list<T>& initial) { 
+            MakeSentinel();
+            mData = new std::array<T, Capacity>();
+            mData->fill(Sentinel);
+
+            for (const auto& e : initial) {
+                insert(e);
+            }
+        }
+        constexpr ~BigSet() { delete mData; }
+
+        constexpr BigSet& operator=(const BigSet& other) {
+            *(this->mData) = *(other.mData);
+            return *this;
+        }
+        constexpr BigSet& operator=(BigSet&& other) {
+            this->mData = std::move(other.mData);
+            return *this;
+        }
+
+        constexpr bool insert(const T& val) {
+            auto slot = FindSlot(val);
+            if (IsOccupied(slot)) return false; //either full, or already in set
+            (*mData)[slot] = val;
+            return true;
+        }
+
+        constexpr void insert(const auto& begin, const auto& end) {
+            for (auto it = begin; it != end; it++) {
+                insert(*it);
+            }
+        }
+
+        constexpr bool contains(const T& val) const {
+            return IsOccupied(FindSlot(val));
+        }
+
+        constexpr void erase(const T& val) {
+            auto slot = FindSlot(val);
+            if (!IsOccupied(slot)) return;
+            (*mData)[slot] = Sentinel;
+            for (size_t j = (slot + 1) % Capacity; j != slot; j = (j + 1) % Capacity) {
+                if (!IsOccupied(j)) return;
+                //size_t k = hash((*mData)[j]) % Capacity;
+                size_t k = FindSlot((*mData)[j]);
+                if (slot <= j) {
+                    if ((slot < k) && (k <= j)) {
+                        continue;
+                    }
+                }
+                else {
+                    if ((slot < k) || (k <= j)) {
+                        continue;
+                    }
+                }
+
+                (*mData)[slot] = (*mData)[j];
+                (*mData)[j] = Sentinel;
+                slot = j;
+            }
+            //maybe warn that the map is full?
+            return;
+        }
+
+        constexpr bool empty() {
+            return size() == 0;
+        }
+        constexpr void clear() {
+            mData->fill(Sentinel);
+        }
+        constexpr std::size_t size() {
+            return std::count_if(mData->begin(), mData->end(), [&](T val) { return val != Sentinel; });
+        }
+
+        constexpr auto begin() {
+            return mData.begin();
+        }
+        constexpr auto begin() const {
+            return mData.begin();
+        }
+        constexpr auto cbegin() const {
+            return mData.cbegin();
+        }
+        constexpr auto end() {
+            return mData.end();
+        }
+        constexpr auto end() const {
+            return mData.end();
+        }
+        constexpr auto cend() const {
+            return mData.cend();
+        }
+
+    private:
+        //T Sentinel { std::is_same_v<std::string, std::remove_cvref_t<T>> ? "SentinelString" : std::is_arithmetic_v<T> ? 9919 : {} };
+        T Sentinel{};
+        std::array<T, Capacity>* mData;
+        
+        constexpr void MakeSentinel() {
+            if constexpr (std::is_same_v<std::remove_cvref_t<T>, std::string>) {
+                Sentinel = "SentinelString";
+            }
+            else if constexpr (std::is_arithmetic_v<T>) {
+                Sentinel = 9919;
+            }
+            else {
+                Sentinel = {}; //bleh
+            }
+        }
+        
+
+        constexpr size_t FindSlot(const T& t) const {
+            //size_t i = hash(t) % Capacity;
+            size_t i = Constexpr::Hash(t) % Capacity;
+            while ((*mData)[i] != Sentinel && (*mData)[i] != t) {
+                i = (i + 1) % Capacity;
+            }
+            return i;
+        };
+
+        constexpr bool IsOccupied(size_t slot) const {
+            return (*mData)[slot] != Sentinel;
+        }
+    };
+
+    template<typename T, size_t Capacity>
+    constexpr inline auto begin(BigSet<T, Capacity>& set) {
+        return set.begin();
+    }
+    template<typename T, size_t Capacity>
+    constexpr inline auto cbegin(const BigSet<T, Capacity>& set) {
+        return set.cbegin();
+    }
+    template<typename T, size_t Capacity>
+    constexpr inline auto end(BigSet<T, Capacity>& set) {
+        return set.end();
+    }
+    template<typename T, size_t Capacity>
+    constexpr inline auto cend(const BigSet<T, Capacity>& set) {
         return set.cend();
     }
 
@@ -573,4 +921,5 @@ namespace Constexpr {
         std::vector<T> mData;
     };
 
+    bool RunCollectionTests();
 }

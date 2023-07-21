@@ -20,7 +20,7 @@ namespace AStarPrivate {
         constexpr explicit MinimalPath(T t) : Val(t) {}
 
         constexpr bool operator<(const MinimalPath& other) const {
-            return other.Forcast < Forcast;
+            return other.Forcast != Forcast ? other.Forcast < Forcast : Known < other.Known;
         }
     };
 
@@ -34,22 +34,21 @@ namespace AStarPrivate {
         constexpr explicit MaximalPath(T t) : Val(t) {}
 
         constexpr bool operator<(const MaximalPath& other) const {
-            return Forcast < other.Forcast;
+            return Forcast != other.Forcast ? Forcast < other.Forcast : other.Known < Known;
         }
     };
 
     template<typename T, typename State>
     constexpr std::vector<T> AStar(T start, auto costFunc, auto doneFunc, auto hFunc, auto nFunc) {
-        Constexpr::Set<T> seen{};
-        Constexpr::SmallMap<T, T> cameFrom{};
-        Constexpr::SmallMap<T, State> state{};
+        Constexpr::BigSet<T> seen{};
+        Constexpr::BigMap<T, T> cameFrom{};
+        Constexpr::BigMap<T, State> state{};
         Constexpr::PriorityQueue<State> queue{};
 
         auto startState = State(start);
         startState.Known = 0;
         startState.Forcast = hFunc(start);
         state[start] = startState;
-        //state.insert({ start, startState });
         cameFrom[start] = start;
         queue.push(startState);
 
