@@ -6,24 +6,23 @@ SOLUTION(2019, 13) {
     enum struct TileType { Empty, Wall, Block, Paddle, Ball };
 
     struct Game {
-        std::unordered_map<Coord, TileType> Board;
+        Constexpr::SmallMap<Coord, TileType> Board;
         s64 Score = 0;
     };
 
-    std::pair<Coord, s64> Read(std::vector<s64>&instructions, Args & args) {
-        static const s64 Consumed = -919;
-        args.Output = Consumed;
+    constexpr std::pair<Coord, s64> Read(std::vector<s64>&instructions, Args & args) {
+        args.Output = Unset;
         u32 readCount = 0;
         s64 x = 0, y = 0, z = 0;
         while (Apply(instructions, args)) {
-            if (args.Output != Consumed) {
+            if (args.Output != Unset) {
                 switch (readCount) {
                 case 0: x = args.Output; break;
                 case 1: y = args.Output; break;
                 case 2: z = args.Output; break;
                 }
                 readCount++;
-                args.Output = Consumed;
+                args.Output = Unset;
                 if (readCount == 3) break;
             }
         }
@@ -33,7 +32,7 @@ SOLUTION(2019, 13) {
     constexpr Coord BoardSize{ 41, 24 };
     constexpr Coord ScorePos{ -1, 0 };
 
-    void UpdateGame(Game & game, std::vector<s64>&instructions, Args & args) {
+    constexpr void UpdateGame(Game & game, std::vector<s64>&instructions, Args & args) {
         while (!NeedsInput(instructions, args)) {
             auto [pos, val] = Read(instructions, args);
             if (pos == ScorePos) {
@@ -48,40 +47,7 @@ SOLUTION(2019, 13) {
         }
     }
 
-    auto Part1(const std::string & line) {
-        auto instructions = ParseInstructions(line);
-        Args args;
-        Game game;
-        UpdateGame(game, instructions, args);
-
-        return std::count_if(game.Board.begin(), game.Board.end(), [](const auto& kvp) {
-            return kvp.second == TileType::Block;
-            });
-    }
-
-#include <iostream>
-    void PrintGame(const Game & game) {
-        for (s32 row = 0; row <= BoardSize.Y; row++) {
-            for (s32 col = 0; col <= BoardSize.X; col++) {
-                Coord pos = { col, row };
-                char icon = ' ';
-                if (game.Board.find(pos) != game.Board.end()) {
-                    switch (game.Board.at(pos)) {
-                    case TileType::Empty: icon = ' '; break;
-                    case TileType::Ball: icon = 'B'; break;
-                    case TileType::Block: icon = '%'; break;
-                    case TileType::Paddle: icon = '_'; break;
-                    case TileType::Wall: icon = '#'; break;
-                    }
-                }
-                std::cout << icon;
-            }
-            std::cout << '\n';
-        }
-
-        std::cout << "Score: " << game.Score << "\n";
-    }
-
+    constexpr Coord origin = { 0, 0 };
     Coord FindFirst(const Game & game, TileType targetType) {
         for (const auto& [pos, type] : game.Board) {
             if (type == targetType) {
@@ -89,11 +55,10 @@ SOLUTION(2019, 13) {
             }
         }
 
-        return { 0, 0 };
+        return origin;
     }
 
-    bool IsGameOver(const Game & game, const std::vector<s64>&instructions, const Args & args) {
-        static const Coord origin = { 0, 0 };
+    constexpr bool IsGameOver(const Game & game, const std::vector<s64>&instructions, const Args & args) {
         if (instructions[args.Ip] % 100 == OpCode::Halt) return true;
         return FindFirst(game, TileType::Block) == origin;
     }
@@ -108,38 +73,35 @@ SOLUTION(2019, 13) {
         Apply(instructions, args);
     }
 
-    auto Part2(const std::string & line) {
-        auto instructions = ParseInstructions(line);
+
+    PART_ONE() {
+        auto instructions = ParseInstructions(lines[0]);
+        Args args;
+        Game game;
+        UpdateGame(game, instructions, args);
+
+        
+        auto blackTiles = std::count_if(game.Board.begin(), game.Board.end(), [](const auto& kvp) {
+            return kvp.second == TileType::Block;
+            });
+
+        return Constexpr::ToString(blackTiles);
+    }
+
+    PART_TWO() {
+        auto instructions = ParseInstructions(lines[0]);
         instructions[0] = 2;
         Args args;
         Game game;
         while (true) {
             UpdateGame(game, instructions, args);
-            //PrintGame(game);
             if (IsGameOver(game, instructions, args)) {
                 break;
             }
             MovePaddle(game, instructions, args);
         }
 
-        return game.Score;
-    }
-
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines[0]));
-        return Constexpr::ToString(Part2(lines[0]));
-    }
-
-    bool RunTests() {
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
+        return Constexpr::ToString(game.Score);
     }
 
     TESTS() {

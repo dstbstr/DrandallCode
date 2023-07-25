@@ -2,24 +2,22 @@
 #include "2019/Comp.h"
 
 SOLUTION(2019, 17) {
-    static constexpr s64 Consumed = -91234;
-    using Map = std::unordered_map<Coord, bool>;
+    using Map = Constexpr::SmallMap<Coord, bool>;
 
     constexpr std::string ReadOutput(std::vector<s64>&instructions) {
         Args args;
-        args.Output = Consumed;
         std::string result;
         while (Apply(instructions, args)) {
-            if (args.Output != Consumed) {
+            if (args.Output != Unset) {
                 result.push_back(static_cast<char>(args.Output));
-                args.Output = Consumed;
+                args.Output = Unset;
             }
         }
 
         return result;
     }
 
-    Map ParseMap(const std::string & mapStr) {
+    constexpr Map ParseMap(const std::string & mapStr) {
         Map result;
         Coord pos{ 0, 0 };
         for (auto c : mapStr) {
@@ -39,8 +37,22 @@ SOLUTION(2019, 17) {
         return result;
     }
 
-    auto Part1(const std::string & line) {
-        auto instructions = ParseInstructions(line);
+    constexpr Args SetupInputs(const std::vector<std::string>&programs, bool videoFeed) {
+        Args args;
+        for (const auto& program : programs) {
+            for (auto c : program) {
+                args.Inputs.push_back(c);
+            }
+            args.Inputs.push_back('\n');
+        }
+        args.Inputs.push_back(videoFeed ? 'y' : 'n');
+        args.Inputs.push_back('\n');
+
+        return args;
+    }
+
+    PART_ONE() {
+        auto instructions = ParseInstructions(lines[0]);
         auto map = ParseMap(ReadOutput(instructions));
         s64 result = 0;
         Coord min, max, pos;
@@ -66,24 +78,11 @@ SOLUTION(2019, 17) {
             }
         }
 
-        return result;
+        return Constexpr::ToString(result);
     }
 
-    Args SetupInputs(const std::vector<std::string>&programs, bool videoFeed) {
-        Args args;
-        for (const auto& program : programs) {
-            for (auto c : program) {
-                args.Inputs.push_back(c);
-            }
-            args.Inputs.push_back('\n');
-        }
-        args.Inputs.push_back(videoFeed ? 'y' : 'n');
-        args.Inputs.push_back('\n');
-
-        return args;
-    }
-    auto Part2(const std::string & line) {
-        auto instructions = ParseInstructions(line);
+    PART_TWO() {
+        auto instructions = ParseInstructions(lines[0]);
         instructions[0] = 2;
         std::string mainProgram = "C,A,C,B,C,A,B,A,B,A";
         std::string programA = "R,8,L,12,R,4,R,4";
@@ -92,32 +91,15 @@ SOLUTION(2019, 17) {
 
         auto args = SetupInputs({ mainProgram, programA, programB, programC }, false);
 
-        auto output = Consumed;
+        auto output = Unset;
         while (Apply(instructions, args)) {
-            if (args.Output != Consumed) {
+            if (args.Output != Unset) {
                 output = args.Output;
-                args.Output = Consumed;
+                args.Output = Unset;
             }
         }
 
-        return output;
-    }
-
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines[0]));
-        return Constexpr::ToString(Part2(lines[0]));
-    }
-
-    bool RunTests() {
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
+        return Constexpr::ToString(output);
     }
 
     TESTS() {

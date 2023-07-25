@@ -6,11 +6,11 @@ SOLUTION(2019, 14) {
         u64 Cost;
     };
 
-    using Produces = std::unordered_map<std::string, u64>;
-    using Ingrediants = std::unordered_map<std::string, std::vector<Ingrediant>>;
-    using Extras = std::unordered_map<std::string, u64>;
+    using Produces = Constexpr::SmallMap<std::string, u64>;
+    using Ingrediants = Constexpr::SmallMap<std::string, std::vector<Ingrediant>>;
+    using Extras = Constexpr::SmallMap<std::string, u64>;
 
-    void ParseLines(const std::vector<std::string>&lines, Produces & outProduces, Ingrediants & outIngrediants) {
+    constexpr void ParseLines(const std::vector<std::string>& lines, Produces& outProduces, Ingrediants& outIngrediants) {
         for (const auto& line : lines) {
             auto s1 = StrUtil::Split(line, " => ");
             std::vector<Ingrediant> ingrediants;
@@ -31,7 +31,7 @@ SOLUTION(2019, 14) {
         }
     }
 
-    u64 TakeFromExtras(Extras & extras, const Ingrediant & ingrediant, u64 count) {
+    constexpr u64 TakeFromExtras(Extras & extras, const Ingrediant & ingrediant, u64 count) {
         const auto& material = ingrediant.Name;
         if (extras.contains(material)) {
             auto& extra = extras.at(material);
@@ -48,7 +48,7 @@ SOLUTION(2019, 14) {
         return count;
     }
 
-    u64 GetProduction(u64 batchSize, u64 needed) {
+    constexpr u64 GetProduction(u64 batchSize, u64 needed) {
         if (needed % batchSize == 0) { //need 7 As, produce 10 per batch
             return needed;
         }
@@ -58,7 +58,7 @@ SOLUTION(2019, 14) {
         }
     }
 
-    u64 ProduceFuel(const Produces & produces, const Ingrediants & ingrediants, Extras & extras, u32 fuelToProduce) {
+    constexpr u64 ProduceFuel(const Produces & produces, const Ingrediants & ingrediants, Extras & extras, u32 fuelToProduce) {
         u64 oreNeeded = 0;
         std::vector<Ingrediant> current;
         current.push_back(Ingrediant{ "FUEL", fuelToProduce });
@@ -91,15 +91,15 @@ SOLUTION(2019, 14) {
         return oreNeeded;
     }
 
-    auto Part1(const std::vector<std::string>&lines) {
+    PART_ONE() {
         Produces produces;
         Ingrediants ingrediants;
         Extras extras;
         ParseLines(lines, produces, ingrediants);
-        return ProduceFuel(produces, ingrediants, extras, 1);
+        return Constexpr::ToString(ProduceFuel(produces, ingrediants, extras, 1));
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
+    PART_TWO() {
         Produces produces;
         Ingrediants ingrediants;
         Extras extras;
@@ -121,15 +121,10 @@ SOLUTION(2019, 14) {
             }
         }
 
-        return totalFuelProduced;
+        return Constexpr::ToString(totalFuelProduced);
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
+    TESTS() {
         std::vector<std::string> lines = {
             "10 ORE => 10 A",
             "1 ORE => 1 B",
@@ -139,7 +134,7 @@ SOLUTION(2019, 14) {
             "7 A, 1 E => 1 FUEL"
         };
 
-        if (Part1(lines) != 31) return false;
+        if (PartOne(lines) != "31") return false;
 
 
         lines = {
@@ -151,7 +146,7 @@ SOLUTION(2019, 14) {
             "4 C, 1 A => 1 CA",
             "2 AB, 3 BC, 4 CA => 1 FUEL"
         };
-        if (Part1(lines) != 165) return false;
+        if (PartOne(lines) != "165") return false;
 
         lines = {
             "157 ORE => 5 NZVS",
@@ -164,8 +159,8 @@ SOLUTION(2019, 14) {
             "165 ORE => 2 GPVTF",
             "3 DCFZ, 7 NZVS, 5 HKGWZ, 10 PSHF => 8 KHKGT"
         };
-        if (Part1(lines) != 13312) return false;
-        if (Part2(lines) != 82892753) return false;
+        if (PartOne(lines) != "13312") return false;
+        if (PartTwo(lines) != "82892753") return false;
 
         lines = {
             "2 VPVL, 7 FWMGM, 2 CXFTF, 11 MNCFX => 1 STKFG",
@@ -181,8 +176,8 @@ SOLUTION(2019, 14) {
             "1 VJHF, 6 MNCFX => 4 RFSQX",
             "176 ORE => 6 VJHF"
         };
-        if (Part1(lines) != 180697) return false;
-        if (Part2(lines) != 5586022) return false;
+        if (PartOne(lines) != "180697") return false;
+        if (PartTwo(lines) != "5586022") return false;
 
         lines = {
             "171 ORE => 8 CNZTR",
@@ -203,21 +198,9 @@ SOLUTION(2019, 14) {
             "7 XCVML => 6 RJRHP",
             "5 BHXH, 4 VRPVC => 5 LTCX"
         };
-        if (Part1(lines) != 2210736) return false;
-        if (Part2(lines) != 460664) return false;
+        if (PartOne(lines) != "2210736") return false;
+        if (PartTwo(lines) != "460664") return false;
 
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }
