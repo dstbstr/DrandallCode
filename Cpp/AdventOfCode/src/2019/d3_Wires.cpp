@@ -2,144 +2,90 @@
 #include "Facing.h"
 
 SOLUTION(2019, 3) {
-    using Seen = std::unordered_set<Coord>;
-    using StepMap = std::unordered_map<Coord, u32>;
+    struct Segment {
+        Vec3<s64> Start;
+        Vec3<s64> End;
 
-    void ApplyMove(Coord & pos, Facing dir, u32 steps, Seen & seen) {
-        seen.insert(pos);
-        for (u32 i = 0; i < steps; i++) {
-            Move(pos, dir);
-            seen.insert(pos);
+        constexpr bool operator==(const Segment& other) const {
+            return Start == other.Start && End == other.End;
         }
-    }
+    };
 
-    static u32 currentStep = 0; //gross?  You betcha
+    constexpr std::vector<Segment> GetSegments(const std::string& line) {
+        std::vector<Segment> result;
+        auto s = Constexpr::Split(line, ",");
+        Vec3<s64> pos;
+        char dir;
+        s64 amount;
+        Segment segment{ pos, pos };
+        for (auto step : s) {
+            dir = step[0];
+            Constexpr::ParseNumber(step.substr(1), amount);
 
-    void ApplyMove(Coord & pos, Facing dir, u32 steps, StepMap & stepMap) {
-        if (!stepMap.contains(pos)) {
-            stepMap[pos] = currentStep;
-        }
-        for (u32 i = 0; i < steps; i++) {
-            Move(pos, dir);
-            currentStep++;
-            if (!stepMap.contains(pos)) {
-                stepMap[pos] = currentStep;
-            }
-        }
-    }
-
-    constexpr std::vector<std::pair<Facing, u32>> ParseWire(const std::string & line) {
-        std::vector<std::pair<Facing, u32>> result;
-
-        auto split = Constexpr::Split(line, ",");
-        for (const auto& v : split) {
-            Facing dir = Up;
-
-            switch (v[0]) {
-            case 'U': dir = Up; break;
-            case 'D': dir = Down; break;
-            case 'L': dir = Left; break;
-            case 'R': dir = Right; break;
+            segment.Start = segment.End;
+            switch (dir) {
+            case 'U': segment.End.Y += amount; break;
+            case 'D': segment.End.Y -= amount; break;
+            case 'L': segment.End.X -= amount; break;
+            case 'R': segment.End.X += amount; break;
             }
 
-            u32 amount;
-            auto numStr = v.substr(1);
-            Constexpr::ParseNumber(numStr, amount);
-            result.push_back(std::make_pair(dir, amount));
+            segment.End.Z += amount;
+            result.push_back(segment);
         }
-
         return result;
     }
 
-    auto Part1(const std::vector<std::string>&lines) {
-        const Coord origin = { 0, 0 };
-        auto w1Path = ParseWire(lines[0]);
-        auto w2Path = ParseWire(lines[1]);
-        Seen seen1;
-        Coord pos1 = origin;
+    constexpr Coord FindIntersection(const Segment& s1, const Segment& s2) {
+        auto h = s1.Start.X == s1.End.X ? s2 : s1;
+        auto v = h == s1 ? s2 : s1;
+        return { v.Start.X, h.Start.Y };
+    }
 
-        for (const auto& [dir, steps] : w1Path) {
-            ApplyMove(pos1, dir, steps, seen1);
-        }
+    constexpr Vec3<s64> FindIntersection2(const Segment& s1, const Segment& s2) {
+        auto h = s1.Start.X == s1.End.X ? s2 : s1;
+        auto v = h == s1 ? s2 : s1;
+        Coord point = { v.Start.X, h.Start.Y };
+        auto lhs = h.End.Z - (h.End.X - point.X);
+        auto rhs = v.End.Z - (v.End.Y - point.Y);
 
-        Seen seen2;
-        Coord pos2 = origin;
-        for (const auto& [dir, steps] : w2Path) {
-            ApplyMove(pos2, dir, steps, seen2);
-        }
+        return { v.Start.X, h.Start.Y, lhs + rhs };
+    }
 
-        size_t best = 999999;
-        for (const auto& coord : seen1) {
-            if (coord == origin) continue;
-            if (seen2.find(coord) != seen2.end()) {
-                best = std::min(best, MDistance(coord, origin));
+    constexpr void Solve(const std::vector<std::string>& lines, auto OnIntersect) {
+        auto w1 = GetSegments(lines[0]);
+        auto w2 = GetSegments(lines[1]);
+
+        for (const auto& s1 : w1) {
+            for (const auto& s2 : w2) {
+                if (Constexpr::DoIntersect(s1.Start, s1.End, s2.Start, s2.End)) {
+                    OnIntersect(s1, s2);
+                }
             }
         }
 
-        return best;
     }
-
-    auto Part2(const std::vector<std::string>&lines) {
-        const Coord origin = { 0, 0 };
-        auto w1Path = ParseWire(lines[0]);
-        auto w2Path = ParseWire(lines[1]);
-        StepMap stepMap1;
-        Coord pos1 = origin;
-
-        for (const auto& [dir, steps] : w1Path) {
-            ApplyMove(pos1, dir, steps, stepMap1);
-        }
-
-        currentStep = 0; //other half of the gross hack
-
-        StepMap stepMap2;
-        Coord pos2 = origin;
-        for (const auto& [dir, steps] : w2Path) {
-            ApplyMove(pos2, dir, steps, stepMap2);
-        }
-
-        currentStep = 0; //third half of the gross hack
-        u32 best = 999999;
-        for (const auto& [pos, steps] : stepMap1) {
-            if (pos == origin) continue;
-            if (stepMap2.contains(pos)) {
-                best = std::min(best, steps + stepMap2.at(pos));
-            }
-        }
-
-        return best;
-    }
-
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
-        std::vector<std::string> lines = {
-            "R75,D30,R83,U83,L12,D49,R71,U7,L72",
-            "U62,R66,U55,R34,D71,R55,D58,R83"
-        };
-
-        if (Part1(lines) != 159) return false;
-        if (Part2(lines) != 610) return false;
-
-        lines = {
-            "R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51",
-            "U98,R91,D20,R16,D67,R40,U7,R15,U6,R7"
-        };
-
-        if (Part1(lines) != 135) return false;
-        if (Part2(lines) != 410) return false;
-        return true;
-    }
-
     PART_ONE() {
-        return lines[0];
+        size_t best = 9999;
+        Solve(lines, [&](const Segment& s1, const Segment& s2) {
+            auto intersection = FindIntersection(s1, s2);
+            auto dist = MDistance(intersection);
+            if (dist > 0) best = std::min(best, dist);
+            });
+
+        return Constexpr::ToString(best);
     }
+
 
     PART_TWO() {
-        return lines[0];
+        s64 best = 999999;
+        Solve(lines, [&](const Segment& s1, const Segment& s2) {
+            auto intersection = FindIntersection2(s1, s2);
+            if (intersection.X != 0 || intersection.Y != 0) {
+                best = std::min(best, intersection.Z);
+            }
+            });
+        return Constexpr::ToString(best);
     }
 
     TESTS() {

@@ -4,9 +4,11 @@
 
 #include <iostream>
 
+constexpr s64 Unset = -9919;
+
 struct Args {
     std::vector<s64> Inputs;
-    s64 Output = 0;
+    s64 Output = Unset;
     s64 Base = 0;
     size_t CurrentInput = 0;
     size_t Ip = 0;
@@ -258,15 +260,7 @@ inline bool ApplyDebug(std::vector<s64>& instructions, Args& args) {
 
 
 constexpr std::vector<s64> ParseInstructions(const std::string& line) {
-    std::vector<s64> result{};
-    auto split = Constexpr::Split(line, ",");
-    for (const auto elem : split) {
-        s64 val;
-        Constexpr::ParseNumber(elem, val);
-        result.push_back(val);
-    }
-
-    return result;
+    return ParseLineAsNumbers<s64>(line);
 }
 
 constexpr void RunUntilInteract(std::vector<s64>& instructions, Args& args) {

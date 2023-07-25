@@ -3,18 +3,18 @@
 #include "Facing.h"
 
 SOLUTION(2019, 11) {
-    auto GetPainting(std::vector<s64>&instructions, bool startOnBlack) {
-        std::unordered_map<Coord, bool> painted;
+    constexpr auto GetPainting(std::vector<s64>&instructions, bool startOnBlack) {
+        Constexpr::SmallMap<Coord, bool> painted;
         Args args;
         args.Inputs.push_back(startOnBlack ? 0 : 1);
-        args.Output = 99;
+        args.Output = Unset;
 
         Facing facing = Up;
         Coord pos = { 0, 0 };
         bool firstOutputRead = false;
 
         while (Apply(instructions, args)) {
-            if (args.Output != 99) {
+            if (args.Output != Unset) {
                 if (!firstOutputRead) {
                     painted[pos] = args.Output == 0;
                 }
@@ -27,38 +27,38 @@ SOLUTION(2019, 11) {
                     }
                     Move(pos, facing);
                     bool onBlack = true;
-                    if (painted.find(pos) != painted.end()) {
+                    if(painted.contains(pos)) {
                         onBlack = painted.at(pos);
                     }
                     args.Inputs.push_back(onBlack ? 0 : 1);
                 }
                 firstOutputRead = !firstOutputRead;
-                args.Output = 99;
+                args.Output = Unset;
             }
         }
 
         return painted;
     }
 
-    auto Part1(const std::string & line) {
-        auto instructions = ParseInstructions(line);
+    PART_ONE() {
+        auto instructions = ParseInstructions(lines[0]);
         auto painted = GetPainting(instructions, true);
 
-        return painted.size();
+        return Constexpr::ToString(painted.size());
     }
 
-    auto Part2(const std::string & line) {
-        auto instructions = ParseInstructions(line);
+    PART_TWO() {
+        auto instructions = ParseInstructions(lines[0]);
         auto painted = GetPainting(instructions, false);
 
         Coord min, max;
         GetLimitsFromMap(painted, min, max);
-        std::string result;
+        std::string result = "\n";
 
         for (auto row = min.Y; row <= max.Y; row++) {
             for (auto col = min.X; col <= max.X; col++) {
                 Coord pos = { col, row };
-                if (painted.find(pos) == painted.end()) {
+                if (!painted.contains(pos)) {
                     result.push_back(' ');
                 }
                 else {
@@ -69,23 +69,6 @@ SOLUTION(2019, 11) {
         }
 
         return result;
-    }
-
-    std::string Run(const std::vector<std::string>&lines) {
-        //return PartOne(lines[0]);
-        return Part2(lines[0]);
-    }
-
-    bool RunTests() {
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
     }
 
     TESTS() {

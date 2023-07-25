@@ -65,73 +65,42 @@ SOLUTION(2019, 12) {
         return potential * kinetic;
     }
 
-    constexpr std::vector<Moon> ParseLines(const std::vector<std::string>&lines) {
-        std::vector<Moon> result;
-        for (const auto& line : lines) {
-            auto split = Constexpr::Split(line, ", ");
-            Moon moon;
-            auto x = Constexpr::Split(split[0], "=")[1];
-            auto y = Constexpr::Split(split[1], "=")[1];
-            auto z = Constexpr::Split(split[2], "=")[1];
-            z = z.substr(0, z.size() - 1);
+    constexpr Moon ParseMoon(const std::string& line) {
+        auto split = Constexpr::Split(line, ", ");
+        Moon moon;
+        auto x = Constexpr::Split(split[0], "=")[1];
+        auto y = Constexpr::Split(split[1], "=")[1];
+        auto z = Constexpr::Split(split[2], "=")[1];
+        z = z.substr(0, z.size() - 1);
 
-            Constexpr::ParseNumber(x, moon.Pos.X);
-            Constexpr::ParseNumber(y, moon.Pos.Y);
-            Constexpr::ParseNumber(z, moon.Pos.Z);
+        Constexpr::ParseNumber(x, moon.Pos.X);
+        Constexpr::ParseNumber(y, moon.Pos.Y);
+        Constexpr::ParseNumber(z, moon.Pos.Z);
 
-            result.push_back(moon);
-        }
-        return result;
+        return moon;
     }
 
-    std::string ToString(const std::vector<Moon>&moons) {
-        return StrUtil::Format("%d,%d,%d %d,%d,%d\n%d,%d,%d %d,%d,%d\n%d,%d,%d %d,%d,%d\n%d,%d,%d %d,%d,%d\n",
-            moons[0].Pos.X, moons[0].Pos.Y, moons[0].Pos.Z, moons[0].Velocity.X, moons[0].Velocity.Y, moons[0].Velocity.Z,
-            moons[1].Pos.X, moons[1].Pos.Y, moons[1].Pos.Z, moons[1].Velocity.X, moons[1].Velocity.Y, moons[1].Velocity.Z,
-            moons[2].Pos.X, moons[2].Pos.Y, moons[2].Pos.Z, moons[2].Velocity.X, moons[2].Velocity.Y, moons[2].Velocity.Z,
-            moons[3].Pos.X, moons[3].Pos.Y, moons[3].Pos.Z, moons[3].Velocity.X, moons[3].Velocity.Y, moons[3].Velocity.Z
-        );
-    }
-
-    auto Part1(const std::vector<std::string>&lines, u32 steps) {
-        auto moons = ParseLines(lines);
-        for (u32 i = 0; i < steps; i++) {
+    PART_ONE() {
+        auto moons = ParseLines(lines, ParseMoon);
+        for (u32 i = 0; i < 1000; i++) {
             Tick(moons);
         }
 
-        u32 energy = 0;
-        for (const auto& moon : moons) {
-            energy += GetEnergy(moon);
-        }
-
-        return energy;
+        return Constexpr::ToString(std::accumulate(moons.begin(), moons.end(), 0, [](u32 previous, const auto& moon) { return previous + GetEnergy(moon); }));
     }
 
-#include <iostream>
-
-    auto Part2(const std::vector<std::string>&lines) {
-        auto moons = ParseLines(lines);
+    PART_TWO() {
+        auto moons = ParseLines(lines, ParseMoon);
         u64 step = 0;
 
         u64 pX = 0;
         u64 pY = 0;
         u64 pZ = 0;
+
         while (true) {
-            if (pX == 0) {
-                if (std::all_of(moons.begin(), moons.end(), [](const Moon& moon) { return moon.Velocity.X == 0; })) {
-                    pX = step;
-                }
-            }
-            if (pY == 0) {
-                if (std::all_of(moons.begin(), moons.end(), [](const Moon& moon) { return moon.Velocity.Y == 0; })) {
-                    pY = step;
-                }
-            }
-            if (pZ == 0) {
-                if (std::all_of(moons.begin(), moons.end(), [](const Moon& moon) { return moon.Velocity.Z == 0; })) {
-                    pZ = step;
-                }
-            }
+            if (pX == 0 && std::all_of(moons.begin(), moons.end(), [](const Moon& moon) { return moon.Velocity.X == 0; })) pX = step;
+            if (pY == 0 && std::all_of(moons.begin(), moons.end(), [](const Moon& moon) { return moon.Velocity.Y == 0; })) pY = step;
+            if (pZ == 0 && std::all_of(moons.begin(), moons.end(), [](const Moon& moon) { return moon.Velocity.Z == 0; })) pZ = step;
 
             if (pX > 0 && pY > 0 && pZ > 0) {
                 break;
@@ -142,44 +111,7 @@ SOLUTION(2019, 12) {
         }
 
         auto lcm = Constexpr::FindLcm<u64>(pX, pY, pZ);
-        return lcm * 2;
-    }
-
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines, 1000));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
-        std::vector<std::string> lines = {
-            "<x=-1, y=0, z=2>",
-            "<x=2, y=-10, z=-7>",
-            "<x=4, y=-8, z=8>",
-            "<x=3, y=5, z=-1>"
-        };
-
-        if (Part1(lines, 10) != 179) return false;
-        //if (Part2(lines) != 2772) return false;
-
-        lines = {
-            "<x=-8, y=-10, z=0>",
-            "<x=5, y=5, z=10>",
-            "<x=2, y=-7, z=3>",
-            "<x=9, y=-8, z=-3>"
-        };
-
-        if (Part1(lines, 100) != 1940) return false;
-        if (Part2(lines) != 4686774924) return false;
-
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
+        return Constexpr::ToString(lcm * 2);
     }
 
     TESTS() {

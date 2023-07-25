@@ -1,4 +1,4 @@
-#include "2015/All.h"
+#include "All.h"
 
 #include "Common.h"
 #include "Utilities/StringUtils.h"
@@ -81,9 +81,10 @@ void RunAll() {
 //maybe look closer at this for more shenanigans: https://stackoverflow.com/questions/410980/include-a-text-file-in-a-c-program-as-a-char
 
 int main(int, char**) {
+    Constexpr::ConstexprMathTests::RunTests();
     //RunAll();
-    RunYear(2018);
-    //RunOne(2018, 25);
+    //RunYear(2019);
+    RunOne(2019, 12);
     //RunLatest();
     return 0;
 }

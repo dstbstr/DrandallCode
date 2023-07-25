@@ -13,10 +13,6 @@ SOLUTION(2019, 4) {
         return hasPair;
     }
 
-    static_assert(Matches(111111));
-    static_assert(!Matches(223450));
-    static_assert(!Matches(123456));
-
     constexpr bool ExtendedMatch(u32 val) {
         auto str = Constexpr::ToString(val);
         std::vector<std::string> pairs;
@@ -34,53 +30,42 @@ SOLUTION(2019, 4) {
         return false;
     }
 
-
-    static_assert(ExtendedMatch(112233));
-    static_assert(!ExtendedMatch(123444));
-    static_assert(ExtendedMatch(111122));
-
-
-    constexpr auto Part1(u32 begin, u32 end) {
-        u32 result = 0;
-        u32 current = begin;
-        while (current <= end) {
-            result += Matches(current++);
-        }
-
+    constexpr std::pair<u32, u32> ParseInput(const std::string& line) {
+        auto s = Constexpr::Split(line, "-");
+        std::pair<u32, u32> result;
+        Constexpr::ParseNumber(s[0], result.first);
+        Constexpr::ParseNumber(s[1], result.second);
         return result;
     }
 
-    constexpr auto Part2() {
+    constexpr u32 Solve(u32 start, u32 end, auto Matcher) {
         u32 result = 0;
-        u32 current = 152085;
-        while (current <= 670283) {
-            result += ExtendedMatch(current++);
+        while (start <= end) {
+            result += Matcher(start++);
         }
 
         return result;
-    }
-
-    std::string Run(const std::vector<std::string>&) {
-        //return Constexpr::ToString(Part1(152085, 670283));
-        return Constexpr::ToString(Part2());
-    }
-
-    bool RunTests() {
-        if (!ExtendedMatch(112233)) return false;
-        if (ExtendedMatch(123444)) return false;
-        if (!ExtendedMatch(111122)) return false;
-        return true;
     }
 
     PART_ONE() {
-        return lines[0];
+        auto [start, end] = ParseInput(lines[0]);
+        return Constexpr::ToString(Solve(start, end, Matches));
     }
 
     PART_TWO() {
-        return lines[0];
+        auto [start, end] = ParseInput(lines[0]);
+        return Constexpr::ToString(Solve(start, end, ExtendedMatch));
     }
 
     TESTS() {
+        static_assert(Matches(111111));
+        static_assert(!Matches(223450));
+        static_assert(!Matches(123456));
+ 
+        static_assert(ExtendedMatch(112233));
+        static_assert(!ExtendedMatch(123444));
+        static_assert(ExtendedMatch(111122));
+
         return true;
     }
 }

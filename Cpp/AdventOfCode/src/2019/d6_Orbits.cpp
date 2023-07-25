@@ -1,10 +1,10 @@
 #include "2019/d6_Orbits.h"
 
 SOLUTION(2019, 6) {
-    using Map = std::unordered_map<std::string, std::string>;
-    using Cache = std::unordered_map<std::string, u32>;
+    using Map = Constexpr::SmallMap<std::string, std::string>;
+    using Cache = Constexpr::SmallMap<std::string, u32>;
 
-    void BuildMap(const std::vector<std::string>&lines, Map & outMap, std::unordered_set<std::string>&outSet) {
+    constexpr void BuildMap(const std::vector<std::string>&lines, Map & outMap, Constexpr::SmallSet<std::string>& outSet) {
         for (const auto& line : lines) {
             auto split = Constexpr::Split(line, ")");
             std::string lhs = std::string(split[0]);
@@ -15,11 +15,11 @@ SOLUTION(2019, 6) {
         }
     }
 
-    u32 CalculatePath(const std::string & str, const Map & map, Cache & cache) {
-        if (cache.find(str) != cache.end()) {
-            return cache[str];
+    constexpr u32 CalculatePath(const std::string & str, const Map & map, Cache & cache) {
+        if (cache.contains(str)) {
+            return cache.at(str);
         }
-        if (map.find(str) == map.end()) {
+        if (!map.contains(str)) {
             cache[str] = 0;
             return 0;
         }
@@ -29,8 +29,8 @@ SOLUTION(2019, 6) {
         return val;
     }
 
-    void BuildData(const std::vector<std::string>&lines, Map & outMap, Cache & outCache) {
-        std::unordered_set<std::string> all;
+    constexpr void BuildData(const std::vector<std::string>& lines, Map& outMap, Cache& outCache) {
+        Constexpr::SmallSet<std::string> all;
         BuildMap(lines, outMap, all);
 
         for (const auto& str : all) {
@@ -38,20 +38,7 @@ SOLUTION(2019, 6) {
         }
     }
 
-    auto Part1(const std::vector<std::string>&lines) {
-        Map map;
-        Cache cache;
-        BuildData(lines, map, cache);
-
-        u32 result = 0;
-        for (const auto& [str, val] : cache) {
-            result += val;
-        }
-
-        return result;
-    }
-
-    std::string FindCommonAncestor(const Map & map, const Cache & cache, const std::string lhs, const std::string rhs) {
+    constexpr std::string FindCommonAncestor(const Map & map, const Cache & cache, const std::string lhs, const std::string rhs) {
         std::string a = lhs;
         std::string b = rhs;
         while (a != b) {
@@ -70,21 +57,25 @@ SOLUTION(2019, 6) {
         return a;
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
+    PART_ONE() {
+        Map map;
+        Cache cache;
+        BuildData(lines, map, cache);
+
+        auto vals = cache.GetValues();
+        return Constexpr::ToString(std::accumulate(vals.begin(), vals.end(), 0));
+    }
+
+    PART_TWO() {
         Map map;
         Cache cache;
         BuildData(lines, map, cache);
         auto shared = FindCommonAncestor(map, cache, "YOU", "SAN");
 
-        return cache.at("YOU") + cache.at("SAN") - (cache.at(shared) * 2) - 2;
+        return Constexpr::ToString(cache.at("YOU") + cache.at("SAN") - (cache.at(shared) * 2) - 2);
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
+    TESTS() {
         std::vector<std::string> lines = {
             "COM)B",
             "B)C",
@@ -101,19 +92,8 @@ SOLUTION(2019, 6) {
             "I)SAN"
         };
 
-        if (Part2(lines) != 4) return false;
-        return true;
-    }
+        if (PartTwo(lines) != "4") return false;
 
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }

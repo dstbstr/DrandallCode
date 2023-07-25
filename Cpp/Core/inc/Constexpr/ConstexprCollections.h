@@ -548,6 +548,13 @@ namespace Constexpr {
             return true;
         }
 
+        constexpr T& operator[](const T& val) {
+            if (!contains(val)) {
+                throw "Key not found";
+            }
+            return *std::find(mData.begin(), mData.end(), val);
+        }
+
         constexpr void insert(const auto& begin, const auto& end) {
             for (auto it = begin; it != end; it++) {
                 insert(*it);

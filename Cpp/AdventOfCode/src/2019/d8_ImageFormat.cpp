@@ -25,88 +25,50 @@ SOLUTION(2019, 8) {
     }
 
     template<size_t Rows, size_t Cols>
-    constexpr u32 CountDigit(const Layer<Rows, Cols>&layer, u32 digit) {
-        u32 result = 0;
-        for (size_t row = 0; row < Rows; row++) {
-            for (size_t col = 0; col < Cols; col++) {
-                if (layer[row][col] == digit) {
-                    result++;
-                }
-            }
-        }
-
-        return result;
+    constexpr size_t CountDigit(const Layer<Rows, Cols>&layer, u32 digit) {
+        return std::accumulate(layer.begin(), layer.end(), 0ull, [digit](size_t previous, const auto& row) { return previous + std::count(row.begin(), row.end(), digit); });
     }
 
-    template<size_t Rows, size_t Cols>
-    auto Part1(const std::string & line) {
-        auto layers = BuildLayers<Rows, Cols>(line);
+    PART_ONE() {
+        auto layers = BuildLayers<6, 25>(lines[0]);
 
-        u32 best = 999;
-        Layer<Rows, Cols> bestLayer;
+        size_t best = 999;
+        size_t result = 0;
         for (const auto& layer : layers) {
             auto zeroCount = CountDigit(layer, 0);
             if (zeroCount < best) {
                 best = zeroCount;
-                bestLayer = layer;
+                result = CountDigit(layer, 1) * CountDigit(layer, 2);
             }
         }
 
-        return CountDigit<Rows, Cols>(bestLayer, 1)* CountDigit<Rows, Cols>(bestLayer, 2);
+        return Constexpr::ToString(result);
     }
 
-    enum struct Pixel { Black = 0, White = 1, Transparent = 2 };
+    PART_TWO() {
+        auto layers = BuildLayers<6, 25>(lines[0]);
 
-    template<size_t Rows, size_t Cols>
-    auto Part2(const std::string & line) {
-        auto layers = BuildLayers<Rows, Cols>(line);
-
-        std::unordered_map<RowCol, Pixel> image;
-
-        for (size_t layer = 0; layer < layers.size(); layer++) {
-            for (size_t row = 0; row < Rows; row++) {
-                for (size_t col = 0; col < Cols; col++) {
-                    RowCol rc = { row, col };
-                    if (image.find(rc) != image.end()) continue;
-                    auto pixel = static_cast<Pixel>(layers[layer][row][col]);
-                    if (pixel != Pixel::Transparent) {
-                        image[rc] = pixel;
-                    }
+        Layer<6, 25> image{};
+        for (auto& r : image) {
+            r.fill(99);
+        }
+        for (const auto& layer : layers) {
+            for (size_t row = 0; row < 6; row++) {
+                for (size_t col = 0; col < 25; col++) {
+                    if (image[row][col] < 2) continue;
+                    image[row][col] = layer[row][col];
                 }
             }
         }
-
-        std::string result;
-        for (size_t row = 0; row < Rows; row++) {
-            for (size_t col = 0; col < Cols; col++) {
-                RowCol rc = { row, col };
-                char c = image[rc] == Pixel::White ? '#' : ' ';
-                result.push_back(c);
+        std::string result = "\n";
+        for (const auto& row : image) {
+            for (const auto& c : row) {
+                result.push_back(c == 0 ? ' ' : '#');
             }
             result.push_back('\n');
         }
 
         return result;
-    }
-
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1<6, 25>(lines[0]));
-        return Part2<6, 25>(lines[0]);
-    }
-
-    bool RunTests() {
-        std::string line = "123456789012";
-
-        if (Part1<2, 3>(line) != 1) return false;
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
     }
 
     TESTS() {

@@ -3,6 +3,8 @@
 #include <vector>
 #include <array>
 #include <string_view>
+#include <algorithm> //std::copy_if
+#include <iterator> //std::back_inserter
 
 namespace Constexpr {
     template<typename T>
@@ -156,8 +158,16 @@ namespace Constexpr {
     }
 
     template<typename T>
+    constexpr auto KnownPrimes = std::array<T, 46>{ 2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97,101,103,107,109,113,127,131,137,139,149,151,157,163,167,173,179,181,191,193,197,199 };
+
+    template<typename T>
     constexpr std::vector<T> GetPrimes(T max) {
         static_assert(!std::is_floating_point_v<T>);
+        if (max <= KnownPrimes<T>.back()) {
+            std::vector<T> result;
+            std::copy_if(KnownPrimes<T>.begin(), KnownPrimes<T>.end(), std::back_inserter(result), [max](auto p) { return p <= max; });
+            return result;
+        }
         std::vector<bool> candidates{};
         candidates.reserve(max + 1);
         for (T i = 0; i < max + 1; i++) {
@@ -186,27 +196,33 @@ namespace Constexpr {
     template<size_t Max, typename T>
     constexpr std::vector<T> GetPrimes() {
         static_assert(!std::is_floating_point_v<T>);
-
-        std::array<bool, Max + 1> candidates{};
-        std::fill(candidates.begin(), candidates.end(), true);
-
-        std::vector<T> result{};
-        auto maxFactor = static_cast<T>(Sqrt(Max + 1));
-        for (T prime = 2; prime <= maxFactor; prime++) {
-            if (!candidates[prime]) continue;
-            result.push_back(prime);
-            for (size_t factor = static_cast<size_t>(prime * prime); factor < Max + 1; factor += prime) {
-                candidates[factor] = false;
-            }
+        if constexpr (Max <= KnownPrimes<T>.back()) {
+            std::vector<T> result;
+            std::copy_if(KnownPrimes<T>.begin(), KnownPrimes<T>.end(), std::back_inserter(result), [](auto p) { return p <= Max; });
+            return result;
         }
+        else {
+            std::array<bool, Max + 1> candidates{};
+            std::fill(candidates.begin(), candidates.end(), true);
 
-        for (T prime = maxFactor + 1; prime < Max + 1; prime++) {
-            if (candidates[prime]) {
+            std::vector<T> result{};
+            auto maxFactor = static_cast<T>(Sqrt(Max + 1));
+            for (T prime = 2; prime <= maxFactor; prime++) {
+                if (!candidates[prime]) continue;
                 result.push_back(prime);
+                for (size_t factor = static_cast<size_t>(prime * prime); factor < Max + 1; factor += prime) {
+                    candidates[factor] = false;
+                }
             }
-        }
 
-        return result;
+            for (T prime = maxFactor + 1; prime < Max + 1; prime++) {
+                if (candidates[prime]) {
+                    result.push_back(prime);
+                }
+            }
+
+            return result;
+        }
     }
 
     template<typename T>
@@ -303,6 +319,39 @@ namespace Constexpr {
     namespace detail {
         template<typename T>
         constexpr T FindLcm(const std::vector<std::vector<T>>& factors) {
+            if (factors.size() == 2) {
+                size_t lhsIndex = 0, rhsIndex = 0;
+                T result = 1;
+                while (lhsIndex < factors[0].size() && rhsIndex < factors[1].size()) {
+                    auto lhs = factors[0][lhsIndex];
+                    auto rhs = factors[1][rhsIndex];
+                    if (lhs == rhs) {
+                        result *= lhs;
+                        lhsIndex++;
+                        rhsIndex++;
+                    }
+                    else if (lhs < rhs) {
+                        result *= lhs;
+                        lhsIndex++;
+                    }
+                    else {
+                        result *= rhs;
+                        rhsIndex++;
+                    }
+                }
+                if (lhsIndex < factors[0].size()) {
+                    for (; lhsIndex < factors[0].size(); lhsIndex++) {
+                        result *= factors[0][lhsIndex];
+                    }
+                }
+                else if (rhsIndex < factors[1].size()) {
+                    for (; rhsIndex < factors[1].size(); rhsIndex++) {
+                        result *= factors[1][rhsIndex];
+                    }
+                }
+
+                return result;
+            }
             T result = 1;
             std::vector<size_t> indexes;
             for (auto i = 0; i < factors.size(); i++) {
@@ -318,15 +367,6 @@ namespace Constexpr {
                 return false;
             };
 
-            auto findMin = [](const std::vector<T>& vec) {
-                T min = std::numeric_limits<T>::max();
-                for (const auto val : vec) {
-                    min = std::min(min, val);
-                }
-
-                return min;
-            };
-
             std::vector<T> values;
             while (!oneListDone()) {
                 values.clear();
@@ -334,7 +374,7 @@ namespace Constexpr {
                     values.push_back(factors[i][indexes[i]]);
                 }
 
-                auto min = findMin(values);
+                auto min = *std::min_element(values.begin(), values.end());
 
                 result *= min;
                 for (auto i = 0; i < indexes.size(); i++) {
@@ -367,6 +407,13 @@ namespace Constexpr {
     template<size_t Lhs, size_t Rhs, typename T>
     constexpr T FindLcm() {
         return detail::FindLcm<T>(GetAllPrimeFactors<Lhs, T>(), GetAllPrimeFactors<Rhs, T>());
+    }
+
+    
+    constexpr auto FindGcd(auto... args) {
+        auto product = (args * ... * 1);
+        auto lcm = FindLcm<decltype(product)>(args...);
+        return product == 0 ? lcm : product / lcm;
     }
 
     template<typename T>
@@ -421,5 +468,9 @@ namespace Constexpr {
         }
 
         return t;
+    }
+
+    namespace ConstexprMathTests {
+        bool RunTests();
     }
 }

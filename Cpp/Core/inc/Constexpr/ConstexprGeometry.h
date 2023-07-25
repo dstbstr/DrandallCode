@@ -279,7 +279,7 @@ constexpr void GetLimits(Start start, End end, RowCol& min, RowCol& max) {
 }
 
 template<typename Key>
-void GetLimitsFromMap(const auto& map, Key& min, Key& max) {
+constexpr void GetLimitsFromMap(const auto& map, Key& min, Key& max) {
     min.X = std::numeric_limits<decltype(min.X)>::max();
     min.Y = std::numeric_limits<decltype(min.Y)>::max();
     max.X = std::numeric_limits<decltype(max.X)>::min();
@@ -293,7 +293,7 @@ void GetLimitsFromMap(const auto& map, Key& min, Key& max) {
     }
 }
 
-void GetLimitsFromMap(const auto& map, RowCol& min, RowCol& max) {
+constexpr void GetLimitsFromMap(const auto& map, RowCol& min, RowCol& max) {
     min.Row = std::numeric_limits<decltype(min.Row)>::max();
     min.Col = std::numeric_limits<decltype(min.Col)>::max();
     max.Row = std::numeric_limits<decltype(max.Row)>::min();
@@ -513,25 +513,32 @@ struct std::hash<Vec4<T>> {
     }
 };
 
-constexpr size_t MDistance(const Coord& lhs, const Coord& rhs) {
-    size_t result = 0;
-    result += (lhs.X < rhs.X ? rhs.X - lhs.X : lhs.X - rhs.X);
-    result += (lhs.Y < rhs.Y ? rhs.Y - lhs.Y : lhs.Y - rhs.Y);
-    return result;
+constexpr size_t MDistance(const Coord& pos) {
+    return Constexpr::Abs(pos.X) + Constexpr::Abs(pos.Y);
 }
 
+constexpr size_t MDistance(const Coord& lhs, const Coord& rhs) {
+    return Constexpr::AbsDistance(lhs.X, rhs.X) + Constexpr::AbsDistance(lhs.Y, rhs.Y);
+}
+
+constexpr size_t MDistance(const UCoord& pos) {
+    return pos.X + pos.Y;
+}
 constexpr size_t MDistance(const UCoord& lhs, const UCoord& rhs) {
-    size_t result = 0;
-    result += (lhs.X < rhs.X ? rhs.X - lhs.X : lhs.X - rhs.X);
-    result += (lhs.Y < rhs.Y ? rhs.Y - lhs.Y : lhs.Y - rhs.Y);
-    return result;
+    return Constexpr::AbsDistance(lhs.X, rhs.X) + Constexpr::AbsDistance(lhs.Y, rhs.Y);
+}
+
+constexpr size_t MDistance(const RowCol& pos) {
+    return pos.Row + pos.Col;
 }
 
 constexpr size_t MDistance(const RowCol& lhs, const RowCol& rhs) {
-    size_t result = 0;
-    result += (lhs.Row < rhs.Row ? rhs.Row - lhs.Row : lhs.Row - rhs.Row);
-    result += (lhs.Col < rhs.Col ? rhs.Col - lhs.Col : lhs.Col - rhs.Col);
-    return result;
+    return Constexpr::AbsDistance(lhs.Row, rhs.Row) + Constexpr::AbsDistance(lhs.Col, rhs.Col);
+}
+
+template<typename T>
+constexpr size_t MDistance(const Vec3<T> pos) {
+    return static_cast<size_t>(Constexpr::Abs(pos.X) + Constexpr::Abs(pos.Y) + Constexpr::Abs(pos.Z));
 }
 
 template<typename T>
@@ -540,6 +547,11 @@ constexpr size_t MDistance(const Vec3<T> lhs, const Vec3<T> rhs) {
         Constexpr::AbsDistance(lhs.X, rhs.X) +
         Constexpr::AbsDistance(lhs.Y, rhs.Y) +
         Constexpr::AbsDistance(lhs.Z, rhs.Z));
+}
+
+template<typename T>
+constexpr size_t MDistance(const Vec4<T> pos) {
+    return static_cast<size_t>(Constexpr::Abs(pos.X) + Constexpr::Abs(pos.Y) + Constexpr::Abs(pos.Z) + Constexpr::Abs(pos.W));
 }
 
 template<typename T>
@@ -732,7 +744,7 @@ namespace Constexpr {
 
     template<typename Point>
     constexpr Orientation GetOrientation(Point p, Point q, Point r) {
-        static_assert(Point{ -1, -1 }.X < 0, "GetOrientation requires signed types");
+        static_assert(std::is_signed_v<decltype(q.X)>, "GetOrientation requires signed types");
 
         auto val = (q.Y - p.Y) * (r.X - q.X) - (q.X - p.X) * (r.Y - q.Y);
         return val == 0 ? Orientation::Linear :

@@ -18,68 +18,25 @@ SOLUTION(2019, 1) {
         return result;
     }
 
-    static_assert(Calculate(12) == 2);
-    static_assert(Calculate(14) == 2);
-    static_assert(Calculate(1969) == 654);
-    static_assert(Calculate(100756) == 33583);
-
-    static_assert(CalculateWithFuel(1969) == 966);
-    static_assert(CalculateWithFuel(100756) == 50346);
-
-    constexpr std::vector<u64> GetMasses(const std::vector<std::string>&lines) {
-        std::vector<u64> result;
-        for (const auto& line : lines) {
-            u64 mass;
-            Constexpr::ParseNumber(line, mass);
-            result.push_back(mass);
-        }
-
-        return result;
-    }
-
-    constexpr auto Part1(const std::vector<std::string>&lines) {
-        u64 result = 0;
-        auto masses = GetMasses(lines);
-        for (auto mass : masses) {
-            result += Calculate(mass);
-        }
-
-        return result;
-    }
-
-    auto Part2(const std::vector<std::string>&lines) {
-        u64 result = 0;
-        auto masses = GetMasses(lines);
-        for (auto mass : masses) {
-            result += CalculateWithFuel(mass);
-        }
-
-        return result;
-    }
-
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
-        std::vector<std::string> lines = {
-
-        };
-
-        if (Part1(lines) != 0) return false;
-        return true;
-    }
-
     PART_ONE() {
-        return lines[0];
+        auto masses = ParseLinesAsNumbers<size_t>(lines);
+        return Constexpr::ToString(std::accumulate(masses.begin(), masses.end(), 0ull, [](size_t previous, size_t mass) { return previous + Calculate(mass); }));
     }
 
     PART_TWO() {
-        return lines[0];
+        auto masses = ParseLinesAsNumbers<size_t>(lines);
+        return Constexpr::ToString(std::accumulate(masses.begin(), masses.end(), 0ull, [](size_t previous, size_t mass) { return previous + CalculateWithFuel(mass); }));
     }
 
     TESTS() {
+        static_assert(Calculate(12) == 2);
+        static_assert(Calculate(14) == 2);
+        static_assert(Calculate(1969) == 654);
+        static_assert(Calculate(100756) == 33583);
+
+        static_assert(CalculateWithFuel(1969) == 966);
+        static_assert(CalculateWithFuel(100756) == 50346);
+        
         return true;
     }
 }

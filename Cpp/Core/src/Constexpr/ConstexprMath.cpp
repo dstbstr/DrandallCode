@@ -56,16 +56,22 @@ namespace Constexpr {
     static_assert(GetDivisors(9) == std::vector<int>{1, 9, 3});
     static_assert(GetDivisors(1) == std::vector<int>{1});
 
+    /*
     static_assert(FindLcm<size_t>(60, 90) == 180);
     static_assert(FindLcm<size_t>(90, 60) == 180);
     static_assert(FindLcm<size_t>(3, 5) == 15);
     static_assert(FindLcm<size_t>(5, 3) == 15);
     static_assert(FindLcm<size_t>(12, 16) == 48);
     static_assert(FindLcm<size_t>(16, 12) == 48);
+    static_assert(FindLcm<size_t>(2, 12) == 12);
 
     static_assert(FindLcm<60, 90, size_t>() == 180);
     static_assert(FindLcm<3, 5, size_t>() == 15);
     static_assert(FindLcm<12, 16, size_t>() == 48);
+    static_assert(FindLcm<2, 12, size_t>() == 12);
+
+    static_assert(FindGcd(15, 70) == 5);
+    */
 
     static_assert(Eval(20, 40, "<"));
     static_assert(Eval(40, 20, ">"));
@@ -89,4 +95,26 @@ namespace Constexpr {
     static_assert(MultiplicativeInverse(3, 5) == 2); //(3 * 2) % 5 == 1
     static_assert(MultiplicativeInverse(3, 11) == 4); //(3 * 4) % 11 = 1
     static_assert(MultiplicativeInverse(3, 7) == 5); //(3 * 5) % 7 == 1
+
+    namespace ConstexprMathTests {
+        bool RunTests() {
+            if(FindLcm<size_t>(60, 90) != 180) return false;
+            if(FindLcm<size_t>(90, 60) != 180) return false;
+            if(FindLcm<size_t>(3, 5) != 15) return false;
+            if(FindLcm<size_t>(5, 3) != 15) return false;
+            if(FindLcm<size_t>(12, 16) != 48) return false;
+            if(FindLcm<size_t>(16, 12) != 48) return false;
+            if(FindLcm<size_t>(2, 12) != 12) return false;
+
+            if(FindLcm<60, 90, size_t>() != 180) return false;
+            if(FindLcm<3, 5, size_t>() != 15) return false;
+            if(FindLcm<12, 16, size_t>() != 48) return false;
+            if(FindLcm<2, 12, size_t>() != 12) return false;
+
+            if(FindGcd(15, 70) != 5) return false;
+
+            return true;
+        }
+    }
+
 }

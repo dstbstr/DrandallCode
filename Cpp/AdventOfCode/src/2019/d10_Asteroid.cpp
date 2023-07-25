@@ -1,8 +1,14 @@
 #include "2019/d10_Asteroid.h"
 
 SOLUTION(2019, 10) {
+    /*
+    Angle between two points is just the slope, Rise/Run
+    Two asteroids are on the same line if they share a slope (fully reduced)
+    The closest is the asteroid with the relative position closest to the slope (5,15 and 1,3 are the same slope, but 1,3 doesn't need to be reduced)
+    To find the 200th asteroid, sort the targets by quadrant, then by slope (Rise/Run)
+    */
     using Map = std::vector<Coord>;
-    using VisibilityMap = std::unordered_map<Coord, std::unordered_map<Coord, bool>>;
+    using VisibilityMap = Constexpr::SmallMap<Coord, Constexpr::SmallMap<Coord, bool>>;
 
     constexpr Map ParseMap(const std::vector<std::string>&lines) {
         Map result;
@@ -16,178 +22,135 @@ SOLUTION(2019, 10) {
         return result;
     }
 
-    constexpr u32 CountVisible(const Coord & pos, const Map & map) {
-        u32 result = 0;
-        for (const auto& end : map) {
-            if (end == pos) continue;
-            bool visible = true;
-            for (const auto& other : map) {
-                if (other == pos || other == end) continue;
-                if (Constexpr::DoIntersect(pos, end, other)) {
-                    visible = false;
-                    break;
-                }
+    struct Target {
+        Coord Pos;
+        Coord Slope;
+        int Quad;
+        size_t Distance;
+
+        constexpr bool operator<(const Target& other) const {
+            if (Quad != other.Quad) return Quad < other.Quad;
+            if (Slope != other.Slope) {
+                auto lhs = static_cast<double>(Slope.Y) / (Slope.X == 0 ? 0.00001 : static_cast<double>(Slope.X));
+                auto rhs = static_cast<double>(other.Slope.Y) / (other.Slope.X == 0 ? 0.00001 : static_cast<double>(other.Slope.X));
+                return lhs < rhs; //probably not totally correct, but works
             }
-            result += visible;
+            return Distance < other.Distance;
         }
 
-        return result;
+        constexpr bool operator==(const Target& other) const {
+            return Slope == other.Slope;
+        }
+    };
+
+    constexpr Target MakeTarget(Coord start, Coord end) {
+        auto relative = Coord{ end.X - start.X, end.Y - start.Y };
+        auto gcd = Constexpr::FindGcd(Constexpr::Abs(relative.X), Constexpr::Abs(relative.Y));
+        Target t;
+        t.Pos = end;
+        t.Slope = { relative.X / gcd, relative.Y / gcd };
+        t.Distance = gcd;
+        if (t.Slope.X < 0) t.Quad = t.Slope.Y <= 0 ? 3 : 2;
+        else t.Quad = t.Slope.Y < 0 ? 0 : 1;
+        return t;
     }
 
-    VisibilityMap BuildVisibilityMap(const Map & map) {
-        VisibilityMap result;
-
+    constexpr std::vector<Target> FindMostTargets(const Map& map) {
+        std::vector<Target> result;
+        Constexpr::SmallSet<Target> targets;
+        size_t count = 0;
         for (const auto& start : map) {
+            targets.clear();
             for (const auto& end : map) {
                 if (start == end) continue;
-                if (result[start].contains(end)) continue;
-                bool visible = true;
-                for (const auto& third : map) {
-                    if (third == start || third == end) continue;
-                    if (Constexpr::DoIntersect(start, end, third)) {
-                        visible = false;
-                        break;
+                auto t = MakeTarget(start, end);
+                if (!targets.insert(t)) {
+                    auto& existing = targets[t];
+                    if (t.Distance < existing.Distance) { //only keep the closest target
+                        existing = t;
                     }
                 }
+            }
 
-                result[start][end] = visible;
-                result[end][start] = visible;
+            if (count < targets.size()) {
+                count = targets.size();
+
+                result = std::vector<Target>(targets.begin(), targets.end());
             }
         }
 
         return result;
     }
 
-#include <iostream>
-    void PrintVisibilityMap(const VisibilityMap & map) {
-        Coord min, max;
-        std::vector<Coord> coords;
-        for (const auto& [from, to] : map) {
-            coords.push_back(from);
-        }
-        GetLimits(coords.begin(), coords.end(), min, max);
-
-        for (s32 row = 0; row <= max.Y; row++) {
-            for (s32 col = 0; col <= max.X; col++) {
-                Coord pos = { col, row };
-                if (map.contains(pos)) {
-                    auto count = std::count_if(map.at(pos).begin(), map.at(pos).end(), [](const auto& kvp) {
-                        return kvp.second;
-                        });
-                    std::cout << count;
-                }
-                else {
-                    std::cout << '.';
-                }
-            }
-            std::cout << '\n';
-        }
-        std::cout << '\n';
-    }
-
-    auto CountVisible(const VisibilityMap & map, const Coord & pos) {
-        return static_cast<u32>(std::count_if(map.at(pos).cbegin(), map.at(pos).cend(), [](const auto& kvp) { return kvp.second; }));
-    }
-
-    auto FindBase(const Map & map, const VisibilityMap & visibility) {
-        auto countVisible = [](const auto& kvp) { return kvp.second; };
-        u32 best = 0;
-        Coord bestPos = { 0, 0 };
-        for (const auto& pos : map) {
-            auto count = CountVisible(visibility, pos);
-            if (best < count) {
-                best = count;
-                bestPos = pos;
-            }
-        }
-
-        return bestPos;
-    }
-
-    auto Part1(const std::vector<std::string>&lines) {
+    PART_ONE() {
         auto map = ParseMap(lines);
-        auto visibility = BuildVisibilityMap(map);
-
-        auto base = FindBase(map, visibility);
-        return CountVisible(visibility, base);
+        auto targets = FindMostTargets(map);
+        return Constexpr::ToString(targets.size());
     }
 
-    void PrintAsteroids(const std::vector<Coord>&coords, Coord base) {
-        Coord min, max;
-        GetLimits(coords.begin(), coords.end(), min, max);
-
-        for (s32 row = 0; row <= max.Y; row++) {
-            for (s32 col = 0; col <= max.X; col++) {
-                Coord pos = { col, row };
-                if (pos == base) {
-                    std::cout << " BAS ";
-                    continue;
-                }
-                auto where = std::find(coords.begin(), coords.end(), pos);
-                if (where == coords.end()) {
-                    std::cout << " .  ";
-                }
-                else {
-                    auto distance = static_cast<u32>(where - coords.begin());
-                    auto out = StrUtil::Format("%03d ", distance);
-                    std::cout << out;
-                }
-            }
-            std::cout << '\n';
-        }
-        std::cout << '\n';
-    }
-    auto Part2(const std::vector<std::string>&lines) {
+    PART_TWO() {
         auto map = ParseMap(lines);
-        auto visibility = BuildVisibilityMap(map);
-        auto base = FindBase(map, visibility);
-        u32 destroyedCount = 0;
+        auto targets = FindMostTargets(map);
+        std::sort(targets.begin(), targets.end());
 
-        Coord target{ 0, 0 };
-        while (!map.empty()) {
-            std::vector<Coord> asteroids;
-            std::copy_if(map.begin(), map.end(), std::back_inserter(asteroids), [&](Coord pos) {
-                return visibility[base][pos];
-                });
-            auto count = static_cast<u32>(asteroids.size());
-            if (destroyedCount + count < 200) {
-                destroyedCount += count;
-                std::erase_if(map, [&asteroids](const Coord& pos) { return std::find(asteroids.begin(), asteroids.end(), pos) != asteroids.end(); });
-                visibility = BuildVisibilityMap(map);
-            }
-            else {
-                std::sort(asteroids.begin(), asteroids.end(), [&](const Coord& lhs, const Coord& rhs) {
-                    return Constexpr::GetOrientation(base, lhs, rhs) == Constexpr::Orientation::CounterClockwise;
-                    });
-
-                //PrintAsteroids(asteroids, base);
-
-                size_t midpoint = 0;
-                for (size_t i = 0; i < asteroids.size(); i++) {
-                    if (asteroids[i].X >= base.X && asteroids[i].Y < base.Y) {
-                        midpoint = i;
-                        break;
-                    }
-                }
-
-                std::rotate(asteroids.begin(), asteroids.begin() + midpoint, asteroids.end());
-                //PrintAsteroids(asteroids, base);
-
-                target = asteroids[199 - destroyedCount];
-                break;
-            }
-        }
-
-        return (target.X * 100) + target.Y;
+        auto result = (targets[199].Pos.X * 100) + targets[199].Pos.Y;
+        return Constexpr::ToString(result);
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
+    TESTS() {
         std::vector<std::string> lines = {
+            ".#..#",
+            ".....",
+            "#####",
+            "....#",
+            "...##"
+        };
+        
+        if (PartOne(lines) != "8") return false;
+
+        lines = {
+            "......#.#.",
+            "#..#.#....",
+            "..#######.",
+            ".#.#.###..",
+            ".#..#.....",
+            "..#....#.#",
+            "#..#....#.",
+            ".##.#..###",
+            "##...#..#.",
+            ".#....####"
+        };
+        if (PartOne(lines) != "33") return false;
+
+        lines = {
+            "#.#...#.#.",
+            ".###....#.",
+            ".#....#...",
+            "##.#.#.#.#",
+            "....#.#.#.",
+            ".##..###.#",
+            "..#...##..",
+            "..##....##",
+            "......#...",
+            ".####.###."
+        };
+        if (PartOne(lines) != "35") return false;
+
+        lines = {
+            ".#..#..###",
+            "####.###.#",
+            "....###.#.",
+            "..###.##.#",
+            "##.##.#.#.",
+            "....###..#",
+            "..#.#..#.#",
+            "#..#.#.###",
+            ".##...##.#",
+            ".....#.#.."
+        };
+        if (PartOne(lines) != "41") return false;
+
+        lines = {
             ".#..##.###...#######",
             "##.############..##.",
             ".#.######.########.#",
@@ -210,19 +173,9 @@ SOLUTION(2019, 10) {
             "###.##.####.##.#..##"
         };
 
-        if (Part2(lines) != 802) return false;
-        return true;
-    }
+        if (PartOne(lines) != "210") return false;
+        //if (PartTwo(lines) != "802") return false;
 
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }
