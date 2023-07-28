@@ -76,9 +76,17 @@ namespace Constexpr {
     }
 
     template<>
-    constexpr size_t Hash(Coord coord) {
-        return Hash(coord.X) ^ Hash(coord.Y);
-    }
+    struct Hasher<Coord> {
+        constexpr size_t operator()(const Coord& c) const {
+            return mHash(c.X) ^ mHash(c.Y);
+        }
+
+        Hasher<size_t> mHash{};
+    };
+
+    //constexpr size_t Hash(Coord coord) {
+    //    return Hash(coord.X) ^ Hash(coord.Y);
+    //}
 }
 
 struct UCoord {
@@ -145,9 +153,16 @@ namespace Constexpr {
     }
 
     template<>
-    constexpr size_t Hash(UCoord coord) {
-        return Hash(coord.X) ^ Hash(coord.Y);
-    }
+    struct Hasher<UCoord> {
+        constexpr size_t operator()(const UCoord& c) const {
+            return mHash(c.X) ^ mHash(c.Y);
+        }
+
+        Hasher<s64> mHash{};
+    };
+    //constexpr size_t Hash(UCoord coord) {
+    //    return Hash(coord.X) ^ Hash(coord.Y);
+    //}
 }
 
 constexpr void GetLimits(const std::vector<UCoord>& coords, UCoord& min, UCoord& max) {
@@ -241,9 +256,14 @@ namespace Constexpr {
     }
 
     template<>
-    constexpr size_t Hash(RowCol rc) {
-        return Hash(rc.Row) ^ Hash(rc.Col);
-    }
+    struct Hasher<RowCol> {
+        constexpr size_t operator()(const RowCol& rc) const {
+
+            return mHash(rc.Row) ^ mHash(rc.Col);
+        }
+
+        Hasher<size_t> mHash{};
+    };
 }
 
 template<typename T, typename Start, typename End>
@@ -416,9 +436,17 @@ namespace Constexpr {
     }
 
     template<typename T>
-    constexpr size_t Hash(Vec3<T> vec) {
-        return Hash(vec.X) ^ Hash(vec.Y) ^ Hash(vec.Z);
-    }
+    struct Hasher<Vec3<T>> {
+        constexpr size_t operator()(const Vec3<T>& vec) const {
+            return mHash(vec.X) ^ mHash(vec.Y) ^ mHash(vec.Z);
+        }
+
+        Hasher<T> mHash;
+    };
+    //template<typename T>
+    //constexpr size_t Hash(Vec3<T> vec) {
+    //    return Hash(vec.X) ^ Hash(vec.Y) ^ Hash(vec.Z);
+    //}
 }
 
 template<typename T>
@@ -501,9 +529,17 @@ namespace Constexpr {
     }
 
     template<typename T>
-    constexpr size_t Hash(Vec4<T> vec) {
-        return Hash(vec.X) ^ Hash(vec.Y) ^ Hash(vec.Z) ^ Hash(vec.W);
-    }
+    struct Hasher<Vec4<T>> {
+        constexpr size_t operator()(const Vec4<T>& vec) const {
+            return mHash(vec.X) ^ mHash(vec.Y) ^ mHash(vec.Z) ^ mHash(vec.W);
+        }
+
+        Hasher<T> mHash{};
+    };
+    //template<typename T>
+    //constexpr size_t Hash(Vec4<T> vec) {
+    //    return Hash(vec.X) ^ Hash(vec.Y) ^ Hash(vec.Z) ^ Hash(vec.W);
+    //}
 }
 
 template<typename T>
@@ -831,9 +867,6 @@ namespace Constexpr {
         return result;
     }
 
-    static_assert(FlipX(std::vector<std::vector<int>>{ {1, 2}, { 3, 4 }}) == std::vector<std::vector<int>> { {3, 4}, { 1, 2 }});
-    static_assert(FlipX(std::vector<std::vector<int>>{ {1, 2, 3}, { 4, 5, 6 }, { 7, 8, 9 }}) == std::vector<std::vector<int>>{ {7, 8, 9}, { 4, 5, 6 }, { 1, 2, 3 }});
-
     template<typename Matrix>
     [[nodiscard]] constexpr Matrix FlipY(const Matrix& matrix) {
         auto result = matrix;
@@ -844,9 +877,6 @@ namespace Constexpr {
 
         return result;
     }
-
-    static_assert(FlipY(std::vector<std::vector<int>>{ {1, 2}, { 3, 4 }}) == std::vector<std::vector<int>>{ {2, 1}, { 4, 3 }});
-    static_assert(FlipY(std::vector<std::vector<int>>{ {1, 2, 3}, { 4, 5, 6 }, { 7, 8, 9 }}) == std::vector<std::vector<int>>{ {3, 2, 1}, { 6, 5, 4 }, { 9, 8, 7 }});
 
     template<typename Matrix>
     [[nodiscard]] constexpr Matrix Rotate(const Matrix& matrix) {
@@ -859,30 +889,7 @@ namespace Constexpr {
         return result;
     }
 
-    static_assert(Rotate(std::vector<std::vector<int>>{
-        {1, 2, 3},
-        { 4, 5, 6 },
-        { 7, 8, 9 }}) == std::vector<std::vector<int>> {
-            {7, 4, 1},
-            { 8, 5, 2 },
-            { 9, 6, 3 }
-    });
-
-    namespace Tests {
-        struct Point {
-            int X;
-            int Y;
-            constexpr bool operator==(const Point& other) const {
-                return X == other.X && Y == other.Y;
-            }
-        };
-
-        static_assert(!DoIntersect<Point>({ 1, 1 }, { 10, 1 }, { 1, 2 }, { 10, 2 }));
-        static_assert(DoIntersect<Point>({ 10, 0 }, { 0, 10 }, { 0, 0 }, { 10, 10 }));
-        static_assert(!DoIntersect<Point>({ -5, -5 }, { 0, 0 }, { 1, 1 }, { 10, 10 }));
-
-        static_assert(DoIntersect<Point>({ 0, 0 }, { 2, 6 }, { 1, 3 }));
-        static_assert(DoIntersect<Point>({ 0, 0 }, { 3, 9 }, { 1, 3 }));
-        static_assert(!DoIntersect<Point>({ 0, 0 }, { 4, 9 }, { 1, 3 }));
+    namespace ConstexprGeometryTests {
+        bool RunTests();
     }
 }

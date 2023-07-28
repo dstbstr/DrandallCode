@@ -1,111 +1,7 @@
 #include "2019/d18_CaveDoors.h"
-#include "Algorithms/AStar.h"
-#include <bitset>
-#include <set>
 
 SOLUTION(2019, 18) {
-    using Map = std::unordered_map<RowCol, char>;
-    using DoorMap = std::unordered_map<char, RowCol>;
-
-    void ParseMap(const std::vector<std::string>&lines, Map & outMap, DoorMap & outDoorMap, u32 & outAllKeys) {
-        for (size_t row = 0; row < lines.size(); row++) {
-            for (size_t col = 0; col < lines[row].size(); col++) {
-                RowCol rc = { row, col };
-                auto c = lines[row][col];
-                outMap[rc] = c;
-                if (c != '#') {
-                    outDoorMap[c] = rc;
-                }
-                if (std::islower(c)) {
-                    Constexpr::SetBit(outAllKeys, c - 'a');
-                }
-            }
-        }
-    }
-
-    size_t GetPathDistance(const Map & map, const RowCol & start, const RowCol & end, const u32 keys, const RowCol & limit) {
-        auto n = [&](const RowCol& pos) {
-            std::vector<RowCol> result;
-            auto possible = GetDirectNeighbors(pos, limit);
-            std::copy_if(possible.cbegin(), possible.cend(), std::back_inserter(result), [&](const RowCol& toPos) {
-                auto c = map.at(toPos);
-                if (c == '.' || c == '@' || std::islower(c)) return true;
-                if (c == '#') return false;
-
-                return Constexpr::IsBitSet(keys, c - 'A');
-                });
-
-            return result;
-        };
-
-        auto path = AStarMin<RowCol>(start, end, n);
-        return path.empty() ? 0 : path.size() - 1;
-    }
-
-
-    auto Part1(const std::vector<std::string>&lines) {
-        RowCol limit = { lines.size() - 1, lines[0].size() - 1 };
-        std::vector<RowCol> startPositions;
-        u32 keys = 0;
-        u32 allKeys = 0;
-        for (size_t row = 0; row < lines.size(); row++) {
-            for (size_t col = 0; col < lines[row].size(); col++) {
-                char c = lines[row][col];
-
-                if (std::islower(c)) {
-                    Constexpr::SetBit(allKeys, c - 'a');
-                }
-                else if (c == '@') {
-                    startPositions.push_back({ row, col });
-                }
-            }
-        }
-
-        std::set<std::tuple<size_t, size_t, u32>> seen;
-
-        struct State { RowCol Pos; u32 Steps; u32 Keys; };
-        std::queue<State> queue;
-
-        for (const auto& pos : startPositions) {
-            queue.push({ pos, 0, 0 });
-            seen.insert(std::make_tuple(pos.Row, pos.Col, 0));
-        }
-
-        while (!queue.empty()) {
-            State current = queue.front();
-            queue.pop();
-            keys = current.Keys;
-
-            if (keys == allKeys) {
-                return current.Steps;
-            }
-
-            auto neighbors = GetDirectNeighbors(current.Pos, limit);
-            for (const auto& neighbor : neighbors) {
-                if (seen.contains(std::make_tuple(neighbor.Row, neighbor.Col, current.Keys))) continue;
-
-                auto c = lines[neighbor.Row][neighbor.Col];
-                if (c == '#') continue;
-                if (std::isupper(c) && !Constexpr::IsBitSet(current.Keys, c - 'A')) continue;
-
-                if (std::islower(c)) {
-                    Constexpr::SetBit(keys, c - 'a');
-                    seen.insert(std::make_tuple(neighbor.Row, neighbor.Col, keys));
-                    queue.push({ neighbor, current.Steps + 1, keys });
-                    Constexpr::UnsetBit(keys, c - 'a');
-                }
-                else {
-                    seen.insert(std::make_tuple(neighbor.Row, neighbor.Col, keys));
-                    queue.push({ neighbor, current.Steps + 1, keys });
-                }
-            }
-        }
-
-        return u32(0);
-    }
-
-
-    void SplitIntoRooms(std::vector<std::string>&lines) {
+    constexpr void SplitIntoRooms(std::vector<std::string>&lines) {
         RowCol origin{ 0, 0 };
         for (size_t row = 0; row < lines.size(); row++) {
             for (size_t col = 0; col < lines[row].size(); col++) {
@@ -121,108 +17,307 @@ SOLUTION(2019, 18) {
         lines[origin.Row + 1][origin.Col] = '#';
         lines[origin.Row][origin.Col - 1] = '#';
         lines[origin.Row][origin.Col + 1] = '#';
-        lines[origin.Row - 1][origin.Col - 1] = '1';
-        lines[origin.Row - 1][origin.Col + 1] = '2';
-        lines[origin.Row + 1][origin.Col - 1] = '3';
-        lines[origin.Row + 1][origin.Col + 1] = '4';
+        lines[origin.Row - 1][origin.Col - 1] = '@';
+        lines[origin.Row - 1][origin.Col + 1] = '@';
+        lines[origin.Row + 1][origin.Col - 1] = '@';
+        lines[origin.Row + 1][origin.Col + 1] = '@';
     }
 
-    std::vector<char> FindReachableKeys(const Map & map, const DoorMap & doorMap, RowCol start, RowCol limit, u32 allKeys) {
-        std::vector<char> result;
-        for (auto key = 'a'; key <= 'z'; key++) {
-            if (!doorMap.contains(key)) break;
-            if (GetPathDistance(map, start, doorMap.at(key), allKeys, limit) > 0) {
-                result.push_back(key);
-            }
+    struct KeyCollection {
+        constexpr KeyCollection() = default;
+
+        //TODO: move this to ConstexprBits?
+        constexpr bool IsProperSubsetOf(KeyCollection other) const {
+            return State != other.State && ((State & other.State) == State);
         }
-        return result;
+
+        constexpr bool Contains(char key) const {
+            return Constexpr::IsBitSet(State, key - 'a');
+        }
+
+        constexpr bool Contains(KeyCollection other) const {
+            return (State & other.State) == other.State;
+        }
+
+        constexpr size_t CountMissingFrom(KeyCollection other) const {
+            return std::popcount(State ^ other.State);
+        }
+
+        constexpr KeyCollection operator+(char key) const {
+            auto result = *this;
+            Constexpr::SetBit(result.State, key - 'a');
+            return result;
+        }
+
+        constexpr KeyCollection operator+(KeyCollection key) const {
+            return KeyCollection(State | key.State);
+        }
+
+        constexpr KeyCollection operator-(char key) const {
+            auto result = *this;
+            Constexpr::UnsetBit(result.State, key - 'a');
+            return result;
+        }
+
+        constexpr bool operator==(KeyCollection other) const {
+            return State == other.State;
+        }
+        constexpr bool operator<(KeyCollection other) const {
+            return State < other.State;
+        }
+
+    private:
+        constexpr KeyCollection(u32 state) : State(state) {}
+        u32 State{ 0 };
+        friend struct KeyHash;
+    };
+
+    struct KeyHash {
+        constexpr size_t operator()(const KeyCollection& keys) const {
+            return mHash(keys.State);
+        }
+        Constexpr::Hasher<u32> mHash{};
+    };
+
+    struct Path {
+        std::vector<RowCol> Bots;
+        KeyCollection Keys{};
+        size_t Steps{ 0 };
+
+        constexpr bool operator==(const Path& other) const {
+            return Keys == other.Keys && Bots == other.Bots;
+        }
+        constexpr bool operator<(const Path& other) const {
+            return other.Steps < Steps;
+        }
+    };
+
+    struct PathHash {
+        constexpr size_t operator()(const Path& path) const {
+            return mHash(path.Keys);
+        }
+        KeyHash mHash{};
+    };
+
+    constexpr bool IsKey(char c) {
+        return c >= 'a' && c <= 'z';
+    }
+    constexpr bool IsDoor(char c) {
+        return c >= 'A' && c <= 'Z';
+    }
+    constexpr bool IsWall(char c) {
+        return c == '#';
+    }
+    constexpr bool IsBotPos(char c) {
+        return c == '@' || (c >= '0' && c <= '9');
+    }
+    constexpr char ToKey(char door) {
+        return door + 32;
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
-        std::vector<std::string> lineCopy = lines;
-        RowCol limit = { lines.size() - 1, lines[0].size() - 1 };
-        SplitIntoRooms(lineCopy);
-        Map map;
-        DoorMap doorMap;
-        u32 allKeys;
-        ParseMap(lineCopy, map, doorMap, allKeys);
-
-        std::vector<RowCol> startingPoints = { doorMap.at('1'), doorMap.at('2'), doorMap.at('3'), doorMap.at('4') };
-        std::vector<std::vector<char>> reachableKeys;
-        for (const auto& rc : startingPoints) {
-            reachableKeys.push_back(FindReachableKeys(map, doorMap, rc, limit, allKeys));
-        }
-
-        struct State {
-            std::vector<RowCol> BotPositions;
-            u32 Keys;
-            size_t Steps;
-        };
-        struct History {
-            std::vector<RowCol> BotPositions;
-            u32 Keys;
-
-            constexpr bool operator==(const History& other) const {
-                return BotPositions == other.BotPositions && Keys == other.Keys;
-            }
-        };
-        struct HistoryHash {
-            constexpr size_t operator()(const History& h) const {
-                size_t result = h.Keys;
-                for (const auto& pos : h.BotPositions) {
-                    result ^= pos.Col ^ pos.Row;
-                }
-                return result;
-            }
-        };
-
-        size_t result = std::numeric_limits<size_t>::max();
-        int tracker = 0;
-        std::unordered_map<History, size_t, HistoryHash> seen;
-        std::vector<State> queue;
-        queue.push_back({ startingPoints, 0, 0 });
-        while (!queue.empty()) {
-            auto current = queue.back();
-            queue.pop_back();
-
-            if (tracker++ % 1000 == 0) {
-                std::cout << "QueueSize: " << queue.size() << " Best: " << result << "\n";
-            }
-            if (current.Keys == allKeys) {
-                result = std::min(result, current.Steps);
-                continue;
-            }
-
-            for (size_t bot = 0; bot < startingPoints.size(); bot++) {
-                for (auto key : reachableKeys[bot]) {
-                    auto keyBit = key - 'a';
-                    if (Constexpr::IsBitSet(current.Keys, keyBit)) continue;
-                    auto distance = GetPathDistance(map, current.BotPositions[bot], doorMap.at(key), current.Keys, limit);
-                    if (distance == 0) continue;
-                    State next = current;
-                    next.BotPositions[bot] = doorMap.at(key);
-                    Constexpr::SetBit(next.Keys, keyBit);
-                    History history = { next.BotPositions, next.Keys };
-                    if (seen.contains(history)) {
-                        if (seen.at(history) <= next.Steps + distance) continue;
+    class Map {
+    public:
+        constexpr Map(const std::vector<std::string>& lines)
+            : mGrid(lines)
+            , mLimits({ lines.size() - 1, lines[0].size() - 1 })
+        {
+            u32 currentStart = 0;
+            for (size_t row = 0; row < mGrid.size(); row++) {
+                for (size_t col = 0; col < mGrid[row].size(); col++) {
+                    auto& c = mGrid[row][col];
+                    if (c == '@') {
+                        c = static_cast<char>('0' + currentStart++);
+                        mKeyNodes[c] = { row, col };
                     }
-                    next.Steps += distance;
-                    seen[history] = next.Steps;
-                    queue.push_back(next);
+                    else if (IsKey(c)) {
+                        AllKeys = AllKeys + c;
+                        mKeyNodes[c] = { row, col };
+                    }
                 }
             }
         }
 
-        return result;
+        constexpr size_t Solve() {
+            Constexpr::PriorityQueue<Path> q;
+            Constexpr::BigSet<Path, 1'000'000, PathHash> seen;
+
+            Path initial{ {}, NoKeys, 0 };
+            for (const auto& [node, pos] : mKeyNodes) {
+                if (!IsKey(node)) {
+                    initial.Bots.push_back(pos);
+                }
+            }
+            q.push(initial);
+
+            while (!q.empty()) {
+                auto current = q.pop();
+
+                if (current.Keys == AllKeys) {
+                    return current.Steps;
+                }
+                if (!seen.insert(current)) continue;
+
+                auto neighbors = GetEdgesFrom(current);
+                for (const auto& n : neighbors) {
+                    if (seen.contains(n)) continue;
+                    q.push_or_update(n);
+                }
+            }
+
+            return 0ull;
+        }
+    private:
+        std::vector<std::string> mGrid;
+        RowCol mLimits{};
+        Constexpr::SmallSet<RowCol> mSeen{};
+        Constexpr::SmallMap<RowCol, std::vector<Path>> mEdgeCache{};
+        Constexpr::SmallMap<char, RowCol> mKeyNodes;
+
+        KeyCollection AllKeys{};
+        KeyCollection NoKeys{};
+
+        constexpr char Get(RowCol rc) const {
+            return mGrid[rc.Row][rc.Col];
+        }
+
+        //Given bots {a,b,c,d}, find all moves for each {a,b,c,d} with given keys
+
+        constexpr std::vector<Path> GetEdgesFrom(const Path& from) {
+            std::vector<Path> result;
+            for (size_t botIndex = 0; botIndex < from.Bots.size(); botIndex++) {
+                auto bot = from.Bots[botIndex];
+                if (!mEdgeCache.contains(bot)) {
+                    mEdgeCache[bot] = GetAllEdgePaths(from, botIndex);
+                }
+
+                for (const auto& to : mEdgeCache[bot]) {
+                    auto key = Get(to.Bots[botIndex]);
+                    if (from.Keys.Contains(to.Keys) && !from.Keys.Contains(key)) {
+                        auto next = Path{ from.Bots, from.Keys + key, from.Steps + to.Steps };
+                        next.Bots[botIndex] = to.Bots[botIndex];
+                        result.push_back(next);
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        constexpr void Recurse(const Path pos, size_t botIndex, auto IsDone) {
+            auto rc = pos.Bots[botIndex];
+            auto current = Get(rc);
+            if (IsKey(current) && pos.Steps > 0) {
+                IsDone(pos);
+            }
+            mSeen.insert(rc);
+            for (auto n : GetDirectNeighbors(rc, mLimits)) {
+                auto c = Get(n);
+                if (c == '#' || mSeen.contains(n)) continue;
+                auto next = pos;
+                next.Bots[botIndex] = n;
+                next.Keys = IsDoor(c) ? next.Keys + ToKey(c) : next.Keys;
+                next.Steps++;
+                Recurse(next, botIndex, IsDone);
+            }
+            mSeen.erase(rc);
+        }
+
+        constexpr void Recurse(const Path& from, size_t botIndex, size_t pathLength, KeyCollection keys, auto IsDone) {
+            auto pos = from.Bots[botIndex];
+            auto current = Get(pos);
+            if (IsKey(current) && pathLength > 0) {
+                IsDone(from);
+            }
+            mSeen.insert(pos);
+            for (auto n : GetDirectNeighbors(pos, mLimits)) {
+                auto c = Get(n);
+                if (c == '#' || mSeen.contains(n)) continue;
+                auto nextKeys = IsDoor(c) ? keys + ToKey(c) : keys;
+                auto next = from;
+                next.Bots[botIndex] = n;
+                next.Keys = nextKeys;
+                Recurse(next, botIndex, pathLength + 1, nextKeys, IsDone);
+            }
+            mSeen.erase(pos);
+        }
+
+        constexpr std::vector<Path> GetAllEdgePaths(const Path& from, size_t botIndex) {
+            std::vector<Path> result;
+            auto IsDone = [&](const Path& to) {
+                if (from.Keys.Contains(Get(to.Bots[botIndex]))) return false;
+
+                bool found = false;
+                for (auto& existing : result) {
+                    if (existing != to) continue;
+                    found = true;
+                    if (to.Keys.IsProperSubsetOf(existing.Keys)) {
+                        existing = to;
+                        return true;
+                    }
+                    else if (to.Keys == existing.Keys && to.Steps < existing.Steps) {
+                        existing = to;
+                        return true;
+                    }
+                }
+                if (!found) {
+                    result.push_back(to);
+                    return true;
+                }
+                return false;
+            };
+
+            auto initial = from;
+            initial.Keys = NoKeys;
+            initial.Steps = 0;
+            Recurse(initial, botIndex, IsDone);
+
+            return result;
+        }
+    };
+
+
+    PART_ONE() {
+        Map solution(lines);
+        return Constexpr::ToString(solution.Solve());
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
+    PART_TWO() {
+        auto copy = lines;
+        SplitIntoRooms(copy);
+
+        Map solution(copy);
+        return Constexpr::ToString(solution.Solve());
     }
 
-    bool RunTests() {
+    TESTS() {
         std::vector<std::string> lines = {
+            "#########",
+            "#b.A.@.a#",
+            "#########"
+        };
+
+        if (PartOne(lines) != "8") return false;
+
+        lines = {
+            "########################",
+            "#f.D.E.e.C.b.A.@.a.B.c.#",
+            "######################.#",
+            "#d.....................#",
+            "########################",
+        };
+
+        if (PartOne(lines) != "86") return false;
+
+        lines = {
+            "########################",
+            "#...............b.C.D.f#",
+            "#.######################",
+            "#.....@.a.B.c.d.A.e.F.g#",
+            "########################"
+        };
+        if (PartOne(lines) != "132") return false;
+
+        lines = {
             "#######",
             "#a.#Cd#",
             "##...##",
@@ -231,8 +326,18 @@ SOLUTION(2019, 18) {
             "#cB#Ab#",
             "#######"
         };
+        if (PartTwo(lines) != "8") return false;
 
-        if (Part2(lines) != 8) return false;
+        lines = {
+            "#############",
+            "#DcBa.#.GhKl#",
+            "#.###...#I###",
+            "#e#d#.@.#j#k#",
+            "###C#...###J#",
+            "#fEbA.#.FgHi#",
+            "#############"
+        };
+        if (PartTwo(lines) != "32") return false;
 
         lines = {
             "#############",
@@ -245,21 +350,8 @@ SOLUTION(2019, 18) {
             "#o#m..#i#jk.#",
             "#############"
         };
+        if (PartTwo(lines) != "72") return false;
 
-        if (Part2(lines) != 72) return false;
-
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }

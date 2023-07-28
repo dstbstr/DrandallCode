@@ -42,7 +42,8 @@ SOLUTION(2021, 15) {
         auto neighbors = [&](const RowCol& pos) {
             return GetDirectNeighbors(pos, end);
         };
-        auto path = AStarMin<RowCol>(start, cost, isComplete, h, neighbors);
+        auto move = [](RowCol&, RowCol&) {};
+        auto path = AStarMin<RowCol>(start, cost, isComplete, h, neighbors, move);
         return CalculatePathCost(map, path);
     }
 

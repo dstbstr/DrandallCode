@@ -56,8 +56,7 @@ SOLUTION(2018, 23) {
         s32 maxCount = 0;
         s32 result = 0;
         while (!queue.empty()) {
-            auto [dist, e] = queue.top();
-            queue.pop();
+            auto [dist, e] = queue.pop();
             count += e;
             if (count > maxCount) {
                 result = dist;

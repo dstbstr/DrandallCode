@@ -3,12 +3,13 @@
 #include <vector>
 #include <array>
 #include <string>
-#include <ranges>
+//#include <ranges>
 #include <algorithm>
 
 #include "Constexpr/ConstexprHash.h"
 
 namespace Constexpr {
+    /*
     template<typename R>
     concept nested_range = std::ranges::input_range<R> && std::ranges::range<std::ranges::range_reference_t<R>>;
 
@@ -62,6 +63,7 @@ namespace Constexpr {
     }
 
     static_assert(TestFlatten());
+    */
 
     constexpr auto Without(auto collection, const auto& toRemove) {
         std::erase_if(collection, [&](const auto& e) {
@@ -207,34 +209,24 @@ namespace Constexpr {
         return map.cend();
     }
 
-    //template<typename Key, typename Value, size_t Capacity = 1'000'000, auto hash = Constexpr::Hash<Key>>
-    template<typename Key, typename Value, size_t Capacity = 1'000'000>
+    template<typename Key, typename Value, size_t Capacity = 1'000'000, typename Hasher = Constexpr::Hasher<Key>>
     struct BigMap {
         constexpr BigMap() {
             MakeSentinel();
             mData = new std::array<std::pair<Key, Value>, Capacity>();
-            /*
-            if constexpr (std::is_same_v<std::remove_cvref_t<Key>, std::string>) {
-                Sentinel = std::make_pair<Key, Value>("SentinelString", {});
-            }
-            else if constexpr (std::is_arithmetic_v<Key>) {
-                Sentinel = std::make_pair<Key, Value>(9919, {});
-            }
-            else {
-                Sentinel = std::make_pair<Key, Value>({}, {}); //bleh
-            }
-            */
             mData->fill(Sentinel);
+            mCurrentSize = 0;
         }
 
-        constexpr BigMap(const BigMap& other) : mData(other.mData), Sentinel(other.Sentinel) {}
-        constexpr BigMap(BigMap&& other) : mData(std::move(other.mData)), Sentinel(std::move(other.Sentinel)) {}
+        constexpr BigMap(const BigMap& other) : mData(other.mData), Sentinel(other.Sentinel), mCurrentSize(other.mCurrentSize) {}
+        constexpr BigMap(BigMap&& other) : mData(std::move(other.mData)), Sentinel(std::move(other.Sentinel)), mCurrentSize(other.mCurrentSize) {}
         constexpr BigMap(const std::initializer_list<std::pair<Key, Value>>& initialState) {
             MakeSentinel();
             mData = new std::array<std::pair<Key, Value>, Capacity>();
             mData->fill(Sentinel);
             for (const auto& p : initialState) {
                 (*mData)[FindSlot(p.first)] = p;
+                mCurrentSize++;
             }
         }
 
@@ -244,17 +236,29 @@ namespace Constexpr {
 
         constexpr BigMap& operator=(const BigMap& other) {
             *(this->mData) = (*other.mData);
+            Sentinel = other.Sentinel;
+            mCurrentSize = other.mCurrentSize;
             return *this;
         }
         constexpr BigMap& operator=(BigMap&& other) {
             *(this->mData) = (*other.mData);
+            Sentinel = other.Sentinel;
+            mCurrentSize = other.mCurrentSize;
             return *this;
+        }
+
+        constexpr void SetSentinel(Key newSentinel) {
+            for (auto& [key, value] : *mData) {
+                if (key == Sentinel) key = newSentinel;
+            }
+            Sentinel = newSentinel;
         }
 
         constexpr Value& operator[](const Key& key) {
             auto slot = FindSlot(key);
             if (!IsOccupied(slot)) {
                 (*mData)[slot] = std::make_pair(key, Value{});
+                mCurrentSize++;
             }
             return (*mData)[slot].second;
         }
@@ -271,12 +275,12 @@ namespace Constexpr {
             return size() == 0;
         }
         constexpr size_t size() const {
-            return std::count_if(mData->begin(), mData->end(), [&](const std::pair<Key, Value>& p) { return p != Sentinel; });
-            //return GetValues().size();
+            return mCurrentSize;
         }
 
         constexpr void clear() {
             mData->fill(Sentinel);
+            mCurrentSize = 0;
         }
         constexpr bool contains(const Key& key) const {
             return IsOccupied(FindSlot(key));
@@ -285,10 +289,10 @@ namespace Constexpr {
             auto slot = FindSlot(key);
             if (!IsOccupied(slot)) return 0ull;
             (*mData)[slot] = Sentinel;
+            mCurrentSize--;
             for (size_t j = (slot + 1) % Capacity; j != slot; j = (j + 1) % Capacity) {
                 if (!IsOccupied(j)) return 1ull;
                 size_t k = FindSlot((*mData)[j].first);
-                //size_t k = Constexpr::Hash((*mData)[j].first) % Capacity;
                 if (slot <= j) {
                     if ((slot < k) && (k <= j)) {
                         continue;
@@ -349,6 +353,8 @@ namespace Constexpr {
     private:
         std::array<std::pair<Key, Value>, Capacity>* mData{};
         std::pair<Key, Value> Sentinel;
+        size_t mCurrentSize{ 0 };
+        Hasher mHash{};
 
         constexpr void MakeSentinel() {
             if constexpr (std::is_same_v<std::remove_cvref_t<Key>, std::string>) {
@@ -363,8 +369,8 @@ namespace Constexpr {
         }
 
         constexpr size_t FindSlot(const Key& key) const {
-            //size_t i = hash(key) % Capacity;
-            size_t i = Constexpr::Hash(key) % Capacity;
+            //size_t i = Constexpr::Hash(key) % Capacity;
+            size_t i = mHash(key) % Capacity;
             while ((*mData)[i].first != Sentinel.first && (*mData)[i].first != key) {
                 i = (i + 1) % Capacity;
             }
@@ -469,7 +475,9 @@ namespace Constexpr {
         constexpr PriorityQueue() = default;
         constexpr PriorityQueue(const PriorityQueue& other) : mData(other.mData) {}
         constexpr PriorityQueue(PriorityQueue&& other) : mData(std::move(other.mData)) {}
-        constexpr PriorityQueue(const std::initializer_list<T>& initial) : mData(initial) {}
+        constexpr PriorityQueue(const std::initializer_list<T>& initial) : mData(initial) {
+            std::make_heap(mData.begin(), mData.end());
+        }
 
         PriorityQueue& operator=(const PriorityQueue& other) {
             mData = other.mData;
@@ -482,24 +490,28 @@ namespace Constexpr {
 
         constexpr void push(T val) {
             mData.push_back(val);
-            mSorted = false;
+            std::push_heap(mData.begin(), mData.end());
         }
 
-        constexpr T top() const {
-            if (mData.empty()) throw "Reading empty queue";
-            if (!mSorted) {
-                std::sort(mData.begin(), mData.end());
-                mSorted = true;
+        constexpr void push_or_update(T val) {
+            auto existing = std::find(mData.begin(), mData.end(), val);
+            if (existing == mData.end()) {
+                push(val);
             }
-            return mData.back();
+            else {
+                if ((*existing) < val) {
+                    *existing = val;
+                    std::make_heap(mData.begin(), mData.end());
+                }
+            }
         }
-        constexpr void pop() {
+
+        constexpr T pop() {
             if (mData.empty()) throw "Popped empty queue";
-            if (!mSorted) {
-                std::sort(mData.begin(), mData.end());
-                mSorted = true;
-            }
+            std::pop_heap(mData.begin(), mData.end());
+            auto result = mData.back();
             mData.pop_back();
+            return result;
         }
 
         constexpr bool empty() const {
@@ -514,7 +526,6 @@ namespace Constexpr {
 
     private:
         mutable std::vector<T> mData;
-        mutable bool mSorted{ false };
     };
 
 
@@ -621,7 +632,7 @@ namespace Constexpr {
     }
 
     //template<typename T, size_t Capacity = 1'000'000, auto hash = Constexpr::Hash<T>>
-    template<typename T, size_t Capacity = 1'000'000>
+    template<typename T, size_t Capacity = 1'000'000, typename Hasher = Constexpr::Hasher<T>>
     class BigSet {
     public:
         constexpr BigSet() {
@@ -633,11 +644,13 @@ namespace Constexpr {
             mData = new std::array<T, Capacity>();
             *mData = *other.mData;
             Sentinel = other.Sentinel;
+            mCurrentSize = other.mCurrentSize;
         }
 
         constexpr BigSet(BigSet&& other) {
             mData = std::move(other.mData);
             Sentinel = other.Sentinel;
+            mCurrentSize = other.mCurrentSize;
         }
 
         constexpr BigSet(const std::initializer_list<T>& initial) { 
@@ -660,10 +673,17 @@ namespace Constexpr {
             return *this;
         }
 
+        constexpr void SetSentinel(T newSentinel) {
+            for (auto& s : *mData) {
+                if (s == Sentinel) s = newSentinel;
+            }
+            Sentinel = newSentinel;
+        }
         constexpr bool insert(const T& val) {
             auto slot = FindSlot(val);
             if (IsOccupied(slot)) return false; //either full, or already in set
             (*mData)[slot] = val;
+            mCurrentSize++;
             return true;
         }
 
@@ -681,9 +701,9 @@ namespace Constexpr {
             auto slot = FindSlot(val);
             if (!IsOccupied(slot)) return;
             (*mData)[slot] = Sentinel;
+            mCurrentSize--;
             for (size_t j = (slot + 1) % Capacity; j != slot; j = (j + 1) % Capacity) {
                 if (!IsOccupied(j)) return;
-                //size_t k = hash((*mData)[j]) % Capacity;
                 size_t k = FindSlot((*mData)[j]);
                 if (slot <= j) {
                     if ((slot < k) && (k <= j)) {
@@ -704,14 +724,16 @@ namespace Constexpr {
             return;
         }
 
-        constexpr bool empty() {
-            return size() == 0;
+        constexpr bool empty() const {
+            return mCurrentSize == 0;
         }
         constexpr void clear() {
             mData->fill(Sentinel);
+            mCurrentSize = 0;
         }
-        constexpr std::size_t size() {
-            return std::count_if(mData->begin(), mData->end(), [&](T val) { return val != Sentinel; });
+        constexpr std::size_t size() const {
+            //return std::count_if(mData->begin(), mData->end(), [&](T val) { return val != Sentinel; });
+            return mCurrentSize;
         }
 
         constexpr auto begin() {
@@ -737,7 +759,9 @@ namespace Constexpr {
         //T Sentinel { std::is_same_v<std::string, std::remove_cvref_t<T>> ? "SentinelString" : std::is_arithmetic_v<T> ? 9919 : {} };
         T Sentinel{};
         std::array<T, Capacity>* mData;
-        
+        size_t mCurrentSize = 0;
+        Hasher mHash{};
+
         constexpr void MakeSentinel() {
             if constexpr (std::is_same_v<std::remove_cvref_t<T>, std::string>) {
                 Sentinel = "SentinelString";
@@ -752,8 +776,10 @@ namespace Constexpr {
         
 
         constexpr size_t FindSlot(const T& t) const {
-            //size_t i = hash(t) % Capacity;
-            size_t i = Constexpr::Hash(t) % Capacity;
+            if (mCurrentSize == Capacity) throw "SetFull";
+
+            //size_t i = Constexpr::Hash(t) % Capacity;
+            size_t i = mHash(t) % Capacity;
             while ((*mData)[i] != Sentinel && (*mData)[i] != t) {
                 i = (i + 1) % Capacity;
             }

@@ -39,7 +39,7 @@ namespace AStarPrivate {
     };
 
     template<typename T, typename State>
-    constexpr std::vector<T> AStar(T start, auto costFunc, auto doneFunc, auto hFunc, auto nFunc) {
+    constexpr std::vector<T> AStar(T start, auto costFunc, auto doneFunc, auto hFunc, auto nFunc, auto moveFunc) {
         //Constexpr::BigSet<T> seen{};
         //Constexpr::BigMap<T, T> cameFrom{};
         //Constexpr::BigMap<T, State> state{};
@@ -60,7 +60,7 @@ namespace AStarPrivate {
             std::vector<T> result{ end };
             auto current = end;
             while (current != start) {
-                auto next = cameFrom[current];
+                auto next = cameFrom.at(current);
                 result.push_back(next);
                 current = next;
             }
@@ -70,8 +70,7 @@ namespace AStarPrivate {
         };
 
         while (!queue.empty()) {
-            auto current = queue.top();
-            queue.pop();
+            auto current = queue.pop();
 
             if (doneFunc(current.Val)) {
                 return constructPath(start, current.Val);
@@ -83,12 +82,13 @@ namespace AStarPrivate {
 
                 auto known = current.Known + costFunc(current.Val, neighbor);
                 if (known < state[neighbor].Known) {
-                    cameFrom[neighbor] = current.Val;
                     state[neighbor].Known = known;
                     state[neighbor].Forcast = known + hFunc(neighbor);
                     State next = State(neighbor);
                     next.Known = known;
                     next.Forcast = state[neighbor].Forcast;
+                    moveFunc(current.Val, next.Val);
+                    cameFrom[next.Val] = current.Val;
                     queue.push(next);
                 }
             }
@@ -103,9 +103,10 @@ constexpr std::vector<T> AStarMin(T start,
     auto costFunc,
     auto doneFunc,
     auto hFunc,
-    auto nFunc) {
+    auto nFunc,
+    auto moveFunc) {
 
-    return AStarPrivate::AStar<T, AStarPrivate::MinimalPath<T>>(start, costFunc, doneFunc, hFunc, nFunc);
+    return AStarPrivate::AStar<T, AStarPrivate::MinimalPath<T>>(start, costFunc, doneFunc, hFunc, nFunc, moveFunc);
 }
 
 template<typename T>
@@ -113,8 +114,9 @@ constexpr std::vector<T> AStarMin(T start, T end, auto nFunc) {
     auto costFunc = [](const T&, const T&) {return 1; };
     auto isComplete = [&end](const T& pos) { return pos == end; };
     auto h = [&end](const T& pos) { return static_cast<size_t>(MDistance(pos, end)); };
+    auto move = [](T&, T&) {};
 
-    return AStarPrivate::AStar<T, AStarPrivate::MinimalPath<T>>(start, costFunc, isComplete, h, nFunc);
+    return AStarPrivate::AStar<T, AStarPrivate::MinimalPath<T>>(start, costFunc, isComplete, h, nFunc, move);
 }
 
 template<typename T>
@@ -122,9 +124,10 @@ constexpr std::vector<T> AStarMax(T start,
     auto costFunc,
     auto doneFunc,
     auto hFunc,
-    auto nFunc) {
+    auto nFunc,
+    auto moveFunc) {
 
-    return AStarPrivate::AStar<T, AStarPrivate::MaximalPath<T>>(start, costFunc, doneFunc, hFunc, nFunc);
+    return AStarPrivate::AStar<T, AStarPrivate::MaximalPath<T>>(start, costFunc, doneFunc, hFunc, nFunc, moveFunc);
 }
 
 template<typename T>
@@ -132,6 +135,7 @@ constexpr std::vector<T> AStarMax(T start, T end, auto nFunc) {
     auto costFunc = [](const T&, const T&) {return 1; };
     auto isComplete = [&end](const T& pos) { return pos == end; };
     auto h = [&end](const T& pos) { return static_cast<size_t>(MDistance(pos, end)); };
+    auto move = [](T&, T&) {};
 
-    return AStarPrivate::AStar<T, AStarPrivate::MaximalPath<T>>(start, costFunc, isComplete, h, nFunc);
+    return AStarPrivate::AStar<T, AStarPrivate::MaximalPath<T>>(start, costFunc, isComplete, h, nFunc, move);
 }

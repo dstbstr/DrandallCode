@@ -53,28 +53,182 @@ namespace Constexpr {
 
         static constexpr size_t AllOnes = 0xFFFFFFFF;
 
-        constexpr size_t Hash(std::string_view str) {
-            size_t result = AllOnes;
-            for (auto c : str) {
-                result = (result >> 8) ^ detail::crc_table[(result ^ c) & 0xFF];
+        constexpr size_t HashNumber(auto val) {
+            size_t result = detail::AllOnes;
+            while (val > 0) {
+                result = (result >> 8) ^ detail::crc_table[(result ^ val) & 0xFF];
+                val /= 2;
             }
-
-            return result ^ AllOnes;
+            return result ^ detail::AllOnes;
         }
     }
 
     template<typename T>
-    constexpr size_t Hash(T in) {
-        if constexpr (std::is_arithmetic_v<T>) {
+    struct Hasher {
+        constexpr size_t operator()(const T& t) const {
+            static_assert(std::_Always_false<T>, "Hash not implemented for type");
+            return 0;
+        }
+    };
+
+    template<>
+    struct Hasher<int> {
+        constexpr size_t operator()(const int& t) const {
+            return detail::HashNumber(t);
+        }
+    };
+    template<>
+    struct Hasher<unsigned int> {
+        constexpr size_t operator()(const unsigned int& t) const {
+            return detail::HashNumber(t);
+        }
+    };
+
+    template<>
+    struct Hasher<long> {
+        constexpr size_t operator()(const long& t) const {
+            return detail::HashNumber(t);
+        }
+    };
+
+    template<>
+    struct Hasher<unsigned long> {
+        constexpr size_t operator()(const unsigned long& t) const {
+            return detail::HashNumber(t);
+        }
+    };
+
+    template<>
+    struct Hasher<size_t> {
+        constexpr size_t operator()(const size_t& t) const {
+            return detail::HashNumber(t);
+        }
+    };
+
+    template<>
+    struct Hasher<long long> {
+        constexpr size_t operator()(const long long& t) const {
+            return detail::HashNumber(t);
+        }
+    };
+
+    template<>
+    struct Hasher<char> {
+        constexpr size_t operator()(const char& c) const {
             size_t result = detail::AllOnes;
-            while (in > 0) {
-                result = (result >> 8) ^ detail::crc_table[(result ^ in) & 0xFF];
-                in /= 2;
-            }
+            result = (result >> 8) ^ detail::crc_table[(result ^ c) ^ 0xFF];
             return result ^ detail::AllOnes;
         }
-        else {
-            return detail::Hash(in);
+    };
+
+    template<>
+    struct Hasher<std::string_view> {
+        constexpr size_t operator()(const std::string_view& sv) const {
+            size_t result = detail::AllOnes;
+            for (auto c : sv) {
+                result = (result >> 8) ^ detail::crc_table[(result ^ c) & 0xFF];
+            }
+
+            return result ^ detail::AllOnes;
         }
+    };
+
+    template<>
+    struct Hasher<std::string> {
+        constexpr size_t operator()(const std::string& str) const {
+            size_t result = detail::AllOnes;
+            for (auto c : str) {
+                result = (result >> 8) ^ detail::crc_table[(result ^ c) & 0xFF];
+            }
+
+            return result ^ detail::AllOnes;
+        }
+    };
+
+    template<typename T, typename U>
+    struct Hasher<std::tuple<T, U>> {
+        constexpr size_t operator()(std::tuple<T, U> tuple) const {
+            size_t result = detail::AllOnes;
+            result ^= Hash(tuple.first);
+            result ^= Hash(tuple.second);
+            return result;
+        }
+    };
+
+    template<typename T, typename U, typename W>
+    struct Hasher<std::tuple<T, U, W>> {
+        constexpr size_t operator()(std::tuple<T, U, W> tuple) const {
+            return detail::AllOnes ^ Hash(std::get<0>(tuple)) ^ Hash(std::get<1>(tuple)) ^ Hash(std::get<2>(tuple));
+        }
+    };
+
+    template<typename T>
+    struct Hasher<std::vector<T>> {
+        constexpr size_t operator()(const std::vector<T>& v) const {
+            size_t result = detail::AllOnes;
+            for (const auto& e : v) {
+                result ^= Hash(e);
+            }
+            return result;
+        }
+    };
+
+    /*
+    constexpr size_t Hash(int val) {
+        return detail::HashNumber(val);
     }
+    constexpr size_t Hash(unsigned int val) {
+        return detail::HashNumber(val);
+    }
+    constexpr size_t Hash(long val) {
+        return detail::HashNumber(val);
+    }
+    constexpr size_t Hash(unsigned long val) {
+        return detail::HashNumber(val);
+    }
+    constexpr size_t Hash(size_t val) {
+        return detail::HashNumber(val);
+    }
+
+    constexpr size_t Hash(long long val) {
+        return detail::HashNumber(val);
+    }
+
+    constexpr size_t Hash(char c) {
+        size_t result = detail::AllOnes;
+        result = (result >> 8) ^ detail::crc_table[(result ^ c) ^ 0xFF];
+        return result ^ detail::AllOnes;
+    }
+
+    constexpr size_t Hash(std::string_view str) {
+        size_t result = detail::AllOnes;
+        for (auto c : str) {
+            result = (result >> 8) ^ detail::crc_table[(result ^ c) & 0xFF];
+        }
+
+        return result ^ detail::AllOnes;
+    }
+
+    template<typename T, typename U>
+    constexpr size_t Hash(std::tuple<T, U> tuple) {
+        size_t result = detail::AllOnes;
+        result ^= Hash(tuple.first);
+        result ^= Hash(tuple.second);
+        return result;
+    }
+
+    template<typename T, typename U, typename W>
+    constexpr size_t Hash(std::tuple<T, U, W> tuple) {
+        return detail::AllOnes ^ Hash(std::get<0>(tuple)) ^ Hash(std::get<1>(tuple)) ^ Hash(std::get<2>(tuple));
+    }
+
+    template<typename T>
+    constexpr size_t Hash(const std::vector<T>& v) {
+        size_t result = detail::AllOnes;
+        for (const auto& e : v) {
+            result ^= Hash(e);
+        }
+        return result;
+    }
+    */
 }

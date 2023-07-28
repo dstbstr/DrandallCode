@@ -20,8 +20,9 @@ namespace AStarTests {
         auto costFunc = [](const Coord& lhs, const Coord& rhs) -> size_t {
             return MDistance(lhs, rhs);
         };
+        auto move = [](Coord&, Coord&) {};
 
-        auto path = AStarMin<Coord>(n1, costFunc, complete, heuristic, neighborFunc);
+        auto path = AStarMin<Coord>(n1, costFunc, complete, heuristic, neighborFunc, move);
 
         if (path.size() != 3) return false;
         if (path[0] != n1) return false;

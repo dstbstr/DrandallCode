@@ -84,7 +84,7 @@ int main(int, char**) {
     Constexpr::ConstexprMathTests::RunTests();
     //RunAll();
     //RunYear(2019);
-    RunOne(2019, 17);
+    RunOne(2019, 18);
     //RunLatest();
     return 0;
 }
