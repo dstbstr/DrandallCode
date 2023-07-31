@@ -28,7 +28,7 @@ SOLUTION(2020, 11) {
             }
         }
         else if (current == State::Occupied) {
-            if (std::count_if(neighbors.begin(), neighbors.end(), [](State state) { return state == State::Occupied; }) >= neighborLimit) {
+            if (std::count(neighbors.begin(), neighbors.end(), State::Occupied) >= neighborLimit) {
                 return State::Empty;
             }
         }
@@ -57,24 +57,6 @@ SOLUTION(2020, 11) {
                 result[row][col] = NextState(currentState, neighborStates, 4);
             }
         }
-        return result;
-    }
-
-    auto Part1(const std::vector<std::string>&lines) {
-        auto grid = ParseInput(lines);
-        while (true) {
-            auto next = Next(grid);
-            if (next == grid) break;
-            else grid = next;
-        }
-
-        size_t result = 0;
-        for (const auto& row : grid) {
-            for (const auto& col : row) {
-                result += col == State::Occupied;
-            }
-        }
-
         return result;
     }
 
@@ -123,57 +105,48 @@ SOLUTION(2020, 11) {
         return result;
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
+    constexpr size_t CountOccupied(const Grid& grid) {
+        return std::accumulate(grid.begin(), grid.end(), 0ull, [](size_t prev, const auto& row) {
+            return prev + std::count(row.begin(), row.end(), State::Occupied);
+            });
+    }
+
+    constexpr size_t Solve(const std::vector<std::string>& lines, auto NextFunc) {
         auto grid = ParseInput(lines);
         while (true) {
-            auto next = Next2(grid);
+            auto next = NextFunc(grid);
             if (next == grid) break;
-            else grid = next;
+            grid = next;
         }
 
-        size_t result = 0;
-        for (const auto& row : grid) {
-            for (const auto& col : row) {
-                result += col == State::Occupied;
-            }
-        }
+        return CountOccupied(grid);
 
-        return result;
     }
-
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
-        std::vector<std::string> lines = {
-            "L.LL.LL.LL",
-            "LLLLLLL.LL",
-            "L.L.L..L..",
-            "LLLL.LL.LL",
-            "L.LL.LL.LL",
-            "L.LLLLL.LL",
-            "..L.L.....",
-            "LLLLLLLLLL",
-            "L.LLLLLL.L",
-            "L.LLLLL.LL"
-        };
-
-        if (Part1(lines) != 37) return false;
-        if (Part2(lines) != 26) return false;
-        return true;
-    }
-
     PART_ONE() {
-        return lines[0];
+        return Constexpr::ToString(Solve(lines, Next));
     }
 
     PART_TWO() {
-        return lines[0];
+        return Constexpr::ToString(Solve(lines, Next2));
     }
 
     TESTS() {
+        std::vector<std::string> lines = {
+           "L.LL.LL.LL",
+           "LLLLLLL.LL",
+           "L.L.L..L..",
+           "LLLL.LL.LL",
+           "L.LL.LL.LL",
+           "L.LLLLL.LL",
+           "..L.L.....",
+           "LLLLLLLLLL",
+           "L.LLLLLL.L",
+           "L.LLLLL.LL"
+        };
+
+        if (PartOne(lines) != "37") return false;
+        if (PartTwo(lines) != "26") return false;
+        
         return true;
     }
 }

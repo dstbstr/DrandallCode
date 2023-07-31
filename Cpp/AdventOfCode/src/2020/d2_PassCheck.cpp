@@ -2,10 +2,10 @@
 
 SOLUTION(2020, 2) {
     struct Entry {
-        char Letter;
-        size_t MinCount;
-        size_t MaxCount;
-        std::string Word;
+        char Letter{ ' ' };
+        size_t MinCount{ 0 };
+        size_t MaxCount{ 0 };
+        std::string Word {""};
     };
 
     constexpr Entry ParseEntry(const std::string & line) {
@@ -26,68 +26,39 @@ SOLUTION(2020, 2) {
         return entry;
     }
 
-    static_assert(ParseEntry("1-3 a: abcde").MinCount == 1);
-    static_assert(ParseEntry("1-3 a: abcde").MaxCount == 3);
-    static_assert(ParseEntry("1-3 a: abcde").Letter == 'a');
-    static_assert(ParseEntry("1-3 a: abcde").Word == "abcde");
-
-    constexpr std::vector<Entry> ParseEntries(const std::vector<std::string>&lines) {
-        std::vector<Entry> result;
-        for (const auto& line : lines) {
-            result.push_back(ParseEntry(line));
-        }
-
-        return result;
-    }
-
     constexpr bool IsEntryValid(const Entry & entry) {
-        size_t letterCount = 0;
-        for (auto c : entry.Word) {
-            letterCount += c == entry.Letter;
-        }
+        size_t letterCount = std::count(entry.Word.begin(), entry.Word.end(), entry.Letter);
         return letterCount >= entry.MinCount && letterCount <= entry.MaxCount;
-    }
-
-    static_assert(IsEntryValid(ParseEntry("1-3 a: abcde")));
-    static_assert(IsEntryValid(ParseEntry("2-9 c: ccccccccc")));
-    static_assert(!IsEntryValid(ParseEntry("1-3 b: cdefg")));
-
-    auto Part1(const std::vector<std::string>&lines) {
-        auto entries = ParseEntries(lines);
-        return std::count_if(entries.begin(), entries.end(), IsEntryValid);
     }
 
     constexpr bool IsEntryValid2(const Entry & entry) {
         return (entry.Word[entry.MinCount - 1] == entry.Letter) != (entry.Word[entry.MaxCount - 1] == entry.Letter);
     }
 
-    static_assert(IsEntryValid2(ParseEntry("1-3 a: abcde")));
-    static_assert(!IsEntryValid2(ParseEntry("2-9 c: ccccccccc")));
-    static_assert(!IsEntryValid2(ParseEntry("1-3 b: cdefg")));
-
-    auto Part2(const std::vector<std::string>&lines) {
-        auto entries = ParseEntries(lines);
-        return std::count_if(entries.begin(), entries.end(), IsEntryValid2);
-    }
-
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
-        return true;
-    }
-
     PART_ONE() {
-        return lines[0];
+        auto entries = ParseLines(lines, ParseEntry);
+        return Constexpr::ToString(std::count_if(entries.begin(), entries.end(), IsEntryValid));
     }
 
     PART_TWO() {
-        return lines[0];
+        auto entries = ParseLines(lines, ParseEntry);
+        return Constexpr::ToString(std::count_if(entries.begin(), entries.end(), IsEntryValid2));
     }
 
     TESTS() {
+        static_assert(ParseEntry("1-3 a: abcde").MinCount == 1);
+        static_assert(ParseEntry("1-3 a: abcde").MaxCount == 3);
+        static_assert(ParseEntry("1-3 a: abcde").Letter == 'a');
+        static_assert(ParseEntry("1-3 a: abcde").Word == "abcde");
+        
+        static_assert(IsEntryValid(ParseEntry("1-3 a: abcde")));
+        static_assert(IsEntryValid(ParseEntry("2-9 c: ccccccccc")));
+        static_assert(!IsEntryValid(ParseEntry("1-3 b: cdefg")));
+
+        static_assert(IsEntryValid2(ParseEntry("1-3 a: abcde")));
+        static_assert(!IsEntryValid2(ParseEntry("2-9 c: ccccccccc")));
+        static_assert(!IsEntryValid2(ParseEntry("1-3 b: cdefg")));
+
         return true;
     }
 }

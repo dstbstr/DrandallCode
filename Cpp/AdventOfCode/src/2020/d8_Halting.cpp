@@ -52,8 +52,8 @@ SOLUTION(2020, 8) {
         state.Ip++;
     }
 
-    bool Terminates(const std::vector<Inst>&instructions, State & state) {
-        std::unordered_set<s64> seen;
+    constexpr bool Terminates(const std::vector<Inst>&instructions, State & state) {
+        Constexpr::SmallSet<s64> seen;
         while (true) {
             if (seen.contains(state.Ip)) {
                 return false;
@@ -66,15 +66,15 @@ SOLUTION(2020, 8) {
         }
     }
 
-    auto Part1(const std::vector<std::string>&lines) {
+    PART_ONE() {
         const auto instructions = ParseInstructions(lines);
 
         State state;
         Terminates(instructions, state);
-        return state.Accumulator;
+        return Constexpr::ToString(state.Accumulator);
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
+    PART_TWO() {
         const auto instructions = ParseInstructions(lines);
 
         for (size_t i = 0; i < instructions.size(); i++) {
@@ -88,45 +88,28 @@ SOLUTION(2020, 8) {
             }
             State state;
             if (Terminates(copy, state)) {
-                return state.Accumulator;
+                return Constexpr::ToString(state.Accumulator);
             }
         }
 
-        return 0ll;
-    }
-
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
-        std::vector<std::string> lines = {
-            "nop +0",
-            "acc +1",
-            "jmp +4",
-            "acc +3",
-            "jmp -3",
-            "acc -99",
-            "acc +1",
-            "jmp -4",
-            "acc +6"
-        };
-
-        if (Part1(lines) != 5) return false;
-        if (Part2(lines) != 8) return false;
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
+        return "Not Found";
     }
 
     TESTS() {
+        std::vector<std::string> lines = {
+           "nop +0",
+           "acc +1",
+           "jmp +4",
+           "acc +3",
+           "jmp -3",
+           "acc -99",
+           "acc +1",
+           "jmp -4",
+           "acc +6"
+        };
+
+        if (PartOne(lines) != "5") return false;
+        if (PartTwo(lines) != "8") return false;
         return true;
     }
 }

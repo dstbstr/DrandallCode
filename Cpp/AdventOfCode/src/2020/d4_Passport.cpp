@@ -69,25 +69,6 @@ SOLUTION(2020, 4) {
         return passport;
     }
 
-    constexpr bool TestParsePassport() {
-        std::vector<std::string> lines = {
-            "ecl:gry pid:860033327 eyr:2020 hcl:#fffffd",
-            "byr:1937 iyr:2017 cid:147 hgt:183cm"
-        };
-
-        auto passport = ParsePassport(lines);
-        if (passport.EyeColor != "gry") return false;
-        if (passport.PassportId != "860033327") return false;
-        if (passport.ExpirationYear != "2020") return false;
-        if (passport.HairColor != "#fffffd") return false;
-        if (passport.BirthYear != "1937") return false;
-        if (passport.IssueYear != "2017") return false;
-        if (passport.CountryId != "147") return false;
-        if (passport.Height != "183cm") return false;
-        return true;
-    }
-    static_assert(TestParsePassport());
-
     constexpr bool ValidatePassport(const Passport & passport) {
         return(!(
             passport.EyeColor.empty() ||
@@ -97,37 +78,6 @@ SOLUTION(2020, 4) {
             passport.BirthYear.empty() ||
             passport.IssueYear.empty() ||
             passport.Height.empty()));
-    }
-
-    constexpr bool TestValidatePassport() {
-        std::vector<std::string> lines = {
-            "hcl:#ae17e1 iyr:2013",
-            "eyr:2024",
-            "ecl:brn pid:760753108 byr:1931",
-            "hgt:179cm"
-        };
-
-        return ValidatePassport(ParsePassport(lines));
-    }
-
-    static_assert(TestValidatePassport());
-
-
-    auto Part1(const std::vector<std::string>&lines) {
-        std::vector<std::string> pLines;
-        size_t result = 0;
-        for (const auto& line : lines) {
-            if (line.empty()) {
-                result += ValidatePassport(ParsePassport(pLines));
-                pLines.clear();
-            }
-            else {
-                pLines.push_back(line);
-            }
-        }
-
-        result += ValidatePassport(ParsePassport(pLines));
-        return result;
     }
 
     constexpr bool VerifyPassport(const Passport & passport) {
@@ -169,54 +119,61 @@ SOLUTION(2020, 4) {
         return true;
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
-        std::vector<std::string> pLines;
-        size_t result = 0;
-        for (const auto& line : lines) {
-            if (line.empty()) {
-                auto passport = ParsePassport(pLines);
-                if (ValidatePassport(passport)) {
-                    result += VerifyPassport(passport);
-                }
-                pLines.clear();
-            }
-            else {
-                pLines.push_back(line);
-            }
-        }
-
-        auto passport = ParsePassport(pLines);
-        if (ValidatePassport(passport)) {
-            result += VerifyPassport(passport);
-        }
-
-        return result;
+    PART_ONE() {
+        auto groups = SplitInputIntoGroups(lines);
+        return Constexpr::ToString(std::count_if(groups.begin(), groups.end(), [](const auto& pLines) {
+            return ValidatePassport(ParsePassport(pLines));
+            }));
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
+    PART_TWO() {
+        auto groups = SplitInputIntoGroups(lines);
+        return Constexpr::ToString(std::count_if(groups.begin(), groups.end(), [](const auto& pLines) {
+            auto p = ParsePassport(pLines);
+            return ValidatePassport(p) && VerifyPassport(p);
+        }));
     }
 
-    bool RunTests() {
+    constexpr bool TestParsePassport() {
+        std::vector<std::string> lines = {
+            "ecl:gry pid:860033327 eyr:2020 hcl:#fffffd",
+            "byr:1937 iyr:2017 cid:147 hgt:183cm"
+        };
+
+        auto passport = ParsePassport(lines);
+        if (passport.EyeColor != "gry") return false;
+        if (passport.PassportId != "860033327") return false;
+        if (passport.ExpirationYear != "2020") return false;
+        if (passport.HairColor != "#fffffd") return false;
+        if (passport.BirthYear != "1937") return false;
+        if (passport.IssueYear != "2017") return false;
+        if (passport.CountryId != "147") return false;
+        if (passport.Height != "183cm") return false;
+        return true;
+    }
+
+    constexpr bool TestValidatePassport() {
+        std::vector<std::string> lines = {
+            "hcl:#ae17e1 iyr:2013",
+            "eyr:2024",
+            "ecl:brn pid:760753108 byr:1931",
+            "hgt:179cm"
+        };
+
+        return ValidatePassport(ParsePassport(lines));
+    }
+
+    TESTS() {
+        static_assert(TestParsePassport());
+        static_assert(TestValidatePassport());
+
         std::vector<std::string> lines = {
             "pid:087499704 hgt:74in ecl:grn iyr:2012 eyr:2030 byr:1980",
             "hcl:#623a2f"
         };
 
-        if (Part2(lines) != 1) return false;
-        return true;
-    }
+        if (PartTwo(lines) != "1") return false;
 
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }

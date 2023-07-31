@@ -23,66 +23,42 @@ SOLUTION(2020, 5) {
         return { minRow, minCol };
     }
 
-    static_assert(FindSeat("FBFBBFFRLR") == RowCol{ 44, 5 });
-    static_assert(FindSeat("FFFBBBFRRR") == RowCol{ 14, 7 });
-    static_assert(FindSeat("BFFFBBFRRR") == RowCol{ 70, 7 });
-    static_assert(FindSeat("BBFFBBFRLL") == RowCol{ 102, 4 });
-    static_assert(FindSeat("FFFFFFFLLL") == RowCol{ 0, 0 });
-    static_assert(FindSeat("BBBBBBBRRR") == RowCol{ 127, 7 });
-
     constexpr size_t GetId(RowCol seat) {
         return (seat.Row * 8) + seat.Col;
     }
 
-    static_assert(GetId({ 44, 5 }) == 357);
-
-    auto Part1(const std::vector<std::string>&lines) {
-        size_t max = 0;
-        for (const auto& line : lines) {
-            max = std::max(max, GetId(FindSeat(line)));
-        }
-
-        return max;
+    constexpr std::vector<size_t> GetSeatIds(const std::vector<std::string>& lines) {
+        std::vector<size_t> result;
+        std::transform(lines.begin(), lines.end(), std::back_inserter(result), [](const std::string& line) { return GetId(FindSeat(line)); });
+        return result;
     }
-
-    auto Part2(const std::vector<std::string>&lines) {
-        std::vector<size_t> seatIds;
-        for (const auto& line : lines) {
-            seatIds.push_back(GetId(FindSeat(line)));
-        }
-        std::sort(seatIds.begin(), seatIds.end());
-        for (size_t i = 0; i < seatIds.size() - 1; i++) {
-            if (seatIds[i] + 1 != seatIds[i + 1]) {
-                return seatIds[i] + 1;
-            }
-        }
-
-        return 0ull;
-    }
-
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
-        std::vector<std::string> lines = {
-
-        };
-
-        if (Part1(lines) != 0) return false;
-        return true;
-    }
-
     PART_ONE() {
-        return lines[0];
+        auto seatIds = GetSeatIds(lines);
+        return Constexpr::ToString(*std::max_element(seatIds.begin(), seatIds.end()));
     }
 
     PART_TWO() {
-        return lines[0];
+        auto seatIds = GetSeatIds(lines);
+        std::sort(seatIds.begin(), seatIds.end());
+        for (size_t i = 0; i < seatIds.size() - 1; i++) {
+            if (seatIds[i] + 1 != seatIds[i + 1]) {
+                return Constexpr::ToString(seatIds[i] + 1);
+            }
+        }
+
+        return "Not Found";
     }
 
     TESTS() {
+        static_assert(FindSeat("FBFBBFFRLR") == RowCol{ 44, 5 });
+        static_assert(FindSeat("FFFBBBFRRR") == RowCol{ 14, 7 });
+        static_assert(FindSeat("BFFFBBFRRR") == RowCol{ 70, 7 });
+        static_assert(FindSeat("BBFFBBFRLL") == RowCol{ 102, 4 });
+        static_assert(FindSeat("FFFFFFFLLL") == RowCol{ 0, 0 });
+        static_assert(FindSeat("BBBBBBBRRR") == RowCol{ 127, 7 });
+
+        static_assert(GetId({ 44, 5 }) == 357);
+        
         return true;
     }
 }

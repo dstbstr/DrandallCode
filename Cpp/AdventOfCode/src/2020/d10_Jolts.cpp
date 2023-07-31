@@ -1,19 +1,24 @@
 #include "2020/d10_Jolts.h"
 
 SOLUTION(2020, 10) {
-    constexpr std::vector<size_t> ParseInput(const std::vector<std::string>&lines) {
-        std::vector<size_t> nums;
-        for (const auto& line : lines) {
-            size_t num;
-            Constexpr::ParseNumber(line, num);
-            nums.push_back(num);
+    constexpr auto KnownPaths = []() {
+        std::array<size_t, 8> known {};
+        known[0] = 1;
+        known[1] = 1;
+        known[2] = 2;
+        for (size_t i = 0; i < 5; i++) {
+            auto next = known[i] + known[i + 1] + known[i + 2];
+            known[i + 3] = next;
         }
-
-        return nums;
+        return known;
+    }();
+        
+    constexpr size_t CountPaths(size_t runLength) {
+        return KnownPaths[runLength];
     }
 
-    auto Part1(const std::vector<std::string>&lines) {
-        auto nums = ParseInput(lines);
+    PART_ONE() {
+        auto nums = ParseLinesAsNumbers<size_t>(lines);
         nums.push_back(0);
         std::sort(nums.begin(), nums.end());
         size_t ones = 0;
@@ -24,21 +29,11 @@ SOLUTION(2020, 10) {
             else if (diff == 3) threes++;
         }
 
-        return ones * threes;
+        return Constexpr::ToString(ones * threes);
     }
 
-    constexpr size_t CountPaths(size_t runLength) {
-        std::vector<size_t> known = { 1, 1, 2 };
-        for (auto i = 0; i < 5; i++) {
-            auto next = known[known.size() - 1] + known[known.size() - 2] + known[known.size() - 3];
-            known.push_back(next);
-        }
-
-        return known[runLength];
-    }
-
-    auto Part2(const std::vector<std::string>&lines) {
-        auto nums = ParseInput(lines);
+    PART_TWO() {
+        auto nums = ParseLinesAsNumbers<size_t>(lines);
         nums.push_back(0);
         std::sort(nums.begin(), nums.end());
         size_t runLength = 0;
@@ -53,15 +48,10 @@ SOLUTION(2020, 10) {
             }
         }
         result *= CountPaths(runLength);
-        return result;
+        return Constexpr::ToString(result);
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
+    TESTS() {
         std::vector<std::string> lines = {
             "16",
             "10",
@@ -76,20 +66,9 @@ SOLUTION(2020, 10) {
             "4"
         };
 
-        if (Part1(lines) != 35) return false;
-        if (Part2(lines) != 8) return false;
-        return true;
-    }
+        if (PartOne(lines) != "35") return false;
+        if (PartTwo(lines) != "8") return false;
 
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }
