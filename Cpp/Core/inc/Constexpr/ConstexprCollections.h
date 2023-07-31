@@ -369,7 +369,6 @@ namespace Constexpr {
         }
 
         constexpr size_t FindSlot(const Key& key) const {
-            //size_t i = Constexpr::Hash(key) % Capacity;
             size_t i = mHash(key) % Capacity;
             while ((*mData)[i].first != Sentinel.first && (*mData)[i].first != key) {
                 i = (i + 1) % Capacity;
@@ -399,7 +398,7 @@ namespace Constexpr {
         constexpr void push(const T& val) {
             mData.push_back(val);
         }
-        constexpr T top() {
+        constexpr T top() const {
             if (mData.empty()) {
                 throw "Accessing empty stack";
             }
@@ -411,13 +410,13 @@ namespace Constexpr {
             }
             mData.pop_back();
         }
-        constexpr bool is_empty() {
+        constexpr bool is_empty() const {
             return mData.empty();
         }
         constexpr void clear() {
             mData.clear();
         }
-        constexpr std::size_t size() {
+        constexpr std::size_t size() const {
             return mData.size();
         }
 
@@ -444,7 +443,7 @@ namespace Constexpr {
         constexpr void push(const T& val) {
             mData.push_back(val);
         }
-        constexpr T front() {
+        constexpr T front() const {
             if (mData.empty()) {
                 throw "Accessing empty queue";
             }
@@ -456,7 +455,7 @@ namespace Constexpr {
             }
             mData.erase(mData.begin());
         }
-        constexpr bool is_empty() {
+        constexpr bool is_empty() const {
             return mData.empty();
         }
         constexpr void clear() {

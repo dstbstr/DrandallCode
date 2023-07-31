@@ -4,8 +4,6 @@
 #include "Facing.h"
 
 SOLUTION(2019, 25) {
-    constexpr s64 Consumed = -9919;
-
     struct Room {
         std::string Name;
         std::vector<Facing> Doors;
@@ -30,17 +28,19 @@ SOLUTION(2019, 25) {
     };
 
     struct RoomHash {
-        size_t operator()(const Room& room) const {
-            return std::hash<std::string>()(room.Name);
+        constexpr size_t operator()(const Room& room) const {
+            return mHash(room.Name);
         }
+
+        Constexpr::Hasher<std::string> mHash;
     };
 
     class Droid {
         std::vector<s64> Instructions;
         Args Args{};
 
-        void IssueCommand(const std::string& cmd) {
-            static const s64 newline = 10;
+        constexpr void IssueCommand(const std::string& cmd) {
+            const s64 newline = 10;
 
             for (const auto& c : cmd) {
                 Args.Inputs.push_back(c);
@@ -54,18 +54,18 @@ SOLUTION(2019, 25) {
     public:
         Coord Pos{ 0, 0 };
 
-        Droid(const std::string& line) {
+        constexpr Droid(const std::string& line) {
             Instructions = ParseInstructions(line);
-            Args.Output = Consumed;
+            Args.Output = Unset;
         }
 
-        Droid(const Droid& other) {
+        constexpr Droid(const Droid& other) {
             Instructions = other.Instructions;
             Args = other.Args;
             Pos = other.Pos;
         }
 
-        std::vector<std::string> ReadOutput() {
+        constexpr std::vector<std::string> ReadOutput() {
             std::vector<std::string> result;
             std::string currentString;
             bool CommandRequested = false;
@@ -73,7 +73,7 @@ SOLUTION(2019, 25) {
                 while (!NeedsInput(Instructions, Args)) {
                     if (!Apply(Instructions, Args)) return result;
 
-                    if (Args.Output != Consumed) {
+                    if (Args.Output != Unset) {
                         auto c = static_cast<char>(Args.Output);
                         if (c == '\n') {
                             result.push_back(currentString);
@@ -83,7 +83,7 @@ SOLUTION(2019, 25) {
                             currentString.push_back(c);
                         }
                         CommandRequested |= c == '?';
-                        Args.Output = Consumed;
+                        Args.Output = Unset;
                     }
                 }
                 if (CommandRequested) break;
@@ -94,14 +94,14 @@ SOLUTION(2019, 25) {
             return result;
         }
 
-        void PrintOutput() {
+        constexpr void PrintOutput() {
             auto output = ReadOutput();
             for (const auto& line : output) {
-                std::cout << line << "\n";
+                GET_LOGS().push_back(line);
             }
         }
 
-        void Move(Facing dir) {
+        constexpr void Move(Facing dir) {
             switch (dir) {
             case Up: IssueCommand("north"); break;
             case Down: IssueCommand("south"); break;
@@ -110,23 +110,23 @@ SOLUTION(2019, 25) {
             }
         }
 
-        void PickUp(const std::string& item) {
+        constexpr void PickUp(const std::string& item) {
             IssueCommand("take " + item);
         }
 
-        void Drop(const std::string& item) {
+        constexpr void Drop(const std::string& item) {
             IssueCommand("drop " + item);
         }
 
-        void PrintInventory() {
+        constexpr void PrintInventory() {
             IssueCommand("inv");
         }
     };
 
-    using CoordMap = std::unordered_map<Coord, Room>;
-    using NameMap = std::unordered_map<std::string, Room>;
+    using CoordMap = Constexpr::SmallMap<Coord, Room>;
+    using NameMap = Constexpr::SmallMap<std::string, Room>;
 
-    CoordMap GetCoordMap() {
+    constexpr CoordMap GetCoordMap() {
         CoordMap coordMap;
         coordMap[{0, 1}] = Room{ "Gift Wrapping Center", {Down}, {}, {0, 1} };
         coordMap[{0, 2}] = Room{ "Blank 1", {Up, Down}, {}, {0, 2}, true };
@@ -156,7 +156,7 @@ SOLUTION(2019, 25) {
         return coordMap;
     }
 
-    NameMap GenerateNameMap(const CoordMap & coordMap) {
+    constexpr NameMap GenerateNameMap(const CoordMap & coordMap) {
         NameMap result;
         for (const auto& [pos, room] : coordMap) {
             result[room.Name] = room;
@@ -166,7 +166,7 @@ SOLUTION(2019, 25) {
     }
 
 
-    Facing FindMoveDirection(const Room & from, const Room & to) {
+    constexpr Facing FindMoveDirection(const Room & from, const Room & to) {
         if (from.Pos.X == to.Pos.X) {
             return from.Pos.Y < to.Pos.Y ? Down : Up;
         }
@@ -175,7 +175,7 @@ SOLUTION(2019, 25) {
         }
     }
 
-    Coord GetPosFromDirection(const Room & room, Facing dir) {
+    constexpr Coord GetPosFromDirection(const Room & room, Facing dir) {
         switch (dir) {
         case Up: return { room.Pos.X, room.Pos.Y - 1 };
         case Down: return { room.Pos.X, room.Pos.Y + 1 };
@@ -185,7 +185,7 @@ SOLUTION(2019, 25) {
         }
     }
 
-    void MoveAdjacent(Droid & droid, const Room & from, const Room & to) {
+    constexpr void MoveAdjacent(Droid & droid, const Room & from, const Room & to) {
         if (to.IsBlank) return;
 
         auto dir = FindMoveDirection(from, to);
@@ -193,7 +193,7 @@ SOLUTION(2019, 25) {
         droid.Move(dir);
     }
 
-    void MoveTo(Droid & droid, const Room & to, const CoordMap & map) {
+    constexpr void MoveTo(Droid & droid, const Room & to, const CoordMap & map) {
         auto n = [&map](const Coord& pos) {
             std::vector<Coord> result;
             const auto& room = map.at(pos);
@@ -211,8 +211,8 @@ SOLUTION(2019, 25) {
         }
     }
 
-    auto Part1(const std::string & line) {
-        auto droid = Droid(line);
+    PART_ONE() {
+        auto droid = Droid(lines[0]);
 
         auto coordMap = GetCoordMap();
         auto nameMap = GenerateNameMap(coordMap);
@@ -222,9 +222,7 @@ SOLUTION(2019, 25) {
         std::vector<std::string> roomsToVisit = {
             "Holodeck",
             "Stables",
-            //"Arcade",
             "Corridor",
-            //"Science Lab",
             "Kitchen"
         };
 
@@ -236,29 +234,14 @@ SOLUTION(2019, 25) {
         }
 
         MoveTo(droid, nameMap.at("Sensor Room"), coordMap);
-        droid.PrintOutput();
-
-        return 0;
-    }
-
-    auto Part2(const std::vector<std::string>&lines) {
-        return lines.size();
-    }
-
-    std::string Run(const std::vector<std::string>&lines) {
-        return Constexpr::ToString(Part1(lines[0]));
-    }
-
-    bool RunTests() {
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
+        auto output = droid.ReadOutput();
+        auto result = "\n" + Constexpr::JoinVec("\n", output);
+        return result;
     }
 
     PART_TWO() {
-        return lines[0];
+        (void)lines;
+        return "Merry Christmas";
     }
 
     TESTS() {

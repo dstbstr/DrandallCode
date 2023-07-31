@@ -3,8 +3,6 @@
 #include <queue>
 
 SOLUTION(2019, 23) {
-    constexpr s64 Consumed = -9919;
-
     struct Packet {
         size_t Destination = 0;
         s64 X = 0;
@@ -16,7 +14,8 @@ SOLUTION(2019, 23) {
         Args Args;
         s64 Id = 0;
 
-        std::queue<Packet> WorkQueue;
+        //std::queue<Packet> WorkQueue;
+        Constexpr::Queue<Packet> WorkQueue;
     };
 
     constexpr void RunUntilInteract(Computer & computer) {
@@ -27,39 +26,32 @@ SOLUTION(2019, 23) {
         return NeedsInput(computer.Instructions, computer.Args);
     }
 
-    std::vector<Computer> InitializeComputers(const std::string & line) {
+    constexpr std::vector<Computer> InitializeComputers(const std::string & line) {
         auto instructions = ParseInstructions(line);
         Args args;
-        args.Output = Consumed;
         std::vector<Computer> result;
-        for (auto i = 0; i < 50; i++) {
+        for (s64 i = 0; i < 50; i++) {
             Computer computer = { instructions, args, i };
-            computer.Args.Inputs.push_back(static_cast<s64>(i));
+            computer.Args.Inputs.push_back(i);
             Apply(computer.Instructions, computer.Args);
             result.push_back(computer);
         }
         return result;
     }
 
-    constexpr bool AreQueuesEmpty(const std::vector<Computer>&computers) {
-        for (const auto& computer : computers) {
-            if (!computer.WorkQueue.empty()) {
-                return false;
-            }
-            if (!HasConsumedAllInput(computer.Args)) {
-                return false;
-            }
-        }
-        return true;
+    constexpr bool AreQueuesEmpty(const std::vector<Computer>& computers) {
+        return std::all_of(computers.begin(), computers.end(), [](const Computer& computer) {
+            return computer.WorkQueue.is_empty() && HasConsumedAllInput(computer.Args);
+        });
     }
 
-    void SendPacket(std::vector<Computer>&computers, Packet packet) {
+    constexpr void SendPacket(std::vector<Computer>& computers, Packet packet) {
         if (packet.Destination < computers.size()) {
             computers[packet.Destination].WorkQueue.push(packet);
         }
     }
 
-    auto ConsumeOutput(Computer & computer) {
+    constexpr auto ConsumeOutput(Computer & computer) {
         Packet packet;
 
         RunUntilInteract(computer);
@@ -74,12 +66,12 @@ SOLUTION(2019, 23) {
         Apply(computer.Instructions, computer.Args);
         packet.Y = computer.Args.Output;
 
-        computer.Args.Output = Consumed;
+        computer.Args.Output = Unset;
         return packet;
     }
 
-    void ConsumeInput(Computer & computer) {
-        if (computer.WorkQueue.empty()) {
+    constexpr void ConsumeInput(Computer& computer) {
+        if (computer.WorkQueue.is_empty()) {
             computer.Args.Inputs.push_back(-1);
             Apply(computer.Instructions, computer.Args);
         }
@@ -94,8 +86,20 @@ SOLUTION(2019, 23) {
         }
     }
 
-    auto Part1(const std::string & line) {
-        auto computers = InitializeComputers(line);
+    Packet NatPacket;
+    s64 PreviousY = Unset;
+
+    constexpr s64 InvokeNat(std::vector<Computer>& computers) {
+        if (PreviousY == NatPacket.Y) {
+            return NatPacket.Y;
+        }
+        PreviousY = NatPacket.Y;
+        computers[0].WorkQueue.push(NatPacket);
+        return 0;
+    }
+
+    PART_ONE() {
+        auto computers = InitializeComputers(lines[0]);
         Packet packet;
         while (true) {
             for (auto& computer : computers) {
@@ -106,7 +110,7 @@ SOLUTION(2019, 23) {
                 else {
                     packet = ConsumeOutput(computer);
                     if (packet.Destination == 255) {
-                        return packet.Y;
+                        return Constexpr::ToString(packet.Y);
                     }
                     else {
                         SendPacket(computers, packet);
@@ -114,23 +118,12 @@ SOLUTION(2019, 23) {
                 }
             }
         }
+
+        return "Not Found";
     }
 
-    Packet NatPacket;
-
-    s64 InvokeNat(std::vector<Computer>&computers) {
-        static s64 PreviousY = -9919;
-
-        if (PreviousY == NatPacket.Y) {
-            return NatPacket.Y;
-        }
-        PreviousY = NatPacket.Y;
-        computers[0].WorkQueue.push(NatPacket);
-        return 0;
-    }
-
-    auto Part2(const std::string & line) {
-        auto computers = InitializeComputers(line);
+    PART_TWO() {
+        auto computers = InitializeComputers(lines[0]);
         u32 emptyFrames = 0;
         Packet packet;
         while (true) {
@@ -157,32 +150,15 @@ SOLUTION(2019, 23) {
                 if (emptyFrames == 10) {
                     auto res = InvokeNat(computers);
                     if (res > 0) {
-                        return res;
+                        return Constexpr::ToString(res);
                     }
 
                     emptyFrames = 0;
                 }
             }
         }
-    }
 
-    //12842 is too high
-    //12568 is wrong
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines[0]));
-        return Constexpr::ToString(Part2(lines[0]));
-    }
-
-    bool RunTests() {
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
+        return "Not Found";
     }
 
     TESTS() {

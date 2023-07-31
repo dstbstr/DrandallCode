@@ -83,8 +83,8 @@ void RunAll() {
 int main(int, char**) {
     Constexpr::ConstexprMathTests::RunTests();
     //RunAll();
-    //RunYear(2019);
-    RunOne(2019, 18);
+    RunYear(2019);
+    //RunOne(2019, 25);
     //RunLatest();
     return 0;
 }

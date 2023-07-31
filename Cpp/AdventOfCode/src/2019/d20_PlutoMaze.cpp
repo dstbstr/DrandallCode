@@ -4,10 +4,11 @@
 #include <map>
 
 SOLUTION(2019, 20) {
-    using WalkingMap = std::unordered_set<RowCol>;
-    using PortalMap = std::unordered_map<RowCol, RowCol>;
+    using WalkingMap = Constexpr::SmallSet<RowCol>;
+    using PortalMap = Constexpr::SmallMap<RowCol, RowCol>;
+    using DistanceMap = Constexpr::SmallMap<RowCol, Constexpr::SmallMap<RowCol, size_t>>;
 
-    void ParseInput(const std::vector<std::string>&lines, WalkingMap & outWalkingMap, PortalMap & outPortalMap, RowCol & outEntrance, RowCol & outExit) {
+    constexpr void ParseInput(const std::vector<std::string>&lines, WalkingMap & outWalkingMap, PortalMap & outPortalMap, RowCol & outEntrance, RowCol & outExit) {
         RowCol origin = { 0, 0 };
         std::array<RowCol, Constexpr::FromBase26("zz")> foundPortals{ origin };
         std::string key = "  ";
@@ -69,10 +70,8 @@ SOLUTION(2019, 20) {
         }
     }
 
-    using DistanceMap = std::unordered_map<RowCol, std::unordered_map<RowCol, size_t>>;
 
-    size_t FindDistance(const RowCol & start, const RowCol & end, const WalkingMap & walkingMap, const RowCol & limit) {
-
+    constexpr size_t FindDistance(const RowCol & start, const RowCol & end, const WalkingMap & walkingMap, const RowCol & limit) {
         auto n = [&](RowCol pos) {
             auto neighbors = GetDirectNeighbors(pos, limit);
             std::vector<RowCol> result;
@@ -86,7 +85,7 @@ SOLUTION(2019, 20) {
         return path.empty() ? 0 : path.size() - 1;
     }
 
-    DistanceMap BuildDistanceMap(const PortalMap & portalMap, const WalkingMap & walkingMap, const RowCol & entrance, const RowCol & exit, const RowCol & limit) {
+    constexpr DistanceMap BuildDistanceMap(const PortalMap & portalMap, const WalkingMap & walkingMap, const RowCol & entrance, const RowCol & exit, const RowCol & limit) {
         DistanceMap result;
 
         auto distance = FindDistance(entrance, exit, walkingMap, limit);
@@ -125,18 +124,19 @@ SOLUTION(2019, 20) {
         return result;
     }
 
-    size_t FindShortestPath(const DistanceMap & dMap, const PortalMap & portalMap, RowCol entrance, RowCol exit) {
+    constexpr size_t FindShortestPath(const DistanceMap & dMap, const PortalMap & portalMap, RowCol entrance, RowCol exit) {
         struct State {
             RowCol Pos;
             size_t Steps;
         };
-        std::map<RowCol, size_t> seen;
-        std::queue<State> queue;
+        Constexpr::SmallMap<RowCol, size_t> seen;
+        Constexpr::Queue<State> queue;
+
         queue.push({ entrance, 0 });
 
         size_t best = 99999;
 
-        while (!queue.empty()) {
+        while (!queue.is_empty()) {
             auto current = queue.front();
             queue.pop();
 
@@ -162,23 +162,11 @@ SOLUTION(2019, 20) {
         return best - 1;
     }
 
-    auto Part1(const std::vector<std::string>&lines) {
-        PortalMap portalMap;
-        WalkingMap walkingMap;
-        RowCol entrance, exit;
-        ParseInput(lines, walkingMap, portalMap, entrance, exit);
-
-        RowCol limit = { lines.size(), lines[0].size() };
-        auto dMap = BuildDistanceMap(portalMap, walkingMap, entrance, exit, limit);
-
-        return FindShortestPath(dMap, portalMap, entrance, exit);
-    }
-
     constexpr bool IsInnerPortal(RowCol pos, RowCol limit) {
         return pos.Row > 3 && pos.Col > 3 && pos.Row < limit.Row - 3 && pos.Col < limit.Col - 3;
     }
 
-    size_t FindShortestRecursivePath(const DistanceMap & dMap, const PortalMap & portalMap, RowCol entrance, RowCol exit, RowCol limit) {
+    constexpr size_t FindShortestRecursivePath(const DistanceMap & dMap, const PortalMap & portalMap, RowCol entrance, RowCol exit, RowCol limit) {
         struct State {
             RowCol Pos;
             size_t Steps;
@@ -189,15 +177,15 @@ SOLUTION(2019, 20) {
             }
         };
 
-        std::map<std::pair<RowCol, size_t>, size_t> seen;
-        std::priority_queue<State> queue;
+        Constexpr::SmallMap<std::pair<RowCol, size_t>, size_t> seen;
+        Constexpr::PriorityQueue<State> queue;
+
         queue.push({ entrance, 0, 1 });
 
         size_t best = 99999;
 
         while (!queue.empty()) {
-            auto current = queue.top();
-            queue.pop();
+            auto current = queue.pop();
 
             auto neighbors = dMap.at(current.Pos);
             for (const auto& [to, distance] : neighbors) {
@@ -234,7 +222,7 @@ SOLUTION(2019, 20) {
         return best - 1;
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
+    PART_ONE() {
         PortalMap portalMap;
         WalkingMap walkingMap;
         RowCol entrance, exit;
@@ -243,38 +231,45 @@ SOLUTION(2019, 20) {
         RowCol limit = { lines.size(), lines[0].size() };
         auto dMap = BuildDistanceMap(portalMap, walkingMap, entrance, exit, limit);
 
-        return FindShortestRecursivePath(dMap, portalMap, entrance, exit, limit);
+        return Constexpr::ToString(FindShortestPath(dMap, portalMap, entrance, exit));
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
+    PART_TWO() {
+        PortalMap portalMap;
+        WalkingMap walkingMap;
+        RowCol entrance, exit;
+        ParseInput(lines, walkingMap, portalMap, entrance, exit);
+
+        RowCol limit = { lines.size(), lines[0].size() };
+        auto dMap = BuildDistanceMap(portalMap, walkingMap, entrance, exit, limit);
+
+        return Constexpr::ToString(FindShortestRecursivePath(dMap, portalMap, entrance, exit, limit));
     }
 
-    bool RunTests() {
+    TESTS() {
         std::vector<std::string> lines = {
-            "         A         ",
-            "         A         ",
-            "  #######.#########",
-            "  #######.........#",
-            "  #######.#######.#",
-            "  #######.#######.#",
-            "  #######.#######.#",
-            "  #####  B    ###.#",
-            "BC...##  C    ###.#",
-            "  ##.##       ###.#",
-            "  ##...DE  F  ###.#",
-            "  #####    G  ###.#",
-            "  #########.#####.#",
-            "DE..#######...###.#",
-            "  #.#########.###.#",
-            "FG..#########.....#",
-            "  ###########.#####",
-            "             Z     ",
-            "             Z     ",
+           "         A         ",
+           "         A         ",
+           "  #######.#########",
+           "  #######.........#",
+           "  #######.#######.#",
+           "  #######.#######.#",
+           "  #######.#######.#",
+           "  #####  B    ###.#",
+           "BC...##  C    ###.#",
+           "  ##.##       ###.#",
+           "  ##...DE  F  ###.#",
+           "  #####    G  ###.#",
+           "  #########.#####.#",
+           "DE..#######...###.#",
+           "  #.#########.###.#",
+           "FG..#########.....#",
+           "  ###########.#####",
+           "             Z     ",
+           "             Z     ",
         };
 
-        if (Part1(lines) != 23) return false;
+        if (PartOne(lines) != "23") return false;
 
         lines = {
             "                   A               ",
@@ -316,7 +311,7 @@ SOLUTION(2019, 20) {
             "           U   P   P               ",
         };
 
-        if (Part1(lines) != 58) return false;
+        if (PartOne(lines) != "58") return false;
 
         lines = {
     "             Z L X W       C                 ",
@@ -358,19 +353,8 @@ SOLUTION(2019, 20) {
     "               A A D   M                     "
         };
 
-        if (Part2(lines) != 396) return false;
-        return true;
-    }
+        if (PartTwo(lines) != "396") return false;
 
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }

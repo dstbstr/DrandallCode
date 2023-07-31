@@ -4,8 +4,8 @@
 SOLUTION(2019, 24) {
     using Grid = std::array<std::array<bool, 5>, 5>;
 
-    constexpr Grid ParseGrid(const std::vector<std::string>&lines) {
-        Grid result;
+    constexpr Grid ParseGrid(const std::vector<std::string>& lines) {
+        Grid result{};
         for (size_t row = 0; row < lines.size(); row++) {
             for (size_t col = 0; col < lines[row].size(); col++) {
                 result[row][col] = lines[row][col] == '#';
@@ -72,33 +72,8 @@ SOLUTION(2019, 24) {
         ".#..."
         })) == 2129920);
 
-
-    auto Part1(const std::vector<std::string>&lines) {
-        auto grid = ParseGrid(lines);
-        std::set<Grid> seen;
-        seen.insert(grid);
-
-        while (true) {
-            grid = Next(grid);
-            if (seen.contains(grid)) {
-                break;
-            }
-            else {
-                seen.insert(grid);
-            }
-        }
-
-        return CalcDiversity(grid);
-    }
-
-    size_t CountNeighborBugs(const RowCol & pos, size_t currentLevel, const std::vector<Grid>&levels) {
-        static const std::vector<RowCol> InnerPositions = {
-            {1, 1},
-            {1, 3},
-            {3, 1},
-            {3, 3}
-        };
-
+    static constexpr std::array<RowCol, 4> InnerPositions = { { {1, 1}, {1, 3}, {3, 1}, {3, 3} } };
+    constexpr size_t CountNeighborBugs(const RowCol & pos, size_t currentLevel, const std::vector<Grid>&levels) {
         size_t neighborBugs = CountNeighborBugs(pos, levels[currentLevel]);
 
         if (pos.Row == 0 || pos.Row == 4 || pos.Col == 0 || pos.Col == 4) {
@@ -186,7 +161,7 @@ SOLUTION(2019, 24) {
         return result;
     }
 
-    auto Part2(const std::vector<std::string>&lines, size_t minutes) {
+    constexpr auto SolvePartTwo(const std::vector<std::string>& lines, size_t minutes) {
         std::vector<Grid> levels;
         for (auto i = 0; i < minutes + 2; i++) {
             levels.push_back(Grid{});
@@ -201,12 +176,30 @@ SOLUTION(2019, 24) {
         return CountBugs(levels);
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines, 200));
+
+    PART_ONE() {
+        auto grid = ParseGrid(lines);
+        Constexpr::SmallSet<Grid> seen;
+        seen.insert(grid);
+
+        while (true) {
+            grid = Next(grid);
+            if (seen.contains(grid)) {
+                break;
+            }
+            else {
+                seen.insert(grid);
+            }
+        }
+
+        return Constexpr::ToString(CalcDiversity(grid));
     }
 
-    bool RunTests() {
+    PART_TWO() {
+        return Constexpr::ToString(SolvePartTwo(lines, 200));
+    }
+
+    TESTS() {
         std::vector<std::string> lines = {
             "....#",
             "#..#.",
@@ -215,21 +208,9 @@ SOLUTION(2019, 24) {
             "#...."
         };
 
-        if (Part1(lines) != 2129920) return false;
-        if (Part2(lines, 10) != 99) return false;
+        if (PartOne(lines) != "2129920") return false;
+        if (SolvePartTwo(lines, 10) != 99) return false;
 
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }
