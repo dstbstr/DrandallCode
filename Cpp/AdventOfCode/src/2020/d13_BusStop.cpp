@@ -1,7 +1,7 @@
 #include "2020/d13_BusStop.h"
 
 SOLUTION(2020, 13) {
-    auto Part1(const std::vector<std::string>&lines) {
+    PART_ONE() {
         size_t earliestTime;
         Constexpr::ParseNumber(lines[0], earliestTime);
         std::vector<size_t> values;
@@ -23,7 +23,7 @@ SOLUTION(2020, 13) {
             }
         }
 
-        return result;
+        return Constexpr::ToString(result);
     }
 
     //77 % 7 == 0
@@ -32,7 +32,8 @@ SOLUTION(2020, 13) {
     //77 + 91 = 168
     //168 % 7 == 0
     //168 % 13 == 12
-    auto Part2(const std::vector<std::string>&lines) {
+
+    PART_TWO() {
         auto split = Constexpr::Split(lines[1], ",");
         size_t jump;
         Constexpr::ParseNumber(split[0], jump);
@@ -49,34 +50,18 @@ SOLUTION(2020, 13) {
             jump *= val;
         }
 
-        return result;
-    }
-
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
-        std::vector<std::string> lines = {
-            "939",
-            "7,13,x,x,59,x,31,19"
-        };
-
-        if (Part1(lines) != 295) return false;
-        if (Part2(lines) != 1068781) return false;
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
+        return Constexpr::ToString(result);
     }
 
     TESTS() {
+        std::vector<std::string> lines = {
+           "939",
+           "7,13,x,x,59,x,31,19"
+        };
+
+        if (PartOne(lines) != "295") return false;
+        if (PartTwo(lines) != "1068781") return false;
+        
         return true;
     }
 }

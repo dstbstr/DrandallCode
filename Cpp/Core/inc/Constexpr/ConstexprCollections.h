@@ -630,7 +630,6 @@ namespace Constexpr {
         return set.cend();
     }
 
-    //template<typename T, size_t Capacity = 1'000'000, auto hash = Constexpr::Hash<T>>
     template<typename T, size_t Capacity = 1'000'000, typename Hasher = Constexpr::Hasher<T>>
     class BigSet {
     public:
@@ -719,7 +718,6 @@ namespace Constexpr {
                 (*mData)[j] = Sentinel;
                 slot = j;
             }
-            //maybe warn that the map is full?
             return;
         }
 
@@ -731,10 +729,11 @@ namespace Constexpr {
             mCurrentSize = 0;
         }
         constexpr std::size_t size() const {
-            //return std::count_if(mData->begin(), mData->end(), [&](T val) { return val != Sentinel; });
             return mCurrentSize;
         }
 
+        //TODO: Yeah, these don't work
+        /*
         constexpr auto begin() {
             return mData.begin();
         }
@@ -753,6 +752,7 @@ namespace Constexpr {
         constexpr auto cend() const {
             return mData.cend();
         }
+        */
 
     private:
         //T Sentinel { std::is_same_v<std::string, std::remove_cvref_t<T>> ? "SentinelString" : std::is_arithmetic_v<T> ? 9919 : {} };

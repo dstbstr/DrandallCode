@@ -22,20 +22,16 @@ SOLUTION(2020, 16) {
         return std::make_pair(min, max);
     }
 
-    constexpr std::vector<Field> ParseFields(const std::vector<std::string>&lines) {
-        std::vector<Field> result;
-        for (const auto& line : lines) {
-            Field field;
-            auto split = Constexpr::Split(line, ": ");
-            field.Name = split[0];
+    constexpr Field ParseField(const std::string& line) {
+        Field field;
+        auto split = Constexpr::Split(line, ": ");
+        field.Name = split[0];
 
-            auto split2 = Constexpr::Split(split[1], " or ");
-            field.LowRange = ParseRange(split2[0]);
-            field.HighRange = ParseRange(split2[1]);
+        auto split2 = Constexpr::Split(split[1], " or ");
+        field.LowRange = ParseRange(split2[0]);
+        field.HighRange = ParseRange(split2[1]);
 
-            result.push_back(field);
-        }
-        return result;
+        return field;
     }
 
     constexpr std::array<bool, 1000> FindInvalidNumbers(const std::vector<Field>&fields) {
@@ -83,23 +79,7 @@ SOLUTION(2020, 16) {
         return result;
     }
 
-    auto Part1(const std::vector<std::string>&lines) {
-        auto groups = SplitInputIntoGroups(lines);
-        auto fields = ParseFields(groups[0]);
-        auto invalidNumbers = FindInvalidNumbers(fields);
-        auto otherTickets = GetNearbyTickets(groups[2]);
-
-        size_t result = 0;
-        for (const auto& ticket : otherTickets) {
-            for (auto value : ticket) {
-                result += value * invalidNumbers[value];
-            }
-        }
-
-        return result;
-    }
-
-    std::vector<Ticket> GetValidTickets(const std::vector<std::string>&lines, const std::vector<Field>&fields) {
+    constexpr std::vector<Ticket> GetValidTickets(const std::vector<std::string>&lines, const std::vector<Field>&fields) {
         auto invalidNumbers = FindInvalidNumbers(fields);
         auto otherTickets = GetNearbyTickets(lines);
 
@@ -118,7 +98,7 @@ SOLUTION(2020, 16) {
         return result;
     }
 
-    std::unordered_map<std::string, size_t> UntangleFields(const std::vector<Field>&fields, const std::vector<Ticket>&tickets) {
+    constexpr Constexpr::SmallMap<std::string, size_t> UntangleFields(const std::vector<Field>&fields, const std::vector<Ticket>&tickets) {
         std::vector<std::vector<std::string>> available;
         for (auto i = 0; i < fields.size(); i++) {
             std::vector<std::string> v;
@@ -158,7 +138,7 @@ SOLUTION(2020, 16) {
             }
         }
 
-        std::unordered_map<std::string, size_t> result;
+        Constexpr::SmallMap<std::string, size_t> result;
         for (size_t i = 0; i < available.size(); i++) {
             result[available[i][0]] = i;
         }
@@ -166,9 +146,26 @@ SOLUTION(2020, 16) {
         return result;
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
+
+    PART_ONE() {
         auto groups = SplitInputIntoGroups(lines);
-        auto fields = ParseFields(groups[0]);
+        auto fields = ParseLines(groups[0], ParseField);
+        auto invalidNumbers = FindInvalidNumbers(fields);
+        auto otherTickets = GetNearbyTickets(groups[2]);
+
+        size_t result = 0;
+        for (const auto& ticket : otherTickets) {
+            for (auto value : ticket) {
+                result += value * invalidNumbers[value];
+            }
+        }
+
+        return Constexpr::ToString(result);
+    }
+
+    PART_TWO() {
+        auto groups = SplitInputIntoGroups(lines);
+        auto fields = ParseLines(groups[0], ParseField);
         auto myTicket = GetMyTicket(groups[1]);
         auto tickets = GetValidTickets(groups[2], fields);
 
@@ -181,31 +178,26 @@ SOLUTION(2020, 16) {
             }
         }
 
-        return result;
+        return Constexpr::ToString(result);
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
+    TESTS() {
         std::vector<std::string> lines = {
-            "class: 1-3 or 5-7",
-            "row: 6-11 or 33-44",
-            "seat: 13-40 or 45-50",
-            "",
-            "your ticket:",
-            "7,1,14",
-            "",
-            "nearby tickets:",
-            "7,3,47",
-            "40,4,50",
-            "55,2,20",
-            "38,6,12"
+           "class: 1-3 or 5-7",
+           "row: 6-11 or 33-44",
+           "seat: 13-40 or 45-50",
+           "",
+           "your ticket:",
+           "7,1,14",
+           "",
+           "nearby tickets:",
+           "7,3,47",
+           "40,4,50",
+           "55,2,20",
+           "38,6,12"
         };
 
-        if (Part1(lines) != 71) return false;
+        if (PartOne(lines) != "71") return false;
 
         lines = {
             "class: 0-1 or 4-19",
@@ -221,19 +213,7 @@ SOLUTION(2020, 16) {
             "5,14,9"
         };
 
-        if (Part2(lines) != 1) return false;
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
+        if (PartTwo(lines) != "1") return false;
         return true;
     }
 }

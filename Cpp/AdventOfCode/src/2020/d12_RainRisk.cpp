@@ -29,14 +29,6 @@ SOLUTION(2020, 12) {
         return { command, value };
     }
 
-    constexpr std::vector<Instruction> ParseInput(const std::vector<std::string>&lines) {
-        std::vector<Instruction> result;
-        for (const auto& line : lines) {
-            result.push_back(ParseInstruction(line));
-        }
-        return result;
-    }
-
     constexpr void ApplyInstruction(const Instruction & instruction, Facing & facing, Coord & pos) {
         auto val = instruction.Value;
         switch (instruction.Op) {
@@ -74,17 +66,6 @@ SOLUTION(2020, 12) {
         throw "Unhandled instruction op";
     }
 
-    auto Part1(const std::vector<std::string>&lines) {
-        auto facing = Facing::Right;
-        Coord pos = { 0, 0 };
-        const auto instructions = ParseInput(lines);
-
-        for (const auto& instruction : instructions) {
-            ApplyInstruction(instruction, facing, pos);
-        }
-
-        return MDistance(pos, Coord{ 0, 0 });
-    }
 
     constexpr void TurnLeft(Coord & wayPoint) {
         std::swap(wayPoint.X, wayPoint.Y);
@@ -95,22 +76,6 @@ SOLUTION(2020, 12) {
         std::swap(wayPoint.X, wayPoint.Y);
         wayPoint.X = -wayPoint.X;
     }
-
-    constexpr bool TestTurns() {
-        Coord pos = { 1, 3 };
-        TurnRight(pos);
-        if (pos != Coord{-3, 1}) return false;
-        TurnRight(pos);
-        if (pos != Coord{ -1, -3 }) return false;
-        TurnRight(pos);
-        if (pos != Coord{ 3, -1 }) return false;
-        TurnRight(pos);
-        if (pos != Coord{ 1, 3 }) return false;
-
-        return true;
-    }
-
-    static_assert(TestTurns());
 
     constexpr void ApplyInstruction2(const Instruction & instruction, Coord & pos, Coord & wayPoint) {
         auto val = instruction.Value;
@@ -150,24 +115,46 @@ SOLUTION(2020, 12) {
         throw "Unhandled instruction op";
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
+    PART_ONE() {
+        auto facing = Facing::Right;
+        Coord pos = { 0, 0 };
+        const auto instructions = ParseLines(lines, ParseInstruction);
+
+        for (const auto& instruction : instructions) {
+            ApplyInstruction(instruction, facing, pos);
+        }
+
+        return Constexpr::ToString(MDistance(pos));
+    }
+
+    PART_TWO() {
         Coord pos = { 0, 0 };
         Coord wayPoint = { 10, -1 };
-        const auto instructions = ParseInput(lines);
+        const auto instructions = ParseLines(lines, ParseInstruction);
 
         for (const auto& instruction : instructions) {
             ApplyInstruction2(instruction, pos, wayPoint);
         }
 
-        return MDistance(pos, { 0, 0 });
+        return Constexpr::ToString(MDistance(pos));
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
+    constexpr bool TestTurns() {
+        Coord pos = { 1, 3 };
+        TurnRight(pos);
+        if (pos != Coord{-3, 1}) return false;
+        TurnRight(pos);
+        if (pos != Coord{ -1, -3 }) return false;
+        TurnRight(pos);
+        if (pos != Coord{ 3, -1 }) return false;
+        TurnRight(pos);
+        if (pos != Coord{ 1, 3 }) return false;
+
+        return true;
     }
 
-    bool RunTests() {
+    TESTS() {
+        static_assert(TestTurns());
         if (!TestTurns()) return false;
 
         std::vector<std::string> lines = {
@@ -178,21 +165,9 @@ SOLUTION(2020, 12) {
             "F11"
         };
 
-        if (Part1(lines) != 25) return false;
-        if (Part2(lines) != 286) return false;
+        if (PartOne(lines) != "25") return false;
+        if (PartTwo(lines) != "286") return false;
 
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }

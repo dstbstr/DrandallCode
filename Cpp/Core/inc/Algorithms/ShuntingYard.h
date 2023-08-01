@@ -1,33 +1,31 @@
 #pragma once
 
 #include <functional>
-#include <stack>
 #include <string>
 #include <string_view>
-#include <queue>
 
+#include "Constexpr/ConstexprCollections.h"
 #include "Constexpr/ConstexprStrUtils.h"
-#include "Utilities/StringUtils.h"
 
 namespace ShuntingYard {
     enum struct Associativity { Left, Right };
+
     template<typename T>
     struct OperatorData {
         size_t Precedence = 0;
         Associativity Associativity = Associativity::Left;
-
         std::function<T(const std::string&, const std::string&)> Run;
     };
 
     namespace Detail {
         template<typename T>
-        std::unordered_map<std::string, OperatorData<T>> DefaultOperatorData{
-            {"+", {2, Associativity::Left, [](const std::string& lhs, const std::string& rhs) {
+        Constexpr::SmallMap<std::string, OperatorData<T>> DefaultOperatorData{
+            { "+", {2, Associativity::Left, [](const std::string& lhs, const std::string& rhs) {
                 T a, b;
                 Constexpr::ParseNumber(lhs, a);
                 Constexpr::ParseNumber(rhs, b);
                 return a + b;
-            }}},
+            }} },
             {"-", {2, Associativity::Left, [](const std::string& lhs, const std::string& rhs) {
                 T a, b;
                 Constexpr::ParseNumber(lhs, a);
@@ -53,7 +51,7 @@ namespace ShuntingYard {
         }
 
         template<typename T>
-        void ProcessToken(const std::string& token, std::queue<std::string>& outputQueue, std::stack<std::string>& operatorStack, const std::unordered_map<std::string, OperatorData<T>>& operators) {
+        constexpr void ProcessToken(const std::string& token, Constexpr::Queue<std::string>& outputQueue, Constexpr::Stack<std::string>& operatorStack, const Constexpr::SmallMap<std::string, OperatorData<T>>& operators) {
             auto firstOpenParen = token.find("(");
             auto firstCloseParen = token.find(")");
             auto firstNum = token.find_first_of("0123456789");
@@ -72,7 +70,7 @@ namespace ShuntingYard {
                 else if (firstCloseParen != token.npos) {
                     for (auto i = 0; i < token.size(); i++) {
                         while (operatorStack.top() != "(") {
-                            if (operatorStack.empty()) throw "Mismatched parens";
+                            if (operatorStack.is_empty()) throw "Mismatched parens";
                             outputQueue.push(operatorStack.top());
                             operatorStack.pop();
                         }
@@ -82,7 +80,7 @@ namespace ShuntingYard {
                 else if (firstSymbol != token.npos) {
                     auto o1 = operators.at(token);
                     auto shouldPop = [&]() {
-                        if (operatorStack.empty()) return false;
+                        if (operatorStack.is_empty()) return false;
                         auto next = operatorStack.top();
                         if (next == "(") return false;
                         auto o2 = operators.at(std::string(next));
@@ -106,22 +104,22 @@ namespace ShuntingYard {
     }
 
     template<typename T>
-    T Evaluate(const std::string& input, const std::unordered_map<std::string, OperatorData<T>>& operators) {
+    constexpr T Evaluate(const std::string& input, const Constexpr::SmallMap<std::string, OperatorData<T>>& operators) {
         auto tokens = Constexpr::Split(input, " ");
-        std::queue<std::string> outputQueue;
-        std::stack<std::string> operatorStack;
+        Constexpr::Queue<std::string> outputQueue;
+        Constexpr::Stack<std::string> operatorStack;
 
         for (const auto& token : tokens) {
             Detail::ProcessToken(std::string(token), outputQueue, operatorStack, operators);
         }
-        while (!operatorStack.empty()) {
+        while (!operatorStack.is_empty()) {
             outputQueue.push(operatorStack.top());
             operatorStack.pop();
         }
 
         //evaluate
-        std::stack<std::string> evaluateStack;
-        while (!outputQueue.empty()) {
+        Constexpr::Stack<std::string> evaluateStack;
+        while (!outputQueue.is_empty()) {
             auto token = outputQueue.front();
             outputQueue.pop();
 
@@ -135,7 +133,7 @@ namespace ShuntingYard {
                 auto rhs = evaluateStack.top();
                 evaluateStack.pop();
 
-                evaluateStack.push(ToString(op.Run(lhs, rhs)));
+                evaluateStack.push(Constexpr::ToString(op.Run(lhs, rhs)));
             }
         }
 
@@ -145,7 +143,7 @@ namespace ShuntingYard {
     }
 
     template<typename T>
-    T Evaluate(const std::string& input) {
+    constexpr T Evaluate(const std::string& input) {
         return Evaluate(input, Detail::DefaultOperatorData<T>);
     }
 

@@ -1,22 +1,10 @@
 #include "2020/d15_NumberGame.h"
 
 SOLUTION(2020, 15) {
-    constexpr std::vector<size_t> ParseNumbers(const std::string & line) {
-        std::vector<size_t> numbers;
-        auto split = Constexpr::Split(line, ",");
-        for (auto v : split) {
-            size_t number;
-            Constexpr::ParseNumber(v, number);
-            numbers.push_back(number);
-        }
-
-        return numbers;
-    }
-
     template<size_t Rounds>
-    auto Solve(const std::string & line) {
+    constexpr auto Solve(const std::string & line) {
         constexpr const size_t sentinal = 999'999'999;
-        auto numbers = ParseNumbers(line);
+        auto numbers = ParseLineAsNumbers<size_t>(line);
         auto aPtr = std::make_unique<std::array<size_t, Rounds>>();
         auto& a = *aPtr;
         a.fill(sentinal);
@@ -41,28 +29,19 @@ SOLUTION(2020, 15) {
         return std::find(a.begin(), a.end(), Rounds - 1) - a.begin();
     }
 
-
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Solve<2020>(lines[0]));
-        return Constexpr::ToString(Solve<30'000'000>(lines[0]));
-    }
-
-    bool RunTests() {
-        if (Solve<2020>("0,3,6") != 436) return false;
-        if (Solve<2020>("0,3,6") != 436) return false;
-        if (Solve<30'000'000>("0,3,6") != 175594) return false;
-        return true;
-    }
-
     PART_ONE() {
-        return lines[0];
+        return Constexpr::ToString(Solve<2020>(lines[0]));
     }
 
     PART_TWO() {
-        return lines[0];
+        return Constexpr::ToString(Solve<30'000'000>(lines[0]));
     }
 
     TESTS() {
+        if (Solve<2020>("0,3,6") != 436) return false;
+        if (Solve<2020>("0,3,6") != 436) return false;
+        if (Solve<30'000'000>("0,3,6") != 175594) return false;
+
         return true;
     }
 }

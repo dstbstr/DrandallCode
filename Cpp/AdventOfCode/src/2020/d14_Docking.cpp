@@ -1,7 +1,7 @@
 #include "2020/d14_Docking.h"
 
 SOLUTION(2020, 14) {
-    using Memory = std::unordered_map<size_t, size_t>;
+    using Memory = Constexpr::SmallMap<size_t, size_t>;
 
     //mask = 110000011XX0000X101000X10X01XX001011
     constexpr void UpdateMasks(std::string_view str, size_t & zeroMask, size_t & oneMask) {
@@ -15,31 +15,13 @@ SOLUTION(2020, 14) {
         }
     }
 
-    /*
-    11000011XX0000X101000X10X01XX001011
-    00111100001111001011100101000110100 = 8084900404 (zeros)
-    11000011000000010100001000100001011 = 26173116683 (ones)
-    */
-    constexpr bool TestUpdateMasks() {
-        std::string mask = "11000011XX0000X101000X10X01XX001011";
-        size_t zeroMask = 0;
-        size_t oneMask = 0;
-
-        UpdateMasks(mask, zeroMask, oneMask);
-        if (zeroMask != 8084900404) return false;
-        if (oneMask != 26173116683) return false;
-        return true;
-    }
-
-    static_assert(TestUpdateMasks());
-
-    void Write(size_t val, size_t address, Memory & memory, size_t zeroMask, size_t oneMask) {
+    constexpr void Write(size_t val, size_t address, Memory & memory, size_t zeroMask, size_t oneMask) {
         val &= ~zeroMask;
         val |= oneMask;
         memory[address] = val;
     }
 
-    void UpdateFloaters(size_t address, size_t floating, Memory & memory, size_t toWrite) {
+    constexpr void UpdateFloaters(size_t address, size_t floating, Memory & memory, size_t toWrite) {
         if (floating == 0) return;
 
         std::vector<size_t> seenValues{ 0 };
@@ -60,7 +42,7 @@ SOLUTION(2020, 14) {
         }
     }
 
-    void Write2(size_t val, size_t address, Memory & memory, size_t zeroMask, size_t oneMask) {
+    constexpr void Write2(size_t val, size_t address, Memory & memory, size_t zeroMask, size_t oneMask) {
         address |= oneMask;
         size_t floating = ~(zeroMask | oneMask);
         size_t floatingMask = ((~0ull) >> (64 - 36));
@@ -70,8 +52,7 @@ SOLUTION(2020, 14) {
         UpdateFloaters(address, floating, memory, val);
     }
 
-
-    size_t ProcessLines(const std::vector<std::string>&lines, auto writeFunc) {
+    constexpr size_t ProcessLines(const std::vector<std::string>&lines, auto writeFunc) {
         size_t zeroMask = 0;
         size_t oneMask = 0;
         Memory memory{};
@@ -93,11 +74,6 @@ SOLUTION(2020, 14) {
             result += value;
         }
         return result;
-    }
-
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(ProcessLines(lines, Write));
-        return Constexpr::ToString(ProcessLines(lines, Write2));
     }
 
     bool RunTests() {
@@ -130,14 +106,58 @@ SOLUTION(2020, 14) {
     }
 
     PART_ONE() {
-        return lines[0];
+        return Constexpr::ToString(ProcessLines(lines, Write));
     }
 
     PART_TWO() {
-        return lines[0];
+        return Constexpr::ToString(ProcessLines(lines, Write2));
     }
 
+    /*
+    11000011XX0000X101000X10X01XX001011
+    00111100001111001011100101000110100 = 8084900404 (zeros)
+    11000011000000010100001000100001011 = 26173116683 (ones)
+    */
+    constexpr bool TestUpdateMasks() {
+        std::string mask = "11000011XX0000X101000X10X01XX001011";
+        size_t zeroMask = 0;
+        size_t oneMask = 0;
+
+        UpdateMasks(mask, zeroMask, oneMask);
+        if (zeroMask != 8084900404) return false;
+        if (oneMask != 26173116683) return false;
+        return true;
+    }
+
+
     TESTS() {
+        static_assert(TestUpdateMasks());
+        if (!TestUpdateMasks()) return false;
+        std::vector<std::string> lines = {
+            "mask = XXXXXXXXXXXXXXXXXXXXXXXXXXXXX1XXXX0X",
+            "mem[8] = 11",
+            "mem[7] = 101",
+            "mem[8] = 0"
+        };
+
+        if (ProcessLines(lines, Write) != 165) return false;
+
+        lines = {
+            "mask = 000000000000000000000000000000X1001X",
+            "mem[42] = 100",
+            "mask = 00000000000000000000000000000000X0XX",
+            "mem[26] = 1"
+        };
+        if (ProcessLines(lines, Write2) != 208) return false;
+
+        lines = {
+            "mask = 000000000000000000000000000000000XXX",
+            "mem[8] = 4",
+            "mask = XX0000000000000000000000000000000000",
+            "mem[0] = 5"
+        };
+        if (ProcessLines(lines, Write2) != 52) return false;
+
         return true;
     }
 }

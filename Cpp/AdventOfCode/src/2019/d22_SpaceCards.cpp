@@ -87,10 +87,11 @@ SOLUTION(2019, 22) {
                 ops.push_back(LinFunc(deckSize - 1, deckSize - 1));
             }
             else if (s[0] == "cut") {
-                s32 cutSize;
+                //s32 cutSize;
+                BigInt cutSize;
                 Constexpr::ParseNumber(Constexpr::Split(line, " ")[1], cutSize);
 
-                BigInt add = cutSize < 0 ? deckSize + cutSize : cutSize;
+                BigInt add = cutSize < 0 ? deckSize + cutSize : BigInt(cutSize);
                 ops.push_back(LinFunc(one, add % deckSize));
             }
             else {

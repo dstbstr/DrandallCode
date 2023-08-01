@@ -1,11 +1,4 @@
 #include "BigInt.h"
-#include <sstream>
-
-std::string ToString(const BigInt& bigInt) {
-    std::stringstream stream;
-    stream << bigInt;
-    return stream.str();
-}
 
 static_assert(BigInt(1) == BigInt("1"), "1 != 1");
 static_assert(BigInt(0) == BigInt(0), "0 != 0");

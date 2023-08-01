@@ -2,24 +2,16 @@
 
 #include <vector>
 #include <array>
+#include <string>
 
 namespace Constexpr {
     constexpr size_t Strlen(const char* str) {
         return std::char_traits<char>::length(str);
     }
 
-    static_assert(Strlen("hello") == 5);
-    static_assert(Strlen("a") == 1);
-    static_assert(Strlen("") == 0);
-
     constexpr bool IsDigit(char c) {
         return c >= '0' && c <= '9';
     }
-
-    static_assert(IsDigit('3'));
-    static_assert(!IsDigit('A'));
-    static_assert(IsDigit('0'));
-    static_assert(IsDigit('9'));
 
     template<typename T>
     constexpr std::string ToString(T val) {
@@ -33,10 +25,10 @@ namespace Constexpr {
 
         std::string result;
         while (val >= 10) {
-            result.push_back('0' + (val % 10));
+            result.push_back(static_cast<char>('0' + (val % 10)));
             val /= 10;
         }
-        result.push_back('0' + (val % 10));
+        result.push_back(static_cast<char>('0' + (val % 10)));
         if (negate) {
             result.push_back('-');
         }
@@ -44,10 +36,6 @@ namespace Constexpr {
         std::reverse(result.begin(), result.end());
         return result;
     }
-
-    static_assert(Constexpr::ToString(10) == "10");
-    static_assert(Constexpr::ToString(1234) == "1234");
-    static_assert(Constexpr::ToString(-1234) == "-1234");
 
     constexpr std::vector<std::string_view> Split(std::string_view input, std::string_view delimiter) {
         size_t last = 0;
@@ -67,9 +55,6 @@ namespace Constexpr {
         }
         return result;
     }
-
-    static_assert(Split("a b c", " ").size() == 3);
-    static_assert(Split("abc", " ").size() == 1);
 
     template<typename T>
     constexpr bool ParseNumber(std::string_view input, T& result) {
@@ -139,7 +124,6 @@ namespace Constexpr {
         }
     }
 
-
     constexpr std::string RemoveAllOfCopy(const std::string& original, char toFind) {
         std::string result = original;
         RemoveAllOf(result, toFind);
@@ -152,31 +136,7 @@ namespace Constexpr {
         return result;
     }
 
-    namespace ContexprTests {
-        template<typename T>
-        constexpr bool TestParseNumber(const std::string& str, T expected) {
-            T actual;
-            auto success = ParseNumber<T>(str, actual);
-            return success && actual == expected;
-        }
-
-        static_assert(TestParseNumber<unsigned int>("1234", 1234));
-        static_assert(TestParseNumber<int>("-1234", -1234));
-        static_assert(TestParseNumber<size_t>("123454321", 123454321));
-        static_assert(TestParseNumber<long long>("1234567654321", 1234567654321));
-
-        static_assert(TestParseNumber("42", 42));
-        static_assert(TestParseNumber("-42", -42));
-        static_assert(TestParseNumber("0", unsigned int(0)));
-        static_assert(!TestParseNumber("-1", int(1)));
-        static_assert(!TestParseNumber("abc", 0));
-
-        static_assert(ReplaceAllCopy("abc", "a", "") == "bc");
-        static_assert(ReplaceAllCopy("aaa", "a", "b") == "bbb");
-        static_assert(ReplaceAllCopy("abbabbabb", "bb", "c") == "acacac");
-
-        static_assert(RemoveAllOfCopy("abcabcabc", "cb") == "aaa");
-        static_assert(RemoveAllOfCopy("abcabcabc", std::string("cb")) == "aaa");
-        static_assert(RemoveAllOfCopy("abcabcabc", 'b') == "acacac");
+    namespace StrUtilsTests {
+        bool Run();
     }
 }
