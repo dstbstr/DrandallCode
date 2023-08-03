@@ -69,12 +69,19 @@ namespace ShuntingYard {
                 else if (firstNum != token.npos) outputQueue.push(token);
                 else if (firstCloseParen != token.npos) {
                     for (auto i = 0; i < token.size(); i++) {
+                        while (true) {
+                            auto next = operatorStack.pop();
+                            if (next == "(") break;
+                            outputQueue.push(next);
+                        }
+                        /*
                         while (operatorStack.top() != "(") {
                             if (operatorStack.is_empty()) throw "Mismatched parens";
                             outputQueue.push(operatorStack.top());
                             operatorStack.pop();
                         }
                         operatorStack.pop();
+                        */
                     }
                 }
                 else if (firstSymbol != token.npos) {
@@ -89,8 +96,7 @@ namespace ShuntingYard {
                     };
 
                     while (shouldPop()) {
-                        outputQueue.push(operatorStack.top());
-                        operatorStack.pop();
+                        outputQueue.push(operatorStack.pop());
                     }
                     operatorStack.push(token);
                 }

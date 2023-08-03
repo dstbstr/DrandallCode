@@ -1,8 +1,10 @@
 #include "2020/d19_SeaMonster.h"
+#include "Constexpr/ConstexprRegex.h"
 
 SOLUTION(2020, 19) {
-    using Entries = std::unordered_map<std::string, std::vector<std::string>>;
-    Entries ParseEntries(const std::vector<std::string>&lines) {
+    using Entries = Constexpr::SmallMap<std::string, std::vector<std::string>>;
+
+    constexpr Entries ParseEntries(const std::vector<std::string>&lines) {
         Entries result;
         for (const auto& line : lines) {
             auto s1 = Constexpr::Split(line, ": ");
@@ -20,9 +22,9 @@ SOLUTION(2020, 19) {
         return result;
     }
 
-    using Cache = std::unordered_map<std::string, std::string>;
+    using Cache = Constexpr::SmallMap<std::string, std::string>;
 
-    std::string Recurse(const std::string & key, const Entries & entries, Cache & cache) {
+    constexpr std::string Recurse(const std::string & key, const Entries & entries, Cache & cache) {
         if (cache.contains(key)) {
             return cache.at(key);
         }
@@ -61,14 +63,26 @@ SOLUTION(2020, 19) {
                 else {
                     std::vector<std::string> choices;
                     std::string thirtyOne = Recurse("31", entries, cache);
+                    /*
                     for (auto i = 0; i < 4; i++) {
-                        std::stringstream stream;
-                        stream << "(" << fortyTwo << "){" << i << "}";
-                        stream << "(" << fortyTwo << thirtyOne << ")";
-                        stream << "(" << thirtyOne << "){" << i << "}";
-                        choices.push_back(stream.str());
+                        std::string choice = "(" + fortyTwo + "){" + Constexpr::ToString(i) + "}";
+                        choice += "(" + fortyTwo + thirtyOne + ")";
+                        choice += "(" + thirtyOne + "){" + Constexpr::ToString(i) + "}";
+                        choices.push_back(choice);
                     }
-                    result = "(" + StrUtil::JoinVec('|', choices) + ")";
+                    */
+                    for (auto i = 0; i < 4; i++) {
+                        std::string choice;
+                        for (auto j = 0; j < i; j++) {
+                            choice += "(" + fortyTwo + ")";
+                        }
+                        choice += "(" + fortyTwo + thirtyOne + ")";
+                        for (auto j = 0; j < i; j++) {
+                            choice += "(" + thirtyOne + ")";
+                        }
+                        choices.push_back(choice);
+                    }
+                    result = "(" + Constexpr::JoinVec('|', choices) + ")";
                 }
                 cache[key] = result;
             }
@@ -90,7 +104,7 @@ SOLUTION(2020, 19) {
         return cache[key];
     }
 
-    std::string ParseRules(const std::vector<std::string>&lines, bool isPartTwo = false) {
+    constexpr std::string ParseRules(const std::vector<std::string>&lines, bool isPartTwo = false) {
         auto entries = ParseEntries(lines);
         if (isPartTwo) {
             entries["8"].push_back("42 8");
@@ -102,53 +116,45 @@ SOLUTION(2020, 19) {
         return Recurse("0", entries, cache);
     }
 
-    auto Part1(const std::vector<std::string>&lines) {
+    constexpr size_t Solve(const std::vector<std::string>& lines, bool isPartTwo) {
         auto groups = SplitInputIntoGroups(lines);
-        auto rules = ParseRules(groups[0]);
+        auto rules = ParseRules(groups[0], isPartTwo);
 
-        std::regex re = std::regex("^" + rules + "$");
-        size_t result = 0;
-        for (const auto& line : groups[1]) {
-            result += std::regex_match(line, re);
-        }
-        return result;
+        //std::regex re = std::regex("^" + rules + "$");
+        Constexpr::Regex::Re re(rules);
+        return std::count_if(groups[1].begin(), groups[1].end(), [&](const std::string& line) {
+            return re.Matches(line);
+            //return std::regex_match(line, re);
+            //return Constexpr::Matches(line, rules);
+            //return line.size() > 0;
+            });
+
+    }
+    PART_ONE() {
+        return Constexpr::ToString(Solve(lines, false));
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
-        auto groups = SplitInputIntoGroups(lines);
-        auto rules = ParseRules(groups[0], true);
-
-        std::regex re = std::regex("^" + rules + "$");
-        size_t result = 0;
-        for (const auto& line : groups[1]) {
-            result += std::regex_match(line, re);
-        }
-        return result;
+    PART_TWO() {
+        return Constexpr::ToString(Solve(lines, true));
     }
 
-    //313 too high
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
+    TESTS() {
         std::vector<std::string> lines = {
-            "0: 4 1 5",
-            "1: 2 3 | 3 2",
-            "2: 4 4 | 5 5",
-            "3: 4 5 | 5 4",
-            "4: \"a\"",
-            "5: \"b\"",
-            "",
-            "ababbb",
-            "bababa",
-            "abbbab",
-            "aaabbb",
-            "aaaabbb"
+           "0: 4 1 5",
+           "1: 2 3 | 3 2",
+           "2: 4 4 | 5 5",
+           "3: 4 5 | 5 4",
+           "4: \"a\"",
+           "5: \"b\"",
+           "",
+           "ababbb",
+           "bababa",
+           "abbbab",
+           "aaabbb",
+           "aaaabbb"
         };
 
-        if (Part1(lines) != 2) return false;
+        if (Solve(lines, false) != 2) return false;
 
         lines = {
             "42: 9 14 | 10 1",
@@ -200,20 +206,9 @@ SOLUTION(2020, 19) {
             "aabbbbbaabbbaaaaaabbbbbababaaaaabbaaabba"
         };
 
-        if (Part1(lines) != 3) return false;
-        if (Part2(lines) != 12) return false;
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
+        if (Solve(lines, false) != 3) return false;
+        if (Solve(lines, true) != 12) return false;
+        
         return true;
     }
 }

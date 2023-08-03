@@ -399,17 +399,19 @@ namespace Constexpr {
             mData.push_back(val);
         }
         constexpr T top() const {
+            if (mData.empty()) throw "Accessing empty stack";
+            return mData.back();
+        }
+
+        constexpr T pop() {
             if (mData.empty()) {
                 throw "Accessing empty stack";
             }
-            return mData.back();
-        }
-        constexpr void pop() {
-            if (mData.empty()) {
-                throw "Popped empty stack";
-            }
+            auto result = mData.back();
             mData.pop_back();
+            return result;
         }
+
         constexpr bool is_empty() const {
             return mData.empty();
         }

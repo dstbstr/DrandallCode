@@ -5,6 +5,8 @@
 #include "Utilities/ScopedTimer.h"
 #include "Instrumentation/LogWriter/StdOutLogWriter.h"
 
+#include "Constexpr/ConstexprRegex.h"
+
 #include <iostream>
 #include <charconv>
 #include <fstream>
@@ -81,10 +83,10 @@ void RunAll() {
 //maybe look closer at this for more shenanigans: https://stackoverflow.com/questions/410980/include-a-text-file-in-a-c-program-as-a-char
 
 int main(int, char**) {
-    Constexpr::ConstexprMathTests::RunTests();
+    Constexpr::Regex::RunTest();
     //RunAll();
     //RunYear(2020);
-    RunOne(2020, 18);
+    RunOne(2020, 19);
     //RunLatest();
     return 0;
 }

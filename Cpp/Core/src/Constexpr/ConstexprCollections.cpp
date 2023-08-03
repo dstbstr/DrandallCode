@@ -233,33 +233,23 @@ namespace Constexpr {
             return stack.size() == 1;
         }
 
-        constexpr bool Top_WithNonEmptyStack_ReturnsTopElement() {
+        constexpr bool Pop_WithNonEmptyStack_ReturnsTopElement() {
             Stack<int> stack;
             stack.push(1);
-            return stack.top() == 1;
+            return stack.pop() == 1;
         }
 
-        constexpr bool Top_WithMultipleElements_ReturnsMostRecentAdded() {
+        constexpr bool Pop_WithMultipleElements_ReturnsMostRecentAdded() {
             Stack<int> stack;
             stack.push(1);
             stack.push(2);
             stack.push(3);
 
-            if (stack.top() != 3) return false;
-            stack.pop();
-            if (stack.top() != 2) return false;
-            stack.pop();
-            if (stack.top() != 1) return false;
-            stack.pop();
+            if (stack.pop() != 3) return false;
+            if (stack.pop() != 2) return false;
+            if (stack.pop() != 1) return false;
 
             return stack.is_empty();
-        }
-
-        constexpr bool Top_WithElements_DoesNotRemoveTopElement() {
-            Stack<int> stack;
-            stack.push(1);
-            stack.top();
-            return !stack.is_empty();
         }
 
         constexpr bool IsEmpty_AfterClearing_ReturnsTrue() {
@@ -554,17 +544,15 @@ namespace Constexpr {
         static_assert(StackTests::IsEmpty_AfterClearing_ReturnsTrue());
         static_assert(StackTests::IsEmpty_OnNonEmptyStack_ReturnsFalse());
         static_assert(StackTests::Push_OnEmptyStack_HasSizeOne());
-        static_assert(StackTests::Top_WithElements_DoesNotRemoveTopElement());
-        static_assert(StackTests::Top_WithMultipleElements_ReturnsMostRecentAdded());
-        static_assert(StackTests::Top_WithNonEmptyStack_ReturnsTopElement());
+        static_assert(StackTests::Pop_WithMultipleElements_ReturnsMostRecentAdded());
+        static_assert(StackTests::Pop_WithNonEmptyStack_ReturnsTopElement());
 
         if (!StackTests::DefaultConstructor_CreatesValidStack()) return false;
         if (!StackTests::IsEmpty_AfterClearing_ReturnsTrue()) return false;
         if (!StackTests::IsEmpty_OnNonEmptyStack_ReturnsFalse()) return false;
         if (!StackTests::Push_OnEmptyStack_HasSizeOne()) return false;
-        if (!StackTests::Top_WithElements_DoesNotRemoveTopElement()) return false;
-        if (!StackTests::Top_WithMultipleElements_ReturnsMostRecentAdded()) return false;
-        if (!StackTests::Top_WithNonEmptyStack_ReturnsTopElement()) return false;
+        if (!StackTests::Pop_WithMultipleElements_ReturnsMostRecentAdded()) return false;
+        if (!StackTests::Pop_WithNonEmptyStack_ReturnsTopElement()) return false;
 
         static_assert(QueueTests::DefaultConstructor_CreatesValidQueue());
         static_assert(QueueTests::Front_WithElements_DoesNotRemoveElements());
