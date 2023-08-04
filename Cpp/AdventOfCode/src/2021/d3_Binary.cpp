@@ -3,7 +3,6 @@
 
 SOLUTION(2021, 3) {
     constexpr char FindMostCommon(const std::vector<std::string>&lines, size_t bit) {
-        //size_t half = lines.size() / 2;
         size_t oneCount = 0;
         for (const auto& line : lines) {
             oneCount += line[bit] == '1';
@@ -29,13 +28,6 @@ SOLUTION(2021, 3) {
     }
 
 
-    auto Part1(const std::vector<std::string>&lines) {
-        std::string lhs, rhs;
-        ReadValues(lines, lhs, rhs);
-
-        return std::bitset<15>(lhs).to_ullong() * std::bitset<15>(rhs).to_ullong();
-    }
-
     constexpr std::string FindPartTwo(const std::vector<std::string>&lines, bool keepMostCommon, size_t bit = 0) {
         auto mostCommon = FindMostCommon(lines, bit);
         auto leastCommon = mostCommon == '1' ? '0' : '1';
@@ -56,19 +48,21 @@ SOLUTION(2021, 3) {
         }
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
+    PART_ONE() {
+        std::string lhs, rhs;
+        ReadValues(lines, lhs, rhs);
+
+        return Constexpr::ToString(std::bitset<15>(lhs).to_ullong() * std::bitset<15>(rhs).to_ullong());
+    }
+
+    PART_TWO() {
         auto oxygen = FindPartTwo(lines, true);
         auto co2 = FindPartTwo(lines, false);
 
-        return std::bitset<15>(oxygen).to_ullong() * std::bitset<15>(co2).to_ullong();
+        return Constexpr::ToString(std::bitset<15>(oxygen).to_ullong() * std::bitset<15>(co2).to_ullong());
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
+    TESTS() {
         std::vector<std::string> lines = {
             "00100",
             "11110",
@@ -84,20 +78,8 @@ SOLUTION(2021, 3) {
             "01010"
         };
 
-        if (Part1(lines) != 198) return false;
-        if (Part2(lines) != 230) return false;
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
+        if (PartOne(lines) != "198") return false;
+        if (PartTwo(lines) != "230") return false;
         return true;
     }
 }

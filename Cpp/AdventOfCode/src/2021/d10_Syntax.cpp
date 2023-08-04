@@ -2,37 +2,6 @@
 #include <stack>
 
 SOLUTION(2021, 10) {
-    struct State {
-        std::vector<char> Expected;
-        bool IsCorrupt = false;
-        char InvalidChar;
-    };
-
-    constexpr State ValidateLine(const std::string & line) {
-        State result;
-
-        for (auto c : line) {
-            bool checkBack = false;
-            switch (c) {
-            case '(': result.Expected.push_back(')'); break;
-            case '[': result.Expected.push_back(']'); break;
-            case '{': result.Expected.push_back('}'); break;
-            case '<': result.Expected.push_back('>'); break;
-            default: checkBack = true; break;
-            }
-            if (!checkBack) continue;
-            if (c == result.Expected.back()) {
-                result.Expected.pop_back();
-                continue;
-            }
-            else {
-                result.IsCorrupt = true;
-                result.InvalidChar = c;
-                return result;
-            }
-        }
-        return result;
-    }
 
     /*
     static_assert(GetLineScore("()") == 0);
@@ -42,8 +11,7 @@ SOLUTION(2021, 10) {
     static_assert(GetLineScore("[(()[<>])]({[<{<<[]>>(") == 0);
     */
 
-    constexpr size_t GetCorruptScore(State & state) {
-        auto c = state.InvalidChar;
+    constexpr size_t GetCorruptScore(char c) {
         switch (c) {
         case ')': return 3;
         case ']': return 57;
@@ -53,52 +21,78 @@ SOLUTION(2021, 10) {
         }
     }
 
-    auto Part1(const std::vector<std::string>&lines) {
-        size_t result = 0;
-        for (const auto& line : lines) {
-            auto state = ValidateLine(line);
-            if (state.IsCorrupt) {
-                result += GetCorruptScore(state);
-            }
+    constexpr size_t GetAcScore(char c) {
+        switch (c) {
+        case ')': return 1;
+        case ']': return 2;
+        case '}': return 3;
+        case '>': return 4;
+        default: throw "Unrecognized";
         }
-        return result;
     }
 
-    constexpr size_t GetAutoCompleteScore(State & state) {
-        size_t result = 0;
-        while (!state.Expected.empty()) {
-            auto c = state.Expected.back();
-            state.Expected.pop_back();
-            result *= 5;
+    constexpr char GetCorresponding(char c) {
+        switch (c) {
+        case '(': return ')';
+        case ')': return '(';
+        case '{': return '}';
+        case '}': return '{';
+        case '[': return ']';
+        case ']': return '[';
+        case '<': return '>';
+        case '>': return '<';
+        default: throw "Unrecognized char";
+        }
+    }
+
+    constexpr std::pair<size_t, size_t> GetScore(const std::string& line) {
+        Constexpr::Stack<char> stack;
+        std::pair<size_t, size_t> result;
+        for (auto c : line) {
             switch (c) {
-            case ')': result += 1; break;
-            case ']': result += 2; break;
-            case '}': result += 3; break;
-            case '>': result += 4; break;
+            case '(': case '[': case '{': case '<':
+                stack.push(c);
+                break;
+            default:
+                auto top = stack.pop();
+                if (top != GetCorresponding(c)) {
+                    result.first = GetCorruptScore(c);
+                    return result;
+                }
             }
+        }
+        
+        while (!stack.is_empty()) {
+            result.second *= 5;
+            result.second += GetAcScore(GetCorresponding(stack.pop()));
         }
 
         return result;
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
-        std::vector<size_t> scores;
-        for (const auto& line : lines) {
-            auto state = ValidateLine(line);
-            if (state.IsCorrupt) continue;
-            scores.push_back(GetAutoCompleteScore(state));
-        }
-
-        std::sort(scores.begin(), scores.end());
-        return scores[scores.size() / 2];
+    PART_ONE() {
+        auto scores = ParseLines(lines, GetScore);
+        return Constexpr::ToString(std::accumulate(scores.begin(), scores.end(), 0ull, [](size_t prev, const auto& pair) {
+            return prev + pair.first;
+            }));
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
+    PART_TWO() {
+        auto scores = ParseLines(lines, GetScore);
+        std::vector<size_t> toKeep;
+        std::transform(scores.begin(), scores.end(), std::back_inserter(toKeep), [](const auto& p) {
+            return p.second;
+            });
+        std::erase_if(toKeep, [](auto s) { return s == 0; });
+        std::sort(toKeep.begin(), toKeep.end());
+        return Constexpr::ToString(toKeep[toKeep.size() / 2]);
     }
 
-    bool RunTests() {
+    TESTS() {
+        static_assert(GetScore("{([(<{}[<>[]}>{[]{[(<()>").first == 1197);
+        static_assert(GetScore("[[<[([]))<([[{}[[()]]]").first == 3);
+        static_assert(GetScore("(((({<>}<{<{<>}{[]{[]{}").second == 1480781);
+
         std::vector<std::string> lines = {
             "[({(<(())[]>[[{[]{<()<>>",
             "[(()[<>])]({[<{<<[]>>(",
@@ -107,19 +101,7 @@ SOLUTION(2021, 10) {
             "<{([{{}}[<[[[<>{}]]]>[]]"
         };
 
-        if (Part2(lines) != 288957) return false;
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
+        if (PartTwo(lines) != "288957") return false;
         return true;
     }
 }

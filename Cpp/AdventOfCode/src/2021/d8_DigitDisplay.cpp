@@ -1,18 +1,6 @@
 #include "2021/d8_DigitDisplay.h"
 
 SOLUTION(2021, 8) {
-    auto Part1(const std::vector<std::string>&lines) {
-        size_t result = 0;
-        for (const auto& line : lines) {
-            auto split = Constexpr::Split(line, " | ");
-            auto s2 = Constexpr::Split(split[1], " ");
-            result += std::count_if(s2.begin(), s2.end(), [](std::string_view sv) {
-                return sv.size() < 5 || sv.size() == 7;
-                });
-        }
-        return result;
-    }
-
     /*
       a
     b   c
@@ -92,7 +80,19 @@ SOLUTION(2021, 8) {
         }
     }
 
-    constexpr auto Part2(const std::vector<std::string>&lines) {
+    PART_ONE() {
+        size_t result = 0;
+        for (const auto& line : lines) {
+            auto split = Constexpr::Split(line, " | ");
+            auto s2 = Constexpr::Split(split[1], " ");
+            result += std::count_if(s2.begin(), s2.end(), [](std::string_view sv) {
+                return sv.size() < 5 || sv.size() == 7;
+                });
+        }
+        return Constexpr::ToString(result);
+    }
+
+    PART_TWO() {
         size_t result = 0;
         for (const auto& line : lines) {
             auto split = Constexpr::Split(line, " | ");
@@ -118,19 +118,14 @@ SOLUTION(2021, 8) {
             result += number;
         }
 
-        return result;
+        return Constexpr::ToString(result);
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
+    TESTS() {
+        std::vector<std::string> lines = { "abcefg cf acdeg acdfg bcdf abdfg abdefg acf abcdefg abcdfg | fc fca cf caf" };
+        if (PartTwo(lines) != "1717") return false;
 
-    bool RunTests() {
-        std::string testString = "abcefg cf acdeg acdfg bcdf abdfg abdefg acf abcdefg abcdfg | fc fca cf caf";
-        if (Part2(std::vector<std::string>{testString}) != 1717) return false;
-
-        std::vector<std::string> lines = {
+        lines = {
             "be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb | fdgacbe cefdb cefbgd gcbe",
             "edbfga begcd cbg gc gcadebf fbgde acbgfd abcde gfcbed gfec | fcgedb cgb dgebacf gc",
             "fgaebd cg bdaec gdafb agbcfd gdcbef bgcad gfac gcb cdgabef | cg cg fdcagb cbg",
@@ -143,20 +138,8 @@ SOLUTION(2021, 8) {
             "gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce"
         };
 
-        if (Part1(lines) != 26) return false;
-        if (Part2(lines) != 61229) return false;
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
+        if (PartOne(lines) != "26") return false;
+        if (PartTwo(lines) != "61229") return false;
         return true;
     }
 }

@@ -889,6 +889,13 @@ namespace Constexpr {
         return result;
     }
 
+    template<typename Point>
+    [[nodiscard]] constexpr Point GetSlope(const Point& start, const Point& end) {
+        auto relative = Point{ end.X - start.X, end.Y - start.Y };
+        auto gcd = Constexpr::FindGcd(Constexpr::Abs(relative.X), Constexpr::Abs(relative.Y));
+        return { relative.X / gcd, relative.Y / gcd };
+    }
+
     namespace ConstexprGeometryTests {
         bool RunTests();
     }

@@ -150,7 +150,7 @@ namespace Constexpr {
         size_t result = 0;
         auto ToLower = [](char c) { return c <= 'Z' ? c + 32 : c; };
         for (auto it = str.rbegin(); it != str.rend(); it++) {
-            result += (static_cast<int>(ToLower(*it) - 'a') + 1) * pow;
+            result += static_cast<size_t>((ToLower(*it) - 'a' + 1)) * pow;
             pow *= 26;
         }
 

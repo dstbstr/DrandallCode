@@ -215,12 +215,12 @@ namespace Constexpr {
                         Patch(e1.outs, nodeId);
 
                         const Node toDuplicate = Nodes.back();
-                        for (auto i = 0; i < minRep - 1; i++) {
+                        for (size_t i = 0; i < minRep - 1; i++) {
                             Nodes.push_back(toDuplicate);
                             Nodes.back().out1 += i + 1;
                         }
                         if (maxRep > minRep) {
-                            for (auto i = minRep; i < maxRep; i++) {
+                            for (size_t i = minRep; i < maxRep; i++) {
                                 //e{3,5} == eeee?e?
                                 Nodes.push_back({ detail::SplitCode, Nodes.size() + 1, Nodes.size() + 2 });
                                 Nodes.push_back(toDuplicate);

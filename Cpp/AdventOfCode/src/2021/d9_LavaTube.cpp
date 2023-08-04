@@ -2,22 +2,18 @@
 #include "Algorithms/FloodFill.h"
 
 SOLUTION(2021, 9) {
-    std::vector<std::vector<u32>> ParseInput(const std::vector<std::string>&lines) {
-        std::vector<std::vector<u32>> result;
-        for (const auto& line : lines) {
-            std::vector<u32> currentLine;
-            for (auto c : line) {
-                currentLine.push_back(c - '0');
-            }
-            result.push_back(currentLine);
+    std::vector<u32> ParseLine(const std::string & line) {
+        std::vector<u32> result;
+        for (auto c : line) {
+            result.push_back(c - '0');
         }
         return result;
     }
 
-    auto Part1(const std::vector<std::string>&lines) {
+    PART_ONE() {
         RowCol limits = { lines.size() - 1, lines[0].size() - 1 };
         size_t result = 0;
-        auto nums = ParseInput(lines);
+        auto nums = ParseLines(lines, ParseLine);
         for (size_t row = 0; row < nums.size(); row++) {
             for (size_t col = 0; col < nums[row].size(); col++) {
                 RowCol rc{ row, col };
@@ -32,12 +28,12 @@ SOLUTION(2021, 9) {
             }
         }
 
-        return result;
+        return Constexpr::ToString(result);
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
+    PART_TWO() {
         RowCol limits = { lines.size() - 1, lines[0].size() - 1 };
-        auto nums = ParseInput(lines);
+        auto nums = ParseLines(lines, ParseLine);
         std::vector<size_t> sizes;
 
         auto n = [&](const RowCol& pos) {
@@ -68,15 +64,10 @@ SOLUTION(2021, 9) {
             result *= sizes.back();
             sizes.pop_back();
         }
-        return result;
+        return Constexpr::ToString(result);
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
+    TESTS() {
         std::vector<std::string> lines = {
             "2199943210",
             "3987894921",
@@ -85,20 +76,8 @@ SOLUTION(2021, 9) {
             "9899965678"
         };
 
-        if (Part1(lines) != 15) return false;
-        if (Part2(lines) != 1134) return false;
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
+        if (PartOne(lines) != "15") return false;
+        if (PartTwo(lines) != "1134") return false;
         return true;
     }
 }

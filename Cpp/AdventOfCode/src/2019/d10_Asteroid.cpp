@@ -25,8 +25,8 @@ SOLUTION(2019, 10) {
     struct Target {
         Coord Pos;
         Coord Slope;
-        int Quad;
-        size_t Distance;
+        int Quad{ 0 };
+        size_t Distance{ 0 };
 
         constexpr bool operator<(const Target& other) const {
             if (Quad != other.Quad) return Quad < other.Quad;

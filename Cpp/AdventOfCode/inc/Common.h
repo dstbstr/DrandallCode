@@ -131,6 +131,12 @@ constexpr auto RunAllReturnMin(const auto& collection, auto func, auto... args) 
     return best;
 }
 
+constexpr size_t Count2D(const auto& collection, auto pred) {
+    return std::accumulate(collection.begin(), collection.end(), 0ull, [pred](size_t previous, const auto& row) {
+        return previous + std::count_if(row.begin(), row.end(), pred);
+    });
+}
+
 using SolutionFunc = std::function<std::string(const std::vector<std::string>&)>;
 std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, SolutionFunc>>>& GetSolutions();
 std::unordered_map<size_t, std::unordered_map<size_t, std::function<bool()>>>& GetTests();

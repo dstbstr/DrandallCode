@@ -22,6 +22,23 @@ SOLUTION(2021, 6) {
         fish = next;
     }
 
+    constexpr auto Solve(const std::string & line, size_t days) {
+        auto fish = GetInitialFish(line);
+        for (auto day = 0; day < days; day++) {
+            NextDay(fish);
+        }
+
+        return std::accumulate(fish.begin(), fish.end(), 0ull);
+    }
+
+    PART_ONE() {
+        return Constexpr::ToString(Solve(lines[0], 80));
+    }
+
+    PART_TWO() {
+        return Constexpr::ToString(Solve(lines[0], 256));
+    }
+
     constexpr bool TestNextDay() {
         Fish fish{ 0,1,1,2,1,0,0,0,0 };
         NextDay(fish);
@@ -37,48 +54,16 @@ SOLUTION(2021, 6) {
         return true;
     }
 
-    static_assert(TestNextDay());
-
-    constexpr auto Solve(const std::string & line, size_t days) {
-        auto fish = GetInitialFish(line);
-        for (auto day = 0; day < days; day++) {
-            NextDay(fish);
-        }
-
-        return std::accumulate(fish.begin(), fish.end(), 0ull);
-    }
-    auto Part1(const std::string & line) {
-        return Solve(line, 80);
-    }
-
-    auto Part2(const std::string & line) {
-        return Solve(line, 256);
-    }
-
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines[0]));
-        return Constexpr::ToString(Part2(lines[0]));
-    }
-
-    bool RunTests() {
+   
+    TESTS() {
+        static_assert(TestNextDay());
         if (!TestNextDay()) return false;
         std::string line = "3,4,3,1,2";
         if (Solve(line, 0) != 5) return false;
         if (Solve(line, 18) != 26) return false;
         if (Solve(line, 80) != 5934) return false;
         if (Solve(line, 256) != 26984457539) return false;
-        return true;
-    }
 
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }

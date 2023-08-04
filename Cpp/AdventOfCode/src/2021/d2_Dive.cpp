@@ -17,15 +17,6 @@ SOLUTION(2021, 2) {
         }
     }
 
-    constexpr auto Part1(const std::vector<std::string>&lines) {
-        Coord pos = { 0, 0 };
-        for (const auto& line : lines) {
-            Apply(pos, line);
-        }
-
-        return pos.X * pos.Y;
-    }
-
     constexpr void Apply(Vec3<s64>&pos, const std::string & line) {
         auto split = Constexpr::Split(line, " ");
         s32 num;
@@ -43,21 +34,25 @@ SOLUTION(2021, 2) {
         }
     }
 
-    constexpr auto Part2(const std::vector<std::string>&lines) {
+    PART_ONE() {
+        Coord pos = { 0, 0 };
+        for (const auto& line : lines) {
+            Apply(pos, line);
+        }
+
+        return Constexpr::ToString(pos.X * pos.Y);
+    }
+
+    PART_TWO() {
         Vec3<s64> pos = { 0, 0, 0 };
         for (const auto& line : lines) {
             Apply(pos, line);
         }
 
-        return pos.X * pos.Y;
+        return Constexpr::ToString(pos.X * pos.Y);
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
+    TESTS() {
         std::vector<std::string> lines = {
             "forward 5",
             "down 5",
@@ -67,20 +62,8 @@ SOLUTION(2021, 2) {
             "forward 2"
         };
 
-        if (Part1(lines) != 150) return false;
-        if (Part2(lines) != 900) return false;
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
+        if (PartOne(lines) != "150") return false;
+        if (PartTwo(lines) != "900") return false;
         return true;
     }
 }

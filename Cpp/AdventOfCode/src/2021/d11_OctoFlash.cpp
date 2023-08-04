@@ -2,21 +2,16 @@
 
 SOLUTION(2021, 11) {
     struct Octo {
-        size_t Energy;
-        bool HasFlashed;
+        size_t Energy{ 0 };
+        bool HasFlashed{ false };
     };
 
     using Grid = std::vector<std::vector<Octo>>;
 
-    constexpr Grid ParseInput(const std::vector<std::string>&lines) {
-        Grid result;
-        for (const auto& line : lines) {
-            std::vector<Octo> row;
-            for (auto c : line) {
-                size_t energy = static_cast<size_t>(c - '0');
-                row.push_back(Octo{ energy, false });
-            }
-            result.push_back(row);
+    std::vector<Octo> ParseLine(const std::string& line) {
+        std::vector<Octo> result;
+        for (auto c : line) {
+            result.push_back({ static_cast<size_t>(c - '0') });
         }
         return result;
     }
@@ -57,35 +52,35 @@ SOLUTION(2021, 11) {
         return result;
     }
 
-    auto Part1(const std::vector<std::string>&lines, size_t steps) {
-        auto grid = ParseInput(lines);
-        size_t result = 0;
-        for (auto i = 0; i < steps; i++) {
+    constexpr void Solve(const std::vector<std::string>& lines, auto IsDone) {
+        auto grid = ParseLines(lines, ParseLine);
+        while(true) {
             Next(grid);
-            result += CountAndReset(grid);
+            if (IsDone(CountAndReset(grid))) break;
         }
-
-        return result;
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
-        auto grid = ParseInput(lines);
+    PART_ONE() {
         size_t step = 0;
-        while (true) {
+        size_t result = 0;
+        Solve(lines, [&](size_t r) {
+            result += r;
             step++;
-            Next(grid);
-            if (CountAndReset(grid) == 100) break;
-        }
-
-        return step;
+            return step == 100;
+            });
+        return Constexpr::ToString(result);
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines, 100));
-        return Constexpr::ToString(Part2(lines));
+    PART_TWO() {
+        size_t step = 0;
+        Solve(lines, [&](size_t r) {
+            step++;
+            return r == 100;
+            });
+        return Constexpr::ToString(step);
     }
 
-    bool RunTests() {
+    TESTS() {
         std::vector<std::string> lines = {
             "5483143223",
             "2745854711",
@@ -99,24 +94,8 @@ SOLUTION(2021, 11) {
             "5283751526"
         };
 
-        if (Part1(lines, 1) != 0) return false;
-        if (Part1(lines, 2) != 35) return false;
-        if (Part1(lines, 10) != 204) return false;
-        if (Part1(lines, 100) != 1656) return false;
-
-        if (Part2(lines) != 195) return false;
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
+        if (PartOne(lines) != "1656") return false;
+        if (PartTwo(lines) != "195") return false;
         return true;
     }
 }

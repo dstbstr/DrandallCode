@@ -1,92 +1,46 @@
 #include "2021/d5_Vents.h"
 
 SOLUTION(2021, 5) {
-    constexpr void ParseLine(const std::string & line, UCoord & outStart, UCoord & outEnd) {
-        auto s1 = Constexpr::Split(line, " -> ");
-        auto start = Constexpr::Split(s1[0], ",");
-        auto end = Constexpr::Split(s1[1], ",");
-        outStart = { 0, 0 };
-        outEnd = { 0, 0 };
-        Constexpr::ParseNumber(start[0], outStart.X);
-        Constexpr::ParseNumber(start[1], outStart.Y);
-        Constexpr::ParseNumber(end[0], outEnd.X);
-        Constexpr::ParseNumber(end[1], outEnd.Y);
+    constexpr void ParseLine(const std::string& line, Coord& outStart, Coord& outEnd) {
+        auto s = Constexpr::Split(line, " -> ");
+        outStart = Coord(s[0]);
+        outEnd = Coord(s[1]);
     }
 
-    constexpr bool IsDiagonal(UCoord start, UCoord end) {
+    constexpr bool IsDiagonal(Coord start, Coord end) {
         return start.X != end.X && start.Y != end.Y;
     }
 
-    constexpr std::vector<UCoord> GetLineCoords(UCoord start, UCoord end) {
-        std::vector<UCoord> result;
-        if (start.X == end.X) {
-            auto startY = start.Y;
-            auto endY = end.Y;
-            if (startY > endY) std::swap(startY, endY);
-
-            for (auto y = startY; y <= endY; y++) {
-                result.push_back({ start.X, y });
-            }
-        }
-        else {
-            auto startX = start.X;
-            auto endX = end.X;
-            if (startX > endX) std::swap(startX, endX);
-
-            for (auto x = startX; x <= endX; x++) {
-                result.push_back({ x, start.Y });
-            }
-        }
-        return result;
-    }
-
-    constexpr std::vector<UCoord> GetAllLineCoords(UCoord start, UCoord end) {
-        if (!IsDiagonal(start, end)) {
-            return GetLineCoords(start, end);
-        }
-
-        std::vector<UCoord> result{ end };
-        auto dx = start.X < end.X ? 1 : -1;
-        auto dy = start.Y < end.Y ? 1 : -1;
-        auto distance = static_cast<int>(Constexpr::AbsDistance(start.X, end.X));
-        for (int i = 0; i < distance; i++) {
-            result.push_back({ start.X + (i * dx), start.Y + (i * dy) });
-        }
-        return result;
-    }
-
-    auto Solve(const std::vector<std::string>&lines, bool ignoreDiagonal) {
-        std::unordered_map<UCoord, u32> seen;
+    constexpr auto Solve(const std::vector<std::string>& lines, bool ignoreDiagonal) {
+        auto* seenPtr = new std::array<std::array<u8, 1024>, 1024>();
+        auto& seen = *seenPtr;
         for (const auto& line : lines) {
-            UCoord start, end;
+            Coord start, end;
             ParseLine(line, start, end);
             if (!ignoreDiagonal || !IsDiagonal(start, end)) {
-                auto coords = GetAllLineCoords(start, end);
-                for (auto coord : coords) {
-                    seen[coord]++;
+                auto slope = Constexpr::GetSlope(start, end);
+
+                for (; start != end; start += slope) {
+                    seen[start.Y][start.X]++;
                 }
+                seen[start.Y][start.X]++;
             }
         }
 
-        return std::count_if(seen.begin(), seen.end(), [](const auto& kvp) {
-            return kvp.second > 1;
-            });
+        auto result = Count2D(seen, [](u8 count) { return count > 1; });
+        delete seenPtr;
+        return result;
     }
 
-    auto Part1(const std::vector<std::string>&lines) {
-        return Solve(lines, true);
+    PART_ONE() {
+        return Constexpr::ToString(Solve(lines, true));
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
-        return Solve(lines, false);
+    PART_TWO() {
+        return Constexpr::ToString(Solve(lines, false));
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
+    TESTS() {
         std::vector<std::string> lines = {
             "0,9 -> 5,9",
             "8,0 -> 0,8",
@@ -100,20 +54,8 @@ SOLUTION(2021, 5) {
             "5,5 -> 8,2"
         };
 
-        if (Part1(lines) != 5) return false;
-        if (Part2(lines) != 12) return false;
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
+        if (Solve(lines, true) != 5) return false;
+        if (Solve(lines, false) != 12) return false;
         return true;
     }
 }

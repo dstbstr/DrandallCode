@@ -2,21 +2,21 @@
 
 SOLUTION(2021, 4) {
     struct BingoCard {
-        std::unordered_map<u32, RowCol> Numbers;
-        std::unordered_map<RowCol, bool> Marked;
+        Constexpr::SmallMap<u32, RowCol> Numbers;
+        Constexpr::SmallSet<RowCol> Marked;
 
-        void Mark(u32 value) {
-            if (Numbers.find(value) != Numbers.end()) {
-                Marked[Numbers[value]] = true;
+        constexpr void Mark(u32 value) {
+            if (Numbers.contains(value)) {
+                Marked.insert(Numbers.at(value));
             }
         }
 
-        bool HasBingo() const {
+        constexpr bool HasBingo() const {
             for (size_t row = 0; row < 5; row++) {
                 bool rowComplete = true;
                 for (size_t col = 0; col < 5; col++) {
                     RowCol rc = { row, col };
-                    if (!Marked.at(rc)) {
+                    if (!Marked.contains(rc)) {
                         rowComplete = false;
                         break;
                     }
@@ -27,7 +27,7 @@ SOLUTION(2021, 4) {
                 bool colComplete = true;
                 for (size_t row = 0; row < 5; row++) {
                     RowCol rc = { row, col };
-                    if (!Marked.at(rc)) {
+                    if (!Marked.contains(rc)) {
                         colComplete = false;
                         break;
                     }
@@ -37,10 +37,10 @@ SOLUTION(2021, 4) {
             return false;
         }
 
-        size_t CalculateScore(u32 lastNumber) const {
+        constexpr size_t CalculateScore(u32 lastNumber) const {
             size_t score = 0;
             for (const auto& [number, rc] : Numbers) {
-                if (!Marked.at(rc)) {
+                if (!Marked.contains(rc)) {
                     score += number;
                 }
             }
@@ -48,7 +48,7 @@ SOLUTION(2021, 4) {
         }
     };
 
-    BingoCard ParseCard(const std::vector<std::string>&lines) {
+    constexpr BingoCard ParseCard(const std::vector<std::string>&lines) {
         BingoCard result;
         for (size_t row = 0; row < lines.size(); row++) {
             auto split = Constexpr::Split(lines[row], " ");
@@ -57,13 +57,12 @@ SOLUTION(2021, 4) {
                 u32 value;
                 Constexpr::ParseNumber(split[col], value);
                 result.Numbers[value] = rc;
-                result.Marked[rc] = false;
             }
         }
         return result;
     }
 
-    auto Part1(const std::vector<std::string>&lines) {
+    PART_ONE() {
         auto groups = SplitInputIntoGroups(lines);
         auto numbers = ParseLineAsNumbers<u32>(lines[0]);
         std::vector<BingoCard> cards;
@@ -75,15 +74,15 @@ SOLUTION(2021, 4) {
             for (auto& card : cards) {
                 card.Mark(num);
                 if (card.HasBingo()) {
-                    return card.CalculateScore(num);
+                    return Constexpr::ToString(card.CalculateScore(num));
                 }
             }
         }
 
-        return 0ull;
+        return "Not Found";
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
+    PART_TWO() {
         auto groups = SplitInputIntoGroups(lines);
         auto numbers = ParseLineAsNumbers<u32>(lines[0]);
         std::vector<BingoCard> cards;
@@ -106,15 +105,10 @@ SOLUTION(2021, 4) {
             lastCard.Mark(numbers[numIndex++]);
         }
 
-        return lastCard.CalculateScore(numbers[numIndex - 1]);
+        return Constexpr::ToString(lastCard.CalculateScore(numbers[numIndex - 1]));
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
+    TESTS() {
         std::vector<std::string> lines = {
             "7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1",
             "",
@@ -137,20 +131,8 @@ SOLUTION(2021, 4) {
             " 2  0 12  3  7",
         };
 
-        if (Part1(lines) != 4512) return false;
-        if (Part2(lines) != 1924) return false;
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
+        if (PartOne(lines) != "4512") return false;
+        if (PartTwo(lines) != "1924") return false;
         return true;
     }
 }

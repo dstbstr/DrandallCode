@@ -10,19 +10,17 @@ SOLUTION(2021, 7) {
         }
     }
 
-    auto Part1(const std::string & line) {
-        auto nums = ParseLineAsNumbers<u32>(line);
+    PART_ONE() {
+        auto nums = ParseLineAsNumbers<u32>(lines[0]);
         std::sort(nums.begin(), nums.end());
         auto target = FindTarget(nums);
-        size_t result = 0;
-        for (auto num : nums) {
-            result += Constexpr::AbsDistance(num, target);
-        }
-        return result;
+        return Constexpr::ToString(std::accumulate(nums.begin(), nums.end(), 0ull, [&](size_t previous, u32 num) {
+            return previous + Constexpr::AbsDistance(num, target);
+            }));
     }
 
-    auto Part2(const std::string & line) {
-        auto nums = ParseLineAsNumbers<u32>(line);
+    PART_TWO() {
+        auto nums = ParseLineAsNumbers<u32>(lines[0]);
         u32 total = std::accumulate(nums.begin(), nums.end(), 0);
         u32 average = static_cast<u32>(total / nums.size());
 
@@ -36,30 +34,13 @@ SOLUTION(2021, 7) {
             result2 += (d2 * (d2 + 1)) / 2;
         }
 
-        return std::min(result1, result2);
-    }
-
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines[0]));
-        return Constexpr::ToString(Part2(lines[0]));
-    }
-
-    bool RunTests() {
-        std::string line = "16,1,2,0,4,2,7,1,2,14";
-        if (Part1(line) != 37) return false;
-        if (Part2(line) != 168) return false;
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
+        return Constexpr::ToString(std::min(result1, result2));
     }
 
     TESTS() {
+        std::vector<std::string> lines = { "16,1,2,0,4,2,7,1,2,14" };
+        if (PartOne(lines) != "37") return false;
+        if (PartTwo(lines) != "168") return false;
         return true;
     }
 }
