@@ -65,7 +65,7 @@ namespace Constexpr {
             if (input[i] < '0' || input[i] > '9') {
                 return false;
             }
-            result += (input[i] - '0') * place;
+            result += static_cast<T>(input[i] - '0') * place;
             place *= 10;
         }
         if (input[pos] < '0' || input[pos] > '9') return false;

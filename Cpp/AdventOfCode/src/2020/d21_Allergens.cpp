@@ -26,16 +26,8 @@ SOLUTION(2020, 21) {
         return result;
     }
 
-    constexpr std::vector<Food> ParseInput(const std::vector<std::string>&lines) {
-        std::vector<Food> result;
-        for (const auto& line : lines) {
-            result.push_back(ParseFood(line));
-        }
-        return result;
-    }
-
-    std::unordered_map<std::string, std::vector<std::string>> FindAllergens(const std::vector<Food>&foods) {
-        std::unordered_map<std::string, std::vector<std::string>> allergens;
+    constexpr Constexpr::SmallMap<std::string, std::vector<std::string>> FindAllergens(const std::vector<Food>&foods) {
+        Constexpr::SmallMap<std::string, std::vector<std::string>> allergens;
 
         //while not all allergens have 1 ingrediant
         while (true) {
@@ -71,8 +63,9 @@ SOLUTION(2020, 21) {
 
         return allergens;
     }
-    auto Part1(const std::vector<std::string>&lines) {
-        auto foods = ParseInput(lines);
+
+    PART_ONE() {
+        auto foods = ParseLines(lines, ParseFood);
         auto allergens = FindAllergens(foods);
 
         std::vector<std::string> toAvoid;
@@ -87,11 +80,11 @@ SOLUTION(2020, 21) {
             }
         }
 
-        return result;
+        return Constexpr::ToString(result);
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
-        auto foods = ParseInput(lines);
+    PART_TWO() {
+        auto foods = ParseLines(lines, ParseFood);
         auto allergens = FindAllergens(foods);
 
         std::vector<std::string> allergenNames;
@@ -112,16 +105,11 @@ SOLUTION(2020, 21) {
             dangerous[targetIndex] = ingrediants[0];
         }
 
-        std::string result = StrUtil::JoinVec(',', dangerous);
+        std::string result = Constexpr::JoinVec(',', dangerous);
         return result;
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Part2(lines);
-    }
-
-    bool RunTests() {
+    TESTS() {
         std::vector<std::string> lines = {
             "mxmxvkd kfcds sqjhc nhms(contains dairy, fish)",
             "trh fvjkl sbzzf mxmxvkd(contains dairy)",
@@ -129,20 +117,9 @@ SOLUTION(2020, 21) {
             "sqjhc mxmxvkd sbzzf(contains fish)"
         };
 
-        if (Part1(lines) != 5) return false;
-        if (Part2(lines) != "mxmxvkd,sqjhc,fvjkl") return false;
-        return true;
-    }
+        if (PartOne(lines) != "5") return false;
+        if (PartTwo(lines) != "mxmxvkd,sqjhc,fvjkl") return false;
 
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }

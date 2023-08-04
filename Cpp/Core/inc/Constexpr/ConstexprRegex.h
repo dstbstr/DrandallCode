@@ -3,7 +3,7 @@
 #include "Constexpr/ConstexprCollections.h"
 
 namespace Constexpr {
-    //A very basic (read, missing features, probably buggy, not simple) Regex library based on
+    //A very basic (read: missing features, probably buggy; not simple) Regex library based on
     //the work here: https://swtch.com/~rsc/regexp/regexp1.html
 
     namespace Regex {
@@ -123,7 +123,7 @@ namespace Constexpr {
 
         private:
             struct Node {
-                int code;
+                int code{ 0 };
                 size_t out1{ Unset };
                 size_t out2{ Unset };
             };

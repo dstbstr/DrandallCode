@@ -21,6 +21,15 @@ namespace FlatHex {
         s32 Q;
         s32 R;
         s32 S;
+
+        constexpr bool operator==(const Pos& other) const {
+            return Q == other.Q && R == other.R && S == other.S;
+        }
+        constexpr bool operator<(const Pos& other) const {
+            return Q != other.Q ? Q < other.Q :
+                R != other.R ? R < other.R :
+                S < other.S;
+        }
     };
 
     constexpr u32 MDistance(Pos lhs, Pos rhs) {
@@ -44,6 +53,18 @@ namespace FlatHex {
         case Direction::SE: pos.Q++, pos.S--; break;
         case Direction::NW: pos.Q--, pos.S++; break;
         }
+    }
+
+    constexpr std::vector<Pos> GetAllNeighbors(const Pos& pos) {
+        std::vector<Pos> result = { pos, pos, pos, pos, pos, pos };
+        Move(result[0], Direction::S);
+        Move(result[1], Direction::N);
+        Move(result[2], Direction::NE);
+        Move(result[3], Direction::NW);
+        Move(result[4], Direction::SE);
+        Move(result[5], Direction::SW);
+
+        return result;
     }
 
     constexpr Direction ParseDirection(std::string_view dir) {
@@ -75,6 +96,15 @@ namespace PointyHex {
         s32 Q;
         s32 R;
         s32 S;
+
+        constexpr bool operator==(const Pos& other) const {
+            return Q == other.Q && R == other.R && S == other.S;
+        }
+        constexpr bool operator<(const Pos& other) const {
+            return Q != other.Q ? Q < other.Q :
+                R != other.R ? R < other.R :
+                S < other.S;
+        }
     };
 
     constexpr u32 MDistance(Pos lhs, Pos rhs) {
@@ -98,6 +128,18 @@ namespace PointyHex {
         case Direction::SE: pos.R++, pos.S--; break;
         case Direction::NW: pos.R--, pos.S++; break;
         }
+    }
+
+    constexpr std::vector<Pos> GetAllNeighbors(const Pos& pos) {
+        std::vector<Pos> result = { pos, pos, pos, pos, pos, pos };
+        Move(result[0], Direction::E);
+        Move(result[1], Direction::W);
+        Move(result[2], Direction::NE);
+        Move(result[3], Direction::NW);
+        Move(result[4], Direction::SE);
+        Move(result[5], Direction::SW);
+
+        return result;
     }
 
     constexpr Direction ParseDirection(std::string_view dir) {

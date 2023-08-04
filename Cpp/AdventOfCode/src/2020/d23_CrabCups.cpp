@@ -1,84 +1,7 @@
 #include "2020/d23_CrabCups.h"
 
 SOLUTION(2020, 23) {
-    constexpr std::vector<u32> ParseLine(const std::string & line) {
-        std::vector<u32> cups;
-        for (const auto& c : line) {
-            cups.push_back(c - '0');
-        }
-        return cups;
-    }
-
-    static_assert(ParseLine("1234") == std::vector<u32>{1, 2, 3, 4});
-
-    constexpr void DoMove(std::vector<u32>&cups) {
-        auto current = cups[0];
-        auto pickedUp = std::vector<u32>{ cups.begin() + 1, cups.begin() + 4 };
-        cups.erase(cups.begin() + 1, cups.begin() + 4);
-        auto target = current - 1;
-        while (std::find(cups.begin(), cups.end(), target) == cups.end()) {
-            if (target == 0) {
-                target = 9;
-            }
-            else {
-                target--;
-            }
-        }
-
-        auto targetIndex = std::find(cups.cbegin(), cups.cend(), target);
-        cups.insert(targetIndex + 1, pickedUp.begin(), pickedUp.end());
-        std::rotate(cups.begin(), cups.begin() + 1, cups.end());
-    }
-
-    auto Part1(const std::string & line, size_t rounds) {
-        auto cups = ParseLine(line);
-        for (size_t round = 0; round < rounds; round++) {
-            DoMove(cups);
-        }
-
-        auto oneIndex = std::find(cups.begin(), cups.end(), 1u);
-        std::rotate(cups.begin(), oneIndex, cups.end());
-        std::string result = "";
-        for (auto i = 1; i < cups.size(); i++) {
-            result.push_back(static_cast<char>(cups[i] + '0'));
-        }
-
-        return result;
-    }
-
-    std::vector<size_t> ParseCupsTwo(const std::string & line) {
-        std::vector<size_t> result;
-        result.reserve(1'000'000);
-        for (const auto c : line) {
-            result.push_back(c - '0');
-        }
-        for (size_t i = 10; i <= 1'000'000; i++) {
-            result.push_back(i);
-        }
-
-        return result;
-    }
-
-    void DoMove2(std::vector<size_t>&cups) {
-        auto current = cups[0];
-        auto pickedUp = std::vector<size_t>{ cups.begin() + 1, cups.begin() + 4 };
-        cups.erase(cups.begin() + 1, cups.begin() + 4);
-        auto target = current - 1;
-        while (std::find(cups.begin(), cups.end(), target) == cups.end()) {
-            if (target == 0) {
-                target = cups.size();
-            }
-            else {
-                target--;
-            }
-        }
-
-        auto targetIndex = std::find(cups.cbegin(), cups.cend(), target);
-        cups.insert(targetIndex + 1, pickedUp.begin(), pickedUp.end());
-        std::rotate(cups.begin(), cups.begin() + 1, cups.end());
-    }
-
-    auto Part2(const std::string & line) {
+    constexpr std::vector<u32> GetCups(const std::string& line, size_t max) {
         //389125467
         //cups[0] = 3
         //cups[1] = 2
@@ -90,12 +13,12 @@ SOLUTION(2020, 23) {
         //cups[7] = 3
         //cups[8] = 9
         //cups[9] = 1
-        constexpr size_t Max = 1'000'000;
-        std::vector<size_t> cups;
-        cups.resize(Max + 1);
-        size_t first = line[0] - '0';
-        size_t prev = 0;
-        size_t next = 0;
+
+        std::vector<u32> cups;
+        cups.resize(max + 1);
+        u32 first = line[0] - '0';
+        u32 prev = 0;
+        u32 next = 0;
         cups[0] = first;
         for (auto i = 1; i < line.size(); i++) {
             prev = line[i - 1] - '0';
@@ -105,54 +28,64 @@ SOLUTION(2020, 23) {
 
         prev = next;
         next = static_cast<u32>(line.size()) + 1;
-        while (prev <= Max) {
+        
+        while (next <= max) {
             cups[prev] = next;
-            prev = next;
-            next++;
+            prev = next++;
         }
-        cups.back() = cups[0];
+        cups[prev] = cups[0];
+        
+        return cups;
+    }
 
-        for (auto round = 0; round < 10'000'000; round++) {
-            auto r1 = cups[cups[0]];
-            auto r2 = cups[r1];
-            auto r3 = cups[r2];
-            auto dest = cups[0] - 1;
+    constexpr void RunRounds(std::vector<u32>& cups, size_t rounds) {
+        auto max = static_cast<u32>(cups.size() - 1);
+        u32 r1, r2, r3, dest, after;
+
+        for (auto round = 0; round < rounds; round++) {
+            r1 = cups[cups[0]];
+            r2 = cups[r1];
+            r3 = cups[r2];
+            dest = cups[0] - 1;
             while (dest == r1 || dest == r2 || dest == r3 || dest == 0) {
-                if (dest == 0) dest = Max;
+                if (dest == 0) dest = max;
                 else dest--;
             }
 
             cups[cups[0]] = cups[r3];
-            auto after = cups[dest];
+            after = cups[dest];
             cups[dest] = r1;
             cups[r3] = after;
             cups[0] = cups[cups[0]];
         }
-        return cups[1] * cups[cups[1]];
-    }
 
-    std::string Run(const std::vector<std::string>&) {
-        //return PartOne("952438716", 100);
-        return Constexpr::ToString(Part2("952438716"));
     }
-
-    bool RunTests() {
-        std::string line = "389125467";
-        if (Part1(line, 10) != "92658374") return false;
-        if (Part1(line, 100) != "67384529") return false;
-        if (Part2(line) != 149245887792) return false;
-        return true;
-    }
-
     PART_ONE() {
-        return lines[0];
+        auto cups = GetCups(lines[0], lines[0].size());
+        RunRounds(cups, 100);
+
+        std::string result = "";
+        size_t index = 1;
+        while (cups[index] != 1) {
+            result += (static_cast<char>('0' + cups[index]));
+            index = cups[index];
+        }
+        return result;
     }
 
     PART_TWO() {
-        return lines[0];
+        auto cups = GetCups(lines[0], 1'000'000);
+        RunRounds(cups, 10'000'000);
+
+        return Constexpr::ToString(static_cast<size_t>(cups[1]) * static_cast<size_t>(cups[cups[1]]));
     }
 
     TESTS() {
+        std::string line = "389125467";
+
+        if (PartOne({ line }) != "67384529") return false;
+        if (PartTwo({ line }) != "149245887792") return false;
+
         return true;
     }
 }

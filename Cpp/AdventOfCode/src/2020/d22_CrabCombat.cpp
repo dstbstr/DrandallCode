@@ -36,35 +36,18 @@ SOLUTION(2020, 22) {
         return result;
     }
 
-    static_assert(CalculateScore({ 3, 2, 10, 6, 8, 5, 9, 4, 7, 1 }) == 306);
-
-    auto Part1(const std::vector<std::string>&lines) {
-        auto groups = SplitInputIntoGroups(lines);
-        std::vector<u32> d1 = ParseDeck(groups[0]);
-        std::vector<u32> d2 = ParseDeck(groups[1]);
-
-        PlayRound(d1, d2);
-
-        return d1.empty() ? CalculateScore(d2) : CalculateScore(d1);
-    }
 
     constexpr std::string GetSeenString(const std::vector<u32>&d1, const std::vector<u32>&d2) {
-        std::string result;
-        for (auto d : d1) {
-            result += Constexpr::ToString(d);
-        }
-        result += "|";
-        for (auto d : d2) {
-            result += Constexpr::ToString(d);
-        }
-        return result;
+        auto lhs = Constexpr::JoinVec("", d1);
+        auto rhs = Constexpr::JoinVec("", d2);
+        return lhs + "|" + rhs;
     }
 
-    bool PlaySubGame(std::vector<u32>&d1, std::vector<u32>&d2) {
-        std::unordered_set<std::string> seen;
+    constexpr bool PlaySubGame(std::vector<u32>&d1, std::vector<u32>&d2) {
+        Constexpr::SmallSet<std::string> seen;
         while (!(d1.empty() || d2.empty())) {
             auto seenString = GetSeenString(d1, d2);
-            if (seen.find(seenString) != seen.end()) {
+            if (seen.contains(seenString)) {
                 return true;
             }
             seen.insert(seenString);
@@ -104,52 +87,37 @@ SOLUTION(2020, 22) {
         return d2.empty();
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
+    constexpr size_t Solve(const std::vector<std::string>& lines, auto Play) {
         auto groups = SplitInputIntoGroups(lines);
-        std::vector<u32> d1 = ParseDeck(groups[0]);
-        std::vector<u32> d2 = ParseDeck(groups[1]);
+        auto d1 = ParseDeck(groups[0]);
+        auto d2 = ParseDeck(groups[1]);
 
-        PlaySubGame(d1, d2);
+        Play(d1, d2);
 
         return d1.empty() ? CalculateScore(d2) : CalculateScore(d1);
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
-        std::vector<std::string> lines = {
-            "Player 1:",
-            "9",
-            "2",
-            "6",
-            "3",
-            "1",
-            "",
-            "Player 2:",
-            "5",
-            "8",
-            "4",
-            "7",
-            "10",
-        };
-
-        if (Part1(lines) != 306) return false;
-        if (Part2(lines) != 291) return false;
-        return true;
-    }
-
     PART_ONE() {
-        return lines[0];
+        return Constexpr::ToString(Solve(lines, PlayRound));
     }
 
     PART_TWO() {
-        return lines[0];
+        return Constexpr::ToString(Solve(lines, PlaySubGame));
     }
 
     TESTS() {
+        static_assert(CalculateScore({ 3, 2, 10, 6, 8, 5, 9, 4, 7, 1 }) == 306);
+        
+        std::vector<std::string> lines = {
+            "Player 1:",
+            "9","2","6","3","1",
+            "",
+            "Player 2:",
+            "5","8","4","7","10",
+        };
+
+        if (PartOne(lines) != "306") return false;
+        if (PartTwo(lines) != "291") return false;
         return true;
     }
 }

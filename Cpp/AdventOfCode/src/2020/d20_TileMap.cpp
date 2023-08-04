@@ -83,8 +83,8 @@ SOLUTION(2020, 20) {
         return DoEdgesMatch(t1, t2, edge, GetOtherEdge(edge));
     }
 
-    std::unordered_map<size_t, std::vector<size_t>> FindNeighbors(std::unordered_map<size_t, Tile> tiles) {
-        std::unordered_map<size_t, std::vector<size_t>> result;
+    constexpr Constexpr::SmallMap<size_t, std::vector<size_t>> FindNeighbors(const Constexpr::SmallMap<size_t, Tile>& tiles) {
+        Constexpr::SmallMap<size_t, std::vector<size_t>> result;
         for (const auto& [lId, lTile] : tiles) {
             for (const auto& [rId, rTile] : tiles) {
                 if (lId == rId) continue;
@@ -105,24 +105,6 @@ SOLUTION(2020, 20) {
         return result;
     }
 
-    auto Part1(const std::vector<std::string>&lines) {
-        auto groups = SplitInputIntoGroups(lines);
-        std::unordered_map<size_t, Tile> tiles;
-        for (const auto& group : groups) {
-            auto tile = ParseTile(group);
-            tiles[tile.Id] = tile;
-        }
-
-        auto neighbors = FindNeighbors(tiles);
-        size_t result = 1;
-        for (const auto& [id, matches] : neighbors) {
-            if (matches.size() == 2) {
-                result *= id;
-            }
-        }
-        return result;
-    }
-
     constexpr bool DoEdgesMatchExact(const Tile & t1, const Tile & t2, Facing edge) {
         Facing otherEdge = edge;
         switch (edge) {
@@ -135,8 +117,8 @@ SOLUTION(2020, 20) {
         return GetEdge(t1.Pixels, edge) == GetEdge(t2.Pixels, otherEdge);
     }
 
-    using TileMap = std::unordered_map<size_t, Tile>;
-    using NeighborMap = std::unordered_map<size_t, std::vector<size_t>>;
+    using TileMap = Constexpr::SmallMap<size_t, Tile>;
+    using NeighborMap = Constexpr::SmallMap<size_t, std::vector<size_t>>;
     using TileGrid = std::vector<std::vector<Tile>>;
 
     void PrintTile(const PixelGrid & pixels) {
@@ -167,7 +149,7 @@ SOLUTION(2020, 20) {
         }
     }
 
-    void FitFirstPiece(TileMap & tiles, const NeighborMap & neighbors, TileGrid & tileGrid) {
+    constexpr void FitFirstPiece(TileMap & tiles, const NeighborMap & neighbors, TileGrid & tileGrid) {
         auto firstPiece = std::find_if(neighbors.begin(), neighbors.end(), [](const auto& kvp) { return kvp.second.size() == 2; });
 
         auto& lhs = tiles.at(firstPiece->first);
@@ -208,7 +190,7 @@ SOLUTION(2020, 20) {
         return true;
     }
 
-    void FitFirstRow(TileMap & tiles, const NeighborMap & neighbors, TileGrid & tileGrid, std::unordered_set<size_t>&seen) {
+    constexpr void FitFirstRow(TileMap & tiles, const NeighborMap & neighbors, TileGrid & tileGrid, Constexpr::SmallSet<size_t>&seen) {
         while (true) {
             const Tile& tile = tileGrid[0].back();
             auto n = neighbors.at(tile.Id);
@@ -226,7 +208,7 @@ SOLUTION(2020, 20) {
         }
     }
 
-    void FlipFirstRowIfNeeded(TileMap & tiles, const NeighborMap & neighbors, TileGrid & tileGrid) {
+    constexpr void FlipFirstRowIfNeeded(TileMap & tiles, const NeighborMap & neighbors, TileGrid & tileGrid) {
         const auto& firstTile = tileGrid.at(0).at(0);
         auto n = neighbors.at(firstTile.Id);
         auto& nextTile = [&]() ->Tile& {
@@ -259,8 +241,7 @@ SOLUTION(2020, 20) {
         }
     }
 
-    void FitRemainingRows(TileMap & tiles, const NeighborMap & neighbors, TileGrid & tileGrid, std::unordered_set<size_t>&seen)
-    {
+    constexpr void FitRemainingRows(TileMap & tiles, const NeighborMap & neighbors, TileGrid & tileGrid, Constexpr::SmallSet<size_t>&seen) {
         auto rowSize = tileGrid[0].size();
         for (auto row = 1; row < rowSize; row++) {
             std::vector<Tile> currentRow;
@@ -356,7 +337,25 @@ SOLUTION(2020, 20) {
         return result;
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
+    PART_ONE() {
+        auto groups = SplitInputIntoGroups(lines);
+        Constexpr::SmallMap<size_t, Tile> tiles;
+        for (const auto& group : groups) {
+            auto tile = ParseTile(group);
+            tiles[tile.Id] = tile;
+        }
+
+        auto neighbors = FindNeighbors(tiles);
+        size_t result = 1;
+        for (const auto& [id, matches] : neighbors) {
+            if (matches.size() == 2) {
+                result *= id;
+            }
+        }
+        return Constexpr::ToString(result);
+    }
+
+    PART_TWO() {
         auto groups = SplitInputIntoGroups(lines);
         TileMap tiles;
         for (const auto& group : groups) {
@@ -367,7 +366,7 @@ SOLUTION(2020, 20) {
         auto neighbors = FindNeighbors(tiles);
         TileGrid tileGrid;
         FitFirstPiece(tiles, neighbors, tileGrid);
-        std::unordered_set<size_t> seen;
+        Constexpr::SmallSet<size_t> seen;
 
         for (const auto& tile : tileGrid[0]) {
             seen.insert(tile.Id);
@@ -379,15 +378,11 @@ SOLUTION(2020, 20) {
 
         auto compressedImage = CompressImage(tileGrid);
         auto mask = FindSeaMonsters(compressedImage);
-        return CalculateRoughness(compressedImage, mask);
+
+        return Constexpr::ToString(CalculateRoughness(compressedImage, mask));
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
+    TESTS() {
         std::vector<std::string> lines = {
             "Tile 2311:",
             "..##.#..#.",
@@ -498,20 +493,8 @@ SOLUTION(2020, 20) {
             "..#.###..."
         };
 
-        //if (Part1(lines) != 20899048083289) return false;
-        if (Part2(lines) != 273) return false;
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
+        if (PartOne(lines) != "20899048083289") return false;
+        if (PartTwo(lines) != "273") return false;
         return true;
     }
 }
