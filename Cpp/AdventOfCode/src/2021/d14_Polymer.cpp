@@ -30,10 +30,6 @@ SOLUTION(2021, 14) {
         return result;
     }
 
-    static_assert(GetInitialCounts("NNCB")[Constexpr::FromBase26("NN")] == 1);
-    static_assert(GetInitialCounts("NNCB")[Constexpr::FromBase26("NC")] == 1);
-    static_assert(GetInitialCounts("NNCB")[Constexpr::FromBase26("CB")] == 1);
-
     constexpr Counts Next(const Counts & counts, const ProduceMap & produceMap, const std::vector<std::string>&knownKeys) {
         Counts result{};
         for (const auto& key : knownKeys) {
@@ -81,6 +77,14 @@ SOLUTION(2021, 14) {
         return Constexpr::FindMax(letterCounts) - min;
     }
 
+    PART_ONE() {
+        return Constexpr::ToString(Solve(lines, 10));
+    }
+
+    PART_TWO() {
+        return Constexpr::ToString(Solve(lines, 40));
+    }
+
     constexpr bool TestSolve() {
         std::vector<std::string> lines = {
             "NNCB",
@@ -106,28 +110,13 @@ SOLUTION(2021, 14) {
         return Solve(lines, 40) == 2188189693529;
     }
 
-    //static_assert(TestSolve());
-
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Solve(lines, 10));
-        return Constexpr::ToString(Solve(lines, 40));
-    }
-
-    bool RunTests() {
+    TESTS() {
+        static_assert(GetInitialCounts("NNCB")[Constexpr::FromBase26("NN")] == 1);
+        static_assert(GetInitialCounts("NNCB")[Constexpr::FromBase26("NC")] == 1);
+        static_assert(GetInitialCounts("NNCB")[Constexpr::FromBase26("CB")] == 1);
+        //static_assert(TestSolve());
         if (!TestSolve()) return false;
 
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }

@@ -4,17 +4,10 @@ SOLUTION(2021, 13) {
     constexpr std::vector<UCoord> ParseInput(const std::vector<std::string>&lines) {
         std::vector<UCoord> result;
         for (const auto& line : lines) {
-            auto split = Constexpr::Split(line, ",");
-            UCoord coord;
-            Constexpr::ParseNumber(split[0], coord.X);
-            Constexpr::ParseNumber(split[1], coord.Y);
-            result.push_back(coord);
+            result.push_back(UCoord(line));
         }
         return result;
     }
-
-    static_assert(ParseInput({ "6,10", "0,14" }).size() == 2);
-    static_assert(ParseInput({ "6,10", "0,14" })[0].X == 6);
 
     struct Fold {
         u32 Edge = 0;
@@ -41,46 +34,50 @@ SOLUTION(2021, 13) {
         paper.erase(std::unique(paper.begin(), paper.end()), paper.end());
     }
 
-    constexpr std::vector<Fold> ParseFolds(const std::vector<std::string>&lines) {
-        std::vector<Fold> result;
-        for (const auto& line : lines) {
-            auto split = Constexpr::Split(line, "=");
-            Fold fold;
-            Constexpr::ParseNumber(split[1], fold.Edge);
-            fold.IsX = split[0].back() == 'x';
-            result.push_back(fold);
-        }
-        return result;
+    constexpr Fold ParseFold(const std::string& line) {
+        auto s = Constexpr::Split(line, "=");
+        Fold fold;
+        Constexpr::ParseNumber(s[1], fold.Edge);
+        fold.IsX = s[0].back() == 'x';
+        return fold;
     }
 
-    static_assert(ParseFolds({ "fold along y=7", "fold along x=5" }).size() == 2);
-    static_assert(ParseFolds({ "fold along y=7", "fold along x=5" })[0].IsX == false);
-    static_assert(ParseFolds({ "fold along y=7", "fold along x=5" })[0].Edge == 7);
-
-    void PrintPaper(const std::vector<UCoord>&paper) {
+    constexpr std::string PrintPaper(const std::vector<UCoord>&paper) {
         auto [min, max] = GetLimits(paper);
+        std::string result = "\n";
         for (auto y = min.Y; y <= max.Y; y++) {
             for (auto x = min.X; x <= max.X; x++) {
                 UCoord pos = { x, y };
                 if (std::find(paper.begin(), paper.end(), pos) == paper.end()) {
-                    std::cout << '.';
+                    result.push_back('.');
                 }
                 else {
-                    std::cout << '#';
+                    result.push_back('#');
                 }
             }
-            std::cout << '\n';
+            result.push_back('\n');
         }
-        std::cout << '\n';
+        return result;
     }
 
-    constexpr auto Part1(const std::vector<std::string>&lines) {
+    PART_ONE() {
         auto groups = SplitInputIntoGroups(lines);
         auto paper = ParseInput(groups[0]);
-        auto folds = ParseFolds(groups[1]);
+        auto folds = ParseLines(groups[1], ParseFold);
         DoFold(paper, folds[0]);
 
-        return paper.size();
+        return Constexpr::ToString(paper.size());
+    }
+
+    PART_TWO() {
+        auto groups = SplitInputIntoGroups(lines);
+        auto paper = ParseInput(groups[0]);
+        auto folds = ParseLines(groups[1], ParseFold);
+        for (const auto& fold : folds) {
+            DoFold(paper, fold);
+        }
+
+        return PrintPaper(paper);
     }
 
     constexpr bool TestPartOne() {
@@ -107,42 +104,19 @@ SOLUTION(2021, 13) {
             "fold along y = 7",
             "fold along x = 5"
         };
-        return Part1(lines) == 17;
-    }
-
-    static_assert(TestPartOne());
-    auto Part2(const std::vector<std::string>&lines) {
-        auto groups = SplitInputIntoGroups(lines);
-        auto paper = ParseInput(groups[0]);
-        auto folds = ParseFolds(groups[1]);
-        for (const auto& fold : folds) {
-            DoFold(paper, fold);
-        }
-
-        PrintPaper(paper);
-        return paper.size();
-    }
-
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
-        if (!TestPartOne()) return false;
-
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
+        return PartOne(lines) == "17";
     }
 
     TESTS() {
+        static_assert(ParseInput({ "6,10", "0,14" }).size() == 2);
+        static_assert(ParseInput({ "6,10", "0,14" })[0].X == 6);
+        
+        static_assert(ParseFold("fold along y=7").Edge == 7);
+        static_assert(ParseFold("fold along y=7").IsX == false);
+        static_assert(ParseFold("fold along x=3").IsX == true);
+
+        static_assert(TestPartOne());
+
         return true;
     }
 }

@@ -16,42 +16,6 @@ SOLUTION(2021, 15) {
         return numbers;
     }
 
-    constexpr size_t CalculatePathCost(const Map & map, const std::vector<RowCol>&path) {
-        size_t result = 0;
-        for (size_t i = 1; i < path.size(); i++) {
-            auto pos = path[i];
-            result += map[pos.Row][pos.Col];
-        }
-
-        return result;
-    }
-
-    size_t FindShortestPath(const Map & map) {
-        RowCol start = { 0, 0 };
-        RowCol end = { map.size() - 1, map[0].size() - 1 };
-
-        auto cost = [&](const RowCol&, const RowCol& to) {
-            return map[to.Row][to.Col];
-        };
-        auto isComplete = [end](const RowCol& pos) {
-            return pos == end;
-        };
-        auto h = [end](const RowCol& pos) {
-            return MDistance(pos, end);
-        };
-        auto neighbors = [&](const RowCol& pos) {
-            return GetDirectNeighbors(pos, end);
-        };
-        auto move = [](RowCol&, RowCol&) {};
-        auto path = AStarMin<RowCol>(start, cost, isComplete, h, neighbors, move);
-        return CalculatePathCost(map, path);
-    }
-
-    auto Part1(const std::vector<std::string>&lines) {
-        auto map = ParseInput(lines);
-        return FindShortestPath(map);
-    }
-
     constexpr Map ExpandMap(const Map & original) {
         Map result;
         for (size_t tileRow = 0; tileRow < 5; tileRow++) {
@@ -72,18 +36,43 @@ SOLUTION(2021, 15) {
         return result;
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
+    constexpr size_t FindAstar(const Map& map, RowCol limits) {
+        RowCol origin = { 0, 0 };
+        RowCol target = { map.size() - 1, map[0].size() - 1 };
+
+        auto cost = [&](RowCol, RowCol to) { return map[to.Row][to.Col]; };
+        auto done = [&](RowCol pos) { return pos == target; };
+        auto h = [&](RowCol pos) { return MDistance(pos, target); };
+        auto n = [&](RowCol pos) { return GetDirectNeighbors(pos, limits); };
+        auto move = [](RowCol, RowCol) {};
+        auto path = AStarMin<RowCol, true>(origin, cost, done, h, n, move);
+
+        size_t result = 0;
+        for (size_t i = 1; i < path.size(); i++) {
+            auto pos = path[i];
+            result += map[pos.Row][pos.Col];
+        }
+        return result;
+    }
+
+    constexpr size_t Solve(const Map& map) {
+        RowCol limits = { map.size() - 1, map[0].size() - 1 };
+        return FindAstar(map, limits);
+    }
+
+    PART_ONE() {
+        auto map = ParseInput(lines);
+        return Constexpr::ToString(Solve(map));
+    }
+
+    PART_TWO() {
         auto map = ParseInput(lines);
         auto bigMap = ExpandMap(map);
-        return FindShortestPath(bigMap);
+        return Constexpr::ToString(Solve(bigMap));
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
+    TESTS() {
+        /*
         std::vector<std::string> lines = {
             "1163751742",
             "1381373672",
@@ -97,20 +86,31 @@ SOLUTION(2021, 15) {
             "2311944581"
         };
 
-        if (Part1(lines) != 40) return false;
-        if (Part2(lines) != 315) return false;
-        return true;
-    }
+        if (PartOne(lines) != "40") return false;
+        if (PartTwo(lines) != "315") return false;
+        
+        lines = {
+            "19111",
+            "11191",
+            "99991"
+        };
+        */
+        std::vector<std::string> lines = {
+            "19111",
+            "11191",
+            "99991"
+        };
+        if (PartOne(lines) != "8") return false;
 
-    PART_ONE() {
-        return lines[0];
-    }
+        lines = {
+            "119",
+            "919",
+            "119",
+            "199",
+            "111"
+        };
+        if (PartOne(lines) != "8") return false;
 
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }

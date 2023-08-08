@@ -38,14 +38,18 @@ namespace AStarPrivate {
         }
     };
 
-    template<typename T, typename State>
-    constexpr std::vector<T> AStar(T start, auto costFunc, auto doneFunc, auto hFunc, auto nFunc, auto moveFunc) {
+    template<typename T, typename State, typename SeenType = Constexpr::SmallSet<T>, typename HistoryType = Constexpr::SmallMap<T, T>, typename ForcastType = Constexpr::SmallMap<T, State>>
+    constexpr std::vector<T> AStar(T start, auto costFunc, auto doneFunc, auto hFunc, auto nFunc, auto moveFunc) {       
+        SeenType seen{};
+        HistoryType cameFrom{};
+        ForcastType state{};
+
         //Constexpr::BigSet<T> seen{};
         //Constexpr::BigMap<T, T> cameFrom{};
         //Constexpr::BigMap<T, State> state{};
-        Constexpr::SmallSet<T> seen{};
-        Constexpr::SmallMap<T, T> cameFrom{};
-        Constexpr::SmallMap<T, State> state{};
+        //Constexpr::SmallSet<T> seen{};
+        //Constexpr::SmallMap<T, T> cameFrom{};
+        //Constexpr::SmallMap<T, State> state{};
 
         Constexpr::PriorityQueue<State> queue{};
 
@@ -98,7 +102,7 @@ namespace AStarPrivate {
     }
 }
 
-template<typename T>
+template<typename T, bool Big = false>
 constexpr std::vector<T> AStarMin(T start,
     auto costFunc,
     auto doneFunc,
@@ -106,36 +110,103 @@ constexpr std::vector<T> AStarMin(T start,
     auto nFunc,
     auto moveFunc) {
 
-    return AStarPrivate::AStar<T, AStarPrivate::MinimalPath<T>>(start, costFunc, doneFunc, hFunc, nFunc, moveFunc);
+    if constexpr (Big) {
+        return AStarPrivate::AStar<
+            T,
+            AStarPrivate::MinimalPath<T>,
+            Constexpr::BigSet<T>,
+            Constexpr::BigMap<T, T>,
+            Constexpr::BigMap<T, AStarPrivate::MinimalPath<T>>
+        >(start, costFunc, doneFunc, hFunc, nFunc, moveFunc);
+    }
+    else {
+        return AStarPrivate::AStar<
+            T,
+            AStarPrivate::MinimalPath<T>,
+            Constexpr::SmallSet<T>,
+            Constexpr::SmallMap<T, T>,
+            Constexpr::SmallMap<T, AStarPrivate::MinimalPath<T>>
+        >(start, costFunc, doneFunc, hFunc, nFunc, moveFunc);
+    }
 }
 
-template<typename T>
+template<typename T, bool Big = false>
 constexpr std::vector<T> AStarMin(T start, T end, auto nFunc) {
     auto costFunc = [](const T&, const T&) {return 1; };
-    auto isComplete = [&end](const T& pos) { return pos == end; };
-    auto h = [&end](const T& pos) { return static_cast<size_t>(MDistance(pos, end)); };
-    auto move = [](T&, T&) {};
+    auto doneFunc = [&end](const T& pos) { return pos == end; };
+    auto hFunc = [&end](const T& pos) { return static_cast<size_t>(MDistance(pos, end)); };
+    auto moveFunc = [](T&, T&) {};
 
-    return AStarPrivate::AStar<T, AStarPrivate::MinimalPath<T>>(start, costFunc, isComplete, h, nFunc, move);
+    if constexpr (Big) {
+        return AStarPrivate::AStar<
+            T,
+            AStarPrivate::MinimalPath<T>,
+            Constexpr::BigSet<T>,
+            Constexpr::BigMap<T, T>,
+            Constexpr::BigMap<T, AStarPrivate::MinimalPath<T>>
+        >(start, costFunc, doneFunc, hFunc, nFunc, moveFunc);
+    }
+    else {
+        return AStarPrivate::AStar<
+            T,
+            AStarPrivate::MinimalPath<T>,
+            Constexpr::SmallSet<T>,
+            Constexpr::SmallMap<T, T>,
+            Constexpr::SmallMap<T, AStarPrivate::MinimalPath<T>>
+        >(start, costFunc, doneFunc, hFunc, nFunc, moveFunc);
+    }
 }
 
-template<typename T>
+template<typename T, bool Big = false>
 constexpr std::vector<T> AStarMax(T start,
     auto costFunc,
     auto doneFunc,
     auto hFunc,
     auto nFunc,
     auto moveFunc) {
-
-    return AStarPrivate::AStar<T, AStarPrivate::MaximalPath<T>>(start, costFunc, doneFunc, hFunc, nFunc, moveFunc);
+    if constexpr (Big) {
+        return AStarPrivate::AStar<
+            T,
+            AStarPrivate::MaximalPath<T>,
+            Constexpr::BigSet<T>,
+            Constexpr::BigMap<T, T>,
+            Constexpr::BigMap<T, AStarPrivate::MaximalPath<T>>
+        >(start, costFunc, doneFunc, hFunc, nFunc, moveFunc);
+    }
+    else {
+        return AStarPrivate::AStar<
+            T,
+            AStarPrivate::MaximalPath<T>,
+            Constexpr::SmallSet<T>,
+            Constexpr::SmallMap<T, T>,
+            Constexpr::SmallMap<T, AStarPrivate::MaximalPath<T>>
+        >(start, costFunc, doneFunc, hFunc, nFunc, moveFunc);
+    }
 }
 
-template<typename T>
+template<typename T, bool Big = false>
 constexpr std::vector<T> AStarMax(T start, T end, auto nFunc) {
     auto costFunc = [](const T&, const T&) {return 1; };
-    auto isComplete = [&end](const T& pos) { return pos == end; };
-    auto h = [&end](const T& pos) { return static_cast<size_t>(MDistance(pos, end)); };
-    auto move = [](T&, T&) {};
+    auto doneFunc = [&end](const T& pos) { return pos == end; };
+    auto hFunc = [&end](const T& pos) { return static_cast<size_t>(MDistance(pos, end)); };
+    auto moveFunc = [](T&, T&) {};
 
-    return AStarPrivate::AStar<T, AStarPrivate::MaximalPath<T>>(start, costFunc, isComplete, h, nFunc, move);
+    if constexpr (Big) {
+        return AStarPrivate::AStar<
+            T,
+            AStarPrivate::MaximalPath<T>,
+            Constexpr::BigSet<T>,
+            Constexpr::BigMap<T, T>,
+            Constexpr::BigMap<T, AStarPrivate::MaximalPath<T>>
+        >(start, costFunc, doneFunc, hFunc, nFunc, moveFunc);
+    }
+    else {
+        return AStarPrivate::AStar<
+            T,
+            AStarPrivate::MaximalPath<T>,
+            Constexpr::SmallSet<T>,
+            Constexpr::SmallMap<T, T>,
+            Constexpr::SmallMap<T, AStarPrivate::MaximalPath<T>>
+        >(start, costFunc, doneFunc, hFunc, nFunc, moveFunc);
+    }
 }

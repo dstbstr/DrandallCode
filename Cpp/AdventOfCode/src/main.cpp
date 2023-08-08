@@ -86,7 +86,7 @@ int main(int, char**) {
     Constexpr::Regex::RunTest();
     //RunAll();
     //RunYear(2021);
-    RunOne(2021, 12);
+    RunOne(2021, 15);
     //RunLatest();
     return 0;
 }
