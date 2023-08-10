@@ -122,8 +122,10 @@ constexpr auto RunAllReturnMax(const auto& collection, auto func, auto... args) 
 }
 
 constexpr auto RunAllReturnMin(const auto& collection, auto func, auto... args) {
-    decltype(func(std::declval<decltype(collection.back())>(), args...)) best = {};
+    //decltype(func(std::declval<decltype(collection.back())>(), args...)) best = {};
+    using Ret = decltype(func(std::declval<decltype(collection.back())>(), args...));
 
+    auto best = std::numeric_limits<Ret>::max();
     for (const auto& element : collection) {
         best = std::min(best, func(element, args...));
     }

@@ -6,6 +6,24 @@
 enum Facing { Up, Right, Down, Left };
 enum Direction {North, East, South, West};
 
+constexpr Facing ParseFacing(char c) {
+    switch (c){
+    case 'u': case 'U': return Facing::Up;
+    case 'd': case 'D': return Facing::Down;
+    case 'l': case 'L': return Facing::Left;
+    case 'r': case 'R': return Facing::Right;
+    default: throw "Unknown";
+    }
+}
+constexpr Direction ParseDirection(char c) {
+    switch (c) {
+    case 'n': case 'N': return Direction::North;
+    case 'e': case 'E': return Direction::East;
+    case 'w': case 'W': return Direction::West;
+    case 's': case 'S': return Direction::South;
+    }
+}
+
 constexpr std::string ToString(Facing facing) {
     switch (facing) {
     case Facing::Up: return "Up";

@@ -85,6 +85,11 @@ namespace Constexpr {
         return true;
     }
 
+    template<typename T>
+    constexpr bool ParseNumber(char c, T& result) {
+        result = c - '0';
+        return result > 0 && result < 10;
+    }
     constexpr void ReplaceAll(std::string& original, const std::string& toFind, const std::string& replacement) {
         size_t index = 0;
         size_t length = toFind.length();

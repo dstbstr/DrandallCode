@@ -13,7 +13,7 @@ SOLUTION(2022, 10) {
         tick++;
         xValues.push_back(x);
 
-        auto split = StrUtil::Split(line, " ");
+        auto split = Constexpr::Split(line, " ");
         s32 change;
         Constexpr::ParseNumber(split[1], change);
 
@@ -60,22 +60,12 @@ SOLUTION(2022, 10) {
         return result;
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        return BuildCrtString(lines);
-    }
-
-    bool RunTests() {
-        std::vector<std::string> lines{ "noop", "addx 3", "addx -5" };
-        SumSignalStrength(lines);
-        return true;
-    }
-
     PART_ONE() {
-        return lines[0];
+        return Constexpr::ToString(SumSignalStrength(lines));
     }
 
     PART_TWO() {
-        return lines[0];
+        return BuildCrtString(lines);
     }
 
     TESTS() {

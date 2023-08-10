@@ -1,8 +1,11 @@
 #include "2022/d6_TuningTrouble.h"
 
 SOLUTION(2022, 6) {
-    constexpr u32 FindUnique(const std::string & input, size_t runLength) {
+    enum struct MessageType { Signal = 4, Message = 14};
+
+    constexpr size_t FindUnique(const std::string & input, MessageType messageType) {
         std::vector<char> allChars;
+        size_t runLength = static_cast<size_t>(messageType);
         for (size_t i = 0; i < input.size() - runLength; i++) {
             allChars.clear();
             for (auto j = 0; j < runLength; j++) {
@@ -14,50 +17,35 @@ SOLUTION(2022, 6) {
                 }
             }
             if (allChars.size() == runLength) {
-                return static_cast<u32>(i + runLength);
+                return i + runLength;
             }
         }
 
         return 0;
     }
 
-    constexpr u32 FindSignalStart(const std::string & input) {
-        return FindUnique(input, 4);
-    }
-
-    static_assert(FindSignalStart("bvwbjplbgvbhsrlpgdmjqwftvncz") == 5);
-    static_assert(FindSignalStart("nppdvjthqldpwncqszvftbrmjlhg") == 6);
-    static_assert(FindSignalStart("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg") == 10);
-    static_assert(FindSignalStart("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw") == 11);
-
-    constexpr u32 FindMessageStart(const std::string & input) {
-        return FindUnique(input, 14);
-    }
-
-    static_assert(FindMessageStart("mjqjpqmgbljsphdztnvjfqwrcgsmlb") == 19);
-
-    std::string Run(const std::vector<std::string>&lines) {
-        return Constexpr::ToString(FindMessageStart(lines[0]));
-    }
-
-    bool RunTests() {
-        if (FindMessageStart("mjqjpqmgbljsphdztnvjfqwrcgsmlb") != 19) return false;
-        if (FindSignalStart("bvwbjplbgvbhsrlpgdmjqwftvncz") != 5) return false;
-        if (FindSignalStart("nppdvjthqldpwncqszvftbrmjlhg") != 6) return false;
-        if (FindSignalStart("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg") != 10) return false;
-        if (FindSignalStart("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw") != 11) return false;
-        return true;
-    }
-
     PART_ONE() {
-        return lines[0];
+        return Constexpr::ToString(FindUnique(lines[0], MessageType::Signal));
     }
 
     PART_TWO() {
-        return lines[0];
+        return Constexpr::ToString(FindUnique(lines[0], MessageType::Message));
     }
 
     TESTS() {
+        static_assert(FindUnique("bvwbjplbgvbhsrlpgdmjqwftvncz", MessageType::Signal) == 5);
+        static_assert(FindUnique("nppdvjthqldpwncqszvftbrmjlhg", MessageType::Signal) == 6);
+        static_assert(FindUnique("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", MessageType::Signal) == 10);
+        static_assert(FindUnique("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", MessageType::Signal) == 11);
+
+        static_assert(FindUnique("mjqjpqmgbljsphdztnvjfqwrcgsmlb", MessageType::Message) == 19);
+        
+        if (FindUnique("bvwbjplbgvbhsrlpgdmjqwftvncz", MessageType::Signal) != 5) return false;
+        if (FindUnique("nppdvjthqldpwncqszvftbrmjlhg", MessageType::Signal) != 6) return false;
+        if (FindUnique("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg", MessageType::Signal) != 10) return false;
+        if (FindUnique("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw", MessageType::Signal) != 11) return false;
+
+        if (FindUnique("mjqjpqmgbljsphdztnvjfqwrcgsmlb", MessageType::Message) != 19) return false;
         return true;
     }
 }

@@ -1,145 +1,86 @@
 #include "2022/d5_SupplyStacks.h"
 
-#include <stack>
-
 SOLUTION(2022, 5) {
-    using StackType = std::vector<std::stack<char>>;
+    using Stacks = std::vector<Constexpr::Stack<char>>;
 
-    s32 FindBottomStack(const std::vector<std::string>&lines) {
-        for (s32 i = 0; i < lines.size(); i++) {
-            if (lines[i][0] == '1' || lines[i][1] == '1') {
-                return i - 1;
+    constexpr Stacks BuildStacks(const std::vector<std::string>& lines) {
+        Stacks result;
+        result.resize((lines[0].size() / 4) + 1);
+
+        for (s32 line = static_cast<s32>(lines.size()) - 2; line >= 0; line--) {
+            for (auto c = 1, i = 0; c < lines[0].size(); c += 4, i++) {
+                auto box = lines[line][c];
+                if (box == ' ') continue;
+                result[i].push(box);
             }
         }
-
-        return 0;
-    }
-
-    void FillStacks(const std::string & line, StackType & stacks) {
-        int stack = 0;
-        for (auto i = 0; i < line.size(); i += 4) {
-            if (stacks.size() < stack + 1) {
-                stacks.push_back(std::stack<char>{});
-            }
-            if (line[i + 1] != ' ') {
-                stacks[stack].push(line[i + 1]);
-            }
-            stack++;
-        }
-    }
-
-    void ParseInstruction(const std::string & line, u32 & move, u32 & from, u32 & to) {
-        static const auto re = std::regex(R"(\D+(\d+)\D+(\d+)\D+(\d+))");
-        std::smatch match;
-        if (std::regex_search(line, match, re)) {
-            Constexpr::ParseNumber(match[1].str(), move);
-            Constexpr::ParseNumber(match[2].str(), from);
-            Constexpr::ParseNumber(match[3].str(), to);
-
-            // fix 1 based indexing
-            from--;
-            to--;
-        }
-    }
-
-    void ProcessInstruction(u32 move, u32 from, u32 to, StackType & stacks) {
-        for (u32 i = 0; i < move; i++) {
-            stacks[to].push(stacks[from].top());
-            stacks[from].pop();
-        }
-    }
-
-    void ProcessInstruction9001(u32 move, u32 from, u32 to, StackType & stacks) {
-        std::stack<char> temp;
-        for (u32 i = 0; i < move; i++) {
-            temp.push(stacks[from].top());
-            stacks[from].pop();
-        }
-        while (!temp.empty()) {
-            stacks[to].push(temp.top());
-            temp.pop();
-        }
-    }
-
-    std::string RunImpl(const std::vector<std::string>&lines, std::function<void(u32, u32, u32, StackType&)> processFunc) {
-        StackType stacks;
-        auto bottomStack = FindBottomStack(lines);
-        for (s32 i = bottomStack; i >= 0; i--) {
-            FillStacks(lines[i], stacks);
-        }
-
-        for (s32 i = bottomStack + 3; i < lines.size(); i++) {
-            u32 move;
-            u32 from;
-            u32 to;
-            ParseInstruction(lines[i], move, from, to);
-            processFunc(move, from, to, stacks);
-        }
-
-        std::string result = "";
-        for (auto stack : stacks) {
-            result += stack.top();
-        }
-
         return result;
     }
-    std::string RunFirst(const std::vector<std::string>&lines) {
-        return RunImpl(lines, ProcessInstruction);
+
+    constexpr Vec3<size_t> ParseMove(const std::string& line) {
+        Vec3<size_t> result;
+        //move 10 from 21 to 15
+        auto s = Constexpr::Split(line, " ");
+        Constexpr::ParseNumber(s[1], result.X);
+        Constexpr::ParseNumber(s[3], result.Y);
+        Constexpr::ParseNumber(s.back(), result.Z);
+        result -= {0, 1, 1}; //Make these 0 based
+        return result;
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        return RunImpl(lines, ProcessInstruction9001);
-    }
+    constexpr auto Solve(const std::vector<std::string>& lines, auto MoveFunc) {
+        auto groups = SplitInputIntoGroups(lines);
+        auto stacks = BuildStacks(groups[0]);
+        auto moves = ParseLines(groups[1], ParseMove);
 
-    bool RunTests() {
-        std::vector<std::string> lines;
-        lines.push_back("    [D]     ");
-        lines.push_back("[N] [C]     ");
-        lines.push_back("[Z] [M] [P] ");
-        lines.push_back(" 1   2   3  ");
-        lines.push_back("");
-        lines.push_back("move 1 from 2 to 1");
-        lines.push_back("move 3 from 1 to 3");
-        lines.push_back("move 2 from 2 to 1");
-        lines.push_back("move 1 from 1 to 2");
-
-        StackType stacks;
-        auto bottomStack = FindBottomStack(lines);
-        for (s32 i = bottomStack; i >= 0; i--) {
-            FillStacks(lines[i], stacks);
+        for (auto move : moves) {
+            MoveFunc(move, stacks);
         }
 
-        if (stacks.size() != 3) return false;
-        if (stacks[0].top() != 'N') return false;
-        if (stacks[1].top() != 'D') return false;
-        if (stacks[2].top() != 'P') return false;
-        if (stacks[0].size() != 2) return false;
-        if (stacks[1].size() != 3) return false;
-        if (stacks[2].size() != 1) return false;
-
-        for (s32 i = bottomStack + 3; i < lines.size(); i++) {
-            u32 move;
-            u32 from;
-            u32 to;
-            ParseInstruction(lines[i], move, from, to);
-            ProcessInstruction(move, from, to, stacks);
+        std::string result;
+        for (auto s : stacks) {
+            if (s.is_empty()) continue;
+            result.push_back(s.top());
         }
-
-        if (stacks[0].top() != 'C') return false;
-        if (stacks[1].top() != 'M') return false;
-        if (stacks[2].top() != 'Z') return false;
-        return true;
+        return result;
     }
 
     PART_ONE() {
-        return lines[0];
+        return Solve(lines, [](Vec3<size_t> move, Stacks& stacks) {
+            for (auto i = 0; i < move.X; i++) {
+                stacks[move.Z].push(stacks[move.Y].pop());
+            }
+            });
     }
 
     PART_TWO() {
-        return lines[0];
+        return Solve(lines, [](Vec3<size_t> move, Stacks& stacks) {
+            Constexpr::Stack<char> temp;
+            for (auto i = 0; i < move.X; i++) {
+                temp.push(stacks[move.Y].pop());
+            }
+            for (auto i = 0; i < move.X; i++) {
+                stacks[move.Z].push(temp.pop());
+            }
+        });
     }
 
     TESTS() {
+        std::vector<std::string> lines{
+            "    [D]     ",
+            "[N] [C]     ",
+            "[Z] [M] [P] ",
+            " 1   2   3  ",
+            "",
+            "move 1 from 2 to 1",
+            "move 3 from 1 to 3",
+            "move 2 from 2 to 1",
+            "move 1 from 1 to 2"
+        };
+        
+        if (PartOne(lines) != "CMZ") return false;
+        if (PartTwo(lines) != "MCD") return false;
+
         return true;
     }
 }

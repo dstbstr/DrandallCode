@@ -18,14 +18,6 @@ SOLUTION(2022, 4) {
         }
     }
 
-    static_assert(FullyContains({ 6, 6 }, { 4, 6 }));
-    static_assert(FullyContains({ 4, 6 }, { 6, 6 }));
-    static_assert(FullyContains({ 2, 8 }, { 3, 7 }));
-    static_assert(FullyContains({ 3, 7 }, { 2, 8 }));
-    static_assert(!FullyContains({ 2, 4 }, { 6, 8 }));
-    static_assert(!FullyContains({ 2, 6 }, { 4, 8 }));
-    static_assert(FullyContains({ 55, 55 }, { 55, 83 }));
-
     constexpr bool Overlap(Section lhs, Section rhs) {
         if (lhs.Start == rhs.Start || lhs.End == rhs.End) {
             return true;
@@ -38,60 +30,50 @@ SOLUTION(2022, 4) {
         }
     }
 
-    static_assert(!Overlap({ 2, 4 }, { 6, 8 }));
-    static_assert(!Overlap({ 2, 3 }, { 4, 5 }));
-    static_assert(Overlap({ 5, 7 }, { 7, 9 }));
-    static_assert(Overlap({ 2, 8 }, { 3, 7 }));
-    static_assert(Overlap({ 6, 6 }, { 4, 6 }));
-    static_assert(Overlap({ 2, 6 }, { 4, 8 }));
-    static_assert(Overlap({ 55, 55 }, { 55, 83 }));
-
-
-    u32 RunImpl(const std::vector<std::string>&lines, std::function<bool(Section, Section)> func) {
-        u32 result = 0;
-        for (const auto& line : lines) {
-            auto firstSplit = StrUtil::Split(line, ",");
-
-            auto lhsStr = StrUtil::Split(firstSplit[0], "-");
-            Section lhs;
-            Constexpr::ParseNumber(lhsStr[0], lhs.Start);
-            Constexpr::ParseNumber(lhsStr[1], lhs.End);
-
-            auto rhsStr = StrUtil::Split(firstSplit[1], "-");
-            Section rhs;
-            Constexpr::ParseNumber(rhsStr[0], rhs.Start);
-            Constexpr::ParseNumber(rhsStr[1], rhs.End);
-
-            if (func(lhs, rhs)) {
-                result++;
-            }
-        }
-
-        return result;
-
+    constexpr std::pair<Section, Section> ParseLine(const std::string& line) {
+        auto s = Constexpr::Split(line, ",");
+        auto a = Constexpr::Split(s[0], "-");
+        auto b = Constexpr::Split(s[1], "-");
+        Section lhs, rhs;
+        Constexpr::ParseNumber(a[0], lhs.Start);
+        Constexpr::ParseNumber(a[1], lhs.End);
+        Constexpr::ParseNumber(b[0], rhs.Start);
+        Constexpr::ParseNumber(b[1], rhs.End);
+        return std::make_pair(lhs, rhs);
     }
 
-    u32 RunFirst(const std::vector<std::string>&lines) {
-        return RunImpl(lines, FullyContains);
-    }
-
-    u32 Run(const std::vector<std::string>&lines) {
-        return RunImpl(lines, Overlap);
-    }
-
-    bool RunTests() {
-        return true;
+    constexpr size_t RunImpl(const std::vector<std::string>&lines, auto func) {
+        auto pairs = ParseLines(lines, ParseLine);
+        return std::count_if(pairs.begin(), pairs.end(), [func](const auto& p) {
+            return func(p.first, p.second);
+            });
     }
 
     PART_ONE() {
-        return lines[0];
+        return Constexpr::ToString(RunImpl(lines, FullyContains));
     }
 
     PART_TWO() {
-        return lines[0];
+        return Constexpr::ToString(RunImpl(lines, Overlap));
     }
 
     TESTS() {
+        static_assert(FullyContains({ 6, 6 }, { 4, 6 }));
+        static_assert(FullyContains({ 4, 6 }, { 6, 6 }));
+        static_assert(FullyContains({ 2, 8 }, { 3, 7 }));
+        static_assert(FullyContains({ 3, 7 }, { 2, 8 }));
+        static_assert(!FullyContains({ 2, 4 }, { 6, 8 }));
+        static_assert(!FullyContains({ 2, 6 }, { 4, 8 }));
+        static_assert(FullyContains({ 55, 55 }, { 55, 83 }));
+        
+        static_assert(!Overlap({ 2, 4 }, { 6, 8 }));
+        static_assert(!Overlap({ 2, 3 }, { 4, 5 }));
+        static_assert(Overlap({ 5, 7 }, { 7, 9 }));
+        static_assert(Overlap({ 2, 8 }, { 3, 7 }));
+        static_assert(Overlap({ 6, 6 }, { 4, 6 }));
+        static_assert(Overlap({ 2, 6 }, { 4, 8 }));
+        static_assert(Overlap({ 55, 55 }, { 55, 83 }));
+        
         return true;
     }
 }

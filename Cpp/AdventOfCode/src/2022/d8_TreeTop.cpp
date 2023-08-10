@@ -55,14 +55,6 @@ SOLUTION(2022, 8) {
         return result;
     }
 
-    static_assert(VisibleInForest<5, 5>({ {
-        {3, 0, 3, 7, 3},
-        {2, 5, 5, 1, 2},
-        {6, 5, 3, 3, 2},
-        {3, 3, 5, 4, 9},
-        {3, 5, 3, 9, 0}
-        } }) == 21);
-
     template<size_t Rows, size_t Cols>
     constexpr u32 GetScenicScore(const std::array<std::array<u8, Cols>, Rows>&forest, size_t treeRow, size_t treeCol) {
         u32 upScore = 0;
@@ -91,22 +83,6 @@ SOLUTION(2022, 8) {
 
         return upScore * downScore * leftScore * rightScore;
     }
-
-    static_assert(GetScenicScore<5, 5>({ {
-        {3, 0, 3, 7, 3},
-        {2, 5, 5, 1, 2},
-        {6, 5, 3, 3, 2},
-        {3, 3, 5, 4, 9},
-        {3, 5, 3, 9, 0}
-        } }, 1, 2) == 4);
-
-    static_assert(GetScenicScore<5, 5>({ {
-        {3, 0, 3, 7, 3},
-        {2, 5, 5, 1, 2},
-        {6, 5, 3, 3, 2},
-        {3, 3, 5, 4, 9},
-        {3, 5, 3, 9, 0}
-        } }, 3, 2) == 8);
 
     template<size_t Rows, size_t Cols>
     constexpr u32 FindBestScenicScore(const std::array<std::array<u8, Cols>, Rows>&forest) {
@@ -139,19 +115,50 @@ SOLUTION(2022, 8) {
         return Constexpr::ToString(FindBestScenicScore(forest));
     }
 
-    bool RunTests() {
-        return true;
+    constexpr size_t Execute(const std::vector<std::string>& lines, auto Func) {
+        std::array<std::array<u8, 99>, 99> forest;
+        for (auto row = 0; row < 99; row++) {
+            for (auto col = 0; col < 99; col++) {
+                forest[row][col] = lines[row][col] - '0';
+            }
+        }
+
+        return Func(forest);
     }
 
     PART_ONE() {
-        return lines[0];
+        return Constexpr::ToString(Execute(lines, VisibleInForest<99, 99>));
     }
 
     PART_TWO() {
-        return lines[0];
+        return Constexpr::ToString(Execute(lines, FindBestScenicScore<99, 99>));
     }
 
     TESTS() {
+        static_assert(VisibleInForest<5, 5>({ {
+           {3, 0, 3, 7, 3},
+           {2, 5, 5, 1, 2},
+           {6, 5, 3, 3, 2},
+           {3, 3, 5, 4, 9},
+           {3, 5, 3, 9, 0}
+           } }) == 21);
+        
+        static_assert(GetScenicScore<5, 5>({ {
+           {3, 0, 3, 7, 3},
+           {2, 5, 5, 1, 2},
+           {6, 5, 3, 3, 2},
+           {3, 3, 5, 4, 9},
+           {3, 5, 3, 9, 0}
+           } }, 1, 2) == 4);
+
+        static_assert(GetScenicScore<5, 5>({ {
+            {3, 0, 3, 7, 3},
+            {2, 5, 5, 1, 2},
+            {6, 5, 3, 3, 2},
+            {3, 3, 5, 4, 9},
+            {3, 5, 3, 9, 0}
+            } }, 3, 2) == 8);
+        
         return true;
     }
 }

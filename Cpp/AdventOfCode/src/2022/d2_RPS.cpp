@@ -21,10 +21,6 @@ SOLUTION(2022, 2) {
         return static_cast<u32>(player) + static_cast<u32>(RunGame(player, opponent));
     }
 
-    static_assert(GetPoints(Play::Paper, Play::Rock) == 8);
-    static_assert(GetPoints(Play::Rock, Play::Paper) == 1);
-    static_assert(GetPoints(Play::Scissors, Play::Scissors) == 6);
-
     constexpr Play WhatToPlay(Play opponent, Outcome target) {
         if (target == Outcome::Draw) {
             return opponent;
@@ -88,7 +84,7 @@ SOLUTION(2022, 2) {
         player = WhatToPlay(opponent, targetOutcome);
     }
 
-    constexpr u32 CalculateTotal(const std::vector<std::string>&lines) {
+    PART_ONE() {
         u32 result = 0;
         for (auto line : lines) {
             Play opponent;
@@ -97,10 +93,10 @@ SOLUTION(2022, 2) {
             result += GetPoints(player, opponent);
         }
 
-        return result;
+        return Constexpr::ToString(result);
     }
 
-    constexpr u32 CalculateUpdatedTotal(const std::vector<std::string>&lines) {
+    PART_TWO() {
         u32 result = 0;
         for (auto line : lines) {
             Play opponent;
@@ -109,18 +105,14 @@ SOLUTION(2022, 2) {
             result += GetPoints(player, opponent);
         }
 
-        return result;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
+        return Constexpr::ToString(result);
     }
 
     TESTS() {
+        static_assert(GetPoints(Play::Paper, Play::Rock) == 8);
+        static_assert(GetPoints(Play::Rock, Play::Paper) == 1);
+        static_assert(GetPoints(Play::Scissors, Play::Scissors) == 6);
+        
         return true;
     }
 }
