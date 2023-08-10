@@ -4,246 +4,193 @@
 
 SOLUTION(2021, 19) {
     using Beacon = Vec3<s32>;
+    using RotationMatrix = std::array<std::array<s32, 3>, 3>;
+
+    constexpr std::array<RotationMatrix, 24> GetRotations() {
+        std::array<RotationMatrix, 24> result{};
+        result[0] = { { {1, 0, 0}, { 0,1,0 }, { 0,0,1 }} };
+        result[1] = { { {1, 0, 0}, { 0,0,-1 }, { 0,1,0 } } };
+        result[2] = { { {1, 0, 0}, { 0,-1,0 }, { 0,0,-1 } } };
+        result[3] = { { {1, 0, 0}, { 0,0,1 }, { 0, -1, 0 }} };
+        result[4] = { {{0,-1,0},{1,0,0},{0,0,1}} };
+        result[5] = { {{0,0,1},{1,0,0},{0,1,0}} };
+        result[6] = { {{0,1,0},{1,0,0},{0,0,-1}} };
+        result[7] = { {{0,0,-1},{1,0,0},{0,-1,0}} };
+        result[8] = { {{-1,0,0},{0,-1,0},{0,0,1}} };
+        result[9] = { {{-1,0,0},{0,0,-1},{0,-1, 0}} };
+        result[10] = { {{-1,0,0},{0,1,0},{0,0,-1}} };
+        result[11] = { {{-1,0,0},{0,0,1},{0,1,0}} };
+        result[12] = { {{0,1,0},{-1,0,0},{0,0,1}} };
+        result[13] = { {{0,0,1},{-1,0,0},{0,-1,0}} };
+        result[14] = { {{0,-1,0},{-1,0,0},{0,0,-1}} };
+        result[15] = { {{0,0,-1},{-1,0,0},{0,1,0}} };
+        result[16] = { {{0,0,-1},{0,1,0},{1,0,0}} };
+        result[17] = { {{0,1,0},{0,0,1},{1,0,0}} };
+        result[18] = { {{0,0,1},{0,-1,0},{1,0,0}} };
+        result[19] = { {{0,-1,0},{0,0,-1},{1,0,0}} };
+        result[20] = { {{0,0,-1},{0,-1,0},{-1,0,0}} };
+        result[21] = { {{0,-1,0},{0,0,1},{-1,0,0}} };
+        result[22] = { {{0,0,1},{0,1,0},{-1,0,0}} };
+        result[23] = { {{0,1,0},{0,0,-1},{-1,0,0}} };
+        return result;
+    }
+
+    constexpr std::array<RotationMatrix, 24> Rotations = GetRotations();
+
+    using BeaconPair = std::pair<Beacon, Beacon>;
 
     struct Scanner {
         std::vector<Beacon> Beacons;
-        std::vector<Beacon> Scanners;
-        std::vector<std::vector<Beacon>> Deltas;
+        Constexpr::SmallMap<size_t, BeaconPair> DeltaMap;
+        size_t id{ 0 };
+
+        constexpr bool operator==(const Scanner& other) const {
+            return Beacons == other.Beacons;
+        }
+        constexpr bool operator<(const Scanner& other) const {
+            return Beacons[0] < other.Beacons[0];
+        }
     };
 
-    constexpr Scanner ParseScanner(const std::vector<std::string>&lines) {
+    constexpr size_t GetDistance(const Beacon& lhs, const Beacon& rhs) {
+        auto delta = lhs - rhs;
+        delta *= delta;
+        return delta.X + delta.Y + delta.Z;
+    }
+
+    constexpr void UpdateDeltaMap(Scanner& scanner) {
+        scanner.DeltaMap.clear();
+        for (size_t i = 0; i < scanner.Beacons.size(); i++) {
+            for (size_t j = i + 1; j < scanner.Beacons.size(); j++) {
+                auto lhs = scanner.Beacons[i];
+                auto rhs = scanner.Beacons[j];
+                auto d = GetDistance(lhs, rhs);
+                scanner.DeltaMap[d] = std::make_pair(lhs, rhs);
+            }
+        }
+    }
+
+    constexpr void UpdateDeltaMap(Constexpr::BigMap<size_t, BeaconPair>& allDeltas, const std::vector<Beacon>& oldBeacons, const std::vector<Beacon>& newBeacons) {
+        for (const auto& old : oldBeacons) {
+            for (const auto& added : newBeacons) {
+                auto d = GetDistance(old, added);
+                allDeltas[d] = std::make_pair(old, added);
+            }
+        }
+
+        for (size_t i = 0; i < newBeacons.size(); i++) {
+            for (size_t j = i + 1; j < newBeacons.size(); j++) {
+                auto lhs = newBeacons[i];
+                auto rhs = newBeacons[j];
+                auto d = GetDistance(lhs, rhs);
+                allDeltas[d] = std::make_pair(lhs, rhs);
+            }
+        }
+    }
+
+    constexpr Scanner ParseScanner(const std::vector<std::string>& lines) {
         Scanner result;
         for (const auto& line : lines | std::views::drop(1)) {
-            auto s = Constexpr::Split(line, ",");
-            Beacon b;
-            Constexpr::ParseNumber(s[0], b.X);
-            Constexpr::ParseNumber(s[1], b.Y);
-            Constexpr::ParseNumber(s[2], b.Z);
-
-            result.Beacons.push_back(b);
+            result.Beacons.push_back(Beacon(line));
         }
-
-        std::sort(result.Beacons.begin(), result.Beacons.end());
+        UpdateDeltaMap(result);
         return result;
     }
-    static_assert(ParseScanner({ "scanner id", "1,1,1" }).Beacons.size() == 1);
 
-    constexpr std::vector<Scanner> ParseScanners(const std::vector<std::string>&lines) {
+    constexpr size_t CountOverlap(const Constexpr::BigMap<size_t, BeaconPair>& allDeltas, const Scanner& toAdd) {
+        auto keys = toAdd.DeltaMap.GetKeys();
+        return std::count_if(keys.begin(), keys.end(), [&](size_t key) { return allDeltas.contains(key); });
+    }
+
+    constexpr bool FindScannerLocation(const BeaconPair& lhs, const BeaconPair& rhs, Beacon& outDelta) {
+        if (lhs.first - rhs.first == lhs.second - rhs.second) {
+            outDelta = lhs.first - rhs.first;
+            return true;
+        }
+        else if (lhs.first - rhs.second == lhs.second - rhs.first) {
+            outDelta = lhs.first - rhs.second;
+            return true;
+        }
+        return false;
+    }
+
+    constexpr void Align(Constexpr::BigMap<size_t, BeaconPair>& allDeltas, std::vector<Beacon>& allBeacons, std::vector<Beacon>& allScanners, const Scanner& toAdd) {
+        auto keys = toAdd.DeltaMap.GetKeys();
+        BeaconPair a;
+        BeaconPair b;
+        BeaconPair aligned;
+        Beacon translate;
+        for (auto key : keys) {
+            if (allDeltas.contains(key)) {
+                a = allDeltas.at(key);
+                b = toAdd.DeltaMap.at(key);
+                for (const auto& rotation : Rotations) {
+                    aligned = std::make_pair(DotProduct(b.first, rotation), DotProduct(b.second, rotation));
+                    if (FindScannerLocation(a, aligned, translate)) {                       
+                        std::vector<Beacon> transformed;
+                        std::transform(toAdd.Beacons.begin(), toAdd.Beacons.end(), std::back_inserter(transformed), [rotation, translate](const Beacon& b) {
+                            return DotProduct(b, rotation) + translate;
+                            });
+                        std::erase_if(transformed, [&](const Beacon& b) {
+                            return std::find(allBeacons.begin(), allBeacons.end(), b) != allBeacons.end();
+                            });
+                        UpdateDeltaMap(allDeltas, allBeacons, transformed);
+                        std::copy(transformed.begin(), transformed.end(), std::back_inserter(allBeacons));
+                        allScanners.push_back(translate);
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    constexpr auto CombineScanners(const std::vector<std::string>& lines) {
         auto groups = SplitInputIntoGroups(lines);
-        std::vector<Scanner> scanners;
+        std::vector<Scanner> all;
         for (const auto& group : groups) {
-            scanners.push_back(ParseScanner(group));
+            auto scanner = ParseScanner(group);
+            scanner.id = all.size();
+            all.push_back(scanner);
         }
 
-        return scanners;
-    }
-
-    constexpr void ForEachBeacon(Scanner & scanner, auto toApply) {
-        for (auto& beacon : scanner.Beacons) {
-            toApply(beacon);
+        Constexpr::BigMap<size_t, BeaconPair> allDeltas;
+        for (const auto& [key, value] : all[0].DeltaMap) {
+            allDeltas[key] = value;
         }
-    }
+        std::vector<Beacon> allBeacons {all[0].Beacons};
+        std::vector<Beacon> allScanners {{0, 0, 0}};
+        std::vector<size_t> alignedIds {0};
 
-    constexpr Scanner FlipX(Scanner scanner) {
-        ForEachBeacon(scanner, [](auto& beacon) { beacon.X = -beacon.X; });
-        return scanner;
-    }
-
-    constexpr Scanner FlipY(Scanner scanner) {
-        ForEachBeacon(scanner, [](auto& beacon) { beacon.Y = -beacon.Y; });
-        return scanner;
-    }
-
-    constexpr Scanner FlipZ(Scanner scanner) {
-        ForEachBeacon(scanner, [](auto& beacon) { beacon.Z = -beacon.Z; });
-        return scanner;
-    }
-
-    constexpr Scanner SwapXY(Scanner scanner) {
-        ForEachBeacon(scanner, [](auto& beacon) { std::swap(beacon.X, beacon.Y); });
-        return scanner;
-    }
-
-    constexpr Scanner SwapXZ(Scanner scanner) {
-        ForEachBeacon(scanner, [](auto& beacon) { std::swap(beacon.X, beacon.Z); });
-        return scanner;
-    }
-
-    constexpr Scanner SwapYZ(Scanner scanner) {
-        ForEachBeacon(scanner, [](auto& beacon) { std::swap(beacon.Y, beacon.Z); });
-        return scanner;
-    }
-
-    constexpr std::vector<Scanner> GetAllOrientations(const Scanner & scanner) {
-        std::vector<Scanner> result;
-        result.push_back(scanner);                                //[X=x, Y=y, Z=z]
-        result.push_back(FlipY(FlipX(scanner)));                  //[X=-x, Y=-y, Z=z]
-        result.push_back(SwapYZ(FlipX(FlipY(FlipZ(scanner)))));   //[X=-x, Y=-z, Z=-y]
-        result.push_back(FlipZ(FlipX(scanner)));                  //[X=-x, Y=y, Z=-z]
-        result.push_back(SwapYZ(FlipX(scanner)));                 //[X=-x, Y=z, Z=y]
-        result.push_back(SwapXY(FlipX(FlipY(FlipZ(scanner)))));   //[X=-y, Y=-x, Z=-z]
-        result.push_back(SwapXY(SwapXZ(FlipY(FlipZ(scanner)))));  //[X=-y, Y=-z, Z=x]
-        result.push_back(SwapXY(FlipY(scanner)));                 //[X=-y, Y=x, Z=z]
-        result.push_back(SwapXY(SwapXZ(FlipY(FlipX(scanner)))));  //[X=-y, Y=z, Z=-x]
-        result.push_back(SwapYZ(SwapXZ(FlipX(FlipZ(scanner)))));  //[X=-z, Y=-x, Z=y]
-        result.push_back(SwapXZ(FlipX(FlipY(FlipZ(scanner)))));   //[X=-z, Y=-y, Z=-x]
-        result.push_back(SwapXZ(SwapXY(FlipZ(FlipY(scanner)))));  //[X=-z, Y=x, Z=-y]
-        result.push_back(SwapXZ(FlipZ(scanner)));                 //[X=-z, Y=y, Z=x]
-        result.push_back(FlipY(FlipZ(scanner)));                  //[X=x, Y=-y, Z=-z]
-        result.push_back(SwapYZ(FlipZ(scanner)));                 //[X=x, Y=-z, Z=y]
-        result.push_back(SwapYZ(FlipY(scanner)));                 //[X=x, Y=z, Z=-y]
-        result.push_back(SwapXY(FlipX(scanner)));                 //[X=y, Y=-x, Z=z]
-        result.push_back(SwapXY(SwapXZ(FlipX(FlipZ(scanner)))));  //[X=y, Y=-z, Z=-x]
-        result.push_back(SwapXY(FlipZ(scanner)));                 //[X=y, Y=x, Z=-z]
-        result.push_back(SwapXY(SwapXZ(scanner)));                //[X=y, Y=z, Z=x]
-        result.push_back(SwapYZ(SwapXZ(FlipX(FlipY(scanner)))));  //[X=z, Y=-x, Z=-y]
-        result.push_back(SwapXZ(FlipY(scanner)));                 //[X=z, Y=-y, Z=x]
-        result.push_back(SwapXZ(SwapXY(scanner)));                //[X=z, Y=x, Z=y]
-        result.push_back(SwapXZ(FlipX(scanner)));                 //[X=z, Y=y, Z=-x]
-
-        for (auto& s : result) {
-            std::sort(s.Beacons.begin(), s.Beacons.end());
-        }
-        return result;
-    }
-
-    constexpr std::vector<Vec3<s32>> GetDeltas(const std::vector<Vec3<s32>>&beacons, size_t beaconIndex) {
-        std::vector<Vec3<s32>> result;
-
-        for (int offset = -20; offset < 21; offset++) {
-            if (offset == 0) continue;
-            if (beaconIndex + offset >= 0 && beaconIndex + offset < beacons.size() - 1) {
-                result.push_back(beacons[beaconIndex] - beacons[beaconIndex + offset]);
-            }
-        }
-        return result;
-    }
-
-    constexpr bool DoesMatch(const std::vector<Vec3<s32>>&lhsDeltas, const std::vector<Vec3<s32>>&rhsDeltas) {
-        for (const auto& lhsDelta : lhsDeltas) {
-            for (const auto& rhsDelta : rhsDeltas) {
-                if (lhsDelta == rhsDelta) return true;
-            }
-        }
-        return false;
-    }
-
-    constexpr size_t CountMatchs(const Scanner & lhs, const Scanner & rhs) {
-        size_t matches = 0;
-        for (const auto& lhsDeltas : lhs.Deltas) {
-            for (const auto& rhsDeltas : rhs.Deltas) {
-                if (DoesMatch(lhsDeltas, rhsDeltas)) {
-                    matches++;
-                    break;
+        while (allScanners.size() < all.size()) {
+            for (const auto& foo : all) {
+                if (std::find(alignedIds.begin(), alignedIds.end(), foo.id) != alignedIds.end()) continue;
+                if (CountOverlap(allDeltas, foo) >= 12) {
+                    Align(allDeltas, allBeacons, allScanners, foo);
+                    alignedIds.push_back(foo.id);
                 }
             }
         }
-
-        return matches;
+        return std::make_pair(allScanners, allBeacons);
+    }
+    PART_ONE() {
+        auto [scanners, beacons] = CombineScanners(lines);
+        return Constexpr::ToString(beacons.size());
     }
 
-
-    constexpr void SetDeltas(Scanner & scanner) {
-        scanner.Deltas.clear();
-        for (size_t i = 0; i < scanner.Beacons.size(); i++) {
-            scanner.Deltas.push_back(GetDeltas(scanner.Beacons, i));
-        }
-    }
-
-
-    constexpr void AlignBeacons(const Scanner & all, Scanner & scanner) {
-        Vec3<s32> offset;
-        for (size_t i = 0; i < scanner.Deltas.size(); i++) {
-            for (size_t j = 0; j < all.Deltas.size(); j++) {
-                if (DoesMatch(scanner.Deltas[i], all.Deltas[j])) {
-                    offset = all.Beacons[j] - scanner.Beacons[i];
-                    break;
-                }
-            }
-        }
-        scanner.Scanners.push_back(offset);
-
-        for (auto& beacon : scanner.Beacons) {
-            beacon += offset;
-        }
-    }
-
-    constexpr bool CanBePlaced(const Scanner & all, const Scanner & scanner, Scanner & outResult) {
-        auto orientations = GetAllOrientations(scanner);
-        for (auto& orientation : orientations) {
-            SetDeltas(orientation);
-            auto matchCount = CountMatchs(all, orientation);
-
-            if (matchCount >= 12) {
-                outResult = orientation;
-                AlignBeacons(all, outResult);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    constexpr void AddMissingBeacons(Scanner & all, const Scanner & scanner) {
-        for (const auto& beacon : scanner.Beacons) {
-            if (std::find(all.Beacons.begin(), all.Beacons.end(), beacon) == all.Beacons.end()) {
-                all.Beacons.push_back(beacon);
-            }
-        }
-
-        std::sort(all.Beacons.begin(), all.Beacons.end());
-        SetDeltas(all);
-        all.Scanners.push_back(scanner.Scanners[0]);
-    }
-
-    constexpr Scanner BuildScannerMap(const std::vector<std::string>&lines) {
-        auto scanners = ParseScanners(lines);
-        scanners[0].Scanners.push_back({ 0, 0, 0 });
-        Scanner all;
-        AddMissingBeacons(all, scanners[0]);
-
-        std::vector<size_t> seenIndexes = { 0 };
-        while (seenIndexes.size() < scanners.size()) {
-            auto startSize = seenIndexes.size();
-            for (size_t i = 0; i < scanners.size(); i++) {
-                if (std::find(seenIndexes.cbegin(), seenIndexes.cend(), i) != seenIndexes.cend()) continue;
-                Scanner scanner;
-                if (CanBePlaced(all, scanners[i], scanner)) {
-                    AddMissingBeacons(all, scanner);
-                    seenIndexes.push_back(i);
-                }
-            }
-            if (startSize == seenIndexes.size()) {
-                throw "Made no progress";
-            }
-        }
-
-        return all;
-    }
-
-    constexpr auto Part1(const std::vector<std::string>&lines) {
-        auto all = BuildScannerMap(lines);
-        return all.Beacons.size();
-    }
-
-    constexpr auto Part2(const std::vector<std::string>&lines) {
-        auto all = BuildScannerMap(lines);
+    PART_TWO() {
+        auto [scanners, beacons] = CombineScanners(lines);
 
         size_t best = 0;
-        for (size_t i = 0; i < all.Scanners.size(); i++) {
-            for (size_t j = i + 1; j < all.Scanners.size(); j++) {
-                best = std::max(best, MDistance(all.Scanners[i], all.Scanners[j]));
+        for (size_t i = 0; i < scanners.size(); i++) {
+            for (size_t j = i + 1; j < scanners.size(); j++) {
+                best = std::max(best, MDistance(scanners[i], scanners[j]));
             }
         }
 
-        return best;
+        return Constexpr::ToString(best);
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
+    TESTS() {
         std::vector<std::string> lines = {
             "--- scanner 0 ---",
             "404,-588,-901",
@@ -383,20 +330,8 @@ SOLUTION(2021, 19) {
             "30,-46,-14"
         };
 
-        if (Part1(lines) != 79) return false;
-        if (Part2(lines) != 3621) return false;
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
+        if (PartOne(lines) != "79") return false;
+        if (PartTwo(lines) != "3621") return false;
         return true;
     }
 }

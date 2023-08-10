@@ -66,12 +66,15 @@ SOLUTION(2021, 20) {
         return result;
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Execute(lines, 2));
+    PART_ONE() {
+        return Constexpr::ToString(Execute(lines, 2));
+    }
+
+    PART_TWO() {
         return Constexpr::ToString(Execute(lines, 50));
     }
 
-    bool RunTests() {
+    TESTS() {
         std::vector<std::string> lines = {
             "..#.#..#####.#.#.#.###.##.....###.##.#..###.####..#####..#....#..#..##..###..######.###...####..#..#####..##..#.#####...##.#.#..#.##..#.#......#.###.######.###.####...#.##.##..#..#..#####.....#.#....###..#.##......#.....#..#..#..##..#...##.######.####.####.#.#...#.......#..#.#.#...####.##.#......#..#...##.#.##..#...##.#.##..###.#......#.#.......#.#.#.####.###.##...#.....####.#..#..#.##.#....##..#.####....##...##..#...#......#.#.......#.......##..####..#...#.#.#...##..#.#..###..#####........#..####......#..#",
             "",
@@ -84,18 +87,6 @@ SOLUTION(2021, 20) {
 
         if (Execute(lines, 2) != 35) return false;
         //if (Execute(lines, 50) != 3351) return false;
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }

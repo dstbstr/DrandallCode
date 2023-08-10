@@ -55,15 +55,6 @@ SOLUTION(2021, 17) {
         }
     };
 
-    constexpr bool TestTargetConstructor() {
-        auto target = Target("target area: x=20..30, y=-10..-5");
-        if (target.TopLeft != Coord{ 20, -5 }) return false;
-        if (target.BottomRight != Coord{ 30, -10 }) return false;
-        return true;
-    }
-
-    static_assert(TestTargetConstructor());
-
     constexpr std::vector<s32> FindValidXs(const Target target) {
         std::vector<s32> result;
         for (s32 x = 1; x <= target.BottomRight.X; x++) {
@@ -99,18 +90,16 @@ SOLUTION(2021, 17) {
         return result;
     }
 
-    constexpr auto Part1(const std::string & line) {
-        auto target = Target(line);
+    PART_ONE() {
+        auto target = Target(lines[0]);
         auto ys = FindValidYs(target);
 
         auto biggest = Constexpr::FindMax(ys);
-        return (biggest * (biggest + 1)) / 2;
+        return Constexpr::ToString((biggest * (biggest + 1)) / 2);
     }
 
-    static_assert(Part1("target area: x=20..30, y=-10..-5") == 45);
-
-    constexpr auto Part2(const std::string & line) {
-        auto target = Target(line);
+    PART_TWO() {
+        auto target = Target(lines[0]);
         auto xs = FindValidXs(target);
         auto ys = FindValidYs(target);
 
@@ -132,28 +121,21 @@ SOLUTION(2021, 17) {
             }
         }
 
-        return result;
+        return Constexpr::ToString(result);
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines[0]));
-        return Constexpr::ToString(Part2(lines[0]));
-    }
-
-    bool RunTests() {
-        if (Part2("target area: x=20..30, y=-10..-5") != 112) return false;
+    constexpr bool TestTargetConstructor() {
+        auto target = Target("target area: x=20..30, y=-10..-5");
+        if (target.TopLeft != Coord{ 20, -5 }) return false;
+        if (target.BottomRight != Coord{ 30, -10 }) return false;
         return true;
     }
 
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
     TESTS() {
+        static_assert(TestTargetConstructor());
+        static_assert(PartOne({ "target area: x=20..30, y=-10..-5" }) == "45");
+        if (PartTwo({ "target area: x=20..30, y=-10..-5" }) != "112") return false;
+
         return true;
     }
 }

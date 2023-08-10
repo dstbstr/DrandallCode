@@ -31,10 +31,6 @@
         return result;
     }
 
-    static_assert(HexToBits("3") == "0011");
-    static_assert(HexToBits("A") == "1010");
-    static_assert(HexToBits("D2FE28") == "110100101111111000101000");
-
     template<typename T>
     constexpr T BitsToValue(std::string_view bits) {
         T result = 0;
@@ -45,9 +41,6 @@
         }
         return result;
     }
-
-    static_assert(BitsToValue<u8>("0011") == u8(3));
-    static_assert(BitsToValue<u32>("1111") == u32(15));
 
     struct Packet {
         u8 Version = 0;
@@ -114,13 +107,6 @@
         return BitsToValue<u64>(bitString);
     }
 
-    constexpr bool TestParseValue() {
-        size_t index = 0;
-        auto result = ParseValue("101111111000101", index);
-        return result == 2021;
-    }
-    static_assert(TestParseValue());
-
     constexpr Packet ParsePacket(const std::string & bits, size_t & index) {
         Packet p;
         p.Version = BitsToValue<u8>(bits.substr(index, 3));
@@ -154,6 +140,39 @@
         return p;
     }
 
+    constexpr Packet GetPacket(const std::string & line) {
+        auto bits = HexToBits(line);
+        size_t index = 0;
+        return ParsePacket(bits, index);
+    }
+
+    PART_ONE() {
+        auto packet = GetPacket(lines[0]);
+
+        size_t result = 0;
+        std::vector<Packet> remaining;
+        remaining.push_back(packet);
+        while (!remaining.empty()) {
+            auto current = remaining.back();
+            remaining.pop_back();
+            result += current.Version;
+            std::copy(current.SubPackets.begin(), current.SubPackets.end(), std::back_inserter(remaining));
+        }
+
+        return Constexpr::ToString(result);
+    }
+
+    PART_TWO() {
+        auto packet = GetPacket(lines[0]);
+        return Constexpr::ToString(packet.Evaluate());
+    }
+
+    constexpr bool TestParseValue() {
+        size_t index = 0;
+        auto result = ParseValue("101111111000101", index);
+        return result == 2021;
+    }
+
     constexpr bool TestParsePacket() {
         std::string bits = "110100101111111000101000";
         size_t index = 0;
@@ -166,67 +185,32 @@
         return true;
     }
 
-    static_assert(TestParsePacket());
-
-    constexpr Packet GetPacket(const std::string & line) {
-        auto bits = HexToBits(line);
-        size_t index = 0;
-        return ParsePacket(bits, index);
-    }
-
-    constexpr auto Part1(const std::string & line) {
-        auto packet = GetPacket(line);
-
-        size_t result = 0;
-        std::vector<Packet> remaining;
-        remaining.push_back(packet);
-        while (!remaining.empty()) {
-            auto current = remaining.back();
-            remaining.pop_back();
-            result += current.Version;
-            std::copy(current.SubPackets.begin(), current.SubPackets.end(), std::back_inserter(remaining));
-        }
-
-        return result;
-    }
-
-    static_assert(Part1("8A004A801A8002F478") == 16);
-    static_assert(Part1("620080001611562C8802118E34") == 12);
-    static_assert(Part1("C0015000016115A2E0802F182340") == 23);
-    static_assert(Part1("A0016C880162017C3686B18A3D4780") == 31);
-
-    constexpr auto Part2(const std::string & line) {
-        auto packet = GetPacket(line);
-        return packet.Evaluate();
-    }
-
-    static_assert(Part2("C200B40A82") == 3);
-    static_assert(Part2("04005AC33890") == 54);
-    static_assert(Part2("880086C3E88112") == 7);
-    static_assert(Part2("CE00C43D881120") == 9);
-    static_assert(Part2("D8005AC2A8F0") == 1);
-    static_assert(Part2("F600BC2D8F") == 0);
-    static_assert(Part2("9C005AC2F8F0") == 0);
-    static_assert(Part2("9C0141080250320F1802104A08") == 1);
-
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines[0]));
-        return Constexpr::ToString(Part2(lines[0]));
-    }
-
-    bool RunTests() {
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
     TESTS() {
+        static_assert(HexToBits("3") == "0011");
+        static_assert(HexToBits("A") == "1010");
+        static_assert(HexToBits("D2FE28") == "110100101111111000101000");
+
+        static_assert(BitsToValue<u8>("0011") == u8(3));
+        static_assert(BitsToValue<u32>("1111") == u32(15));
+
+        static_assert(TestParseValue());
+
+        static_assert(TestParsePacket());
+        
+        static_assert(PartOne({"8A004A801A8002F478"}) == "16");
+        static_assert(PartOne({"620080001611562C8802118E34"}) == "12");
+        static_assert(PartOne({"C0015000016115A2E0802F182340"}) == "23");
+        static_assert(PartOne({ "A0016C880162017C3686B18A3D4780" }) == "31");
+ 
+        static_assert(PartTwo({"C200B40A82"}) == "3");
+        static_assert(PartTwo({"04005AC33890"}) == "54");
+        static_assert(PartTwo({"880086C3E88112"}) == "7");
+        static_assert(PartTwo({"CE00C43D881120"}) == "9");
+        static_assert(PartTwo({"D8005AC2A8F0"}) == "1");
+        static_assert(PartTwo({"F600BC2D8F"}) == "0");
+        static_assert(PartTwo({"9C005AC2F8F0"}) == "0");
+        static_assert(PartTwo({ "9C0141080250320F1802104A08" }) == "1");
+        
         return true;
     }
 }

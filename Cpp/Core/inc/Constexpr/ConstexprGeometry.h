@@ -443,10 +443,6 @@ namespace Constexpr {
 
         Hasher<T> mHash;
     };
-    //template<typename T>
-    //constexpr size_t Hash(Vec3<T> vec) {
-    //    return Hash(vec.X) ^ Hash(vec.Y) ^ Hash(vec.Z);
-    //}
 }
 
 template<typename T>
@@ -536,10 +532,6 @@ namespace Constexpr {
 
         Hasher<T> mHash{};
     };
-    //template<typename T>
-    //constexpr size_t Hash(Vec4<T> vec) {
-    //    return Hash(vec.X) ^ Hash(vec.Y) ^ Hash(vec.Z) ^ Hash(vec.W);
-    //}
 }
 
 template<typename T>
@@ -773,6 +765,15 @@ constexpr void GetLimits(const auto& collection, Vec4<T>& outMinValues, Vec4<T>&
 
     outMinValues = { minX, minY, minZ, minW };
     outMaxValues = { maxX, maxY, maxZ, maxW };
+}
+
+template<typename T>
+constexpr Vec3<T> DotProduct(const Vec3<T>& pos, const std::array<std::array<s32, 3>, 3>& matrix) {
+    Vec3<T> result;
+    result.X = ((pos.X * matrix[0][0]) + (pos.Y * matrix[0][1]) + (pos.Z * matrix[0][2]));
+    result.Y = ((pos.X * matrix[1][0]) + (pos.Y * matrix[1][1]) + (pos.Z * matrix[1][2]));
+    result.Z = ((pos.X * matrix[2][0]) + (pos.Y * matrix[2][1]) + (pos.Z * matrix[2][2]));
+    return result;
 }
 
 namespace Constexpr {

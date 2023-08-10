@@ -4,7 +4,6 @@ SOLUTION(2021, 18) {
     constexpr std::string Add(const std::string & lhs, const std::string & rhs) {
         return "[" + lhs + "," + rhs + "]";
     }
-    static_assert(Add("[1,2]", "[[3,4],5]") == "[[1,2],[[3,4],5]]");
 
     constexpr std::string Explode(const std::string & val) {
         size_t index = std::string::npos;
@@ -61,14 +60,6 @@ SOLUTION(2021, 18) {
         return leftSide + "0" + rightSide;
     }
 
-    static_assert(Explode("[1,2]") == "[1,2]");
-    static_assert(Explode("[[[[[9,8],1],2],3],4]") == "[[[[0,9],2],3],4]");
-    static_assert(Explode("[7,[6,[5,[4,[3,2]]]]]") == "[7,[6,[5,[7,0]]]]");
-    static_assert(Explode("[[6,[5,[4,[3,2]]]],1]") == "[[6,[5,[7,0]]],3]");
-    static_assert(Explode("[[3,[2,[1,[7,3]]]],[6,[5,[4,[3,2]]]]]") == "[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]");
-    static_assert(Explode("[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]") == "[[3,[2,[8,0]]],[9,[5,[7,0]]]]");
-    static_assert(Explode("[[[[4,0],[5,4]],[[7,0],[15,5]]],[7,[[[3,7],[4,3]],[[6,3],[8,8]]]]]") == "[[[[4,0],[5,4]],[[7,0],[15,5]]],[10,[[0,[11,3]],[[6,3],[8,8]]]]]");
-
     constexpr std::string Split(const std::string & val) {
         size_t digitStart = 0, digitLength = 0;
 
@@ -100,10 +91,6 @@ SOLUTION(2021, 18) {
         return resultString;
     }
 
-    static_assert(Split("[1,2]") == "[1,2]");
-    static_assert(Split("[[[[0,7],4],[15,[0,13]]],[1,1]]") == "[[[[0,7],4],[[7,8],[0,13]]],[1,1]]");
-    static_assert(Split("[[[[0,7],4],[[7,8],[0,13]]],[1,1]]") == "[[[[0,7],4],[[7,8],[0,[6,7]]]],[1,1]]");
-
     constexpr std::string Reduce(const std::string & val) {
         auto result = Explode(val);
         if (result == val) {
@@ -134,10 +121,6 @@ SOLUTION(2021, 18) {
         return result;
     }
 
-    static_assert(CalculateMagnitude("[9,1]") == 29);
-    static_assert(CalculateMagnitude("[1,9]") == 21);
-    static_assert(CalculateMagnitude("[[9,1],[1,9]]") == 129);
-
     constexpr std::string FullyReduce(const std::string & eq) {
         auto running = eq;
         std::string prev = "";
@@ -149,16 +132,16 @@ SOLUTION(2021, 18) {
         return running;
     }
 
-    constexpr auto Part1(const std::vector<std::string>&lines) {
+    PART_ONE() {
         std::string current = lines[0];
         for (size_t i = 1; i < lines.size(); i++) {
             current = FullyReduce(Add(current, lines[i]));
         }
 
-        return CalculateMagnitude(current);
+        return Constexpr::ToString(CalculateMagnitude(current));
     }
 
-    constexpr auto Part2(const std::vector<std::string>&lines) {
+    PART_TWO() {
         size_t best = 0;
         for (size_t i = 0; i < lines.size(); i++) {
             for (size_t j = i + 1; j < lines.size(); j++) {
@@ -169,15 +152,28 @@ SOLUTION(2021, 18) {
             }
         }
 
-        return best;
+        return Constexpr::ToString(best);
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
+    TESTS() {
+        static_assert(Add("[1,2]", "[[3,4],5]") == "[[1,2],[[3,4],5]]");
+        
+        static_assert(Explode("[1,2]") == "[1,2]");
+        static_assert(Explode("[[[[[9,8],1],2],3],4]") == "[[[[0,9],2],3],4]");
+        static_assert(Explode("[7,[6,[5,[4,[3,2]]]]]") == "[7,[6,[5,[7,0]]]]");
+        static_assert(Explode("[[6,[5,[4,[3,2]]]],1]") == "[[6,[5,[7,0]]],3]");
+        static_assert(Explode("[[3,[2,[1,[7,3]]]],[6,[5,[4,[3,2]]]]]") == "[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]");
+        static_assert(Explode("[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]") == "[[3,[2,[8,0]]],[9,[5,[7,0]]]]");
+        static_assert(Explode("[[[[4,0],[5,4]],[[7,0],[15,5]]],[7,[[[3,7],[4,3]],[[6,3],[8,8]]]]]") == "[[[[4,0],[5,4]],[[7,0],[15,5]]],[10,[[0,[11,3]],[[6,3],[8,8]]]]]");
+        
+        static_assert(Split("[1,2]") == "[1,2]");
+        static_assert(Split("[[[[0,7],4],[15,[0,13]]],[1,1]]") == "[[[[0,7],4],[[7,8],[0,13]]],[1,1]]");
+        static_assert(Split("[[[[0,7],4],[[7,8],[0,13]]],[1,1]]") == "[[[[0,7],4],[[7,8],[0,[6,7]]]],[1,1]]");
 
-    bool RunTests() {
+        static_assert(CalculateMagnitude("[9,1]") == 29);
+        static_assert(CalculateMagnitude("[1,9]") == 21);
+        static_assert(CalculateMagnitude("[[9,1],[1,9]]") == 129);
+
         std::vector<std::string> lines = {
             "[[[0,[5,8]],[[1,7],[9,6]]],[[4,[1,2]],[[1,4],2]]]",
             "[[[5,[2,8]],4],[5,[[9,9],0]]]",
@@ -191,20 +187,8 @@ SOLUTION(2021, 18) {
             "[[[[5,2],5],[8,[3,7]]],[[5,[7,5]],[4,4]]]"
         };
 
-        if (Part1(lines) != 4140) return false;
-        if (Part2(lines) != 3993) return false;
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
+        if (PartOne(lines) != "4140") return false;
+        if (PartTwo(lines) != "3993") return false;
         return true;
     }
 }

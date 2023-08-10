@@ -34,27 +34,8 @@ SOLUTION(2021, 25) {
         }
         return result;
     }
-    static_assert(Next({ "...>>>>>..." })[0] == "...>>>>.>..");
-    static_assert(Next({ "...>>>>.>.." })[0] == "...>>>.>.>.");
-    static_assert(Next({
-        "...>...",
-        ".......",
-        "......>",
-        "v.....>",
-        "......>",
-        ".......",
-        "..vvv..",
-        }) == std::vector<std::string> {
-        "..vv>..",
-            ".......",
-            ">......",
-            "v.....>",
-            ">......",
-            ".......",
-            "....v..",
-    });
 
-    constexpr auto Part1(const std::vector<std::string>&lines) {
+    PART_ONE() {
         auto current = lines;
         size_t steps = 0;
         while (true) {
@@ -64,40 +45,49 @@ SOLUTION(2021, 25) {
             current = next;
         }
 
-        return steps;
-    }
-
-    /*
-    static_assert(Part1({
-        "v...>>.vv>",
-        ".vv>>.vv..",
-        ">>.>v>...v",
-        ">>v>>.>.v.",
-        "v>v.vv.v..",
-        ">.>>..v...",
-        ".vv..>.>v.",
-        "v.v..>>v.v",
-        "....v..v.>",
-        }) == 58);
-        */
-
-    std::string Run(const std::vector<std::string>&lines) {
-        return Constexpr::ToString(Part1(lines));
-    }
-
-    bool RunTests() {
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
+        return Constexpr::ToString(steps);
     }
 
     PART_TWO() {
-        return lines[0];
+        (void)lines;
+        return "Merry Christmas!";
     }
 
     TESTS() {
+        static_assert(Next({ "...>>>>>..." })[0] == "...>>>>.>..");
+        static_assert(Next({ "...>>>>.>.." })[0] == "...>>>.>.>.");
+        static_assert(Next({
+            "...>...",
+            ".......",
+            "......>",
+            "v.....>",
+            "......>",
+            ".......",
+            "..vvv..",
+            }) == std::vector<std::string> {
+            "..vv>..",
+                ".......",
+                ">......",
+                "v.....>",
+                ">......",
+                ".......",
+                "....v..",
+        });
+ 
+        /*
+        static_assert(Part1({
+            "v...>>.vv>",
+            ".vv>>.vv..",
+            ">>.>v>...v",
+            ">>v>>.>.v.",
+            "v>v.vv.v..",
+            ">.>>..v...",
+            ".vv..>.>v.",
+            "v.v..>>v.v",
+            "....v..v.>",
+            }) == 58);
+        */
+
         return true;
     }
 }

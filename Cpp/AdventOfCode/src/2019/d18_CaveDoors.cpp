@@ -1,4 +1,5 @@
 #include "2019/d18_CaveDoors.h"
+#include <bit>
 
 SOLUTION(2019, 18) {
     constexpr void SplitIntoRooms(std::vector<std::string>&lines) {

@@ -175,7 +175,7 @@ namespace Constexpr {
             size_t totalElements = 0;
             size_t sumOfKeys = 0;
             size_t sumOfValues = 0;
-            for (auto [key, value] : map) {
+            for (auto [key, value] : map.GetAllEntries()) {
                 totalElements++;
                 sumOfKeys += key;
                 sumOfValues += value;
@@ -196,7 +196,7 @@ namespace Constexpr {
             size_t totalElements = 0;
             size_t sumOfKeys = 0;
             size_t sumOfValues = 0;
-            for (const auto& [key, value] : map) {
+            for (const auto& [key, value] : map.GetAllEntries()) {
                 totalElements++;
                 sumOfKeys += key;
                 sumOfValues += value;

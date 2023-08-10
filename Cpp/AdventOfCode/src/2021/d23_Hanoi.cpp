@@ -96,8 +96,8 @@ SOLUTION(2021, 23) {
 
     class Hall {
     public:
-        Hall() {}
-        Hall(const std::string& cache) {
+        constexpr Hall() = default;
+        constexpr Hall(const std::string& cache) {
             Occupants = cache;
         }
 
@@ -219,7 +219,17 @@ SOLUTION(2021, 23) {
         return result;
     }
 
-    using Entry = std::pair<size_t, std::string>;
+    struct Entry {
+        size_t Cost;
+        std::string CacheString;
+
+        constexpr bool operator==(const Entry& e) const {
+            return CacheString == e.CacheString;
+        }
+        constexpr bool operator<(const Entry& e) const {
+            return e.Cost < Cost;
+        }
+    };
 
     constexpr size_t GetMoveCost(char type, const RowCol & from, const RowCol & to) {
         auto distance = MDistance(from, to);
@@ -246,7 +256,7 @@ SOLUTION(2021, 23) {
                         nextHall.Remove(bot);
                         den.Push(bot);
 
-                        result.push_back(std::make_pair(cost, ToCacheString(nextHall, nextDens)));
+                        result.push_back({ cost, ToCacheString(nextHall, nextDens) });
                     }
                     break;
                 }
@@ -272,45 +282,42 @@ SOLUTION(2021, 23) {
                     nextDens[denIndex].Pop();
                     nextHall.Occupy(nextBot);
 
-                    result.push_back(std::make_pair(cost, ToCacheString(nextHall, nextDens)));
+                    result.push_back({ cost, ToCacheString(nextHall, nextDens) });
                 }
             }
         }
 
-        std::sort(result.begin(), result.end(), [](const Entry& lhs, const Entry& rhs) {return lhs.first < rhs.first; });
+        std::sort(result.begin(), result.end());
         return result;
     }
 
-
-    auto Solve(std::vector<Den> dens) {
+    constexpr auto Solve(std::vector<Den> dens) {
         Hall hall{};
 
-        std::unordered_map<std::string, size_t> seen;
-        std::priority_queue<Entry, std::vector<Entry>, std::greater<Entry>> queue;
+        Constexpr::BigMap<std::string, size_t> seen;
+        Constexpr::PriorityQueue<Entry> queue;
         auto initialState = ToCacheString(hall, dens);
 
-        queue.push(std::make_pair(0, initialState));
+        queue.push({ 0, initialState });
         seen[initialState] = 0;
 
         auto finishedString = GetFinishedString(dens);
 
         while (!queue.empty()) {
-            auto next = queue.top();
-            queue.pop();
-            auto cacheString = next.second;
-            if (cacheString == finishedString) return next.first;
+            auto next = queue.pop();
+            if (next.CacheString == finishedString) return next.Cost;
 
-            FromCacheString(cacheString, hall, dens);
+            FromCacheString(next.CacheString, hall, dens);
 
-            auto nextMoves = GetNextMoves(hall, dens, next.first);
+            auto nextMoves = GetNextMoves(hall, dens, next.Cost);
             for (const auto& move : nextMoves) {
-                if (seen.contains(move.second)) {
-                    if (move.first < seen.at(move.second)) {
+                if (seen.contains(move.CacheString)) {
+                    if (move.Cost < seen.at(move.CacheString)) {
                         queue.push(move);
                     }
                 }
                 else {
-                    seen[move.second] = move.first;
+                    seen[move.CacheString] = move.Cost;
                     queue.push(move);
                 }
             }
@@ -319,23 +326,17 @@ SOLUTION(2021, 23) {
         return 0ull;
     }
 
-    auto Part1(const std::vector<std::string>&lines) {
+    PART_ONE() {
         auto dens = GetInitialDens(lines, false);
-        return Solve(dens);
+        return Constexpr::ToString(Solve(dens));
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
+    PART_TWO() {
         auto dens = GetInitialDens(lines, true);
-        return Solve(dens);
+        return Constexpr::ToString(Solve(dens));
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-
-    bool RunTests() {
+    TESTS() {
         std::vector<std::string> lines = {
             "#############",
             "#...........#",
@@ -344,20 +345,9 @@ SOLUTION(2021, 23) {
             "  #########"
         };
 
-        if (Part1(lines) != 12521) return false;
-        if (Part2(lines) != 44169) return false;
-        return true;
-    }
+        if (PartOne(lines) != "12521") return false;
+        if (PartTwo(lines) != "44169") return false;
 
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }

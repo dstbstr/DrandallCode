@@ -11,29 +11,8 @@ SOLUTION(2021, 21) {
         return score >= 1000;
     }
 
-    constexpr auto Part1(size_t p1Pos, size_t p2Pos) {
-        //let's make these zero based
-        p1Pos--;
-        p2Pos--;
-
-        size_t dieRolls = 0;
-        size_t dieValue = 1;
-        size_t p1Score = 0;
-        size_t p2Score = 0;
-        while (true) {
-            if (Roll(dieRolls, dieValue, p1Pos, p1Score)) break;
-            if (Roll(dieRolls, dieValue, p2Pos, p2Score)) break;
-        }
-
-        return std::min(p1Score, p2Score) * dieRolls;
-    }
-
-    static_assert(Part1(4, 8) == 739785);
-    static_assert(Part1(6, 10) == 853776);
-
     //s1, s2, p1, p2
     using Cache = std::array<std::array<std::array<std::array<std::pair<size_t, size_t>, 10>, 10>, 21>, 21>;
-    //using Cache = std::array<std::array<std::pair<size_t, size_t>, 21>, 21>;
     constexpr auto Missing = std::make_pair<size_t, size_t>(0, 0);
 
     constexpr std::vector<size_t> GetPositions(size_t current) {
@@ -69,7 +48,7 @@ SOLUTION(2021, 21) {
     }
 
     //roll die 3 times, add score once
-    std::pair<size_t, size_t> Recurse(Player p1, Player p2, bool isP1Turn) {
+    constexpr std::pair<size_t, size_t> Recurse(Player p1, Player p2, bool isP1Turn) {
         auto& cache = isP1Turn ? *p1.Cache : *p2.Cache;
         auto& seen = cache[p1.Score][p2.Score][p1.Pos][p2.Pos];
 
@@ -93,38 +72,57 @@ SOLUTION(2021, 21) {
         return seen;
     }
 
-    auto Part2(size_t p1Pos, size_t p2Pos) {
+    constexpr size_t SolveP1(size_t p1Pos, size_t p2Pos) {
+        //let's make these zero based
         p1Pos--;
         p2Pos--;
-        auto p1Cache = std::make_unique<Cache>();
-        auto p2Cache = std::make_unique<Cache>();
 
-        Player p1{ 0, p1Pos, p1Cache.get() };
-        Player p2{ 0, p2Pos, p2Cache.get() };
+        size_t dieRolls = 0;
+        size_t dieValue = 1;
+        size_t p1Score = 0;
+        size_t p2Score = 0;
+        while (true) {
+            if (Roll(dieRolls, dieValue, p1Pos, p1Score)) break;
+            if (Roll(dieRolls, dieValue, p2Pos, p2Score)) break;
+        }
+
+        return std::min(p1Score, p2Score) * dieRolls;
+    }
+    PART_ONE() {
+        size_t p1Pos, p2Pos;
+
+        Constexpr::ParseNumber(Constexpr::Split(lines[0], " ").back(), p1Pos);
+        Constexpr::ParseNumber(Constexpr::Split(lines[1], " ").back(), p2Pos);
+        return Constexpr::ToString(SolveP1(p1Pos, p2Pos));
+    }
+
+    constexpr size_t SolveP2(size_t p1Pos, size_t p2Pos) {
+        p1Pos--;
+        p2Pos--;
+        auto p1Cache = new Cache();
+        auto p2Cache = new Cache();
+
+        Player p1{ 0, p1Pos, p1Cache };
+        Player p2{ 0, p2Pos, p2Cache };
         auto result = Recurse(p1, p2, true);
+        delete p1Cache;
+        delete p2Cache;
         return std::max(result.first, result.second);
     }
-
-    std::string Run(const std::vector<std::string>&) {
-        //return Constexpr::ToString(Part1(6, 10));
-        return Constexpr::ToString(Part2(6, 10));
-    }
-
-    bool RunTests() {
-        if (Part1(4, 8) != 739785) return false;
-        if (Part2(4, 8) != 444356092776315u) return false;
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
     PART_TWO() {
-        return lines[0];
+        size_t p1Pos, p2Pos;
+
+        Constexpr::ParseNumber(Constexpr::Split(lines[0], " ").back(), p1Pos);
+        Constexpr::ParseNumber(Constexpr::Split(lines[1], " ").back(), p2Pos);
+        return Constexpr::ToString(SolveP2(p1Pos, p2Pos));
     }
 
     TESTS() {
+        static_assert(SolveP1(4, 8) == 739785);
+        static_assert(SolveP1(6, 10) == 853776);
+
+        if (SolveP1(4, 8) != 739785) return false;
+        if (SolveP2(4, 8) != 444356092776315u) return false;
         return true;
     }
 }

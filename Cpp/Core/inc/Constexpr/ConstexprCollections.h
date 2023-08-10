@@ -5,6 +5,7 @@
 #include <string>
 //#include <ranges>
 #include <algorithm>
+#include <iterator>
 
 #include "Constexpr/ConstexprHash.h"
 
@@ -218,8 +219,14 @@ namespace Constexpr {
             mCurrentSize = 0;
         }
 
-        constexpr BigMap(const BigMap& other) : mData(other.mData), Sentinel(other.Sentinel), mCurrentSize(other.mCurrentSize) {}
-        constexpr BigMap(BigMap&& other) : mData(std::move(other.mData)), Sentinel(std::move(other.Sentinel)), mCurrentSize(other.mCurrentSize) {}
+        constexpr BigMap(const BigMap& other) : Sentinel(other.Sentinel), mCurrentSize(other.mCurrentSize) {
+            mData = new std::array<std::pair<Key, Value>, Capacity>();
+            *mData = *other.mData;
+        }
+        constexpr BigMap(BigMap&& other) : Sentinel(std::move(other.Sentinel)), mCurrentSize(other.mCurrentSize) {
+            mData = std::move(other.mData);
+            other.mData = nullptr;
+        }
         constexpr BigMap(const std::initializer_list<std::pair<Key, Value>>& initialState) {
             MakeSentinel();
             mData = new std::array<std::pair<Key, Value>, Capacity>();
@@ -241,7 +248,10 @@ namespace Constexpr {
             return *this;
         }
         constexpr BigMap& operator=(BigMap&& other) {
-            *(this->mData) = (*other.mData);
+            if (this == &other) return *this;
+            mData = std::move(other.mData);
+            other.mData = nullptr;
+
             Sentinel = other.Sentinel;
             mCurrentSize = other.mCurrentSize;
             return *this;
@@ -312,6 +322,7 @@ namespace Constexpr {
             return 1ull;
         }
 
+        /*
         constexpr auto begin() {
             return mData->begin();
         }
@@ -330,6 +341,7 @@ namespace Constexpr {
         constexpr auto cend() const {
             return mData->cend();
         }
+        */
 
         constexpr std::vector<Key> GetKeys() const {
             std::vector<Key> result;
@@ -348,6 +360,14 @@ namespace Constexpr {
                     result.push_back(p.second);
                 }
             }
+            return result;
+        }
+
+        constexpr std::vector<std::pair<Key, Value>> GetAllEntries() const {
+            std::vector<std::pair<Key, Value>> result;
+            std::copy_if(mData->begin(), mData->end(), std::back_inserter(result), [&](auto p) {
+                return p != Sentinel;
+                });
             return result;
         }
     private:
@@ -640,17 +660,14 @@ namespace Constexpr {
             mData = new std::array<T, Capacity>();
             mData->fill(Sentinel);
         }
-        constexpr BigSet(const BigSet& other) {
+        constexpr BigSet(const BigSet& other) : Sentinel(other.Sentinel), mCurrentSize(other.mCurrentSize) {
             mData = new std::array<T, Capacity>();
             *mData = *other.mData;
-            Sentinel = other.Sentinel;
-            mCurrentSize = other.mCurrentSize;
         }
 
-        constexpr BigSet(BigSet&& other) {
+        constexpr BigSet(BigSet&& other) : Sentinel(other.Sentinel), mCurrentSize(other.mCurrentSize) {
             mData = std::move(other.mData);
-            Sentinel = other.Sentinel;
-            mCurrentSize = other.mCurrentSize;
+            other.mData = nullptr;
         }
 
         constexpr BigSet(const std::initializer_list<T>& initial) { 
@@ -666,10 +683,17 @@ namespace Constexpr {
 
         constexpr BigSet& operator=(const BigSet& other) {
             *(this->mData) = *(other.mData);
+            Sentinel = other.Sentinel;
+            mCurrentSize = other.mCurrentSize;
             return *this;
         }
         constexpr BigSet& operator=(BigSet&& other) {
+            if (this == &other) return *this;
             this->mData = std::move(other.mData);
+            other.mData = nullptr;
+
+            Sentinel = other.Sentinel;
+            mCurrentSize = other.mCurrentSize;
             return *this;
         }
 

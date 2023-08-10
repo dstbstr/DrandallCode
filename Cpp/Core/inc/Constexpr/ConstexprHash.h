@@ -60,6 +60,8 @@ namespace Constexpr {
                 val /= 2;
             }
             return result ^ detail::AllOnes;
+            
+            //return static_cast<size_t>(val);
         }
     }
 
@@ -172,63 +174,4 @@ namespace Constexpr {
             return result;
         }
     };
-
-    /*
-    constexpr size_t Hash(int val) {
-        return detail::HashNumber(val);
-    }
-    constexpr size_t Hash(unsigned int val) {
-        return detail::HashNumber(val);
-    }
-    constexpr size_t Hash(long val) {
-        return detail::HashNumber(val);
-    }
-    constexpr size_t Hash(unsigned long val) {
-        return detail::HashNumber(val);
-    }
-    constexpr size_t Hash(size_t val) {
-        return detail::HashNumber(val);
-    }
-
-    constexpr size_t Hash(long long val) {
-        return detail::HashNumber(val);
-    }
-
-    constexpr size_t Hash(char c) {
-        size_t result = detail::AllOnes;
-        result = (result >> 8) ^ detail::crc_table[(result ^ c) ^ 0xFF];
-        return result ^ detail::AllOnes;
-    }
-
-    constexpr size_t Hash(std::string_view str) {
-        size_t result = detail::AllOnes;
-        for (auto c : str) {
-            result = (result >> 8) ^ detail::crc_table[(result ^ c) & 0xFF];
-        }
-
-        return result ^ detail::AllOnes;
-    }
-
-    template<typename T, typename U>
-    constexpr size_t Hash(std::tuple<T, U> tuple) {
-        size_t result = detail::AllOnes;
-        result ^= Hash(tuple.first);
-        result ^= Hash(tuple.second);
-        return result;
-    }
-
-    template<typename T, typename U, typename W>
-    constexpr size_t Hash(std::tuple<T, U, W> tuple) {
-        return detail::AllOnes ^ Hash(std::get<0>(tuple)) ^ Hash(std::get<1>(tuple)) ^ Hash(std::get<2>(tuple));
-    }
-
-    template<typename T>
-    constexpr size_t Hash(const std::vector<T>& v) {
-        size_t result = detail::AllOnes;
-        for (const auto& e : v) {
-            result ^= Hash(e);
-        }
-        return result;
-    }
-    */
 }

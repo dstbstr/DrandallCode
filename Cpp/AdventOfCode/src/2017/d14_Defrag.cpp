@@ -3,6 +3,7 @@
 #include "Algorithms/FloodFill.h"
 
 #include <bitset>
+#include <bit>
 
 SOLUTION(2017, 14) {
     using Grid = std::vector<std::vector<bool>>;

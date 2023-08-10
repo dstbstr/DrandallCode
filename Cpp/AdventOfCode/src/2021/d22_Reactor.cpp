@@ -47,19 +47,6 @@ SOLUTION(2021, 22) {
 
     };
 
-    constexpr bool TestCubeSubtract() {
-        auto lhs = Cube({ 10, 10, 10 }, { 12, 12, 12 }, true);
-        if (lhs.Area != 27) return false;
-        auto rhs = Cube({ 11, 11, 11 }, { 13, 13, 13 }, true);
-        if (rhs.Area != 27) return false;
-        rhs.Subtract(lhs);
-        if (rhs.Area != 19) return false;
-
-        return true;
-    }
-
-    static_assert(TestCubeSubtract());
-
     //on x=-40..11,y=-14..32,z=-31..22
     constexpr Cube ParseLine(const std::string & line) {
         auto s1 = Constexpr::Split(line, " ");
@@ -82,9 +69,6 @@ SOLUTION(2021, 22) {
 
         return Cube(min, max, s1[0] == "on");
     }
-    static_assert(ParseLine("on x=-40..11,y=-14..32,z=-31..22").On);
-    static_assert(ParseLine("on x=-40..11,y=-14..32,z=-31..22").Min == Vec3<s32>{-40, -14, -31});
-    static_assert(ParseLine("on x=-40..11,y=-14..32,z=-31..22").Max == Vec3<s32>{11, 32, 22});
 
     constexpr bool IsInRange(const Cube & r) {
         s32 min = std::min(std::min(r.Min.X, r.Min.Y), r.Min.Z);
@@ -115,12 +99,32 @@ SOLUTION(2021, 22) {
         return result;
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Solve(lines, IsInRange));
+    PART_ONE() {
+        return Constexpr::ToString(Solve(lines, IsInRange));
+    }
+
+    PART_TWO() {
         return Constexpr::ToString(Solve(lines, AcceptAll));
     }
 
-    bool RunTests() {
+    constexpr bool TestCubeSubtract() {
+        auto lhs = Cube({ 10, 10, 10 }, { 12, 12, 12 }, true);
+        if (lhs.Area != 27) return false;
+        auto rhs = Cube({ 11, 11, 11 }, { 13, 13, 13 }, true);
+        if (rhs.Area != 27) return false;
+        rhs.Subtract(lhs);
+        if (rhs.Area != 19) return false;
+
+        return true;
+    }
+
+    TESTS() {
+        static_assert(TestCubeSubtract());
+
+        static_assert(ParseLine("on x=-40..11,y=-14..32,z=-31..22").On);
+        static_assert(ParseLine("on x=-40..11,y=-14..32,z=-31..22").Min == Vec3<s32>{-40, -14, -31});
+        static_assert(ParseLine("on x=-40..11,y=-14..32,z=-31..22").Max == Vec3<s32>{11, 32, 22});
+        
         std::vector<std::string> lines = {
             "on x=-20..26,y=-36..17,z=-47..7",
             "on x=-20..33,y=-21..23,z=-26..28",
@@ -213,18 +217,6 @@ SOLUTION(2021, 22) {
 
         if (Solve(lines, AcceptAll) != 2758514936282235u) return false;
 
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }

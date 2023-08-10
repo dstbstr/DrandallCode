@@ -34,60 +34,44 @@ SOLUTION(2021, 24) {
         result = (result * mul) + add;
     }
 
-    size_t Solve(bool useMax) {
-        std::unordered_map<size_t, size_t> seen;
-        std::unordered_map<size_t, size_t> next;
-        seen[0] = 0;
-
-        for (size_t currentDigit = 0; currentDigit < 14; currentDigit++) {
-            for (const auto& [remainder, value] : seen) {
-                for (int i = 9; i > 0; i--) {
-                    size_t result = remainder;
-                    Eval(i, Entries[currentDigit], result);
-                    size_t val = (value * 10) + i;
-                    if (next.contains(result)) {
-                        if (useMax) {
-                            next[result] = std::max(val, next.at(result));
-                        }
-                        else {
-                            next[result] = std::min(val, next.at(result));
-                        }
-                    }
-                    else {
-                        next[result] = val;
-                    }
-                }
+    constexpr bool Recurse(size_t z, size_t digit, size_t acc, bool useMax, size_t& outResult) {
+        if (digit == Entries.size()) {
+            if (z == 0) {
+                outResult = acc;
+                return true;
             }
-
-            seen = next;
-            next.clear();
+            return false;
         }
 
-        return seen[0];
-    }
-    auto Part1() {
-        return Solve(true);
-    }
+        for (auto i = useMax ? 9 : 1; (useMax && i > 0) || (!useMax && i < 10); useMax ? i-- : i++) {
+            auto entry = Entries[digit];
+            if (entry.MatchDelta > 0 || z % 26 == i - entry.MatchDelta) {
+                auto newZ = z;
+                Eval(i, entry, newZ);
+                size_t result;
+                if (Recurse(newZ, digit + 1, acc * 10 + i, useMax, result)) {
+                    outResult = result;
+                    return true;
+                }
+            }
+        }
 
-    auto Part2() {
-        return Solve(false);
+        return false;
     }
-
-    std::string Run(const std::vector<std::string>&) {
-        //return Constexpr::ToString(Part1());
-        return Constexpr::ToString(Part2());
-    }
-
-    bool RunTests() {
-        return true;
+    constexpr size_t Solve(bool useMax) {
+        size_t result;
+        Recurse(0, 0, 0, useMax, result);
+        return result;
     }
 
     PART_ONE() {
-        return lines[0];
+        (void)lines;
+        return Constexpr::ToString(Solve(true));
     }
 
     PART_TWO() {
-        return lines[0];
+        (void)lines;
+        return Constexpr::ToString(Solve(false));
     }
 
     TESTS() {
