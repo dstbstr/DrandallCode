@@ -1,216 +1,96 @@
 #include "2022/d13_DistressSignal.h"
 
 SOLUTION(2022, 13) {
-    constexpr size_t FindClose(const std::string & input) {
-        int depth = 0;
-        for (size_t i = 0; i < input.size(); i++) {
-            if (input[i] == '[') {
-                depth++;
+    constexpr bool Compare(const std::string& first, const std::string& second) {
+        //Need to be able to add square brackets, but not change the original
+        std::string lhs = first;
+        std::string rhs = second;
+        size_t i = 0;
+        char a, b;
+        while (i < lhs.size() && i < rhs.size()) {
+            a = lhs[i];
+            b = rhs[i];
+            if (a == b);
+            else if (b == ']') return false;
+            else if (a == ']') return true;
+            else if (a == '[') { //[ vs d
+                rhs.insert(rhs.begin() + i + 1, ']');
+                rhs.insert(rhs.begin() + i, '[');
             }
-            else if (input[i] == ']') {
-                depth--;
-                if (depth == 0) {
-                    return i;
-                }
+            else if (b == '[') {//d vs [
+                lhs.insert(lhs.begin() + i + 1, ']');
+                lhs.insert(lhs.begin() + i, '[');
             }
+            else { //d vs d
+                return a < b;
+            }
+
+            i++;
         }
-
-        return 0; //something went wrong
-    }
-    static_assert(FindClose("[abc]") == 4);
-    static_assert(FindClose("[[a],[b]]") == 8);
-    static_assert(FindClose("[a][b]") == 2);
-
-    struct Pair {
-        std::string AsString{ "" };
-        bool IsNumber{ false };
-        u32 Num{ 0 };
-        std::vector<Pair> List{};
-
-        constexpr static Pair ToList(u32 num) {
-            return Pair("[" + Constexpr::ToString(num) + "]");
-        }
-
-        constexpr Pair(const std::string& line) {
-            AsString = line;
-            if (line[0] == '[') {
-                //make list
-                std::string numStr;
-                char c;
-                for (size_t i = 1; i < line.size(); i++) {
-                    c = line[i];
-                    if (c == '[') {
-                        auto substr = line.substr(i);
-                        auto close = FindClose(substr);
-                        List.push_back(Pair(line.substr(i, close + 1)));
-                        i += close + 1;
-                    }
-                    else if (c == ',' || c == ']') {
-                        if (!numStr.empty()) {
-                            List.push_back(Pair(numStr));
-                            numStr.clear();
-                        }
-                    }
-                    else {
-                        numStr += c;
-                    }
-                }
-                IsNumber = false;
-            }
-            else {
-                Constexpr::ParseNumber(line, Num);
-                IsNumber = true;
-            }
-        }
-
-        /*
-        constexpr auto operator<=>(const Pair& other) {
-            if (IsNumber && other.IsNumber) {
-                return Num <=> other.Num;
-            }
-            else if (IsNumber) {
-                return Pair::ToList(Num) <=> other;
-            }
-            else if (other.IsNumber) {
-                return *this <=> Pair::ToList(other.Num);
-            }
-            else {
-                for (size_t i = 0; i < List.size(); i++) {
-                    if (i >= other.List.size()) {
-                        return std::strong_ordering::greater;
-                    }
-                    auto comp = List[i] <=> other.List[i];
-                    if (comp != std::strong_ordering::equal) {
-                        return comp;
-                    }
-                }
-
-                return List.size() == other.List.size() ? std::strong_ordering::equal : std::strong_ordering::less;
-            }
-        }
-        */
-
-        constexpr auto operator==(const Pair& other) {
-            if (IsNumber && other.IsNumber) {
-                return Num == other.Num;
-            }
-            else if (IsNumber) {
-                return Pair::ToList(Num) == other;
-            }
-            else if (other.IsNumber) {
-                return this->operator==(Pair::ToList(other.Num));
-                /*
-                auto lhs = *this;
-                auto rhs = Pair::ToList(other.Num);
-                return lhs == rhs;
-                */
-                //return (*this) == Pair::ToList(other.Num);
-            }
-            else {
-                for (size_t i = 0; i < List.size(); i++) {
-                    if (i >= other.List.size()) {
-                        return false;
-                    }
-
-                    if (!(List[i] == other.List[i])) {
-                        return false;
-                    }
-                }
-                return List.size() == other.List.size();
-            }
-        }
-        constexpr auto operator<(const Pair& other) {
-            if (IsNumber && other.IsNumber) {
-                return Num < other.Num;
-            }
-            else if (IsNumber) {
-                return Pair::ToList(Num) < other;
-            }
-            else if (other.IsNumber) {
-                return *this < Pair::ToList(other.Num);
-            }
-            else {
-                for (size_t i = 0; i < List.size(); i++) {
-                    if (i >= other.List.size()) {
-                        return false;
-                    }
-                    if (List[i] < other.List[i]) {
-                        return true;
-                    }
-                }
-            }
-            return List.size() < other.List.size();
-            //return (*this <=> other) < 0;
-        }
-    };
-
-    bool IsOrdered(const std::string & lhs, const std::string & rhs) {
-        auto left = Pair(lhs);
-        auto right = Pair(rhs);
-
-        //return (left <=> right) < 0;
-        return left < right;
+        return lhs.size() < rhs.size();
     }
 
-    u32 SumOrderedPairs(const std::vector<std::string>&lines) {
-        u32 result = 0;
-        int pairIndex = 1;
+    PART_ONE() {
+        auto copy = lines;
+        for (auto& line : copy) {
+            Constexpr::ReplaceAll(line, "10", "A");
+        }
+        auto groups = SplitInputIntoGroups(copy);
+        size_t result = 0;
+        for (size_t i = 0; i < groups.size(); i++) {
+            result += (1 + i) * Compare(groups[i][0], groups[i][1]);
+        }
+        return Constexpr::ToString(result);
+    }
+
+    PART_TWO() {
+        std::vector<std::string> all;
         for (auto i = 0; i < lines.size(); i += 3) {
-            if (IsOrdered(lines[i], lines[i + 1])) {
-                result += pairIndex;
+            all.push_back(lines[i]);
+            all.push_back(lines[i + 1]);
+        }
+        for (auto& line : all) {
+            Constexpr::ReplaceAll(line, "10", "A");
+        }
+        std::string a = "[[2]]";
+        std::string b = "[[6]]";
+        all.push_back(a);
+        all.push_back(b);
+
+        std::sort(all.begin(), all.end(), Compare);
+
+        size_t result = 1;
+        for (auto i = 0; i < all.size(); i++) {
+            if (all[i] == a || all[i] == b) {
+                result *= (i + 1);
             }
-            pairIndex++;
         }
-
-        return result;
+        return Constexpr::ToString(result);
     }
 
-    constexpr void ExtractKey(const std::string & str, size_t index, size_t & key1Index, size_t & key2Index) {
-        auto key1 = std::string("[[2]]");
-        auto key2 = std::string("[[6]]");
+    TESTS() {
+        static_assert(Compare("[1,1,3,1,1]", "[1,1,5,1,1]"));
+        static_assert(Compare("[[1],[2,3,4]]", "[[1],4]"));
+        static_assert(!Compare("[9]", "[[8,7,6]]"));
+        static_assert(Compare("[[4,4],4,4]", "[[4,4],4,4,4]"));
+        static_assert(!Compare("[7,7,7,7]", "[7,7,7]"));
+        static_assert(Compare("[]", "[3]"));
+        static_assert(!Compare("[[[]]]", "[[]]"));
+        static_assert(!Compare("[1,[2,[3,[4,[5,6,7]]]],8,9]", "[1,[2,[3,[4,[5,6,0]]]],8,9]"));
 
-        if (key1Index == 0 && str == key1) key1Index = index + 1;
-        if (key2Index == 0 && str == key2) key2Index = index + 1;
-    }
-
-    u32 FindDecoderKey(const std::vector<std::string>&lines) {
-        std::vector<Pair> pairs;
-        for (size_t i = 0; i < lines.size(); i += 3) {
-            pairs.push_back(Pair(lines[i]));
-            pairs.push_back(Pair(lines[i + 1]));
-        }
-
-        pairs.push_back(Pair("[[2]]"));
-        pairs.push_back(Pair("[[6]]"));
-
-        std::sort(pairs.begin(), pairs.end());
-        size_t key1Index = 0;
-        size_t key2Index = 0;
-
-        for (size_t i = 0; i < pairs.size(); i++) {
-            ExtractKey(pairs[i].AsString, i, key1Index, key2Index);
-        }
-
-        return static_cast<u32>(key1Index * key2Index);
-    }
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(SumOrderedPairs(lines));
-        return Constexpr::ToString(FindDecoderKey(lines));
-    }
-
-    bool RunTests() {
-        /*
-        if (!IsOrdered("[1,1,3,1,1]", "[1,1,5,1,1]")) return false;
-        if (!IsOrdered("[[1],[2,3,4]]", "[[1],4]")) return false;
-        if (!IsOrdered("[[4,4],4,4]", "[[4,4],4,4,4]")) return false;
-        if (!IsOrdered("[]", "[3]")) return false;
-        if (!IsOrdered("[[[[],3],[5,[1],[8,5],10,[5,8]]],[],[1]]", "[[9,[4,9]]]")) return false;
-
-        if (IsOrdered("[9]", "[[8,7,6]]")) return false;
-        if (IsOrdered("[7,7,7,7]", "[7,7,7]")) return false;
-        if (IsOrdered("[[[]]]", "[[]]")) return false;
-        */
-
+        static_assert(Compare("[2]", "[A]"));
+        static_assert(Compare("[A]", "[B]"));
+        static_assert(!Compare("[A]", "[2]"));
+        static_assert(!Compare("[[1],[4,3,2]", "[[1],2]"));
+        static_assert(!Compare("[1,[2,[1,2]],3]", "[1,[2,[1,2]],3]"));
+        static_assert(Compare("[1,[2,[1,2]],1]", "[1,[2,[1,2]],3]"));
+        static_assert(!Compare("[]", "[]"));
+        static_assert(!Compare("[[8,[[7]]]]", "[[[[8]]]]"));
+        static_assert(Compare("[8,[[7]]]]", "[[[[8],2]]]"));
+        static_assert(!Compare("[[1,2],4]", "[[1],5,5]"));
+        static_assert(Compare("[[1,2],4]", "[[[3]],5,5]"));
+        static_assert(!Compare("[1,2,3,[1,2,3],4,1]", "[1,2,3,[1,2,3],4,0]"));
+        static_assert(Compare("[[8,[[7,A,A,5],[8,4,9]],3,5],[[[3,9,4],5,[7,5,5]],[[3,2,5],[A],[5,5],0,[8]]],[4,2,[],[[7,5,6,3,0],[4,4,A,7],6,[8,A,9]]],[[4,[],4],A,1]]", "[[[[8], [3, A],[7,6,3,7,4],1,8]]]"));
         std::vector<std::string> lines = {
             "[1,1,3,1,1]",
             "[1,1,5,1,1]",
@@ -237,20 +117,9 @@ SOLUTION(2022, 13) {
             "[1,[2,[3,[4,[5,6,0]]]],8,9]",
         };
 
-        if (FindDecoderKey(lines) != 140) return false;
+        if (PartOne(lines) != "13") return false;
+        if (PartTwo(lines) != "140") return false;
 
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }

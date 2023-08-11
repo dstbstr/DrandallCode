@@ -59,30 +59,27 @@ SOLUTION(2022, 12) {
         return result;
     }
 
-    static_assert(FindNext<3, 3>(0).size() == 2);
-    static_assert(FindNext<3, 3>(4).size() == 4);
-
-#include <iostream>
-
     template<size_t Rows, size_t Cols>
-    void Print(const std::array<std::array<char, Cols>, Rows>&map, const std::vector<size_t>&current) {
+    constexpr std::string Print(const std::array<std::array<char, Cols>, Rows>&map, const std::vector<size_t>&current) {
         size_t row, col;
+        std::string result;
         for (auto index : current) {
             GetRowCol<Rows, Cols>(index, row, col);
-            std::cout << "map[" << row << "][" << col << "] = " << map[row][col] << "\n";
+            result += "map[" + Constexpr::ToString(row) + "][" + Constexpr::ToString(col) + "] = " + Constexpr::ToString(map[row][col]) + "\n";
         }
 
-        std::cout << "\n";
+        result += "\n";
+        return result;
     }
 
     template<size_t Rows, size_t Cols>
     constexpr u32 Bfs(const std::array<std::array<char, Cols>, Rows>&map, size_t startIndex, size_t endIndex) {
-        std::unordered_set<size_t> visited{ startIndex };
+        Constexpr::SmallSet<size_t> visited{ startIndex };
         size_t row, col;
         Constexpr::GetRowCol<Rows, Cols>(startIndex, row, col);
 
         std::vector<size_t> current{startIndex};
-        std::unordered_set<size_t> next{};
+        Constexpr::SmallSet<size_t> next{};
 
         u32 steps = 0;
         while (true) {
@@ -102,28 +99,26 @@ SOLUTION(2022, 12) {
             }
 
             current.clear();
-            std::copy_if(next.cbegin(), next.cend(), std::back_inserter(current), [&visited](const size_t index) {
-                return visited.find(index) == visited.end();
-                });
-
-            visited.insert(current.cbegin(), current.cend());
-            next.clear();
-            if (current.empty()) {
-                break; //Fail case
+            for (auto index : next) {
+                if (visited.insert(index)) {
+                    current.push_back(index);
+                }
             }
+            next.clear();
+            if (current.empty()) break; //Fail case
 
             steps++;
         }
         return 999; //fail case
     }
 
-    std::string RunFirst(const std::vector<std::string>&lines) {
+    PART_ONE() {
         size_t startIndex, endIndex;
         auto map = BuildMap<41, 66>(lines, startIndex, endIndex);
         return Constexpr::ToString(Bfs<41, 66>(map, startIndex, endIndex));
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
+    PART_TWO() {
         size_t startIndex, endIndex;
         auto map = BuildMap<41, 66>(lines, startIndex, endIndex);
         auto allStarts = FindAllStarts(map);
@@ -137,13 +132,16 @@ SOLUTION(2022, 12) {
         return Constexpr::ToString(best);
     }
 
-    bool RunTests() {
+    TESTS() {
+        static_assert(FindNext<3, 3>(0).size() == 2);
+        static_assert(FindNext<3, 3>(4).size() == 4);
+
         std::vector<std::string> lines{
             "Sabqponm",
-                "abcryxxl",
-                "accszExk",
-                "acctuvwj",
-                "abdefghi"
+            "abcryxxl",
+            "accszExk",
+            "acctuvwj",
+            "abdefghi"
         };
         size_t startIndex, endIndex;
         auto map = BuildMap<5, 8>(lines, startIndex, endIndex);
@@ -168,19 +166,6 @@ SOLUTION(2022, 12) {
 
         if (best != 29) return false;
 
-
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }

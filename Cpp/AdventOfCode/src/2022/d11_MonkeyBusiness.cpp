@@ -2,159 +2,142 @@
 
 SOLUTION(2022, 11) {
     struct Monkey {
-        std::vector<u64> Items;
-        std::function<u64(u64)> Operation;
-        std::function<u64(u64)> Test;
+        std::vector<size_t> Items;
+        size_t Divisor{ 0 };
+        size_t TrueTarget{ 0 };
+        size_t FalseTarget{ 0 };
+        size_t ItemsHandled{ 0 };
 
-        u64 Modulus = 1;
-        u64 ItemsHandled = 0;
+        size_t Test(size_t val) {
+            return val % Divisor ? FalseTarget : TrueTarget;
+        }
+
+        constexpr bool operator<(const Monkey& other) const {
+            return other.ItemsHandled < ItemsHandled;
+        }
     };
 
-    std::vector<Monkey> InitMonkeys() {
-        Monkey m0;
-        m0.Items = { 85, 77, 77 };
-        m0.Operation = [](u64 input) { return input * 7; };
-        m0.Test = [](u64 input) { return input % 19 == 0 ? 6 : 7; };
-        m0.Modulus = 19;
+    enum struct Operation {Plus, Mul};
+    constexpr auto ParseOperation(const std::string& line) {
+        auto s = Constexpr::Split(line, " = ");
+        auto s1 = Constexpr::Split(s[1], " ");
+        size_t lhs, rhs;
+        Constexpr::ParseNumber(s1[0], lhs);
+        Constexpr::ParseNumber(s1[2], rhs);
+        Operation op = (s1[1] == "*" ? Operation::Mul : Operation::Plus);
 
-        Monkey m1;
-        m1.Items = { 80, 99 };
-        m1.Operation = [](u64 input) { return input * 11; };
-        m1.Test = [](u64 input) { return input % 3 == 0 ? 3 : 5; };
-        m1.Modulus = 3;
-
-        Monkey m2;
-        m2.Items = { 74, 60, 74, 63, 86, 92, 80 };
-        m2.Operation = [](u64 input) { return input + 8; };
-        m2.Test = [](u64 input) { return input % 13 == 0 ? 0 : 6; };
-        m2.Modulus = 13;
-
-        Monkey m3;
-        m3.Items = { 71, 58, 93, 65, 80, 68, 54, 71 };
-        m3.Operation = [](u64 input) { return input + 7; };
-        m3.Test = [](u64 input) { return input % 7 == 0 ? 2 : 4; };
-        m3.Modulus = 7;
-
-        Monkey m4;
-        m4.Items = { 97, 56, 79, 65, 58 };
-        m4.Operation = [](u64 input) { return input + 5; };
-        m4.Test = [](u64 input) { return input % 5 == 0 ? 2 : 0; };
-        m4.Modulus = 5;
-
-        Monkey m5;
-        m5.Items = { 77 };
-        m5.Operation = [](u64 input) { return input + 4; };
-        m5.Test = [](u64 input) {return input % 11 == 0 ? 4 : 3; };
-        m5.Modulus = 11;
-
-        Monkey m6;
-        m6.Items = { 99, 90, 84, 50 };
-        m6.Operation = [](u64 input) { return input * input; };
-        m6.Test = [](u64 input) {return input % 17 == 0 ? 7 : 1; };
-        m6.Modulus = 17;
-
-        Monkey m7;
-        m7.Items = { 50, 66, 61, 92, 64, 78 };
-        m7.Operation = [](u64 input) { return input + 3; };
-        m7.Test = [](u64 input) {return input % 2 == 0 ? 5 : 1; };
-        m7.Modulus = 2;
-
-        return { m0, m1, m2, m3, m4, m5, m6, m7 };
+        return [lhs, rhs, op](size_t old) {
+            size_t a = lhs;
+            size_t b = rhs;
+            if (lhs == 0) a = old;
+            if (rhs == 0) b = old;
+            switch (op) {
+            case Operation::Plus: return a + b;
+            case Operation::Mul: return a * b;
+            default: throw "Unknown Operation";
+            }
+        };
     }
 
-    void RunRounds(std::vector<Monkey>&monkeys) {
-        for (auto round = 0; round < 20; round++) {
-            for (auto& monkey : monkeys) {
-                monkey.ItemsHandled += static_cast<u64>(monkey.Items.size());
+    constexpr std::vector<Monkey> ParseMonkeys(const std::vector<std::string>& lines) {
+        auto groups = SplitInputIntoGroups(lines);
+        std::vector<Monkey> monkeys;
+        for (const auto& group : groups) {
+            auto s0 = Constexpr::Split(group[1], ": ");
+            auto s1 = Constexpr::Split(s0[1], ", ");
+            Monkey monkey;
+            monkey.Items = ParseLinesAsNumbers<size_t>(s1);
+
+            auto divisor = Constexpr::Split(group[3], " ").back();
+            Constexpr::ParseNumber(divisor, monkey.Divisor);
+
+            auto trueTarget = Constexpr::Split(group[4], " ").back();
+            auto falseTarget = Constexpr::Split(group[5], " ").back();
+            Constexpr::ParseNumber(trueTarget, monkey.TrueTarget);
+            Constexpr::ParseNumber(falseTarget, monkey.FalseTarget);
+
+            monkeys.push_back(monkey);
+        }
+
+        return monkeys;
+    }
+
+    constexpr std::vector<std::string> GetOpLines(const std::vector<std::string>& lines) {
+        auto groups = SplitInputIntoGroups(lines);
+        std::vector<std::string> result;
+        for (const auto& group : groups) {
+            result.push_back(group[2]);
+        }
+        return result;
+    }
+
+    constexpr size_t Execute(const std::vector<std::string>& lines, size_t rounds, size_t divisor) {
+        auto monkeys = ParseMonkeys(lines);
+        auto ops = ParseLines(GetOpLines(lines), ParseOperation);
+
+        auto mod = std::accumulate(monkeys.begin(), monkeys.end(), 1ull, [](size_t running, const Monkey& monkey) {
+            return running * monkey.Divisor;
+            });
+
+        u64 running = 0;
+        for (auto round = 0; round < rounds; round++) {
+            for (size_t i = 0; i < monkeys.size(); i++) {
+                auto& monkey = monkeys[i];
+                monkey.ItemsHandled += monkey.Items.size();
                 for (auto item : monkey.Items) {
-                    u64 running = monkey.Operation(item);
-                    running /= 3;
-                    u64 next = monkey.Test(running);
-                    monkeys[next].Items.push_back(running);
+                    running = ops[i](item% mod) / divisor;
+                    monkeys[monkey.Test(running)].Items.push_back(running);
                 }
                 monkey.Items.clear();
             }
         }
-    }
-
-    void RunHardRounds(std::vector<Monkey>&monkeys) {
-        u64 mod = 1;
-        for (const auto& monkey : monkeys) {
-            mod *= monkey.Modulus;
-        }
-
-        for (auto round = 0; round < 10000; round++) {
-            for (auto& monkey : monkeys) {
-                monkey.ItemsHandled += static_cast<u64>(monkey.Items.size());
-                for (auto item : monkey.Items) {
-                    u64 running = item % mod;
-                    running = monkey.Operation(running);
-                    u64 next = monkey.Test(running);
-                    monkeys[next].Items.push_back(running);
-                }
-                monkey.Items.clear();
-            }
-        }
-    }
-    std::string Run(const std::vector<std::string>&) {
-        auto monkeys = InitMonkeys();
-        //RunRounds(monkeys);
-        RunHardRounds(monkeys);
-
-        std::sort(monkeys.begin(), monkeys.end(), [](Monkey& lhs, Monkey& rhs) { return lhs.ItemsHandled > rhs.ItemsHandled; });
-
-        return Constexpr::ToString(monkeys[0].ItemsHandled * monkeys[1].ItemsHandled);
-    }
-
-    std::vector<Monkey> InitTestMonkeys() {
-        Monkey m0;
-        m0.Items = { 79, 98 };
-        m0.Operation = [](u64 input) { return input * 19; };
-        m0.Test = [](u64 input) { return input % 23 == 0 ? 2 : 3; };
-        m0.Modulus = 23;
-
-        Monkey m1;
-        m1.Items = { 54, 65, 75, 74 };
-        m1.Operation = [](u64 input) { return input + 6; };
-        m1.Test = [](u64 input) { return input % 19 == 0 ? 2 : 0; };
-        m1.Modulus = 19;
-
-        Monkey m2;
-        m2.Items = { 79, 60, 97 };
-        m2.Operation = [](u64 input) { return input * input; };
-        m2.Test = [](u64 input) { return input % 13 == 0 ? 1 : 3; };
-        m2.Modulus = 13;
-
-        Monkey m3;
-        m3.Items = { 74 };
-        m3.Operation = [](u64 input) { return input + 3; };
-        m3.Test = [](u64 input) { return input % 17 == 0 ? 0 : 1; };
-        m3.Modulus = 17;
-
-        return { m0, m1, m2, m3 };
-    }
-
-    bool RunTests() {
-        auto monkeys = InitTestMonkeys();
-        RunHardRounds(monkeys);
-
-        if (monkeys[0].ItemsHandled != 52166) return false;
-        if (monkeys[1].ItemsHandled != 47830) return false;
-        if (monkeys[2].ItemsHandled != 1938) return false;
-        if (monkeys[3].ItemsHandled != 52013) return false;
-
-        return true;
+        std::sort(monkeys.begin(), monkeys.end());
+        return monkeys[0].ItemsHandled * monkeys[1].ItemsHandled;
     }
 
     PART_ONE() {
-        return lines[0];
+        auto result = Execute(lines, 20, 3);
+        return Constexpr::ToString(result);
     }
 
     PART_TWO() {
-        return lines[0];
+        auto result = Execute(lines, 10'000, 1);
+        return Constexpr::ToString(result);
     }
 
     TESTS() {
+        std::vector<std::string> lines = {
+            "Monkey 0:",
+            "  Starting items: 79, 98",
+            "  Operation: new = old * 19",
+            "  Test: divisible by 23",
+            "    If true: throw to monkey 2",
+            "    If false: throw to monkey 3",
+            "",
+            "Monkey 1:",
+            "  Starting items: 54, 65, 75, 74",
+            "  Operation: new = old + 6",
+            "  Test: divisible by 19",
+            "    If true: throw to monkey 2",
+            "    If false: throw to monkey 0",
+            "",
+            "Monkey 2:",
+            "  Starting items: 79, 60, 97",
+            "  Operation: new = old * old",
+            "  Test: divisible by 13",
+            "    If true: throw to monkey 1",
+            "    If false: throw to monkey 3",
+            "",
+            "Monkey 3:",
+            "  Starting items: 74",
+            "  Operation: new = old + 3",
+            "  Test: divisible by 17",
+            "    If true: throw to monkey 0",
+            "    If false: throw to monkey 1"
+        };
+
+        if (PartOne(lines) != "10605") return false;
+        if (PartTwo(lines) != "2713310158") return false;
         return true;
     }
 }

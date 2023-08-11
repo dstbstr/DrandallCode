@@ -79,11 +79,32 @@ constexpr std::vector<T> ParseLineAsNumbers(const std::string& line, std::string
     }
     return result;
 }
+template<typename T>
+constexpr std::vector<T> ParseLineAsNumbers(std::string_view line, std::string_view delimiter = ",") {
+    std::vector<T> result;
+    auto split = Constexpr::Split(line, delimiter);
+    for (auto s : split) {
+        T num;
+        Constexpr::ParseNumber(s, num);
+        result.push_back(num);
+    }
+    return result;
+}
 
 template<typename T>
 constexpr std::vector<T> ParseLinesAsNumbers(const std::vector<std::string>& lines) {
     std::vector<T> result;
     for (const auto& s : lines) {
+        T num;
+        Constexpr::ParseNumber(s, num);
+        result.push_back(num);
+    }
+    return result;
+}
+template<typename T>
+constexpr std::vector<T> ParseLinesAsNumbers(const std::vector<std::string_view>& lines) {
+    std::vector<T> result;
+    for (auto s : lines) {
         T num;
         Constexpr::ParseNumber(s, num);
         result.push_back(num);
@@ -122,7 +143,6 @@ constexpr auto RunAllReturnMax(const auto& collection, auto func, auto... args) 
 }
 
 constexpr auto RunAllReturnMin(const auto& collection, auto func, auto... args) {
-    //decltype(func(std::declval<decltype(collection.back())>(), args...)) best = {};
     using Ret = decltype(func(std::declval<decltype(collection.back())>(), args...));
 
     auto best = std::numeric_limits<Ret>::max();
