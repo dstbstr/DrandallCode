@@ -6,6 +6,8 @@ SOLUTION(2022, 14) {
     //Y = 12 - 178
     constexpr size_t Rows = 200;
     constexpr size_t Cols = 1000;
+    constexpr UCoord Entrance{ 500, 0 };
+
     using Map = std::array<std::array<bool, Cols>, Rows>;
 
     constexpr void Set(size_t x, size_t y, Map & map) {
@@ -39,11 +41,11 @@ SOLUTION(2022, 14) {
 
     constexpr void AddWalls(const std::vector<std::string>&lines, Map & map) {
         for (const auto& line : lines) {
-            auto points = StrUtil::Split(line, " -> ");
+            auto points = Constexpr::Split(line, " -> ");
             std::vector<UCoord> coords;
             for (auto point : points) {
                 u32 x, y;
-                auto split = StrUtil::Split(point, ",");
+                auto split = Constexpr::Split(point, ",");
                 Constexpr::ParseNumber(split[0], x);
                 Constexpr::ParseNumber(split[1], y);
                 coords.push_back({ x, y });
@@ -62,7 +64,7 @@ SOLUTION(2022, 14) {
         AddWall(start, end, map);
     }
 
-    bool DropSand(UCoord & sandPos, Map & map) {
+    constexpr bool DropSand(UCoord & sandPos, Map & map) {
         if (Check(sandPos.X, sandPos.Y + 1, map)) { // down
             if (Check(sandPos.X - 1, sandPos.Y + 1, map)) { //down left
                 if (Check(sandPos.X + 1, sandPos.Y + 1, map)) { //down right
@@ -82,64 +84,45 @@ SOLUTION(2022, 14) {
         return false;
     }
 
-    constexpr bool IsAbyss(UCoord sandPos) {
-        return sandPos.Y > 180;
-    }
-
-    constexpr bool BlocksEntrance(UCoord sandPos) {
-        return sandPos.Y == 0 && sandPos.X == 500;
-    }
-
-    u32 CountSand(const std::vector<std::string>&lines, u32 maxY) {
-        auto map = std::make_unique<Map>();
+    constexpr u32 CountSand(const std::vector<std::string>& lines, u32 maxY, auto IsDone) {
+        auto* map = new Map();
         AddWalls(lines, *map);
         AddFloor(*map, maxY);
         u32 grains = 0;
-
-        UCoord sandPos;
+        UCoord sandPos = Entrance;
         while (true) {
-            sandPos = { 500, 0 };
-            /*
-            while (!DropSand(sandPos, map) && !IsAbyss(sandPos));
-            if (IsAbyss(sandPos)) {
-                return grains;
-            }
-            */
-
+            sandPos = Entrance;
             grains++;
-
-            while (!DropSand(sandPos, *map) && !BlocksEntrance(sandPos));
-            if (BlocksEntrance(sandPos)) {
+            while (!DropSand(sandPos, *map) && !IsDone(sandPos));
+            if (IsDone(sandPos)) {
+                delete map;
                 return grains;
             }
         }
-
+        delete map;
         return grains;
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        return Constexpr::ToString(CountSand(lines, 180));
+    PART_ONE() {
+        return Constexpr::ToString(CountSand(lines, 180, [](UCoord sandPos) {
+            return sandPos.Y == 178;
+            }) - 1);
     }
 
-    bool RunTests() {
+    PART_TWO() {
+        return Constexpr::ToString(CountSand(lines, 180, [](UCoord sandPos) {
+            return sandPos == Entrance;
+            }));
+    }
+
+    TESTS() {
         std::vector<std::string> lines = {
             "498,4 -> 498,6 -> 496,6",
             "503,4 -> 502,4 -> 502,9 -> 494,9"
         };
 
-        if (CountSand(lines, 11) != 93) return false;
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
+        if (CountSand(lines, 11, [](UCoord sandPos) { return sandPos.Y == 9; }) - 1 != 24) return false;
+        if (CountSand(lines, 11, [](UCoord sandPos) { return sandPos == Entrance; }) != 93) return false;
         return true;
     }
 }

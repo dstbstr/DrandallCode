@@ -1,225 +1,97 @@
 #include "2022/d15_Beacon.h"
 
 SOLUTION(2022, 15) {
+    struct Sensor {
+        Coord Pos;
+        Coord Beacon;
+        size_t Distance;
 
-    //Sensor at x=220580, y=684270: closest beacon is at x=436611, y=263737
-
-    void ParseLine(const std::string & line, Coord & sensor, Coord & beacon) {
-        static auto re = std::regex(R"(Sensor at x=(-?\d+), y=(-?\d+): closest beacon is at x=(-?\d+), y=(-?\d+))");
-        std::smatch match;
-        if (std::regex_search(line, match, re)) {
-            Constexpr::ParseNumber(match[1].str(), sensor.X);
-            Constexpr::ParseNumber(match[2].str(), sensor.Y);
-            Constexpr::ParseNumber(match[3].str(), beacon.X);
-            Constexpr::ParseNumber(match[4].str(), beacon.Y);
-        }
-    }
-
-    std::vector<std::pair<Coord, Coord>> GetPairs(const std::vector<std::string>&lines) {
-        std::vector<std::pair<Coord, Coord>> pairs;
-
-        for (const auto& line : lines) {
-            Coord sensor, beacon;
-            ParseLine(line, sensor, beacon);
-            pairs.push_back(std::make_pair(sensor, beacon));
+        constexpr bool IsInRange(Coord pos) const {
+            return MDistance(Pos, pos) <= Distance;
         }
 
-        return pairs;
-    }
-
-    constexpr u64 SignalFrequency(const Coord & coord) {
-        return static_cast<u64>(coord.X) * u64(4'000'000) + coord.Y;
-    }
-
-    void MarkNonBeacons(const std::vector<std::pair<Coord, Coord>> pairs, std::unordered_set<s64>&seen, s64 row, s64 min, s64 max) {
-        for (const auto& [source, beacon] : pairs) {
-            auto mDist = MDistance(source, beacon);
-            auto yDist = Constexpr::Abs(source.Y - row);
-            auto xDist = mDist - yDist;
-
-            for (auto x = std::max(min, static_cast<s64>(source.X - xDist)); x <= std::min(max, static_cast<s64>(source.X + xDist)); x++) {
-                seen.insert(x);
-            }
-            if (xDist == 0) {
-                seen.insert(source.X);
-            }
+        constexpr bool CanContainUnseenPoints(Coord min, Coord max) const {
+            std::vector<Coord> corners = { min, {min.X, max.Y}, {max.X, min.Y}, max };
+            auto biggest = RunAllReturnMax(corners, [&](Coord corner) {
+                return MDistance(Pos, corner);
+                });
+            return biggest > Distance;
         }
-
-        for (const auto& [source, beacon] : pairs) {
-            if (beacon.Y == row) {
-                seen.erase(beacon.X);
-            }
-        }
-    }
-
-    u32 CountNonBeacons(const std::vector<std::string>&lines, s64 targetRow) {
-        auto pairs = GetPairs(lines);
-        std::unordered_set<s64> seen;
-
-        MarkNonBeacons(pairs, seen, targetRow, -5000000, 5000000);
-
-        return static_cast<u32>(seen.size());
-    }
-
-    void PrintSeen(const std::vector<std::pair<Coord, Coord >>&pairs, const std::unordered_set<s64>&seen, s64 row, size_t max) {
-        for (s64 i = 0; i <= static_cast<s64>(max); i++) {
-            bool printed = false;
-            for (const auto& [source, beacon] : pairs) {
-                if (source.X == i && source.Y == row) {
-                    std::cout << "S";
-                    printed = true;
-                    break;
-                }
-                else if (beacon.X == i && beacon.Y == row) {
-                    std::cout << "B";
-                    printed = true;
-                    break;
-                }
-            }
-            if (!printed) {
-                if (seen.find(i) == seen.end()) {
-                    std::cout << ".";
-                }
-                else {
-                    std::cout << "#";
-                }
-            }
-        }
-        std::cout << '\n';
-    }
-
-    s32 HasBeacon(const std::vector<std::pair<Coord, Coord>>&pairs, s64 row, size_t max) {
-        static std::unordered_set<s64> seen = [max]() {
-            std::unordered_set<s64> result;
-            result.reserve(max);
-            return result;
-        }();
-
-        seen.clear();
-        MarkNonBeacons(pairs, seen, row, 0, max);
-
-        //don't consider existing beacons
-        for (const auto& [source, beacon] : pairs) {
-            if (beacon.Y == row) {
-                seen.insert(beacon.X);
-            }
-        }
-
-        //PrintSeen(pairs, seen, row, max);
-        if (seen.size() == max) {
-            for (auto x = 0; x < max; x++) {
-                if (seen.find(x) == seen.end()) {
-                    return x;
-                }
-            }
-        }
-        return 0;
-    }
-
-    Coord FindMissingBeacon(const std::vector<std::string>&lines, s32 max) {
-        auto pairs = GetPairs(lines);
-        for (s32 row = 0; row <= max; row++) {
-            auto col = HasBeacon(pairs, row, max);
-            if (col != 0) {
-                return Coord{ col, row };
-            }
-        }
-
-        return {};
-    }
-
-    struct Circle {
-        Coord Center;
-        size_t Radius;
     };
 
-    std::vector<Circle> GetCircles(const std::vector<std::pair<Coord, Coord>> pairs) {
-        std::vector<Circle> result;
-        for (const auto& [source, beacon] : pairs) {
-            result.push_back({ source, MDistance(source, beacon) });
+    //Sensor at x=220580, y=684270: closest beacon is at x=436611, y=263737
+    constexpr Sensor ParseSensor(const std::string& line) {
+        auto s = Constexpr::Split(line, "=");
+        Sensor result;
+        Constexpr::ParseNumber(s[1].substr(0, s[1].find(',')), result.Pos.X);
+        Constexpr::ParseNumber(s[2].substr(0, s[2].find(':')), result.Pos.Y);
+        Constexpr::ParseNumber(s[3].substr(0, s[3].find(',')), result.Beacon.X);
+        Constexpr::ParseNumber(s[4], result.Beacon.Y);
+        result.Distance = MDistance(result.Pos, result.Beacon);
+        return result;
+    }
+
+    constexpr size_t Solve1(const std::vector<std::string>& lines, s64 targetRow) {
+        auto sensors = ParseLines(lines, ParseSensor);
+        Constexpr::SmallSet<Coord> occupied;
+        s64 minX{ 99999999999 }, maxX{ 0 }, maxRange{ 0 };
+        for (const auto& sensor : sensors) {
+            occupied.insert(sensor.Pos);
+            occupied.insert(sensor.Beacon);
+            minX = std::min(minX, std::min(sensor.Pos.X, sensor.Beacon.X));
+            maxX = std::max(maxX, std::max(sensor.Pos.X, sensor.Beacon.X));
+            maxRange = std::max(maxRange, static_cast<s64>(sensor.Distance));
+        }
+        
+        size_t result = 0;
+        for (auto x = minX - maxRange; x <= maxX + maxRange; x++) {
+            Coord pos{ x, targetRow };
+            if (occupied.contains(pos)) continue;
+            result += std::any_of(sensors.begin(), sensors.end(), [pos](const Sensor& s) { return s.IsInRange(pos); });
         }
 
         return result;
     }
-
-    constexpr bool Contains(const Circle & circle, const Coord & point) {
-        return static_cast<size_t>(Constexpr::Abs(point.X - circle.Center.X) + Constexpr::Abs(point.Y - circle.Center.Y)) <= circle.Radius;
+    PART_ONE() {
+        return Constexpr::ToString(Solve1(lines, 2'000'000));
     }
 
-    static_assert(Contains({ {0, 0}, 5 }, { 1, 1 }));
-    static_assert(Contains({ {0, 11}, 3 }, { 0, 8 }));
-    static_assert(!Contains({ {0, 0}, 2 }, { 5, 5 }));
-    static_assert(!Contains({ {8, 7}, 9 }, { 14, 11 }));
+    constexpr Coord Solve2(const std::vector<std::string>& lines, Coord min, Coord max) {
+        auto sensors = ParseLines(lines, ParseSensor);
 
-    constexpr void Translate(Coord & coord, const Circle & circle) {
-        coord.X += circle.Center.X;
-        coord.Y += circle.Center.Y;
-    }
-
-    constexpr std::vector<Coord> GetAdjacentPoints(const Circle & circle, s32 min, s32 max) {
-        std::vector<Coord> result;
-        auto rad = static_cast<s32>(circle.Radius);
-        std::vector<Coord> dir;
-        dir.resize(4);
-        for (auto i = 0; i < rad; i++) {
-            dir[0] = { 0 + i, 1 + rad - i };
-            dir[1] = { 0 - i, -1 - rad + i };
-            dir[2] = { -1 - rad + i, 0 - i };
-            dir[3] = { 1 + rad - i, 0 + i };
-            std::transform(dir.begin(), dir.end(), dir.begin(), [&circle](Coord coord) {
-                return Coord{ coord.X + circle.Center.X, coord.Y + circle.Center.Y };
-                });
-
-            std::copy_if(dir.begin(), dir.end(), std::back_inserter(result), [max, min](Coord coord) {
-                return coord.X >= min && coord.X <= max && coord.Y >= min && coord.Y <= max;
-                });
-        }
-
-        return result;
-    }
-
-    Coord FindMissing(const std::vector<std::string>&lines, s32 min, s32 max) {
-        auto circles = GetCircles(GetPairs(lines));
-        std::sort(circles.begin(), circles.end(), [](const Circle& lhs, const Circle& rhs) {
-            return lhs.Radius < rhs.Radius;
-            });
-        std::unordered_set<Coord> candidates;
-        for (size_t i = 0; i < circles.size(); i++) {
-            std::cout << "Checking circle " << (i + 1) << " of " << circles.size();
-            candidates.clear();
-            auto adjacent = GetAdjacentPoints(circles[i], min, max);
-            candidates.insert(adjacent.cbegin(), adjacent.cend());
-            std::cout << " with " << candidates.size() << " Candidates\n";
-
-            for (auto candidate : candidates) {
-                bool contained = false;
-                for (size_t j = 0; j < circles.size(); j++) {
-                    if (i == j) continue;
-                    if (Contains(circles[j], candidate)) {
-                        contained = true;
-                        break;
-                    }
+        Constexpr::Stack<std::pair<Coord, Coord>> qStack;
+        qStack.push(std::make_pair(min, max));
+        while (!qStack.is_empty()) {
+            auto [a, b] = qStack.pop();
+            if (a == b) {
+                if (std::all_of(sensors.begin(), sensors.end(), [a](const Sensor& s) { return !s.IsInRange(a); })) {
+                    return a;
                 }
-                if (!contained) {
-                    std::cout << "Candidate Found! {" << candidate.X << "," << candidate.Y << "}\n";
-                    return candidate;
+            }
+            else {
+                Coord mid = { (a.X + b.X) / 2, (a.Y + b.Y) / 2 };
+                std::vector<std::pair<Coord, Coord>> quads = {
+                    {a, mid},
+                    {{mid.X + 1, a.Y}, {b.X, mid.Y}},
+                    {{a.X, mid.Y + 1}, {mid.X, b.Y}},
+                    {{mid.X + 1, mid.Y + 1}, b}
+                };
+                for (const auto& quad : quads) {
+                    if (quad.first.X > quad.second.X || quad.first.Y > quad.second.Y) continue;
+                    if (std::all_of(sensors.begin(), sensors.end(), [quad](const Sensor& s) { return s.CanContainUnseenPoints(quad.first, quad.second); })) {
+                        qStack.push(quad);
+                    }
                 }
             }
         }
-
-        return {};
+        return { 0, 0 };
+    }
+    PART_TWO() {
+        auto missingPoint = Solve2(lines, { 0, 0 }, { 4'000'000, 4'000'000 });
+        return Constexpr::ToString(missingPoint.X * 4'000'000 + missingPoint.Y);
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(CountNonBeacons(lines, 2'000'000));
-        s32 min = 2'000'000; //trial and error
-        s32 max = 4'000'000;
-
-        auto missingCoord = FindMissing(lines, min, max);
-        return Constexpr::ToString(SignalFrequency(missingCoord));
-    }
-
-    bool RunTests() {
+    TESTS() {
         std::vector < std::string> lines = {
             "Sensor at x=2, y=18: closest beacon is at x=-2, y=15",
             "Sensor at x=9, y=16: closest beacon is at x=10, y=16",
@@ -237,26 +109,9 @@ SOLUTION(2022, 15) {
             "Sensor at x=20, y=1: closest beacon is at x=15, y=3"
         };
 
-        //if (CountNonBeacons(lines, 10) != 26) return false;
-        //auto missingCoord = FindMissingBeacon(lines, 20);
-        auto missingCoord = FindMissing(lines, 0, 20);
-        if (missingCoord.X != 14) return false;
-        if (missingCoord.Y != 11) return false;
-        if (SignalFrequency(missingCoord) != 56000011) return false;
+        if (Solve1(lines, 10) != 26) return false;
+        if (Solve2(lines, { 0, 0 }, { 20, 20 }) != Coord{14, 11}) return false;
 
-
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }
