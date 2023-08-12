@@ -59,7 +59,7 @@ SOLUTION(2022, 17) {
         return { x, y };
     }
 
-    std::vector<bool> ParseInput(const std::string & line) {
+    constexpr std::vector<bool> ParseInput(const std::string & line) {
         std::vector<bool> result;
         for (auto c : line) {
             result.push_back(c == '<');
@@ -138,15 +138,17 @@ SOLUTION(2022, 17) {
         }
     }
 
-    u32 FindPeriod(const std::vector<bool>&directions, const std::vector<Piece>&pieces, size_t & offset, size_t & prePeriod, std::vector<size_t>&outAmounts) {
-        Grid grid{};
+    constexpr u32 FindPeriod(const std::vector<bool>&directions, const std::vector<Piece>&pieces, size_t & offset, size_t & prePeriod, std::vector<size_t>&outAmounts) {
+        //Grid grid{};
+        auto* grid = new Grid();
+
         size_t horizontalIndex = 0;
         size_t pieceIndex = 0;
         u64 pieceCount = 0;
         s64 top = 0;
         u32 period = 0;
 
-        std::unordered_set<std::string> seen{};
+        Constexpr::BigSet<std::string> seen{};
         std::vector<size_t> recentDeltas{};
 
         std::string mostRecentAdd = "";
@@ -157,8 +159,8 @@ SOLUTION(2022, 17) {
             auto piece = pieces[(pieceIndex++) % pieces.size()];
             piece.TopLeft = { 2, top + 7 };
             while (true) {
-                MoveSideways(piece, grid, directions[(horizontalIndex++) % directions.size()]);
-                if (!TryMoveDown(piece, grid, top)) break;
+                MoveSideways(piece, *grid, directions[(horizontalIndex++) % directions.size()]);
+                if (!TryMoveDown(piece, *grid, top)) break;
             }
             auto deltaY = std::max(0ll, top - oldTop);
             prePeriod += deltaY;
@@ -167,37 +169,35 @@ SOLUTION(2022, 17) {
                 recentDeltas.erase(recentDeltas.begin());
             }
             recentDeltas.push_back(deltaY);
-            auto checkStr = StrUtil::JoinVec(',', recentDeltas);
-            if (seen.find(checkStr) != seen.end()) {
-                outAmounts.push_back(deltaY);
-                if (checkStr == mostRecentAdd) {
-                    break;
-                }
-            }
-            else {
-                seen.insert(checkStr);
+            auto checkStr = Constexpr::JoinVec(',', recentDeltas);
+            if (seen.insert(checkStr)) {
                 mostRecentAdd = checkStr;
                 outAmounts.clear();
+            }
+            else {
+                outAmounts.push_back(deltaY);
+                if (checkStr == mostRecentAdd) break;
             }
         }
         period = static_cast<u32>(outAmounts.size());
         offset -= period;
 
+        delete grid;
         return period;
     }
 
-    u64 FindTowerHeight(const std::string & line, u64 maxPieces) {
-        static auto directions = ParseInput(line);
-        static auto pieces = GetPieces();
-        static std::vector<size_t> increaseAmounts;
-        static size_t offset = 0;
-        static size_t prePeriod = 0;
+    constexpr u64 FindTowerHeight(const std::string & line, u64 maxPieces) {
+        auto directions = ParseInput(line);
+        auto pieces = GetPieces();
+        std::vector<size_t> increaseAmounts;
+        size_t offset = 0;
+        size_t prePeriod = 0;
 
-        static auto period = FindPeriod(directions, pieces, offset, prePeriod, increaseAmounts);
+        auto period = FindPeriod(directions, pieces, offset, prePeriod, increaseAmounts);
 
         //u64 amountPerPeriod = Constexpr::Sum(increaseAmounts);
         u64 amountPerPeriod = std::accumulate(increaseAmounts.begin(), increaseAmounts.end(), 0ull);
-        static bool firstTime = true;
+        bool firstTime = true;
         if (firstTime) {
             prePeriod -= static_cast<u32>(amountPerPeriod); //this amount contains 1 full cycle
             firstTime = false;
@@ -214,28 +214,19 @@ SOLUTION(2022, 17) {
         return result;
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(FindTowerHeight(lines[0], 2022));
+    PART_ONE() {
+        return Constexpr::ToString(FindTowerHeight(lines[0], 2022));
+    }
+
+    PART_TWO() {
         return Constexpr::ToString(FindTowerHeight(lines[0], 1'000'000'000'000));
     }
 
-    bool RunTests() {
+    TESTS() {
         std::string line = ">>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>";
 
         if (FindTowerHeight(line, 2022) != 3068) return false;
         if (FindTowerHeight(line, 1'000'000'000'000) != 1'514'285'714'288) return false;
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }

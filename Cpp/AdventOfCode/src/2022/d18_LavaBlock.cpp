@@ -4,7 +4,7 @@ SOLUTION(2022, 18) {
 
     using Grid = std::array<std::array<std::array<bool, 25>, 25>, 25>;
 
-    void ParseLine(const std::string & line, Grid & grid) {
+    constexpr void ParseLine(const std::string & line, Grid & grid) {
         size_t x, y, z;
         auto split = Constexpr::Split(line, ",");
         Constexpr::ParseNumber(split[0], x);
@@ -99,19 +99,23 @@ SOLUTION(2022, 18) {
         return CalcSurface(grid) - CalcAirPockets(grid);
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
+    constexpr size_t Execute(const std::vector<std::string>& lines, auto Calc) {
         Grid grid{};
         for (const auto& line : lines) {
             ParseLine(line, grid);
         }
-
-        //between 2570 and 4316
-
-        //return Constexpr::ToString(CalcSurface(grid));
-        return Constexpr::ToString(CalcExterior(grid));
+        return Calc(grid);
     }
 
-    bool RunTests() {
+    PART_ONE() {
+        return Constexpr::ToString(Execute(lines, CalcSurface));
+    }
+
+    PART_TWO() {
+        return Constexpr::ToString(Execute(lines, CalcExterior));
+    }
+
+    TESTS() {
         std::vector<std::string> lines = {
             "2,2,2",
             "1,2,2",
@@ -134,18 +138,6 @@ SOLUTION(2022, 18) {
 
         if (CalcSurface(grid) != 64) return false;
         if (CalcExterior(grid) != 58) return false;
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }

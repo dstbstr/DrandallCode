@@ -21,7 +21,7 @@ SOLUTION(2022, 19) {
         std::array<u32, Mineral::COUNT> Bots{};
         u32 RemainingTime = 0;
 
-        void Tick() {
+        constexpr void Tick() {
             for (u32 i = 0; i < Mineral::COUNT; i++) {
                 Minerals[i] += Bots[i];
             }
@@ -60,22 +60,18 @@ SOLUTION(2022, 19) {
         return result;
     }
 
-    Bp ParseLine(const std::string & line) {
-        static auto re = std::regex(R"(Blueprint (\d+): [\w ]+ (\d+) ore. [\w ]+ (\d+) ore. [\w ]+ (\d+) ore and (\d+) clay. [\w ]+ (\d+) ore and (\d+) obsidian.)");
-        std::smatch match;
-        if (!std::regex_match(line, match, re)) {
-            throw std::logic_error("Failed to parse");
-        }
-
+    //Blueprint 30: Each ore robot costs 4 ore. Each clay robot costs 3 ore. Each obsidian robot costs 2 ore and 5 clay. Each geode robot costs 2 ore and 10 obsidian.
+    constexpr Bp ParseLine(const std::string & line) {
+        auto s = Constexpr::Split(line, " ");
         Bp bp;
 
-        Constexpr::ParseNumber(match[1].str(), bp.Index);
-        Constexpr::ParseNumber(match[2].str(), bp.Costs[Ore].Costs[Ore]);
-        Constexpr::ParseNumber(match[3].str(), bp.Costs[Clay].Costs[Ore]);
-        Constexpr::ParseNumber(match[4].str(), bp.Costs[Obsidian].Costs[Ore]);
-        Constexpr::ParseNumber(match[5].str(), bp.Costs[Obsidian].Costs[Clay]);
-        Constexpr::ParseNumber(match[6].str(), bp.Costs[Geode].Costs[Ore]);
-        Constexpr::ParseNumber(match[7].str(), bp.Costs[Geode].Costs[Obsidian]);
+        Constexpr::ParseNumber(s[1].substr(0, s[1].size() - 1), bp.Index);
+        Constexpr::ParseNumber(s[6], bp.Costs[Ore].Costs[Ore]);
+        Constexpr::ParseNumber(s[12], bp.Costs[Clay].Costs[Ore]);
+        Constexpr::ParseNumber(s[18], bp.Costs[Obsidian].Costs[Ore]);
+        Constexpr::ParseNumber(s[21], bp.Costs[Obsidian].Costs[Clay]);
+        Constexpr::ParseNumber(s[27], bp.Costs[Geode].Costs[Ore]);
+        Constexpr::ParseNumber(s[30], bp.Costs[Geode].Costs[Obsidian]);
 
         bp.Costs[Ore].Produces = Ore;
         bp.Costs[Clay].Produces = Clay;
@@ -86,7 +82,7 @@ SOLUTION(2022, 19) {
     }
 
 
-    u32 GetScore(const Bp&, const Resources & resource) {
+    constexpr u32 GetScore(const Bp&, const Resources & resource) {
         auto geodes = resource.Minerals[Geode];
         geodes += resource.Bots[Geode] * resource.RemainingTime;
         auto obs = resource.Bots[Obsidian];
@@ -96,7 +92,7 @@ SOLUTION(2022, 19) {
         return geodes * 100000 + obs * 1000 + clay * 10 + ore;
     }
 
-    u32 FindMostGeodes(const Bp & bp, u32 minutes) {
+    constexpr u32 FindMostGeodes(const Bp & bp, u32 minutes) {
         const auto maxCosts = GetMaxCosts(bp);
 
         Resources initial;
@@ -149,8 +145,7 @@ SOLUTION(2022, 19) {
         return best;
     }
 
-
-    u32 SumQualityLevels(const std::vector<std::string>&lines) {
+    constexpr u32 SumQualityLevels(const std::vector<std::string>&lines) {
         std::vector<Bp> bps;
         for (const auto& line : lines) {
             bps.push_back(ParseLine(line));
@@ -164,7 +159,7 @@ SOLUTION(2022, 19) {
         return result;
     }
 
-    u32 MultiplyQualityLevels(const std::vector<std::string>&lines) {
+    constexpr u32 MultiplyQualityLevels(const std::vector<std::string>&lines) {
         std::vector<Bp> bps;
         for (auto i = 0; i < 3; i++) {
             bps.push_back(ParseLine(lines[i]));
@@ -178,12 +173,15 @@ SOLUTION(2022, 19) {
         return result;
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(SumQualityLevels(lines));
+    PART_ONE() {
+        return Constexpr::ToString(SumQualityLevels(lines));
+    }
+
+    PART_TWO() {
         return Constexpr::ToString(MultiplyQualityLevels(lines));
     }
 
-    bool RunTests() {
+    TESTS() {
         std::vector<std::string> lines = {
             "Blueprint 1: Each ore robot costs 4 ore. Each clay robot costs 2 ore. Each obsidian robot costs 3 ore and 14 clay. Each geode robot costs 2 ore and 7 obsidian.",
             "Blueprint 2: Each ore robot costs 2 ore. Each clay robot costs 3 ore. Each obsidian robot costs 3 ore and 8 clay. Each geode robot costs 3 ore and 12 obsidian."
@@ -203,18 +201,6 @@ SOLUTION(2022, 19) {
         if (FindMostGeodes(bps[0], 32) != 56) return false;
         if (FindMostGeodes(bps[1], 32) != 62) return false;
 
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }

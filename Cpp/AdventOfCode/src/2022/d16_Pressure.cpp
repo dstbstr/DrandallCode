@@ -92,7 +92,7 @@ SOLUTION(2022, 16) {
     }
 
     template<size_t RoomCount, typename TDistance>
-    void RecursePermutations(const State<RoomCount, TDistance>&state, u64 seen, size_t roomIndex, s16 remainingTime, u32 totalSteam, std::unordered_map<u64, u32>&outMap) {
+    constexpr void RecursePermutations(const State<RoomCount, TDistance>&state, u64 seen, size_t roomIndex, s16 remainingTime, u32 totalSteam, Constexpr::SmallMap<u64, u32>&outMap) {
         static const u64 done = [&state]() {
             u64 result = 0;
             for (const auto& [_, index] : state.IndexMap) {
@@ -140,10 +140,10 @@ SOLUTION(2022, 16) {
     }
 
     template<size_t RoomCount, typename TDistance>
-    u32 FindBestSolo(const std::vector<std::string>&lines) {
+    constexpr u32 FindBestSolo(const std::vector<std::string>&lines) {
         auto state = ParseState<RoomCount, TDistance>(lines);
         auto startIndex = state.IndexMap.at("AA");
-        std::unordered_map<u64, u32> permutations;
+        Constexpr::SmallMap<u64, u32> permutations;
 
         RecursePermutations<RoomCount, TDistance>(state, 0, startIndex, 30, 0, permutations);
         std::vector<std::pair<u64, u32>> pairs;
@@ -160,10 +160,10 @@ SOLUTION(2022, 16) {
     }
 
     template<size_t RoomCount, typename TDistance>
-    u32 FindBestPair(const std::vector<std::string>&lines) {
+    constexpr u32 FindBestPair(const std::vector<std::string>&lines) {
         auto state = ParseState<RoomCount, TDistance>(lines);
         auto startIndex = state.IndexMap.at("AA");
-        std::unordered_map<u64, u32> permutations;
+        Constexpr::SmallMap<u64, u32> permutations;
 
         RecursePermutations<RoomCount, TDistance>(state, 0, startIndex, 26, 0, permutations);
 
@@ -188,13 +188,15 @@ SOLUTION(2022, 16) {
         return best;
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(FindBestSolo<51, u8>(lines));
+    PART_ONE() {
+        return Constexpr::ToString(FindBestSolo<51, u8>(lines));
+    }
+
+    PART_TWO() {
         return Constexpr::ToString(FindBestPair<51, u8>(lines));
     }
 
-
-    bool RunTests() {
+    TESTS() {
         std::vector<std::string> lines = {
             "Valve AA has flow rate=0; tunnels lead to valves DD, II, BB",
             "Valve BB has flow rate=13; tunnels lead to valves CC, AA",
@@ -208,46 +210,9 @@ SOLUTION(2022, 16) {
             "Valve JJ has flow rate=21; tunnel leads to valve II"
         };
 
-        //if (Find<10, u8>(lines) != 1651) return false;
         if (FindBestSolo<10, u8>(lines) != 1651) return false;
         //if (FindBestPair<10, u8>(lines) != 1707) return false;
-        /*
-        auto rooms = ParseRoomList(lines);
-        auto indexMap = GetIndexMap(rooms);
-        auto distances = GetDistanceMap(rooms, indexMap);
 
-        if (distances[indexMap["AA"]][indexMap["DD"]] != 1) return false;
-        if (distances[indexMap["AA"]][indexMap["CC"]] != 2) return false;
-        if (distances[indexMap["AA"]][indexMap["HH"]] != 5) return false;
-        */
-        /*
-        auto map = MakeMap(lines);
-        auto graph = MakeGraph(map);
-
-        std::vector<std::string> path = {
-            "AA", "DD", "BB", "JJ", "HH", "EE", "CC"
-        };
-        if (CalculateValue(path, map, graph, 30) != 1651) return false;
-        */
-        //if (FindBestPath(lines) != 1651) return false;
-
-        /*
-        if (FindBestRelease(lines, 30) != 1651) return false;
-        if (FindBestWithPair(lines, 26) != 1707) return false;
-        */
-
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }
