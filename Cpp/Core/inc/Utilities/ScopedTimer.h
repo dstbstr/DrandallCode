@@ -17,9 +17,11 @@ public:
 
     ~ScopedTimer() {
         auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - m_StartTime);
-        LOG_INFO(StrUtil::Format("%s ElapsedTime: %s", m_Label, TimeUtils::DurationToString(elapsed, m_MinTimeUnit)));
         if (m_OnExit) {
             m_OnExit(elapsed);
+        }
+        else {
+            LOG_INFO(StrUtil::Format("%s ElapsedTime: %s", m_Label, TimeUtils::DurationToString(elapsed, m_MinTimeUnit)));
         }
     }
 
