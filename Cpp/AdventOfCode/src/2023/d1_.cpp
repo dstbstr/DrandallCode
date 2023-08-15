@@ -2,7 +2,13 @@
 
 SOLUTION(2023, 1) {
     PART_ONE() {
-        return lines[0];
+        (void)lines;
+        if (input.empty()) {
+            return "Couldn't Find Input";
+        }
+        else {
+            return std::string(inputLines[0]);
+        }
     }
 
     PART_TWO() {

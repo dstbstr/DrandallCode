@@ -68,6 +68,16 @@ constexpr std::vector<std::vector<std::string>> SplitInputIntoGroups(const std::
     return result;
 }
 
+template<size_t LineCount>
+constexpr std::array<std::string, LineCount> SplitInputIntoLines(const std::string_view& input) {
+    std::array<std::string, LineCount> result{};
+    auto s = Constexpr::Split(input, "\n");
+    for (size_t i = 0; i < s.size(); i++) {
+        result[i] = std::string(s[i]);
+    }
+    return result;
+}
+
 template<typename T>
 constexpr std::vector<T> ParseLineAsNumbers(const std::string& line, std::string delimiter = ",") {
     std::vector<T> result;

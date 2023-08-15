@@ -127,8 +127,8 @@ void PrintTimings(std::vector<TimingEntry> timings, size_t maxResults = 0, std::
 
 int main(int, char**) {
     //auto timings = RunAll();
-    auto timings = RunYear(2022);
-    //auto timings = RunOne(2022, 25);
+    //auto timings = RunYear(2022);
+    auto timings = RunOne(2015, 1);
 
     //PrintTimings(0, std::chrono::seconds(1));
     PrintTimings(timings);
