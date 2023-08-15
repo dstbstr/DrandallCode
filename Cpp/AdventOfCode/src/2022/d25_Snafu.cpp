@@ -1,29 +1,17 @@
 #include "2022/d25_Snafu.h"
 
 SOLUTION(2022, 25) {
-    static constexpr std::array<s64, 21> Powers = {
-    95'367'431'640'625,         // 20
-    19'073'486'328'125,         // 19
-    3'814'697'265'625,          // 18
-    762'939'453'125,            // 17
-    152'587'890'625,            // 16
-    30'517'578'125,             // 15
-    6'103'515'625,              // 14
-    1'220'703'125,              // 13
-    244'140'625,                // 12
-    48'828'125,                 // 11
-    9'765'625,                  // 10
-    1'953'125,                  // 9
-    390'625,                    // 8
-    78'125,                     // 7
-    15'625,                     // 6
-    3'125,                      // 5
-    625,                        // 4
-    125,                        // 3
-    25,                         // 2
-    5,                          // 1
-    1                           // 0
-    };
+    template<size_t Count>
+    constexpr std::array<s64, Count> GetPowers() {
+        std::array<s64, Count> result{};
+        result.back() = 1;
+        for (int i = static_cast<int>(Count) - 2; i >= 0; i--) {
+            result[i] = result[i + 1] * 5;
+        }
+        return result;
+    }
+
+    constexpr std::array<s64, 21> Powers = GetPowers<21>();
 
     constexpr s64 FromSnafu(const std::string & value) {
         s64 result = 0;
@@ -43,9 +31,6 @@ SOLUTION(2022, 25) {
         }
         return static_cast<s64>(result);
     }
-
-    static_assert(FromSnafu("1=-0-2") == 1747);
-    static_assert(FromSnafu("1121-1110-1=0") == 314159265);
 
     constexpr std::string ToSnafu(u64 value) {
         s64 running = value;
@@ -99,22 +84,7 @@ SOLUTION(2022, 25) {
         return result;
     }
 
-
-    static_assert(ToSnafu(1) == "1");
-    static_assert(ToSnafu(2) == "2");
-    static_assert(ToSnafu(3) == "1=");
-    static_assert(ToSnafu(4) == "1-");
-    static_assert(ToSnafu(5) == "10");
-    static_assert(ToSnafu(6) == "11");
-    static_assert(ToSnafu(7) == "12");
-    static_assert(ToSnafu(8) == "2=");
-    static_assert(ToSnafu(9) == "2-");
-    static_assert(ToSnafu(10) == "20");
-    static_assert(ToSnafu(1747) == "1=-0-2");
-    static_assert(ToSnafu(314159265) == "1121-1110-1=0");
-
-
-    auto Part1(const std::vector<std::string>&lines) {
+    PART_ONE() {
         u64 result = 0;
         for (const auto& line : lines) {
             result += FromSnafu(line);
@@ -122,15 +92,28 @@ SOLUTION(2022, 25) {
         return ToSnafu(result);
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
-        return lines.size();
+    PART_TWO() {
+        (void)lines;
+        return "Merry Christmas!";
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        return Part1(lines);
-    }
+    TESTS() {
+        static_assert(FromSnafu("1=-0-2") == 1747);
+        static_assert(FromSnafu("1121-1110-1=0") == 314159265);
 
-    bool RunTests() {
+        static_assert(ToSnafu(1) == "1");
+        static_assert(ToSnafu(2) == "2");
+        static_assert(ToSnafu(3) == "1=");
+        static_assert(ToSnafu(4) == "1-");
+        static_assert(ToSnafu(5) == "10");
+        static_assert(ToSnafu(6) == "11");
+        static_assert(ToSnafu(7) == "12");
+        static_assert(ToSnafu(8) == "2=");
+        static_assert(ToSnafu(9) == "2-");
+        static_assert(ToSnafu(10) == "20");
+        static_assert(ToSnafu(1747) == "1=-0-2");
+        static_assert(ToSnafu(314159265) == "1121-1110-1=0");
+
         std::vector<std::string> lines = {
             "1=-0-2",
             "12111",
@@ -147,19 +130,8 @@ SOLUTION(2022, 25) {
             "122"
         };
 
-        if (Part1(lines) != "2=-1=0") return false;
-        return true;
-    }
+        if (PartOne(lines) != "2=-1=0") return false;
 
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }

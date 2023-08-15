@@ -45,11 +45,6 @@ SOLUTION(2022, 21) {
         return monkey;
     }
 
-    static_assert(ParseLine("root: pppw + sjmn").Name == "root");
-    static_assert(ParseLine("root: pppw + sjmn").Operation == Op::Plus);
-    static_assert(ParseLine("abcd: 42").Name == "abcd");
-    static_assert(ParseLine("abcd: 42").Value == 42);
-
     constexpr u64 CalcValue(const Monkey & worker, const Monkey & lhs, const Monkey & rhs) {
         switch (worker.Operation) {
         case Op::Plus: return lhs.Value + rhs.Value;
@@ -60,7 +55,7 @@ SOLUTION(2022, 21) {
         }
     }
 
-    constexpr void RunMonkeys(std::vector<Monkey>&monkeys, const std::unordered_map<std::string, size_t>&monkeyMap, size_t rootIndex) {
+    constexpr void RunMonkeys(std::vector<Monkey>&monkeys, const Constexpr::SmallMap<std::string, size_t>&monkeyMap, size_t rootIndex) {
         while (monkeys[rootIndex].ValueSet == false) {
             for (auto& monkey : monkeys) {
                 if (monkey.ValueSet) continue;
@@ -75,14 +70,14 @@ SOLUTION(2022, 21) {
         }
     }
 
-    auto Part1(const std::vector<std::string>&lines) {
+    PART_ONE() {
         std::vector<Monkey> monkeys;
         size_t rootIndex = 0;
         for (const auto& line : lines) {
             monkeys.push_back(ParseLine(line));
         }
 
-        std::unordered_map<std::string, size_t> monkeyMap;
+        Constexpr::SmallMap<std::string, size_t> monkeyMap;
         for (auto i = 0; i < monkeys.size(); i++) {
             monkeyMap[monkeys[i].Name] = i;
             if (monkeys[i].Name == "root") {
@@ -91,21 +86,18 @@ SOLUTION(2022, 21) {
         }
 
         RunMonkeys(monkeys, monkeyMap, rootIndex);
-        return monkeys[rootIndex].Value;
+        return Constexpr::ToString(monkeys[rootIndex].Value);
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
-        std::vector<Monkey> monkeys;
+    PART_TWO() {
         size_t rootIndex = 0;
         size_t humanIndex = 0;
         size_t leftMonkeyIndex = 0;
         size_t rightMonkeyIndex = 0;
 
-        for (const auto& line : lines) {
-            monkeys.push_back(ParseLine(line));
-        }
+        auto monkeys = ParseLines(lines, ParseLine);
 
-        std::unordered_map<std::string, size_t> monkeyMap;
+        Constexpr::SmallMap<std::string, size_t> monkeyMap;
         for (auto i = 0; i < monkeys.size(); i++) {
             monkeyMap[monkeys[i].Name] = i;
             if (monkeys[i].Name == "root") {
@@ -179,17 +171,15 @@ SOLUTION(2022, 21) {
             currentMonkey = nextMonkey;
         }
 
-        return monkeys[humanIndex].Value;
-
-
+        return Constexpr::ToString(monkeys[humanIndex].Value);
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
+    TESTS() {
+        static_assert(ParseLine("root: pppw + sjmn").Name == "root");
+        static_assert(ParseLine("root: pppw + sjmn").Operation == Op::Plus);
+        static_assert(ParseLine("abcd: 42").Name == "abcd");
+        static_assert(ParseLine("abcd: 42").Value == 42);
 
-    bool RunTests() {
         std::vector<std::string> lines = {
             "root: pppw + sjmn",
             "dbpl: 5",
@@ -208,21 +198,9 @@ SOLUTION(2022, 21) {
             "hmdt: 32"
         };
 
-        if (ParseLine("abcd: 42").Value != u64(42)) return false;
-        if (Part1(lines) != 152) return false;
+        if (ParseLine("abcd: 42").Value != 42ull) return false;
+        if (PartOne(lines) != "152") return false;
 
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }

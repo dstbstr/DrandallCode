@@ -25,7 +25,7 @@ SOLUTION(2022, 22) {
         }
     }
 
-    Map ParseMap(const std::vector<std::string>&lines) {
+    constexpr Map ParseMap(const std::vector<std::string>&lines) {
         Map result;
 
         auto normalized = lines;
@@ -45,7 +45,7 @@ SOLUTION(2022, 22) {
 
     using Bounds = std::vector<std::pair<size_t, size_t>>;
 
-    Bounds GetYBounds(const Map & map) {
+    constexpr Bounds GetYBounds(const Map & map) {
         Bounds result;
 
         for (auto row : map) {
@@ -74,7 +74,7 @@ SOLUTION(2022, 22) {
         return result;
     }
 
-    Bounds GetXBounds(const Map & map) {
+    constexpr Bounds GetXBounds(const Map & map) {
         Bounds result;
 
         for (size_t col = 0; col < map[0].size(); col++) {
@@ -120,7 +120,6 @@ SOLUTION(2022, 22) {
         result.push_back(number);
         return result;
     }
-    static_assert(SplitPath("10R5L5R10L4R5L5") == std::vector<std::string>{"10", "R", "5", "L", "5", "R", "10", "L", "4", "R", "5", "L", "5"});
 
     /*
     RowCol FindStart(const Map& map, const Bounds& xBounds, const Bounds& yBounds) {
@@ -135,7 +134,7 @@ SOLUTION(2022, 22) {
     }
     */
 
-    RowCol FindStart(const Map & map, const Bounds & yBounds) {
+    constexpr RowCol FindStart(const Map & map, const Bounds & yBounds) {
         for (size_t row = 0; row < map.size(); row++) {
             for (size_t col = yBounds[row].first; col <= yBounds[row].second; col++) {
                 if (map[row][col] == State::Open) {
@@ -146,7 +145,7 @@ SOLUTION(2022, 22) {
         return { 0, 0 };
     }
 
-    void TravelUp(RowCol & pos, u32 distance, const Map & map, const Bounds & x) {
+    constexpr void TravelUp(RowCol & pos, u32 distance, const Map & map, const Bounds & x) {
         for (u32 moves = 0; moves < distance; moves++) {
             if (x[pos.Col].first > pos.Row) {
                 throw std::logic_error("We've moved off the map...");
@@ -171,7 +170,7 @@ SOLUTION(2022, 22) {
         }
     }
 
-    void TravelDown(RowCol & pos, u32 distance, const Map & map, const Bounds & x) {
+    constexpr void TravelDown(RowCol & pos, u32 distance, const Map & map, const Bounds & x) {
         for (u32 moves = 0; moves < distance; moves++) {
             if (x[pos.Col].second < pos.Row) {
                 throw std::logic_error("We've moved off the map...");
@@ -195,7 +194,7 @@ SOLUTION(2022, 22) {
         }
     }
 
-    void TravelRight(RowCol & pos, u32 distance, const Map & map, const Bounds & y) {
+    constexpr void TravelRight(RowCol & pos, u32 distance, const Map & map, const Bounds & y) {
         for (u32 moves = 0; moves < distance; moves++) {
             if (y[pos.Row].second < pos.Col) {
                 throw std::logic_error("We've moved off the map...");
@@ -221,7 +220,7 @@ SOLUTION(2022, 22) {
         }
     }
 
-    void TravelLeft(RowCol & pos, u32 distance, const Map & map, const Bounds & y) {
+    constexpr void TravelLeft(RowCol & pos, u32 distance, const Map & map, const Bounds & y) {
         for (u32 moves = 0; moves < distance; moves++) {
             if (y[pos.Row].first > pos.Col) {
                 throw std::logic_error("We've moved off the map...");
@@ -247,7 +246,7 @@ SOLUTION(2022, 22) {
         }
     }
 
-    void Travel(RowCol & pos, u32 distance, Facing facing, const Map & map, const Bounds & x, const Bounds & y) {
+    constexpr void Travel(RowCol & pos, u32 distance, Facing facing, const Map & map, const Bounds & x, const Bounds & y) {
         switch (facing) {
         case Facing::Up: TravelUp(pos, distance, map, x); break;
         case Facing::Down: TravelDown(pos, distance, map, x); break;
@@ -256,48 +255,18 @@ SOLUTION(2022, 22) {
         }
     }
 
-    auto Part1(const std::vector<std::string>&lines) {
-        const auto facingValues = 4;
-        auto map = ParseMap(lines);
-        auto x = GetXBounds(map);
-        auto y = GetYBounds(map);
-        auto path = SplitPath(ReadPath(lines));
-        auto currentPos = FindStart(map, y);
-        auto facing = Facing::Right;
-        u32 distance;
-
-        u32 commandsProcessed = 0;
-
-        for (auto cmd : path) {
-            if (cmd[0] == 'R') {
-                facing = static_cast<Facing>((facing + 1) % facingValues);
-            }
-            else if (cmd[0] == 'L') {
-                facing = static_cast<Facing>((facingValues + facing - 1) % facingValues);
-            }
-            else {
-                Constexpr::ParseNumber(cmd, distance);
-                Travel(currentPos, distance, facing, map, x, y);
-            }
-
-            commandsProcessed++;
-        }
-
-        return static_cast<u32>(((currentPos.Row + 1) * 1000) + ((currentPos.Col + 1) * 4) + static_cast<u32>(facing));
-    }
-
     struct CubeSide {
         std::vector<std::vector<bool>> Walls;
         RowCol Tl;
-        std::unordered_map<Facing, std::pair<CubeFace, Facing>> Transforms;
+        Constexpr::SmallMap<Facing, std::pair<CubeFace, Facing>> Transforms;
     };
 
     struct Cube {
-        std::unordered_map<CubeFace, CubeSide> Faces;
+        Constexpr::SmallMap<CubeFace, CubeSide> Faces;
         size_t FaceSize = 0;
     };
 
-    void AddWalls(Cube & cube, const std::vector<std::string>&lines) {
+    constexpr void AddWalls(Cube & cube, const std::vector<std::string>&lines) {
         for (auto& [_, face] : cube.Faces) {
             for (size_t row = 0; row < cube.FaceSize; row++) {
                 std::vector<bool> wallRow;
@@ -309,7 +278,7 @@ SOLUTION(2022, 22) {
         }
     }
 
-    Cube MakeTestCube(const std::vector<std::string>&lines) {
+    constexpr Cube MakeTestCube(const std::vector<std::string>&lines) {
         /*
         B
     D L U
@@ -372,7 +341,7 @@ SOLUTION(2022, 22) {
         return result;
 
     }
-    Cube MakeCube(const std::vector<std::string>&lines) {
+    constexpr Cube MakeCube(const std::vector<std::string>&lines) {
         /*
           B R
           U
@@ -437,7 +406,7 @@ SOLUTION(2022, 22) {
         return result;
     }
 
-    void ChangeFace(RowCol & pos, Facing & currentFacing, CubeFace & currentFace, const Cube & cube) {
+    constexpr void ChangeFace(RowCol & pos, Facing & currentFacing, CubeFace & currentFace, const Cube & cube) {
         auto [nextFace, nextFacing] = cube.Faces.at(currentFace).Transforms.at(currentFacing);
         auto nextPos = pos;
 
@@ -496,7 +465,7 @@ SOLUTION(2022, 22) {
         currentFace = nextFace;
     }
 
-    void Travel(const Cube & cube, u32 distance, RowCol & pos, Facing & facing, CubeFace & currentFace) {
+    constexpr void Travel(const Cube & cube, u32 distance, RowCol & pos, Facing & facing, CubeFace & currentFace) {
         RowCol nextPos = pos;
         Facing nextFacing = facing;
         CubeFace nextFace = currentFace;
@@ -530,7 +499,41 @@ SOLUTION(2022, 22) {
         }
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
+    constexpr u32 GetResult(const RowCol& pos, Facing facing) {
+        return static_cast<u32>(((pos.Row + 1) * 1000) + ((pos.Col + 1) * 4) + static_cast<u32>(facing));
+    }
+
+    PART_ONE() {
+        const auto facingValues = 4;
+        auto map = ParseMap(lines);
+        auto x = GetXBounds(map);
+        auto y = GetYBounds(map);
+        auto path = SplitPath(ReadPath(lines));
+        auto currentPos = FindStart(map, y);
+        auto facing = Facing::Right;
+        u32 distance;
+
+        u32 commandsProcessed = 0;
+
+        for (auto cmd : path) {
+            if (cmd[0] == 'R') {
+                facing = static_cast<Facing>((facing + 1) % facingValues);
+            }
+            else if (cmd[0] == 'L') {
+                facing = static_cast<Facing>((facingValues + facing - 1) % facingValues);
+            }
+            else {
+                Constexpr::ParseNumber(cmd, distance);
+                Travel(currentPos, distance, facing, map, x, y);
+            }
+
+            commandsProcessed++;
+        }
+
+        return Constexpr::ToString(GetResult(currentPos, facing));
+    }
+
+    PART_TWO() {
         const auto facingValues = 4;
         auto cube = MakeCube(lines);
         //auto cube = MakeTestCube(lines);
@@ -556,15 +559,12 @@ SOLUTION(2022, 22) {
         auto finalFace = cube.Faces.at(currentFace);
         RowCol resultPos = { pos.Row + finalFace.Tl.Row, pos.Col + finalFace.Tl.Col };
 
-        return static_cast<u32>(((resultPos.Row + 1) * 1000) + ((resultPos.Col + 1) * 4) + static_cast<u32>(facing));
+        return Constexpr::ToString(GetResult(resultPos, facing));
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
+    TESTS() {
+        static_assert(SplitPath("10R5L5R10L4R5L5") == std::vector<std::string>{"10", "R", "5", "L", "5", "R", "10", "L", "4", "R", "5", "L", "5"});
+        
         std::vector<std::string> lines = {
             "        ...#",
             "        .#..",
@@ -582,37 +582,9 @@ SOLUTION(2022, 22) {
             "10R5L5R10L4R5L5"
         };
 
-        //if (Part1(lines) != 6032) return false;
-        if (Part2(lines) != 5031) return false;
+        if (PartOne(lines) != "6032") return false;
+        //if (PartTwo(lines) != "5031") return false;
 
-        //auto map = ParseMap(lines);
-        //if (map[0][0] != State::None) return false;
-        //auto x = GetXBounds(map);
-        //auto y = GetYBounds(map);
-
-        //if (map[0][y[0].first] != State::Open) return false;
-        //if (map[0][y[0].second] != State::Closed) return false;
-
-        //if (map[x[0].first][0] != State::Open) return false;
-        //if (map[x[0].second][0] != State::Open) return false;
-
-        //auto path = ReadPath(lines);
-        //if (path != "10R5L5R10L4R5L5") return false;
-
-        //auto startPos = FindStart(map, x, y);
-        //if (startPos != RowCol{0, 8}) return false;
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }

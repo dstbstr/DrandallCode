@@ -85,8 +85,8 @@ void RunAll() {
 int main(int, char**) {
     Constexpr::Regex::RunTest();
     //RunAll();
-    //RunYear(2022);
-    RunOne(2022, 19);
+    RunYear(2022);
+    //RunOne(2022, 25);
     //RunLatest();
     return 0;
 }

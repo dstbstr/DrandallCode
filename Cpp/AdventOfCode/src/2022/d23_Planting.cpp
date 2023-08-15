@@ -5,7 +5,7 @@ SOLUTION(2022, 23) {
 
     using Action = std::function<bool(RowCol&, const Map&)>;
 
-    std::vector<std::vector<bool>> ReduceMap(const Map & map) {
+    constexpr std::vector<std::vector<bool>> ReduceMap(const Map & map) {
         UCoord min{ 500, 500 };
         UCoord max{ 0, 0 };
 
@@ -31,18 +31,20 @@ SOLUTION(2022, 23) {
         return result;
     }
 
-    void PrintMap(const Map & map) {
+    constexpr std::string PrintMap(const Map & map) {
         auto reduced = ReduceMap(map);
+        std::string result = "\n";
         for (auto row : reduced) {
             for (auto col : row) {
-                std::cout << (col ? '#' : '.');
+                result.push_back(col ? '#' : '.');
             }
-            std::cout << '\n';
+            result.push_back('\n');
         }
-        std::cout << "\n";
+        result.push_back('\n');
+        return result;
     }
 
-    std::vector<Action> GetActions() {
+    constexpr std::vector<Action> GetActions() {
         auto isAlone = [](RowCol& pos, const Map& map) -> bool {
             for (auto row = pos.Row - 1; row < pos.Row + 2; row++) {
                 for (auto col = pos.Col - 1; col < pos.Col + 2; col++) {
@@ -103,11 +105,11 @@ SOLUTION(2022, 23) {
         return { isAlone, checkNorth, checkSouth, checkWest, checkEast };
     }
 
-    void RotateActions(std::vector<Action>&actions) {
+    constexpr void RotateActions(std::vector<Action>&actions) {
         std::rotate(actions.begin() + 1, actions.begin() + 2, actions.end());
     }
 
-    Map ParseMap(const std::vector<std::string>&lines) {
+    constexpr Map ParseMap(const std::vector<std::string>&lines) {
         Map result;
         for (auto& row : result) {
             row.fill(false);
@@ -122,7 +124,7 @@ SOLUTION(2022, 23) {
         return result;
     }
 
-    RowCol RunActions(RowCol pos, const Map & map, const std::vector<Action> actions) {
+    constexpr RowCol RunActions(RowCol pos, const Map & map, const std::vector<Action> actions) {
         RowCol result = pos;
         for (auto action : actions) {
             if (!action(result, map)) {
@@ -133,7 +135,7 @@ SOLUTION(2022, 23) {
         return result;
     }
 
-    bool RunRound(Map & map, std::vector<Action>&actions) {
+    constexpr bool RunRound(Map & map, std::vector<Action>&actions) {
         std::vector<std::pair<RowCol, RowCol>> moves;
         for (size_t row = 0; row < map.size(); row++) {
             for (size_t col = 0; col < map[row].size(); col++) {
@@ -183,7 +185,7 @@ SOLUTION(2022, 23) {
         return !keep.empty();
     }
 
-    auto Part1(const std::vector<std::string>&lines) {
+    PART_ONE() {
         auto actions = GetActions();
         auto map = ParseMap(lines);
 
@@ -199,10 +201,10 @@ SOLUTION(2022, 23) {
                 if (!elf) result++;
             }
         }
-        return result;
+        return Constexpr::ToString(result);
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
+    PART_TWO() {
         auto actions = GetActions();
         auto map = ParseMap(lines);
 
@@ -211,15 +213,10 @@ SOLUTION(2022, 23) {
             round++;
         }
 
-        return round + 1;
+        return Constexpr::ToString(round + 1);
     }
 
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
+    TESTS() {
         std::vector<std::string> lines = {
             "..............",
             "..............",
@@ -235,20 +232,8 @@ SOLUTION(2022, 23) {
             ".............."
         };
 
-        //if (Part1(lines) != 110) return false;
-        if (Part2(lines) != 20) return false;
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
+        if (PartOne(lines) != "110") return false;
+        if (PartTwo(lines) != "20") return false;
         return true;
     }
 }

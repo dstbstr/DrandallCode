@@ -5,24 +5,24 @@ SOLUTION(2022, 24) {
     enum struct Direction { Up, Down, Left, Right };
 
     using BlizzardDirection = std::vector<std::vector<bool>>;
-    using Blizzard = std::unordered_map<Direction, BlizzardDirection>;
+    using Blizzard = Constexpr::SmallMap<Direction, BlizzardDirection>;
 
-    RowCol GetStart() {
+    constexpr RowCol GetStart() {
         return { 0, 1 };
     }
 
-    RowCol GetExit(const std::vector<std::string>&lines) {
+    constexpr RowCol GetExit(const std::vector<std::string>&lines) {
         return { lines.size() - 1, lines[lines.size() - 1].size() - 2 };
     }
 
-    RowCol GetRowColCounts(const Blizzard & blizzard) {
+    constexpr RowCol GetRowColCounts(const Blizzard & blizzard) {
         auto down = blizzard.at(Direction::Down);
         auto right = blizzard.at(Direction::Right);
 
         return { right.size(), down[0].size() };
     }
 
-    Blizzard ParseInput(const std::vector<std::string>&lines) {
+    constexpr Blizzard ParseInput(const std::vector<std::string>&lines) {
         Blizzard result;
         BlizzardDirection up;
         BlizzardDirection down;
@@ -66,7 +66,7 @@ SOLUTION(2022, 24) {
         return result;
     }
 
-    Blizzard GetBlizzardAtTime(const Blizzard & blizzard, u32 timeStep) {
+    constexpr Blizzard GetBlizzardAtTime(const Blizzard & blizzard, u32 timeStep) {
         Blizzard result = blizzard;
         auto& up = result.at(Direction::Up);
         auto& down = result.at(Direction::Down);
@@ -92,7 +92,7 @@ SOLUTION(2022, 24) {
         return result;
     }
 
-    std::vector<RowCol> GetOpenPositions(const Blizzard & blizzard) {
+    constexpr std::vector<RowCol> GetOpenPositions(const Blizzard & blizzard) {
         auto up = blizzard.at(Direction::Up);
         auto down = blizzard.at(Direction::Down);
         auto left = blizzard.at(Direction::Left);
@@ -113,18 +113,19 @@ SOLUTION(2022, 24) {
         return result;
     }
 
-    void PrintBlizzard(const Blizzard & blizzard, const RowCol & santaPos) {
+    constexpr std::string PrintBlizzard(const Blizzard & blizzard, const RowCol & santaPos) {
         auto limits = GetRowColCounts(blizzard);
         RowCol start = { 0, 1 };
         RowCol end = { limits.Row - 1, limits.Col - 2 };
+        std::string result = "\n";
 
         for (auto row = 0; row < limits.Row; row++) {
             for (auto col = 0; col < limits.Col; col++) {
                 if (row == 0 || col == 0) {
-                    std::cout << '#';
+                    result.push_back('#');
                 }
                 else if (row == limits.Row - 1 || col == limits.Col - 1) {
-                    std::cout << '#';
+                    result.push_back('#');
                 }
                 else {
                     bool up = blizzard.at(Direction::Up)[row][col];
@@ -136,33 +137,33 @@ SOLUTION(2022, 24) {
                     auto count = up + down + left + right;
                     if (count == 1) {
                         if (santa) throw std::logic_error("Santa's standing in a blizzard");
-
-                        if (up) std::cout << '^';
-                        if (down) std::cout << 'v';
-                        if (left) std::cout << '<';
-                        if (right) std::cout << '>';
+                        if (up) result.push_back('^');
+                        if (down) result.push_back('v');
+                        if (left) result.push_back('<');
+                        if (right) result.push_back('>');
                     }
                     else if (count == 0) {
                         if (santa) {
-                            std::cout << "S";
+                            result.push_back('S');
                         }
                         else {
-                            std::cout << '.';
+                            result.push_back('.');
                         }
                     }
                     else {
                         if (santa) throw std::logic_error("Santa's standing in at least 2 blizzards");
 
-                        std::cout << count;
+                        result += Constexpr::ToString(count);
                     }
                 }
             }
-            std::cout << '\n';
+            result.push_back('\n');
         }
-        std::cout << '\n';
+        result.push_back('\n');
+        return result;
     }
 
-    std::vector<RowCol> GetNeighbors(const RowCol & pos, const RowCol & exit, const RowCol & limits) {
+    constexpr std::vector<RowCol> GetNeighbors(const RowCol & pos, const RowCol & exit, const RowCol & limits) {
         std::vector<RowCol> nextPositions;
         if (MDistance(pos, exit) == 1) {
             nextPositions.push_back(exit);
@@ -185,8 +186,8 @@ SOLUTION(2022, 24) {
         return nextPositions;
     }
 
-    u32 Travel(const Blizzard & blizzard, RowCol start, RowCol exit, RowCol limits, u32 startTime) {
-        std::unordered_map<RowCol, std::vector<u32>> openTimePoints;
+    constexpr u32 Travel(const Blizzard & blizzard, RowCol start, RowCol exit, RowCol limits, u32 startTime) {
+        Constexpr::BigMap<RowCol, std::vector<u32>, 10'000> openTimePoints;
         for (auto i = 0; i < 400; i++) {
             auto open = GetOpenPositions(GetBlizzardAtTime(blizzard, i + startTime));
             openTimePoints[start].push_back(i + startTime);
@@ -197,8 +198,8 @@ SOLUTION(2022, 24) {
         }
 
         std::vector<RowCol> current = { start };
-        std::unordered_set<RowCol> next;
-        std::unordered_map<RowCol, RowCol> moveFrom;
+        Constexpr::SmallSet<RowCol> next;
+        Constexpr::SmallMap<RowCol, RowCol> moveFrom;
 
         while (true) {
             //std::cout << "Minute " << startTime << "\n";
@@ -210,7 +211,7 @@ SOLUTION(2022, 24) {
 
                     if (std::find(openTimePoints.at(neighbor).begin(), openTimePoints.at(neighbor).end(), startTime + 1) != openTimePoints.at(neighbor).end()) {
                         //PrintBlizzard(GetBlizzardAtTime(blizzard, startTime + 1), neighbor);
-                        if (moveFrom.find(neighbor) == moveFrom.end()) {
+                        if (!moveFrom.contains(neighbor)) {
                             moveFrom[neighbor] = pos;
                         }
                         next.insert(neighbor);
@@ -228,19 +229,18 @@ SOLUTION(2022, 24) {
         }
 
         return startTime;
-
     }
 
-    auto Part1(const std::vector<std::string>&lines) {
+    PART_ONE() {
         auto blizzard = ParseInput(lines);
         auto start = GetStart();
         auto exit = GetExit(lines);
         auto limits = GetRowColCounts(blizzard);
 
-        return Travel(blizzard, start, exit, limits, 0);
+        return Constexpr::ToString(Travel(blizzard, start, exit, limits, 0));
     }
 
-    auto Part2(const std::vector<std::string>&lines) {
+    PART_TWO() {
         auto blizzard = ParseInput(lines);
         auto start = GetStart();
         auto exit = GetExit(lines);
@@ -249,16 +249,10 @@ SOLUTION(2022, 24) {
         auto result = Travel(blizzard, start, exit, limits, 0);
         result = Travel(blizzard, exit, start, limits, result);
         result = Travel(blizzard, start, exit, limits, result);
-        return result;
+        return Constexpr::ToString(result);
     }
 
-    //690 is too low
-    std::string Run(const std::vector<std::string>&lines) {
-        //return Constexpr::ToString(Part1(lines));
-        return Constexpr::ToString(Part2(lines));
-    }
-
-    bool RunTests() {
+    TESTS() {
         std::vector<std::string> lines = {
             "#.######",
             "#>>.<^<#",
@@ -268,34 +262,9 @@ SOLUTION(2022, 24) {
             "######.#"
         };
 
-        //if (Part1(lines) != 18) return false;
-        if (Part2(lines) != 54) return false;
-        /*
-        auto blizzard = ParseInput(lines);
-        auto start = GetStart();
-        auto exit = GetExit(lines);
-        auto limits = GetRowColCounts(blizzard);
-        */
+        if (PartOne(lines) != "18") return false;
+        if (PartTwo(lines) != "54") return false;
 
-        /*
-        if (Travel(blizzard, start, exit, limits, 0) != 18) return false;
-        if (Travel(blizzard, start, exit, limits, 41) != 54) return false;
-        */
-        //if (Travel(blizzard, exit, start, limits, 18) != 41) return false;
-        //if (Travel(blizzard, exit, start, limits, 18) != 41) return false;
-
-        return true;
-    }
-
-    PART_ONE() {
-        return lines[0];
-    }
-
-    PART_TWO() {
-        return lines[0];
-    }
-
-    TESTS() {
         return true;
     }
 }

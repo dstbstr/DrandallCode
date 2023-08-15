@@ -29,6 +29,7 @@ namespace Constexpr {
     static_assert(ModPow(2, 3, 5) == 3); //2^3 == 8 % 5 == 3
 
     static_assert(EuclideanModulo(-5, 3) == 1);
+    static_assert(EuclideanModulo(-2, 6) == 4);
 
     static_assert(FromBase26(std::string_view("a")) == 0);
     static_assert(FromBase26(std::string_view("z")) == 25);
