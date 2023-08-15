@@ -15,6 +15,15 @@
 #include <thread>
 #include <vector>
 
+template<typename ReturnType>
+struct TaskQueue {
+    constexpr void push(auto func) {
+        Tasks.push_back(concurrency::create_task(func));
+    }
+
+    std::vector<concurrency::task<ReturnType>> Tasks;
+};
+
 class MsvcRunner {
 public:
     static MsvcRunner Get() {
@@ -25,14 +34,14 @@ public:
 private:
     template<class ReturnType>
     struct IRunner {
-        virtual std::vector<ReturnType> Run(u32 maxConcurrency, std::vector<std::unique_ptr<IRunnable<ReturnType>>>& runnables) = 0;
+        virtual std::vector<ReturnType> Run(u32 maxConcurrency, const std::vector<std::unique_ptr<IRunnable<ReturnType>>>& runnables) = 0;
         virtual ~IRunner() = default;
     };
 
     template<class ReturnType>
     class SerialRunner : public IRunner<ReturnType> {
     public:
-        std::vector<ReturnType> Run(u32, std::vector<std::unique_ptr<IRunnable<ReturnType>>>& runnables) final {
+        std::vector<ReturnType> Run(u32, const std::vector<std::unique_ptr<IRunnable<ReturnType>>>& runnables) final {
             std::vector<ReturnType> result;
 
             for(auto&& runnable: runnables) {
@@ -46,7 +55,7 @@ private:
     template<class ReturnType>
     class BatchRunner : public IRunner<ReturnType> {
     public:
-        std::vector<ReturnType> Run(u32 maxConcurrency, std::vector<std::unique_ptr<IRunnable<ReturnType>>>& runnables) final {
+        std::vector<ReturnType> Run(u32 maxConcurrency, const std::vector<std::unique_ptr<IRunnable<ReturnType>>>& runnables) final {
             ProgressBar progress(runnables.size());
             LOG_INFO(StrUtil::Format("Processing %d jobs with %u tasks", runnables.size(), maxConcurrency));
 
@@ -78,7 +87,7 @@ private:
     template<class ReturnType>
     class WorkStealRunner : public IRunner<ReturnType> {
     public:
-        std::vector<ReturnType> Run(u32 maxConcurrency, std::vector<std::unique_ptr<IRunnable<ReturnType>>>& runnables) final {
+        std::vector<ReturnType> Run(u32 maxConcurrency, const std::vector<std::unique_ptr<IRunnable<ReturnType>>>& runnables) final {
             ProgressBar progress(runnables.size());
 
             std::vector<concurrency::task<ReturnType>> tasks;
@@ -126,22 +135,32 @@ private:
 
 public:
     template<class ReturnType>
-    std::vector<ReturnType> RunAll(Threading::ExpectedRunTime expectedRunTime, std::vector<std::unique_ptr<IRunnable<ReturnType>>>& runnables) {
+    std::vector<ReturnType> RunAll(Threading::ExpectedRunTime expectedRunTime, const std::vector<std::unique_ptr<IRunnable<ReturnType>>>& runnables) {
         ScopedTimer timer("Runner::RunAll");
-        std::unique_ptr<IRunner<ReturnType>> runner;
-        if(runnables.size() < (u64)m_MaxConcurrency * 2 && expectedRunTime < Threading::ExpectedRunTime::SECONDS) {
-            runner = std::make_unique<SerialRunner<ReturnType>>();
-        } else if(expectedRunTime < Threading::ExpectedRunTime::SECONDS) {
-            runner = std::make_unique<BatchRunner<ReturnType>>();
-        } else {
-            runner = std::make_unique<WorkStealRunner<ReturnType>>();
+        if (runnables.size() < (u64)m_MaxConcurrency * 2 && expectedRunTime < Threading::ExpectedRunTime::SECONDS) {
+            return SerialRunner<ReturnType>().Run(m_MaxConcurrency, runnables);
         }
+        else if (expectedRunTime < Threading::ExpectedRunTime::SECONDS) {
+            return BatchRunner<ReturnType>().Run(m_MaxConcurrency, runnables);
+        }
+        else {
+            return WorkStealRunner<ReturnType>().Run(m_MaxConcurrency, runnables);
+        }
+    }
 
-        return runner->Run(m_MaxConcurrency, runnables);
+    template<typename ReturnType>
+    std::vector<ReturnType> RunAll(const TaskQueue<ReturnType> tasks) {
+        ScopedTimer timer("Runner::RunAll");
+        concurrency::when_all(tasks.Tasks.begin(), tasks.Tasks.end()).wait();
+        std::vector<ReturnType> result;
+        for (const auto& t : tasks.Tasks) {
+            result.push_back(t.get());
+        }
+        return result;
     }
 
 private:
     MsvcRunner() = default;
-    const u32 m_MaxConcurrency{std::max(u32(1), std::thread::hardware_concurrency())};
+    const u32 m_MaxConcurrency{std::max(1u, std::thread::hardware_concurrency())};
 };
 #endif // __MSVCRUNNER_H__

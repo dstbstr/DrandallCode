@@ -16,7 +16,7 @@
 #include <filesystem>
 
 Log::MinimalStdOutLogWriter logWriter{};
-static std::unordered_map<std::string, std::chrono::microseconds> SolutionTimings;
+using TimingEntry = std::pair<std::string, std::chrono::microseconds>;
 
 std::vector<std::string> ReadInputFile(size_t year, size_t day) {
     std::vector<std::string> result{};
@@ -34,14 +34,14 @@ std::vector<std::string> ReadInputFile(size_t year, size_t day) {
     return result;
 }
 
-bool Check(size_t year, size_t day, bool hideOutput = false) {
+bool Check(size_t year, size_t day, std::vector<TimingEntry>& timingData, bool hideOutput = false) {
     if (!GetTests().contains(year) || !GetTests()[year].contains(day)) {
         return true;
     }
 
-    auto GatherTiming = [year, day](std::chrono::microseconds elapsed) {
+    auto GatherTiming = [&](std::chrono::microseconds elapsed) {
         auto key = Constexpr::ToString(year) + "/" + Constexpr::ToString(day) + ":Test";
-        SolutionTimings[key] = elapsed;
+        timingData.push_back(std::make_pair(key, elapsed));
         };
 
     if (auto testTime = ScopedTimer(GatherTiming, "Test Time"); GetTests()[year][day]()) {
@@ -54,74 +54,69 @@ bool Check(size_t year, size_t day, bool hideOutput = false) {
     }
 }
 
-struct PuzzleSolver : IRunnable<bool> {
-    PuzzleSolver(size_t year, size_t day, bool hideOutput) : Year(year), Day(day), HideOutput(hideOutput) {}
-    bool Execute() const override {
-        if (!HideOutput) std::cout << "### " << Year << " Day " << Day << "###\n";
-        if (!Check(Year, Day, HideOutput)) return false;
+std::vector<TimingEntry> RunOne(size_t year, size_t day, bool hideOutput = false) {
+    if (!hideOutput) std::cout << "### " << year << " Day " << day << "###\n";
+    std::vector<TimingEntry> timingData;
 
-        const auto lines = ReadInputFile(Year, Day);
-        for (const auto& [part, func] : GetSolutions()[Year][Day]) {
-            auto GatherTiming = [=](std::chrono::microseconds elapsed) {
-                auto key = Constexpr::ToString(Year) + "/" + Constexpr::ToString(Day) + ":" + Constexpr::ToString(part);
-                SolutionTimings[key] = elapsed;
-                };
-            auto partTime = ScopedTimer(GatherTiming);
-            auto result = func(lines);
-            if (!HideOutput) {
-                std::cout << "Part " << part << ": " << result << "\n";
+    if (!Check(year, day, timingData, hideOutput)) return timingData;
 
-                if (!GET_LOGS().empty()) {
-                    std::cout << "## Logs ##\n";
-                    std::cout << Constexpr::JoinVec("\n", GET_LOGS());
-                    GET_LOGS().clear();
-                }
+    const auto lines = ReadInputFile(year, day);
+    for (const auto& [part, func] : GetSolutions()[year][day]) {
+        auto GatherTiming = [&](std::chrono::microseconds elapsed) {
+            auto key = Constexpr::ToString(year) + "/" + Constexpr::ToString(day) + ":" + Constexpr::ToString(part);
+            timingData.push_back(std::make_pair(key, elapsed));
+            };
+        auto partTime = ScopedTimer(GatherTiming);
+        auto result = func(lines);
+        if (!hideOutput) {
+            std::cout << "Part " << part << ": " << result << "\n";
+
+            if (!GET_LOGS().empty()) {
+                std::cout << "## Logs ##\n";
+                std::cout << Constexpr::JoinVec("\n", GET_LOGS());
+                GET_LOGS().clear();
             }
         }
-        if (!HideOutput) {
-            std::cout << "\n";
-        }
-
-        return true;
+    }
+    if (!hideOutput) {
+        std::cout << "\n";
     }
 
-    size_t Year;
-    size_t Day;
-    bool HideOutput;
-};
+    return timingData;
 
-void RunOne(size_t year, size_t day) {
-    auto solver = PuzzleSolver(year, day, false);
-    solver.Execute();
 }
 
-void RunYear(size_t year) {
-    auto tasks = std::vector<std::unique_ptr<IRunnable<bool>>>{};
+std::vector<TimingEntry> RunTasks(const TaskQueue<std::vector<TimingEntry>>& tasks) {
+    auto timingData = Runner::Get().RunAll(tasks);
+    std::vector<TimingEntry> result;
+    for (const auto& d : timingData) {
+        std::copy(d.begin(), d.end(), std::back_inserter(result));
+    }
+    return result;
+}
+std::vector<TimingEntry> RunYear(size_t year) {
+    auto tasks = TaskQueue<std::vector<TimingEntry>>{};
     for (const auto& [day, part] : GetSolutions()[year]) {
-        tasks.push_back(std::move(std::make_unique<PuzzleSolver>(year, day, true)));
+        tasks.push([=]() { return RunOne(year, day, true); });
     }
-    Runner::Get().RunAll(Threading::ExpectedRunTime::SECONDS, tasks);
+    return RunTasks(tasks);
 }
 
-void RunAll() {
-    auto tasks = std::vector<std::unique_ptr<IRunnable<bool>>>{};
+std::vector<TimingEntry> RunAll() {
+    auto tasks = TaskQueue<std::vector<TimingEntry>>{};
     for (const auto& [year, days] : GetSolutions()) {
         for (const auto& [day, parts] : days) {
-            tasks.push_back(std::move(std::make_unique<PuzzleSolver>(year, day, true)));
+            tasks.push([=]() { return RunOne(year, day, true); });
         }
     }
-    Runner::Get().RunAll(Threading::ExpectedRunTime::SECONDS, tasks);
+    return RunTasks(tasks);
 }
 
-void PrintTimings(size_t maxResults = 0, std::chrono::microseconds minElapsed = std::chrono::microseconds(0)) {
-    std::vector<std::pair<std::chrono::microseconds, std::string>> timings;
-    for (const auto& [key, elapsed] : SolutionTimings) {
-        timings.push_back(std::make_pair(elapsed, key));
-    }
-    std::sort(timings.begin(), timings.end(), [](auto lhs, auto rhs) { return rhs.first < lhs.first; });
+void PrintTimings(std::vector<TimingEntry> timings, size_t maxResults = 0, std::chrono::microseconds minElapsed = std::chrono::microseconds(0)) {
+    std::sort(timings.begin(), timings.end(), [](auto lhs, auto rhs) { return rhs.second < lhs.second; });
 
     size_t resultId = 0;
-    for (auto [elapsed, key] : timings) {
+    for (auto [key, elapsed] : timings) {
         if (minElapsed > std::chrono::microseconds(0) && elapsed < minElapsed) break;
         if (maxResults > 0 && resultId > maxResults) break;
 
@@ -131,13 +126,11 @@ void PrintTimings(size_t maxResults = 0, std::chrono::microseconds minElapsed = 
 //maybe look closer at this for more shenanigans: https://stackoverflow.com/questions/410980/include-a-text-file-in-a-c-program-as-a-char
 
 int main(int, char**) {
-    Constexpr::Regex::RunTest();
-    //RunAll();
-    //RunYear(2022);
-    RunOne(2022, 25);
-    //RunLatest();
+    //auto timings = RunAll();
+    auto timings = RunYear(2022);
+    //auto timings = RunOne(2022, 25);
 
     //PrintTimings(0, std::chrono::seconds(1));
-    PrintTimings();
+    PrintTimings(timings);
     return 0;
 }
