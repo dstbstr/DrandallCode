@@ -14,6 +14,7 @@
 #include <filesystem>
 
 Log::MinimalStdOutLogWriter logWriter{};
+static std::unordered_map<std::string, std::chrono::microseconds> SolutionTimings;
 
 std::vector<std::string> ReadInputFile(size_t year, size_t day) {
     std::vector<std::string> result{};
@@ -36,7 +37,12 @@ bool Check(size_t year, size_t day) {
         return true;
     }
 
-    if (auto testTime = ScopedTimer("Test Time"); GetTests()[year][day]()) {
+    auto GatherTiming = [year, day](std::chrono::microseconds elapsed) {
+        auto key = Constexpr::ToString(year) + "/" + Constexpr::ToString(day) + ":Test";
+        SolutionTimings[key] = elapsed;
+        };
+
+    if (auto testTime = ScopedTimer(GatherTiming, "Test Time"); GetTests()[year][day]()) {
         std::cout << "Test Pass\n";
         return true;
     }
@@ -49,9 +55,14 @@ bool Check(size_t year, size_t day) {
 void RunOne(size_t year, size_t day) {
     std::cout << "### " << year << " Day " << day << " ###\n";
     if (!Check(year, day)) return;
+
     const auto lines = ReadInputFile(year, day);
     for (const auto& [part, func] : GetSolutions()[year][day]) {
-        auto partTime = ScopedTimer();
+        auto GatherTiming = [year, day, part](std::chrono::microseconds elapsed) {
+            auto key = Constexpr::ToString(year) + "/" + Constexpr::ToString(day) + ":" + Constexpr::ToString(part);
+            SolutionTimings[key] = elapsed;
+            };
+        auto partTime = ScopedTimer(GatherTiming);
         std::cout << "Part " << part << ": " << func(lines) << "\n";
 
         if (!GET_LOGS().empty()) {
@@ -64,7 +75,7 @@ void RunOne(size_t year, size_t day) {
 }
 
 void RunYear(size_t year) {
-    auto fullTime = ScopedTimer("Total Time");
+    auto fullTime = ScopedTimer("Year" + Constexpr::ToString(year) + " Time");
     for (const auto& [day, part] : GetSolutions()[year]) {
         RunOne(year, day);
     }
@@ -80,13 +91,30 @@ void RunAll() {
     }
 }
 
+void PrintTimings(size_t maxResults = 0, std::chrono::microseconds minElapsed = std::chrono::microseconds(0)) {
+    std::vector<std::pair<std::chrono::microseconds, std::string>> timings;
+    for (const auto& [key, elapsed] : SolutionTimings) {
+        timings.push_back(std::make_pair(elapsed, key));
+    }
+    std::sort(timings.begin(), timings.end(), [](auto lhs, auto rhs) { return rhs.first < lhs.first; });
+
+    size_t resultId = 0;
+    for (auto [elapsed, key] : timings) {
+        if (minElapsed > std::chrono::microseconds(0) && elapsed < minElapsed) break;
+        if (maxResults > 0 && resultId > maxResults) break;
+
+        std::cout << key << ": " << TimeUtils::DurationToString(elapsed) << "\n";
+    }
+}
 //maybe look closer at this for more shenanigans: https://stackoverflow.com/questions/410980/include-a-text-file-in-a-c-program-as-a-char
 
 int main(int, char**) {
     Constexpr::Regex::RunTest();
-    //RunAll();
-    RunYear(2022);
+    RunAll();
+    //RunYear(2022);
     //RunOne(2022, 25);
     //RunLatest();
+
+    PrintTimings(0, std::chrono::seconds(1));
     return 0;
 }
