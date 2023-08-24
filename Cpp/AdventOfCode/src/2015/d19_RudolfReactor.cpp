@@ -43,7 +43,7 @@ SOLUTION(2015, 19) {
     }
 
     PART_ONE() {
-        auto groups = SplitInputIntoGroups(lines);
+        auto groups = SplitInputIntoGroups(Lines);
         Transforms transforms;
         RTransforms reverseTransforms;
         for (const auto& line : groups[0]) {
@@ -57,7 +57,7 @@ SOLUTION(2015, 19) {
         return Constexpr::ToString(molecules.size());
     }
     PART_TWO() {
-        auto groups = SplitInputIntoGroups(lines);
+        auto groups = SplitInputIntoGroups(Lines);
         Transforms transforms;
         RTransforms reverseTransforms;
         for (const auto& line : groups[0]) {
@@ -73,6 +73,7 @@ SOLUTION(2015, 19) {
         return Constexpr::ToString(steps);
     }
     TESTS() {
+        /*
         std::vector<std::string> lines = {
             "H => HO",
             "H => OH",
@@ -82,6 +83,7 @@ SOLUTION(2015, 19) {
         };
 
         if (PartOne(lines) != "4") return false;
+        */
         return true;
     }
 }

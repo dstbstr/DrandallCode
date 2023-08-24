@@ -15,7 +15,7 @@ SOLUTION(2016, 2) {
     using LookupType = Constexpr::SmallMap<std::string, Constexpr::SmallMap<Facing, std::string>>;
 
     template<size_t Rows, size_t Cols>
-    constexpr LookupType BuildMap(std::vector<std::string> input) {
+    constexpr LookupType BuildMap(const std::vector<std::string>& input) {
         auto result = LookupType{};
 
         for (size_t row = 0; row < Rows; row++) {
@@ -60,7 +60,7 @@ SOLUTION(2016, 2) {
         return result;
     }
 
-    constexpr std::vector<std::string> GetCode(const std::vector<std::string>&lines, const LookupType& lookup) {
+    constexpr std::vector<std::string> GetCode(const auto& lines, const LookupType& lookup) {
         std::string key = "5";
         std::vector<std::string> result;
 
@@ -74,7 +74,7 @@ SOLUTION(2016, 2) {
         return result;
     }
 
-    constexpr std::string GetSimpleCode(const std::vector<std::string>&lines) {
+    constexpr std::string GetSimpleCode(const auto& lines) {
         auto lookup = BuildMap<3, 3>({
             "1", "2", "3",
             "4", "5", "6",
@@ -86,7 +86,7 @@ SOLUTION(2016, 2) {
         return Constexpr::JoinVec("", keys);
     }
 
-    constexpr std::string GetRealCode(const std::vector<std::string>&lines) {
+    constexpr std::string GetRealCode(const auto& lines) {
         auto lookup = BuildMap<5, 5>({
             " ", " ", "1", " ", " ",
             " ", "2", "3", "4", " ",
@@ -100,14 +100,14 @@ SOLUTION(2016, 2) {
     }
 
     PART_ONE() {
-        return GetSimpleCode(lines);
+        return GetSimpleCode(Lines);
     }
     PART_TWO() {
-        return GetRealCode(lines);
+        return GetRealCode(Lines);
     }
 
     TESTS() {
-        std::vector<std::string> lines = {
+        std::vector<std::string_view> lines = {
             "ULL",
             "RRDDD",
             "LURDL",

@@ -7,7 +7,7 @@ SOLUTION(2016, 4) {
         std::string Checksum;
     };
 
-    constexpr Room ParseRoom(const std::string& line) {
+    constexpr Room ParseRoom(std::string_view line) {
         auto s1 = Constexpr::Split(line, "[");
         auto s2 = Constexpr::Split(s1[0], "-");
         Room result;
@@ -65,32 +65,17 @@ SOLUTION(2016, 4) {
     }
 
     PART_ONE() {
-        
-        u32 result = 0;
-        auto rooms = ParseLines(lines, ParseRoom);
-        for (const auto& room : rooms) {
-            result += room.Id * IsReal(room);
-        }
-
-        return Constexpr::ToString(result);
+        auto rooms = ParseLines(Lines, ParseRoom);
+        return Constexpr::ToString(std::accumulate(rooms.begin(), rooms.end(), 0, [](u32 prev, const Room& room) {
+            return prev + room.Id * IsReal(room);
+            }));
     }
     PART_TWO() {
-        
-        std::vector<Room> realRooms;
-        for (auto line : lines) {
-            auto room = ParseRoom(line);
-            if (IsReal(room)) {
-                realRooms.push_back(room);
-            }
-        }
-
-        for (auto room : realRooms) {
-            if (DecryptRoom(room) == "northpole object storage") {
-                return Constexpr::ToString(room.Id);
-            }
-        }
-
-        return "Not Found";
+        auto rooms = ParseLines(Lines, ParseRoom);
+        auto result = std::find_if(rooms.begin(), rooms.end(), [](const Room& room) {
+            return IsReal(room) && DecryptRoom(room) == "northpole object storage";
+            });
+        return Constexpr::ToString(result->Id);
     }
 
     TESTS() {

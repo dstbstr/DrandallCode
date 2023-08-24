@@ -29,23 +29,21 @@ SOLUTION(2015, 25) {
 
     PART_ONE() {
         //To continue, please consult the code grid in the manual.  Enter the code at row 2981, column 3075.
-        auto line = lines[0];
         const auto numbers = "0123456789";
-        auto firstDigitStart = line.find_first_of(numbers);
-        auto firstDigitEnd = line.find_first_not_of(numbers, firstDigitStart);
-        auto secondDigitStart = line.find_first_of(numbers, firstDigitEnd);
-        auto secondDigitEnd = line.find_first_not_of(numbers, secondDigitStart);
+        auto firstDigitStart = Line.find_first_of(numbers);
+        auto firstDigitEnd = Line.find_first_not_of(numbers, firstDigitStart);
+        auto secondDigitStart = Line.find_first_of(numbers, firstDigitEnd);
+        auto secondDigitEnd = Line.find_first_not_of(numbers, secondDigitStart);
 
         size_t row, col;
-        Constexpr::ParseNumber(line.substr(firstDigitStart, firstDigitEnd - firstDigitStart), row);
-        Constexpr::ParseNumber(line.substr(secondDigitStart, secondDigitEnd - secondDigitStart), col);
+        Constexpr::ParseNumber(Line.substr(firstDigitStart, firstDigitEnd - firstDigitStart), row);
+        Constexpr::ParseNumber(Line.substr(secondDigitStart, secondDigitEnd - secondDigitStart), col);
 
         return Constexpr::ToString(CalculateCode(CalculateIndex(row, col)));
     }
 
     PART_TWO() {
-        (void)lines;
-        return "";
+        return "Merry Christmas";
     }
 
     TESTS() {

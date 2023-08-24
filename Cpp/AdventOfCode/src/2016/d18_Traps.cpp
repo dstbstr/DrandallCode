@@ -1,7 +1,7 @@
 #include "2016/d18_Traps.h"
 
 SOLUTION(2016, 18) {
-    constexpr size_t CountSafeTiles(const std::string & initial, u32 rowCount) {
+    constexpr size_t CountSafeTiles(std::string_view initial, u32 rowCount) {
         std::vector<bool> a;
         a.emplace_back(false);
         std::transform(initial.begin(), initial.end(), std::back_inserter(a), [](u8 c) { return c == '^'; });
@@ -20,10 +20,10 @@ SOLUTION(2016, 18) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(CountSafeTiles(lines[0], 40));
+        return Constexpr::ToString(CountSafeTiles(Line, 40));
     }
     PART_TWO() {
-        return Constexpr::ToString(CountSafeTiles(lines[0], 400'000));
+        return Constexpr::ToString(CountSafeTiles(Line, 400'000));
     }
 
     TESTS() {

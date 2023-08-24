@@ -4,7 +4,7 @@
 
 SOLUTION(2015, 23) {
     //wow, this works, and is faster
-    constexpr auto GenerateFunc(const std::string & line) {
+    constexpr auto GenerateFunc(std::string_view line) {
         auto s = Constexpr::Split(line, " ");
         std::vector<std::string> parts;
         std::transform(s.cbegin(), s.cend(), std::back_inserter(parts), [](auto sv) { return std::string(sv); });
@@ -38,11 +38,8 @@ SOLUTION(2015, 23) {
         };
     }
 
-    constexpr size_t Solve(const std::vector<std::string>& lines, size_t initialAValue) {
-        std::vector<std::function<void(size_t&, size_t&, size_t&)>> instructions;
-        for (const auto& line : lines) {
-            instructions.push_back(GenerateFunc(line));
-        }
+    constexpr size_t Solve(const auto& lines, size_t initialAValue) {
+        auto instructions = ParseLines(lines, GenerateFunc);
 
         size_t a = initialAValue;
         size_t b = 0;
@@ -55,10 +52,10 @@ SOLUTION(2015, 23) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(Solve(lines, 0));
+        return Constexpr::ToString(Solve(Lines, 0));
     }
     PART_TWO() {
-        return Constexpr::ToString(Solve(lines, 1));
+        return Constexpr::ToString(Solve(Lines, 1));
     }
     TESTS() {
         return true;

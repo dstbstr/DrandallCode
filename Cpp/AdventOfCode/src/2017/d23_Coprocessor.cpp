@@ -6,7 +6,7 @@ SOLUTION(2017, 23) {
     constexpr size_t Unset = 9919;
     enum struct Cmd {Set, Add, Sub, Mul, Mod, Jnz};
 
-    constexpr auto GenCommand(const std::string & line) {
+    constexpr auto GenCommand(std::string_view line) {
         auto s = Constexpr::Split(line, " ");
         Cmd cmd = Cmd::Set;
         if (s[0] == "set") cmd = Cmd::Set;
@@ -47,8 +47,8 @@ SOLUTION(2017, 23) {
         s64 ip = 0;
         size_t result = 0;
 
-        auto maxIp = static_cast<s64>(lines.size());
-        auto cmds = ParseLines(lines, GenCommand);
+        auto maxIp = static_cast<s64>(Lines.size());
+        auto cmds = ParseLines(Lines, GenCommand);
         while (ip < maxIp) {
             cmds[ip](ip, regs, result);
         }
@@ -62,7 +62,7 @@ SOLUTION(2017, 23) {
 
         auto unused = 0ull;
         auto ip = 0ll;
-        auto cmds = ParseLines(lines, GenCommand);
+        auto cmds = ParseLines(Lines, GenCommand);
 
         for (auto i = 0; i < 8; i++) {
             cmds[ip](ip, regs, unused);

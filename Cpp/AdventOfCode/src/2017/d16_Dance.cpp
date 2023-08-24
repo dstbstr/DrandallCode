@@ -39,38 +39,6 @@ SOLUTION(2017, 16) {
         }
     }
 
-    auto Part1(const std::string & startingDancers, const std::string & line) {
-        std::string dancers = startingDancers;
-        auto split = Constexpr::Split(line, ",");
-        for (auto move : split) {
-            ApplyMove(dancers, move);
-        }
-
-        return dancers;
-    }
-
-    auto Part2(const std::vector<std::string>&lines) {
-        return lines.size();
-    }
-
-    std::string Run(const std::vector<std::string>&lines) {
-        std::string dancers = "abcdefghijklmnop";
-        return Part1(dancers, lines[0]);
-    }
-    /*
-    bool RunTests() {
-        std::string dancers = "abcde";
-        std::string line = "s1,x3/4,pe/b";
-        if (Part1(dancers, line) != "baedc") return false;
-
-        dancers = "abcde";
-
-        Spin(dancers, "3");
-        if (dancers != "cdeab") return false;
-        return true;
-    }
-    */
-
     constexpr auto GenMove(std::string_view move) {
         auto type = move[0];
         auto details = move.substr(1);
@@ -99,7 +67,7 @@ SOLUTION(2017, 16) {
         };
     }
 
-    constexpr auto GetMoves(const std::string& line) {
+    constexpr auto GetMoves(std::string_view line) {
         using Move = decltype(GenMove(""));
         std::vector<Move> moves;
         auto s = Constexpr::Split(line, ",");
@@ -116,7 +84,7 @@ SOLUTION(2017, 16) {
         return dancers;
     }
     PART_ONE() {
-        auto moves = GetMoves(lines[0]);
+        auto moves = GetMoves(Line);
 
         std::string dancers = InitialDancers;
         for (const auto& move : moves) {
@@ -127,7 +95,7 @@ SOLUTION(2017, 16) {
     }
 
     PART_TWO() {
-        auto moves = GetMoves(lines[0]);
+        auto moves = GetMoves(Line);
         std::string dancers = InitialDancers;
         u32 cycleLength, cycleStart;
         FloydCycle::FindCycle(dancers, [&](std::string d) { return Dance(d, moves); }, cycleLength, cycleStart);

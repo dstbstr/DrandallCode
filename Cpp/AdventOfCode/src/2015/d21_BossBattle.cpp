@@ -148,7 +148,7 @@ SOLUTION(2015, 21) {
         return worstCost;
     }
 
-    constexpr Character ParseBoss(const std::vector<std::string>& lines) {
+    constexpr Character ParseBoss(const auto& lines) {
         Character result;
         auto hp = Constexpr::Split(lines[0], ": ")[1];
         auto dmg = Constexpr::Split(lines[1], ": ")[1];
@@ -161,10 +161,10 @@ SOLUTION(2015, 21) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(FindBestBuild(ParseBoss(lines)));
+        return Constexpr::ToString(FindBestBuild(ParseBoss(Lines)));
     }
     PART_TWO() {
-        return Constexpr::ToString(FindWorstBuild(ParseBoss(lines)));
+        return Constexpr::ToString(FindWorstBuild(ParseBoss(Lines)));
     }
     TESTS() {
         static_assert(CountRounds({ 8, 5, 5 }, { 12, 7, 2 }) == 4);

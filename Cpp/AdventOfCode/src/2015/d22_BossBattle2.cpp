@@ -5,7 +5,7 @@
 SOLUTION(2015, 22) {
     struct Player { s32 Hp{ 0 }; s32 Mana{ 0 }; s32 Armor{ 0 }; };
     struct Boss { s32 Hp{ 0 }; s32 Atk{ 0 }; };
-    constexpr Boss ParseBoss(const std::vector<std::string>& lines) {
+    constexpr Boss ParseBoss(const auto& lines) {
         Boss result;
         auto hp = Constexpr::Split(lines[0], ": ")[1];
         auto dmg = Constexpr::Split(lines[1], ": ")[1];
@@ -208,13 +208,13 @@ SOLUTION(2015, 22) {
         return bestMana;
     }
     PART_ONE() {
-        auto boss = ParseBoss(lines);
+        auto boss = ParseBoss(Lines);
         Player player = { 50, 500, 0 };
         State initialState{ player, boss, {} };
         return Constexpr::ToString(FindBestMana(initialState, false));
     }
     PART_TWO() {
-        auto boss = ParseBoss(lines);
+        auto boss = ParseBoss(Lines);
         Player player = { 50, 500, 0 };
         State initialState{ player, boss, {} };
         return Constexpr::ToString(FindBestMana(initialState, true));

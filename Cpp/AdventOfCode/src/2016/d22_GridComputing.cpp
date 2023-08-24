@@ -10,7 +10,7 @@ SOLUTION(2016, 22) {
         u32 PercentFull;
     };
 
-    constexpr Dir ParseLine(const std::string & line) {
+    constexpr Dir ParseLine(std::string_view line) {
         Dir result;
         auto xPos = line.find('x');
         auto yPos = line.find('y');
@@ -33,7 +33,7 @@ SOLUTION(2016, 22) {
     }
 
     PART_ONE() {
-        auto skipOne = std::vector<std::string>{ lines.begin() + 1, lines.end() };
+        auto skipOne = std::vector<std::string>{ Lines.begin() + 1, Lines.end() };
         auto dirs = ParseLines(skipOne, ParseLine);
 
         u32 fitCount = 0;
@@ -46,9 +46,10 @@ SOLUTION(2016, 22) {
         }
         return Constexpr::ToString(fitCount);
     }
-    PART_TWO() {
+
+    constexpr u32 SolvePartTwo(const auto& lines) {
         Constexpr::SmallMap<UCoord, Dir> map;
-        
+
         UCoord origin{ 0, 0 };
         UCoord emptyDir{ 0, 0 };
         UCoord limits{ 0, 0 };
@@ -76,7 +77,7 @@ SOLUTION(2016, 22) {
                 return next != goal && map.at(next).Used <= map.at(pos).Size;
                 });
             return result;
-        };
+            };
 
         auto optimalPath = AStarMin<UCoord>(goal, target, neighborFunc);
         u32 steps = 0;
@@ -89,7 +90,11 @@ SOLUTION(2016, 22) {
             goal = optimalPath[i];
         }
 
-        return Constexpr::ToString(steps);
+        return steps;
+
+    }
+    PART_TWO() {
+        return Constexpr::ToString(SolvePartTwo(Lines));
     }
 
     TESTS() {
@@ -117,7 +122,7 @@ SOLUTION(2016, 22) {
             "/dev/grid/node-x2-y2    9T    6T     3T   66%"
         };
 
-        if (PartTwo(lines) != "7") return false;
+        if (SolvePartTwo(lines) != 7) return false;
         return true;
     }
 }

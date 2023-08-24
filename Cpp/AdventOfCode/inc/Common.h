@@ -51,7 +51,7 @@ void PrintMap(const std::unordered_map<Key, Value, Hash>& map, std::function<cha
     std::cout << '\n';
 }
 
-constexpr std::vector<std::vector<std::string>> SplitInputIntoGroups(const std::vector<std::string>& lines) {
+constexpr std::vector<std::vector<std::string>> SplitInputIntoGroups(const auto& lines) {
     std::vector<std::vector<std::string>> result;
     std::vector<std::string> group;
     for (const auto& line : lines) {
@@ -60,7 +60,12 @@ constexpr std::vector<std::vector<std::string>> SplitInputIntoGroups(const std::
             group.clear();
         }
         else {
-            group.push_back(line);
+            if constexpr (std::is_same_v<decltype(line), const std::string&>) {
+                group.push_back(line);
+            }
+            else {
+                group.push_back(Constexpr::ToString(line));
+            }
         }
     }
 
@@ -69,11 +74,11 @@ constexpr std::vector<std::vector<std::string>> SplitInputIntoGroups(const std::
 }
 
 template<size_t LineCount>
-constexpr std::array<std::string, LineCount> SplitInputIntoLines(const std::string_view& input) {
-    std::array<std::string, LineCount> result{};
+constexpr std::array<std::string_view, LineCount> SplitInputIntoLines(const std::string_view& input) {
+    std::array<std::string_view, LineCount> result{};
     auto s = Constexpr::Split(input, "\n");
-    for (size_t i = 0; i < s.size(); i++) {
-        result[i] = std::string(s[i]);
+    for (size_t i = 0; i < LineCount && i < s.size(); i++) {
+        result[i] = s[i];
     }
     return result;
 }
@@ -102,7 +107,7 @@ constexpr std::vector<T> ParseLineAsNumbers(std::string_view line, std::string_v
 }
 
 template<typename T>
-constexpr std::vector<T> ParseLinesAsNumbers(const std::vector<std::string>& lines) {
+constexpr std::vector<T> ParseLinesAsNumbers(const auto& lines) {
     std::vector<T> result;
     for (const auto& s : lines) {
         T num;
@@ -111,19 +116,9 @@ constexpr std::vector<T> ParseLinesAsNumbers(const std::vector<std::string>& lin
     }
     return result;
 }
-template<typename T>
-constexpr std::vector<T> ParseLinesAsNumbers(const std::vector<std::string_view>& lines) {
-    std::vector<T> result;
-    for (auto s : lines) {
-        T num;
-        Constexpr::ParseNumber(s, num);
-        result.push_back(num);
-    }
-    return result;
-}
 
 //Returns a vector of whatever parseFunc returns, when given a string and any extra args
-constexpr auto ParseLines(const std::vector<std::string>& lines, auto parseFunc, auto... args) {
+constexpr auto ParseLines(const auto& lines, auto parseFunc, auto... args) {
     using T = decltype(parseFunc("", args...));
     std::vector<T> result;
     for (const auto& line : lines) {
@@ -132,7 +127,7 @@ constexpr auto ParseLines(const std::vector<std::string>& lines, auto parseFunc,
     return result;
 }
 
-constexpr auto ParseLinesWithIndex(const std::vector<std::string>& lines, auto parseFunc) {
+constexpr auto ParseLinesWithIndex(const auto& lines, auto parseFunc) {
     using T = decltype(parseFunc("", 0));
     std::vector<T> result;
     for (size_t i = 0; i < lines.size(); i++) {
@@ -163,13 +158,20 @@ constexpr auto RunAllReturnMin(const auto& collection, auto func, auto... args) 
     return best;
 }
 
+constexpr std::vector<std::string> CopyToVector(const auto& lines) {
+    std::vector<std::string> result;
+    std::transform(lines.begin(), lines.end(), std::back_inserter(result), [](std::string_view sv) { return std::string(sv); });
+    return result;
+}
+
 constexpr size_t Count2D(const auto& collection, auto pred) {
     return std::accumulate(collection.begin(), collection.end(), 0ull, [pred](size_t previous, const auto& row) {
         return previous + std::count_if(row.begin(), row.end(), pred);
     });
 }
 
-using SolutionFunc = std::function<std::string(const std::vector<std::string>&)>;
+//using SolutionFunc = std::function<std::string(const std::vector<std::string>&)>;
+using SolutionFunc = std::function<std::string()>;
 std::unordered_map<size_t, std::unordered_map<size_t, std::unordered_map<size_t, SolutionFunc>>>& GetSolutions();
 std::unordered_map<size_t, std::unordered_map<size_t, std::function<bool()>>>& GetTests();
 
@@ -187,11 +189,13 @@ struct TestRegistrar {
 
 
 #define SOLUTION(_year, _day) namespace Year##_year##Day##_day
-#define PART_ONE() constexpr std::string PartOne(const std::vector<std::string>& lines)
-#define PART_TWO() constexpr std::string PartTwo(const std::vector<std::string>& lines)
+#define PART_ONE() constexpr std::string PartOne()
+#define PART_TWO() constexpr std::string PartTwo()
 #define TESTS() constexpr bool Tests()
 
-#define DECLARE_SOLUTION(_year, _day) \
+#define DECLARE_SOLUTION(_year, _day, _input) \
+    constexpr std::string_view Line = _input; \
+    constexpr auto Lines = SplitInputIntoLines<std::count(Line.begin(), Line.end(), '\n')>(Line); \
     SOLUTION(_year, _day) { \
     PART_ONE(); \
     PART_TWO(); \

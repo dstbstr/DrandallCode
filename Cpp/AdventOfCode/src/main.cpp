@@ -60,14 +60,15 @@ std::vector<TimingEntry> RunOne(size_t year, size_t day, bool hideOutput = false
 
     if (!Check(year, day, timingData, hideOutput)) return timingData;
 
-    const auto lines = ReadInputFile(year, day);
+    //const auto lines = ReadInputFile(year, day);
     for (const auto& [part, func] : GetSolutions()[year][day]) {
         auto GatherTiming = [&](std::chrono::microseconds elapsed) {
             auto key = Constexpr::ToString(year) + "/" + Constexpr::ToString(day) + ":" + Constexpr::ToString(part);
             timingData.push_back(std::make_pair(key, elapsed));
             };
         auto partTime = ScopedTimer(GatherTiming);
-        auto result = func(lines);
+        //auto result = func(lines);
+        auto result = func();
         if (!hideOutput) {
             std::cout << "Part " << part << ": " << result << "\n";
 

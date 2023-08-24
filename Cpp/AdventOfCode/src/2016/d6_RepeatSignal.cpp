@@ -5,7 +5,7 @@ SOLUTION(2016, 6) {
     using CountType = std::array<std::array<u32, 26>, MsgLength>;
 
     template<size_t MsgLength>
-    constexpr void UpdateLetterCounts(const std::string & line, CountType<MsgLength>&result) {
+    constexpr void UpdateLetterCounts(std::string_view line, CountType<MsgLength>&result) {
         for (size_t i = 0; i < line.size(); i++) {
             result[i][line[i] - 'a']++;
         }
@@ -48,25 +48,19 @@ SOLUTION(2016, 6) {
         return result;
     }
 
-    PART_ONE() {
-        CountType<8> counts;
-        for (auto& count : counts) {
-            std::fill(count.begin(), count.end(), 0);
-        }
-        for (const auto& line : lines) {
+    constexpr std::string Solve(auto Decoder) {
+        CountType<8> counts{};
+        for (auto line : Lines) {
             UpdateLetterCounts(line, counts);
         }
-        return Decode(counts);
+        return Decoder(counts);
+    }
+
+    PART_ONE() {
+        return Solve(Decode<8>);
     }
     PART_TWO() {
-        CountType<8> counts;
-        for (auto& count : counts) {
-            std::fill(count.begin(), count.end(), 0);
-        }
-        for (const auto& line : lines) {
-            UpdateLetterCounts(line, counts);
-        }
-        return DecodeMin(counts);
+        return Solve(DecodeMin<8>);
     }
 
     TESTS() {

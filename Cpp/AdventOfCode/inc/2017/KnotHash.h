@@ -20,7 +20,7 @@ namespace KnotHash {
         skip++;
     }
 
-    constexpr std::vector<u32> GetLengths(const std::string& input) {
+    constexpr std::vector<u32> GetLengths(std::string_view input) {
         std::vector<u32> lengths;
         for (auto c : input) {
             lengths.push_back(static_cast<u32>(c));
@@ -66,7 +66,7 @@ namespace KnotHash {
 
     static_assert(HashToHex({ 64, 7 , 255 }) == "4007ff");
 
-    constexpr auto Hash(const std::string& line) {
+    constexpr auto Hash(std::string_view line) {
         auto numbers = GetInitialNumbers();
         auto lengths = GetLengths(line);
         u32 skip = 0;

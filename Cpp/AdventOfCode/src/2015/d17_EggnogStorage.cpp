@@ -81,21 +81,12 @@ SOLUTION(2015, 17) {
         return CountCombinationsWithMaxContainers(containers, 0, initial, 0, size);
     }
 
-    constexpr std::vector<u32> ParseContainers(const std::vector<std::string>& lines) {
-        std::vector<u32> result;
-        for (const auto& line : lines) {
-            u32 val;
-            Constexpr::ParseNumber(line, val);
-            result.push_back(val);
-        }
-        return result;
-    }
     PART_ONE() {
-        auto containers = ParseContainers(lines);
+        auto containers = ParseLinesAsNumbers<u32>(Lines);
         return Constexpr::ToString(CountCombinations(containers, 150));
     }
     PART_TWO() {
-        auto containers = ParseContainers(lines);
+        auto containers = ParseLinesAsNumbers<u32>(Lines);
         return Constexpr::ToString(CountSmallContainers(containers, 150));
     }
 

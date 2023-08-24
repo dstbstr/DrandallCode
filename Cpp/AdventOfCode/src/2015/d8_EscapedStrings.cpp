@@ -52,13 +52,13 @@ SOLUTION(2015, 8) {
 
     PART_ONE() {
         std::vector<u32> deltas;
-        std::transform(lines.cbegin(), lines.cend(), std::back_inserter(deltas), CalculateDelta);
+        std::transform(Lines.cbegin(), Lines.cend(), std::back_inserter(deltas), CalculateDelta);
         return Constexpr::ToString(std::accumulate(deltas.cbegin(), deltas.cend(), 0 ));
     }
 
     PART_TWO() {
         std::vector<u32> growths;
-        std::transform(lines.cbegin(), lines.cend(), std::back_inserter(growths), CalculateGrowth);
+        std::transform(Lines.cbegin(), Lines.cend(), std::back_inserter(growths), CalculateGrowth);
         return Constexpr::ToString(std::accumulate(growths.cbegin(), growths.cend(), 0));
     }
 

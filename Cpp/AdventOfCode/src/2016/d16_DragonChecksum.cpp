@@ -24,8 +24,8 @@ SOLUTION(2016, 16) {
         return running;
     }
 
-    constexpr std::string FillDisk(size_t size, const std::string & initial) {
-        std::string running = initial;
+    constexpr std::string FillDisk(size_t size, std::string_view initial) {
+        std::string running = std::string(initial);
         while (running.size() <= size) {
             running = Next(running);
         }
@@ -34,11 +34,11 @@ SOLUTION(2016, 16) {
     }
 
     PART_ONE() {
-        return FillDisk(272, lines[0]);
+        return FillDisk(272, Line);
 
     }
     PART_TWO() {
-        return FillDisk(35651584, lines[0]);
+        return FillDisk(35651584, Line);
 
     }
 

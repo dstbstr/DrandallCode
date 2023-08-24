@@ -1,7 +1,7 @@
 #include "2017/d24_Bridge.h"
 
 SOLUTION(2017, 24) {
-    constexpr UCoord ParsePiece(const std::string & line) {
+    constexpr UCoord ParsePiece(std::string_view line) {
         auto s = Constexpr::Split(line, "/");
         UCoord result;
         Constexpr::ParseNumber(s[0], result.X);
@@ -53,12 +53,12 @@ SOLUTION(2017, 24) {
     }
 
     PART_ONE() {
-        auto pieces = ParseLines(lines, ParsePiece);
+        auto pieces = ParseLines(Lines, ParsePiece);
         return Constexpr::ToString(Dfs(0, pieces, 0));
     }
 
     PART_TWO() {
-        auto pieces = ParseLines(lines, ParsePiece);
+        auto pieces = ParseLines(Lines, ParsePiece);
         return Constexpr::ToString(CalculateStrength(FindLongestBridge(0, pieces, {})));
     }
 
@@ -74,8 +74,9 @@ SOLUTION(2017, 24) {
             "9/10"
         };
 
-        if (PartOne(lines) != "31") return false;
-        if (PartTwo(lines) != "19") return false;
+        auto pieces = ParseLines(Lines, ParsePiece);
+        if (Dfs(0, pieces, 0) != 31) return false;
+        if (CalculateStrength(FindLongestBridge(0, pieces, {})) != 19)  return false;
 
         return true;
     }

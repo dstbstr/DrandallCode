@@ -1,4 +1,50 @@
 #pragma once
 
 #include "Common.h"
-DECLARE_SOLUTION(2015, 23);
+DECLARE_SOLUTION(2015, 23, R"RawInput_(jio a, +18
+inc a
+tpl a
+inc a
+tpl a
+tpl a
+tpl a
+inc a
+tpl a
+inc a
+tpl a
+inc a
+inc a
+tpl a
+tpl a
+tpl a
+inc a
+jmp +22
+tpl a
+inc a
+tpl a
+inc a
+inc a
+tpl a
+inc a
+tpl a
+inc a
+inc a
+tpl a
+tpl a
+inc a
+inc a
+tpl a
+inc a
+inc a
+tpl a
+inc a
+inc a
+tpl a
+jio a, +8
+inc b
+jie a, +4
+tpl a
+inc a
+jmp +2
+hlf a
+jmp -7)RawInput_");

@@ -25,8 +25,7 @@ namespace Constexpr {
         return result;
     }
 
-    template<typename Collection>
-    constexpr std::string JoinVec(std::string&& delimiter, const Collection& input) {
+    constexpr std::string JoinVec(std::string&& delimiter, const auto& input) {
         std::string result;
         bool first = true;
         for (const auto& elem : input) {
@@ -43,8 +42,7 @@ namespace Constexpr {
         return result;
     }
 
-    template<typename Collection>
-    constexpr std::string JoinVec(char&& delimiter, Collection const& input) {
+    constexpr std::string JoinVec(char&& delimiter, const auto& input) {
         return JoinVec(std::string(1, delimiter), input);
     }
 

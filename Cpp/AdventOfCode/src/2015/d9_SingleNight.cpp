@@ -5,7 +5,7 @@
 SOLUTION(2015, 9) {
     using DistanceMap = Constexpr::SmallMap<std::string, Constexpr::SmallMap<std::string, size_t>>;
 
-    constexpr void ParseInput(const std::vector<std::string>& lines, DistanceMap& outDistances, Constexpr::SmallSet<std::string>& outDestinations) {
+    constexpr void ParseInput(const auto& lines, DistanceMap& outDistances, Constexpr::SmallSet<std::string>& outDestinations) {
         outDistances = {};
         outDestinations = {};
 
@@ -32,7 +32,7 @@ SOLUTION(2015, 9) {
         return result;
     }
 
-    constexpr size_t Solve(const std::vector<std::string>& lines, bool min) {
+    constexpr size_t Solve(const auto& lines, bool min) {
         DistanceMap distances;
         Constexpr::SmallSet<std::string> destinations;
         ParseInput(lines, distances, destinations);
@@ -57,11 +57,11 @@ SOLUTION(2015, 9) {
         return best;
     }
     PART_ONE() {
-        return Constexpr::ToString(Solve(lines, true));
+        return Constexpr::ToString(Solve(Lines, true));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(Solve(lines, false));
+        return Constexpr::ToString(Solve(Lines, false));
     }
 
     TESTS() {

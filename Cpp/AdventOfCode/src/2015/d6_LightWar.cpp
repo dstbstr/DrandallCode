@@ -11,7 +11,7 @@ SOLUTION(2015, 6) {
         CommandType CommandType{};
     };
 
-    constexpr Command ParseCommand(const std::string& line) {
+    constexpr Command ParseCommand(std::string_view line) {
         auto s1 = Constexpr::Split(line, " through ");
         auto s2 = Constexpr::Split(s1[0], " ");
         auto blStr = Constexpr::Split(s2.back(), ",");
@@ -25,6 +25,67 @@ SOLUTION(2015, 6) {
         result.TopRight = UCoord(s1[1]);
 
         return result;
+    }
+
+    constexpr std::vector<size_t> GetLightIndexes(const Command& command, size_t gridSize) {
+        std::vector<size_t> result;
+        for (auto x = command.BottomLeft.X; x <= command.TopRight.X; x++) {
+            for (auto y = command.BottomLeft.Y; y <= command.TopRight.Y; y++) {
+                result.push_back(x * gridSize + y);
+            }
+        }
+        return result;
+    }
+
+    constexpr size_t SolvePartOne(auto& lines) {
+        constexpr size_t gridSize = 1000;
+        auto gridPtr = new std::array<bool, gridSize* gridSize>();
+        auto grid = *gridPtr;
+
+        for (const auto& line : lines) {
+            auto command = ParseCommand(line);
+            auto indexes = GetLightIndexes(command, gridSize);
+            switch (command.CommandType) {
+            case CommandType::On: for (auto i : indexes) grid[i] = true; break;
+            case CommandType::Off: for (auto i : indexes) grid[i] = false; break;
+            case CommandType::Toggle: for (auto i : indexes) grid[i] = !grid[i]; break;
+            }
+        }
+
+        auto count = std::count(grid.cbegin(), grid.cend(), true);
+        delete gridPtr;
+
+        return count;
+    }
+    PART_ONE() {
+        return Constexpr::ToString(SolvePartOne(Lines));
+    }
+
+    constexpr size_t SolvePartTwo(auto& lines) {
+        constexpr size_t gridSize = 1000;
+        size_t* grid = new size_t[gridSize * gridSize]();
+
+        for (const auto& line : lines) {
+            auto command = ParseCommand(line);
+            auto indexes = GetLightIndexes(command, gridSize);
+            switch (command.CommandType) {
+            case CommandType::On: for (auto i : indexes) grid[i]++; break;
+            case CommandType::Off: for (auto i : indexes) grid[i] = grid[i] == 0 ? 0 : grid[i] - 1; break;
+            case CommandType::Toggle: for (auto i : indexes) grid[i] += 2; break;
+            }
+        }
+
+        size_t result = 0;
+        for (size_t i = 0; i < gridSize * gridSize; i++) {
+            result += grid[i];
+        }
+
+        delete[] grid;
+        return result;
+    }
+
+    PART_TWO() {
+        return Constexpr::ToString(SolvePartTwo(Lines));
     }
 
     constexpr bool TestParseCommand() {
@@ -46,60 +107,6 @@ SOLUTION(2015, 6) {
         return true;
     }
 
-    constexpr std::vector<size_t> GetLightIndexes(const Command& command, size_t gridSize) {
-        std::vector<size_t> result;
-        for (auto x = command.BottomLeft.X; x <= command.TopRight.X; x++) {
-            for (auto y = command.BottomLeft.Y; y <= command.TopRight.Y; y++) {
-                result.push_back(x * gridSize + y);
-            }
-        }
-        return result;
-    }
-
-    PART_ONE() {
-        constexpr size_t gridSize = 1000;
-        auto gridPtr = new std::array<bool, gridSize* gridSize>();
-        auto grid = *gridPtr;
-
-        for (const auto& line : lines) {
-            auto command = ParseCommand(line);
-            auto indexes = GetLightIndexes(command, gridSize);
-            switch (command.CommandType) {
-            case CommandType::On: for (auto i : indexes) grid[i] = true; break;
-            case CommandType::Off: for (auto i : indexes) grid[i] = false; break;
-            case CommandType::Toggle: for (auto i : indexes) grid[i] = !grid[i]; break;
-            }
-        }
-
-        auto count = std::count(grid.cbegin(), grid.cend(), true);
-        delete gridPtr;
-
-        return Constexpr::ToString(count);
-    }
-
-    PART_TWO() {
-        constexpr size_t gridSize = 1000;
-        size_t* grid = new size_t[gridSize * gridSize]();
-
-        for (const auto& line : lines) {
-            auto command = ParseCommand(line);
-            auto indexes = GetLightIndexes(command, gridSize);
-            switch (command.CommandType) {
-            case CommandType::On: for (auto i : indexes) grid[i]++; break;
-            case CommandType::Off: for (auto i : indexes) grid[i] = grid[i] == 0 ? 0 : grid[i] - 1; break;
-            case CommandType::Toggle: for (auto i : indexes) grid[i] += 2; break;
-            }
-        }
-
-        size_t result = 0;
-        for (size_t i = 0; i < gridSize * gridSize; i++) {
-            result += grid[i];
-        }
-
-        delete[] grid;
-        return Constexpr::ToString(result);
-    }
-
     TESTS() {
         if (!TestParseCommand()) return false;
 
@@ -107,7 +114,7 @@ SOLUTION(2015, 6) {
             "turn on 0,0 through 1,1",
             "toggle 1,1 through 2,2"
         };
-        if (PartOne(lines) != "6") return false;
+        if (SolvePartOne(lines) != 6) return false;
 
         return true;
     }

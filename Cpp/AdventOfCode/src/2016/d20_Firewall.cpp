@@ -3,20 +3,16 @@
 SOLUTION(2016, 20) {
     constexpr u32 MaxIp = 4294967295;
 
-    constexpr std::vector<UCoord> GetRanges(const std::vector<std::string>& lines) {
+    constexpr std::vector<UCoord> GetRanges(const auto& lines) {
         std::vector<UCoord> ranges;
         for (const auto& line : lines) {
-            auto split = Constexpr::Split(line, "-");
-            UCoord range;
-            Constexpr::ParseNumber(split[0], range.X);
-            Constexpr::ParseNumber(split[1], range.Y);
-            ranges.push_back(range);
+            ranges.push_back(UCoord(line, "-"));
         }
 
         return ranges;
     }
 
-    constexpr u64 FindLowest(const std::vector<std::string>& lines) {
+    constexpr u64 FindLowest(const auto& lines) {
         auto ranges = GetRanges(lines);
         std::ranges::sort(ranges, {}, &UCoord::X);
 
@@ -34,7 +30,7 @@ SOLUTION(2016, 20) {
         return 0;
     }
 
-    constexpr u64 CountAvailable(const std::vector<std::string> &lines) {
+    constexpr u64 CountAvailable(const auto& lines) {
         auto ranges = GetRanges(lines);
         std::ranges::sort(ranges, {}, &UCoord::X);
 
@@ -59,10 +55,10 @@ SOLUTION(2016, 20) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(FindLowest(lines));
+        return Constexpr::ToString(FindLowest(Lines));
     }
     PART_TWO() {
-        return Constexpr::ToString(CountAvailable(lines));
+        return Constexpr::ToString(CountAvailable(Lines));
     }
 
     TESTS() {

@@ -9,7 +9,7 @@ SOLUTION(2015, 5) {
         return c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u';
     }
 
-    constexpr bool IsNice(const std::string& input) {
+    constexpr bool IsNice(std::string_view input) {
         for (const auto& badPair : naughtyPairs) {
             if (input.find(badPair) != input.npos) return false;
         }
@@ -23,13 +23,13 @@ SOLUTION(2015, 5) {
         return vowelCount > 2 && hasDouble;
     }
 
-    constexpr std::string ExtractPair(const std::string& str, size_t firstChar) {
+    constexpr std::string ExtractPair(std::string_view str, size_t firstChar) {
         std::string pair;
         pair.push_back(str[firstChar]);
         pair.push_back(str[firstChar + 1]);
         return pair;
     }
-    constexpr bool IsReallyNice(const std::string& input) {
+    constexpr bool IsReallyNice(std::string_view input) {
         bool hasSplit = false;
         for (size_t i = 2; i < input.size(); i++) {
             if (input[i - 2] == input[i]) {
@@ -50,11 +50,11 @@ SOLUTION(2015, 5) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(std::count_if(lines.cbegin(), lines.cend(), IsNice));
+        return Constexpr::ToString(std::count_if(Lines.cbegin(), Lines.cend(), IsNice));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(std::count_if(lines.cbegin(), lines.cend(), IsReallyNice));
+        return Constexpr::ToString(std::count_if(Lines.cbegin(), Lines.cend(), IsReallyNice));
     }
 
     TESTS() {

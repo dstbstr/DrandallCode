@@ -1,7 +1,7 @@
 #include "2017/d22_Infecting.h"
 
 SOLUTION(2017, 22) {
-    constexpr size_t Solve(const std::vector<std::string>& lines, size_t iterations, auto MoveFunc) {
+    constexpr size_t Solve(const auto& lines, size_t iterations, auto MoveFunc) {
         constexpr const size_t mapSize = 10'001;
         std::vector<std::vector<char>> map(mapSize);
         for (auto& m : map) {
@@ -36,7 +36,7 @@ SOLUTION(2017, 22) {
     }
 
     PART_ONE() {
-        auto result = Solve(lines, 10'000, [](char& currentPos, size_t& dir) {
+        auto result = Solve(Lines, 10'000, [](char& currentPos, size_t& dir) {
             switch (currentPos) {
             case '.': dir = (dir + 3) % 4; currentPos = '#'; return 1;
             case '#': dir = (dir + 1) % 4; currentPos = '.'; return 0;
@@ -48,7 +48,7 @@ SOLUTION(2017, 22) {
     }
 
     PART_TWO() {
-        auto result = Solve(lines, 10'000'000, [](char& currentPos, size_t& dir) {
+        auto result = Solve(Lines, 10'000'000, [](char& currentPos, size_t& dir) {
             switch (currentPos) {
             case '.': dir = (dir + 3) % 4; currentPos = 'W'; return 0;
             case 'W': currentPos = '#'; return 1;

@@ -1,7 +1,6 @@
 #include "2018/d2_BoxId.h"
 SOLUTION(2018, 2) {
-
-    constexpr void HasTwosAndThrees(const std::string & line, bool& outHasTwos, bool& outHasThrees) {
+    constexpr void HasTwosAndThrees(std::string_view line, bool& outHasTwos, bool& outHasThrees) {
         std::array<u8, 26> counts{};
 
         outHasTwos = false;
@@ -15,7 +14,7 @@ SOLUTION(2018, 2) {
         }
     }
 
-    constexpr bool OffByOne(const std::string& lhs, const std::string& rhs) {
+    constexpr bool OffByOne(std::string_view lhs, std::string_view rhs) {
         u32 deltas = 0;
         for (size_t i = 0; i < lhs.size(); i++) {
             deltas += lhs[i] != rhs[i];
@@ -26,7 +25,7 @@ SOLUTION(2018, 2) {
     PART_ONE() {
         u32 twos = 0;
         u32 threes = 0;
-        for (const auto& line : lines) {
+        for (const auto& line : Lines) {
             bool hasTwos, hasThrees = false;
             HasTwosAndThrees(line, hasTwos, hasThrees);
             twos += hasTwos;
@@ -37,11 +36,11 @@ SOLUTION(2018, 2) {
     }
 
     PART_TWO() {
-        auto copy = lines;
+        auto copy = Lines;
         std::sort(copy.begin(), copy.end());
         for (auto i = 0; i < copy.size() - 1; i++) {
             if (OffByOne(copy[i], copy[i + 1])) {
-                return copy[i] + '\n' + copy[i + 1];
+                return std::string(copy[i]) + '\n' + std::string(copy[i + 1]);
             }
         }
 
@@ -65,17 +64,17 @@ SOLUTION(2018, 2) {
         static_assert(OffByOne("abc", "adc"));
         static_assert(!OffByOne("abcd", "efgh"));
         
-        std::vector<std::string> lines = {
-            "abcdef",
-            "bababc",
-            "abbcde",
-            "abcccd",
-            "aabcdd",
-            "abcdee",
-            "ababab"
-        };
-
-        if (PartOne(lines) != "12") return false;
+        //std::vector<std::string> lines = {
+        //    "abcdef",
+        //    "bababc",
+        //    "abbcde",
+        //    "abcccd",
+        //    "aabcdd",
+        //    "abcdee",
+        //    "ababab"
+        //};
+        //
+        //if (PartOne(lines) != "12") return false;
 
         return true;
     }

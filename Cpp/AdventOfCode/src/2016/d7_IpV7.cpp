@@ -1,7 +1,7 @@
 #include "2016/d7_IpV7.h"
 
 SOLUTION(2016, 7) {
-    constexpr bool ContainsAbba(const std::string & str) {
+    constexpr bool ContainsAbba(std::string_view str) {
         for (size_t i = 0; i < str.size() - 3; i++) {
             if (str[i] == str[i + 3] && str[i + 1] == str[i + 2] && str[i] != str[i + 1]) {
                 return true;
@@ -11,7 +11,7 @@ SOLUTION(2016, 7) {
         return false;
     }
 
-    constexpr std::vector<std::string> GetThreeLetterSequences(const std::string & str) {
+    constexpr std::vector<std::string> GetThreeLetterSequences(const std::string& str) {
         std::vector<std::string> result;
 
         for (auto i = 0; i < str.size() - 2; i++) {
@@ -23,7 +23,7 @@ SOLUTION(2016, 7) {
         return result;
     }
 
-    constexpr void ParseLine(const std::string & line, std::vector<std::string>& outOfBrackets, std::vector<std::string>& inBrackets) {
+    constexpr void ParseLine(std::string_view line, std::vector<std::string>& outOfBrackets, std::vector<std::string>& inBrackets) {
         bool outsideBrackets = true;
         size_t index = 0;
         std::string str = "";
@@ -50,7 +50,7 @@ SOLUTION(2016, 7) {
         }
     }
 
-    constexpr bool IsValid(const std::string & line) {
+    constexpr bool IsValid(std::string_view line) {
         std::vector<std::string> inBrackets;
         std::vector<std::string> outOfBrackets;
         ParseLine(line, outOfBrackets, inBrackets);
@@ -79,7 +79,7 @@ SOLUTION(2016, 7) {
         return result;
     }
 
-    constexpr bool SupportsSsl(const std::string & line) {
+    constexpr bool SupportsSsl(std::string_view line) {
         std::vector<std::string> inBrackets;
         std::vector<std::string> outOfBrackets;
         ParseLine(line, outOfBrackets, inBrackets);
@@ -102,14 +102,11 @@ SOLUTION(2016, 7) {
         return false;
     }
 
-    constexpr std::string RunImpl(const std::vector<std::string>& lines, auto check) {
-        return Constexpr::ToString(std::count_if(lines.begin(), lines.end(), check));
-    }
     PART_ONE() {
-        return RunImpl(lines, IsValid);
+        return Constexpr::ToString(std::count_if(Lines.begin(), Lines.end(), IsValid));
     }
     PART_TWO() {
-        return RunImpl(lines, SupportsSsl);
+        return Constexpr::ToString(std::count_if(Lines.begin(), Lines.end(), SupportsSsl));
     }
 
     TESTS() {

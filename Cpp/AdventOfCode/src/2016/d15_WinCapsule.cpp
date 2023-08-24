@@ -26,7 +26,7 @@ SOLUTION(2016, 15) {
         return spin;
     }
 
-    constexpr Disc ParseDisc(const std::string& line) {
+    constexpr Disc ParseDisc(std::string_view line) {
         auto s = Constexpr::Split(line, " ");
         Disc result;
         Constexpr::ParseNumber(s[3], result.Positions);
@@ -34,14 +34,15 @@ SOLUTION(2016, 15) {
         Constexpr::ParseNumber(initial.substr(0, initial.size() - 1), result.Initial);
         return result;
     }
+
     PART_ONE() {
-        auto discs = ParseLines(lines, ParseDisc);
+        auto discs = ParseLines(Lines, ParseDisc);
 
         return Constexpr::ToString(BestSpin(discs));
         
     }
     PART_TWO() {
-        auto copy = lines;
+        auto copy = CopyToVector(Lines);
         copy.push_back("Disc #7 has 11 positions; at time=0, it is at position 0.");
         auto discs = ParseLines(copy, ParseDisc);
 

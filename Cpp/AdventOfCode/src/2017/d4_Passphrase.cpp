@@ -8,7 +8,7 @@ SOLUTION(2017, 4) {
         }
         return true;
     }
-    constexpr bool IsValid(const std::string & line) {
+    constexpr bool IsValid(std::string_view line) {
         std::vector<std::string> words;
         auto split = Constexpr::Split(line, " ");
         for (const auto& sv : split) {
@@ -17,7 +17,7 @@ SOLUTION(2017, 4) {
         return Validate(words);
     }
 
-    constexpr bool IsSecure(const std::string & line) {
+    constexpr bool IsSecure(std::string_view line) {
         std::vector<std::string> words;
         auto split = Constexpr::Split(line, " ");
         for (const auto& sv : split) {
@@ -29,13 +29,12 @@ SOLUTION(2017, 4) {
         return Validate(words);
     }
 
-
     PART_ONE() {
-        return Constexpr::ToString(std::count_if(lines.cbegin(), lines.cend(), IsValid));
+        return Constexpr::ToString(std::count_if(Lines.cbegin(), Lines.cend(), IsValid));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(std::count_if(lines.cbegin(), lines.cend(), IsSecure));
+        return Constexpr::ToString(std::count_if(Lines.cbegin(), Lines.cend(), IsSecure));
     }
 
     TESTS() {

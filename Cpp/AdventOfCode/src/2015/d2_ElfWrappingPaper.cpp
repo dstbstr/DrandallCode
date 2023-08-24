@@ -35,14 +35,14 @@ SOLUTION(2015, 2) {
         return 0;
     }
 
-    constexpr void ParseLine(const std::string& line, size_t& outLength, size_t& outWidth, size_t& outHeight) {
+    constexpr void ParseLine(std::string_view line, size_t& outLength, size_t& outWidth, size_t& outHeight) {
         auto s = Constexpr::Split(line, "x");
         Constexpr::ParseNumber(s[0], outLength);
         Constexpr::ParseNumber(s[1], outWidth);
         Constexpr::ParseNumber(s[2], outHeight);
     }
 
-    constexpr std::string Solve(const std::vector<std::string>& lines, auto func) {
+    constexpr std::string Solve(const auto& lines, auto func) {
         size_t result = 0;
         for (const auto& line : lines) {
             size_t length, width, height;
@@ -53,11 +53,11 @@ SOLUTION(2015, 2) {
         return Constexpr::ToString(result);
     }
     PART_ONE() {
-        return Solve(lines, CalculateWrappingPaper);
+        return Solve(Lines, CalculateWrappingPaper);
     }
 
     PART_TWO() {
-        return Solve(lines, CalculateRibbon);
+        return Solve(Lines, CalculateRibbon);
     }
 
     TESTS() {

@@ -2,18 +2,18 @@
 #include "Algorithms/FloodFill.h"
 
 SOLUTION(2017, 12) {
-    constexpr std::vector<u32> ParseLine(const std::string & line) {
+    constexpr std::vector<u32> ParseLine(std::string_view line) {
         auto rhs = std::string(Constexpr::Split(line, " <-> ")[1]);
         return ParseLineAsNumbers<u32>(rhs, ", ");
     }
 
     PART_ONE() {
-        auto connections = ParseLines(lines, ParseLine);
+        auto connections = ParseLines(Lines, ParseLine);
         return Constexpr::ToString(FloodFill(0, [&connections](u32 pipe) { return connections[pipe]; }).size());
     }
 
     PART_TWO() {
-        auto connections = ParseLines(lines, ParseLine);
+        auto connections = ParseLines(Lines, ParseLine);
         std::vector<u32> remainingGroups;
         for (auto i = 0; i < connections.size(); i++) {
             remainingGroups.push_back(i);

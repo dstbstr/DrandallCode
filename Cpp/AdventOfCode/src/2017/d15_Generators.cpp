@@ -15,7 +15,7 @@ SOLUTION(2017, 15) {
 
     static_assert((GenA(1181022009) & Mask) == (GenB(1233683848) & Mask));
 
-    constexpr void ParseLines(const std::vector<std::string>& lines, size_t& a, size_t& b) {
+    constexpr void ParseLines(const auto& lines, size_t& a, size_t& b) {
         auto s1 = Constexpr::Split(lines[0], " ");
         auto s2 = Constexpr::Split(lines[1], " ");
         Constexpr::ParseNumber(s1.back(), a);
@@ -40,13 +40,13 @@ SOLUTION(2017, 15) {
 
     PART_ONE() {
         u64 a, b;
-        ParseLines(lines, a, b);
+        ParseLines(Lines, a, b);
         return Constexpr::ToString(solve(a, 0, b, 0, 40'000'000ull));
     }
 
     PART_TWO() {
         u64 a, b;
-        ParseLines(lines, a, b);
+        ParseLines(Lines, a, b);
         return Constexpr::ToString(solve(a, 3, b, 7, 5'000'000ull));
     }
     

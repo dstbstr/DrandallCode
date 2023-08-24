@@ -7,7 +7,7 @@ SOLUTION(2015, 18) {
     //nothing == off
 
     template<size_t N, size_t M>
-    constexpr std::array<std::array<bool, N>, M> BuildArray(const std::string_view & input) {
+    constexpr std::array<std::array<bool, N>, M> BuildArray(std::string_view input) {
         auto result = std::array<std::array<bool, N>, M>{};
         if (input.size() != N * M) {
             throw std::logic_error("Bad input");
@@ -41,21 +41,6 @@ SOLUTION(2015, 18) {
 
         return lit;
     }
-
-    /*
-    template<size_t N, size_t M>
-    constexpr std::string ToString(const std::array<std::array<bool, N>, M>&arr) {
-        std::string result;
-
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < M; j++) {
-                result += (arr[i][j] ? '#' : '.');
-            }
-        }
-
-        return result;
-    }
-    */
 
     //on with 2 or 3 on neighbors stays on
     //off with 3 on neightbors turns on
@@ -100,7 +85,7 @@ SOLUTION(2015, 18) {
     }
 
     PART_ONE() {
-        auto lights = BuildArray<100, 100>(Constexpr::JoinVec("", lines));
+        auto lights = BuildArray<100, 100>(Constexpr::JoinVec("", Lines));
         for (auto i = 0; i < 100; i++) {
             Next(lights);
         }
@@ -108,7 +93,7 @@ SOLUTION(2015, 18) {
         return Constexpr::ToString(CountLit(lights));
     }
     PART_TWO() {
-        auto lights = BuildArray<100, 100>(Constexpr::JoinVec("", lines));
+        auto lights = BuildArray<100, 100>(Constexpr::JoinVec("", Lines));
         SetCorners(lights);
 
         for (auto i = 0; i < 100; i++) {

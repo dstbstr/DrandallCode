@@ -2,7 +2,7 @@
 #include "Facing.h"
 
 SOLUTION(2016, 1) {
-    constexpr size_t FindTarget(const std::string & directions) {
+    constexpr size_t FindTarget(std::string_view directions) {
         auto split = Constexpr::Split(directions, ", ");
         Direction facing = Direction::North;
         u32 amount;
@@ -17,7 +17,7 @@ SOLUTION(2016, 1) {
         return MDistance(target, Coord{ 0, 0 });
     }
 
-    constexpr size_t FindTarget2(const std::string& directions) {
+    constexpr size_t FindTarget2(std::string_view directions) {
         Constexpr::SmallSet<Coord> seen;
         Direction facing = North;
         Coord pos{ 0, 0 };
@@ -37,10 +37,10 @@ SOLUTION(2016, 1) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(FindTarget(lines[0]));
+        return Constexpr::ToString(FindTarget(Line));
     }
     PART_TWO() {
-        return Constexpr::ToString(FindTarget2(lines[0]));
+        return Constexpr::ToString(FindTarget2(Line));
     }
 
     TESTS() {

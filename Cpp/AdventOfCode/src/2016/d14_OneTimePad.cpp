@@ -20,13 +20,14 @@ SOLUTION(2016, 14) {
 
     using Pair = std::pair<u32, std::string>;
 
-    constexpr void PopulateCache(const std::string& salt, std::vector<Pair>& threes, std::vector<Pair>& fives, bool stretch) {
+    constexpr void PopulateCache(std::string_view salt, std::vector<Pair>& threes, std::vector<Pair>& fives, bool stretch) {
         std::string candidate;
         std::string hash;
         std::string targetString;
+        std::string prefix = std::string(salt);
 
         for (auto i = 0; i < 30'000; i++) {
-            candidate = salt + Constexpr::ToString(i);
+            candidate = prefix + Constexpr::ToString(i);
             hash = ToHexLower(md5::compute(candidate.c_str()));
             if (stretch) hash = Stretch(hash);
 
@@ -67,7 +68,7 @@ SOLUTION(2016, 14) {
         return false;
     }
 
-    constexpr u32 FindKey64(const std::string & key, bool stretch, std::vector<u32> hints) {
+    constexpr u32 FindKey64(std::string_view key, bool stretch, std::vector<u32> hints) {
         if (!hints.empty()) {
             return hints.back();
         }
@@ -98,7 +99,7 @@ SOLUTION(2016, 14) {
     };
 
     PART_ONE() {
-        return Constexpr::ToString(FindKey64(lines[0], false, PartOneHints));
+        return Constexpr::ToString(FindKey64(Line, false, PartOneHints));
     }
 
     static const std::vector<u32> PartTwoHints = {
@@ -108,7 +109,7 @@ SOLUTION(2016, 14) {
     };
 
     PART_TWO() {
-        return Constexpr::ToString(FindKey64(lines[0], true, PartTwoHints));
+        return Constexpr::ToString(FindKey64(Line, true, PartTwoHints));
     }
 
     TESTS() {

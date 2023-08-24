@@ -4,7 +4,7 @@
 SOLUTION(2016, 24) {
     using Walls = std::vector<std::vector<bool>>;
 
-    constexpr Walls FindWalls(const std::vector<std::string>&lines) {
+    constexpr Walls FindWalls(const auto& lines) {
         Walls result;
         for (auto row = 0; row < lines.size(); row++) {
             std::vector<bool> line;
@@ -17,7 +17,7 @@ SOLUTION(2016, 24) {
         return result;
     }
 
-    constexpr std::vector<RowCol> FindTargets(const std::vector<std::string>&lines) {
+    constexpr std::vector<RowCol> FindTargets(const auto& lines) {
         std::vector<RowCol> result;
         for (size_t row = 0; row < lines.size(); row++) {
             for (size_t col = 0; col < lines[row].size(); col++) {
@@ -30,7 +30,7 @@ SOLUTION(2016, 24) {
         return result;
     }
 
-    constexpr RowCol FindStart(const std::vector<std::string>&lines) {
+    constexpr RowCol FindStart(const auto& lines) {
         for (size_t row = 0; row < lines.size(); row++) {
             for (size_t col = 0; col < lines[row].size(); col++) {
                 if (lines[row][col] == '0') {
@@ -71,7 +71,7 @@ SOLUTION(2016, 24) {
         return result;
     }
 
-    constexpr u32 Solve(const std::vector<std::string>& lines, bool extendTargets) {
+    constexpr u32 Solve(const auto& lines, bool extendTargets) {
         auto walls = FindWalls(lines);
         auto targets = FindTargets(lines);
         auto start = FindStart(lines);
@@ -94,10 +94,10 @@ SOLUTION(2016, 24) {
 
     }
     PART_ONE() {
-        return Constexpr::ToString(Solve(lines, false));
+        return Constexpr::ToString(Solve(Lines, false));
     }
     PART_TWO() {
-        return Constexpr::ToString(Solve(lines, true));
+        return Constexpr::ToString(Solve(Lines, true));
     }
 
     TESTS() {
@@ -109,7 +109,7 @@ SOLUTION(2016, 24) {
            "#4.......3#",
            "###########"
         };
-        if (PartOne(lines) != "14") return false;
+        if (Solve(lines, false) != 14) return false;
         
         return true;
     }

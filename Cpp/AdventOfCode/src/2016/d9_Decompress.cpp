@@ -1,7 +1,7 @@
 #include "2016/d9_Decompress.h"
 
 SOLUTION(2016, 9) {
-    constexpr u64 Decompress(const std::string & line, bool recurse) {
+    constexpr u64 Decompress(std::string_view line, bool recurse) {
         u64 result = 0;
         u32 runLength;
         u32 repeatCount;
@@ -31,11 +31,11 @@ SOLUTION(2016, 9) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(Decompress(lines[0], false));
+        return Constexpr::ToString(Decompress(Line, false));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(Decompress(lines[0], true));
+        return Constexpr::ToString(Decompress(Line, true));
     }
 
     TESTS() {

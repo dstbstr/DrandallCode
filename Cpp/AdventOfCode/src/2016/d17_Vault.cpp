@@ -7,7 +7,7 @@ SOLUTION(2016, 17) {
         return value > 'a';
     }
 
-    constexpr std::vector<char> GetOpenDoors(const std::string & hash) {
+    constexpr std::vector<char> GetOpenDoors(std::string_view hash) {
         std::vector<char> result;
         if (IsOpen(hash[0])) result.push_back('U');
         if (IsOpen(hash[1])) result.push_back('D');
@@ -38,7 +38,7 @@ SOLUTION(2016, 17) {
         return result;
     }
 
-    constexpr std::vector<char> GetNextDirections(size_t pos, const std::string & hash) {
+    constexpr std::vector<char> GetNextDirections(size_t pos, std::string_view hash) {
         auto openDoors = GetOpenDoors(hash);
         auto validDirections = GetValidDirections(pos);
         std::vector<char> result;
@@ -63,10 +63,10 @@ SOLUTION(2016, 17) {
         return pos;
     }
 
-    constexpr std::string FindShortestPath(const std::string & key) {
+    constexpr std::string FindShortestPath(std::string_view key) {
         constexpr size_t finalIndex = Constexpr::GetIndex<4, 4>(3, 3);
 
-        std::vector<std::pair<size_t, std::string>> current{ {0, key } };
+        std::vector<std::pair<size_t, std::string>> current{ {0, std::string(key) } };
         std::vector<std::pair<size_t, std::string>> next;
 
         while (true) {
@@ -89,15 +89,15 @@ SOLUTION(2016, 17) {
             }
         }
 
-        return key;
+        return "Something went very wrong";
     }
 
-    constexpr u32 FindLongestPath(const std::string & key) {
+    constexpr u32 FindLongestPath(std::string_view key) {
         constexpr size_t finalIndex = Constexpr::GetIndex<4, 4>(3, 3);
 
         u32 pathLength = 0;
         u32 best = 0;
-        std::vector<std::pair<size_t, std::string>> current{ {0, key} };
+        std::vector<std::pair<size_t, std::string>> current{ {0, std::string(key)} };
         std::vector<std::pair<size_t, std::string>> next;
 
         while (true) {
@@ -125,10 +125,10 @@ SOLUTION(2016, 17) {
     }
 
     PART_ONE() {
-        return FindShortestPath(lines[0]);
+        return FindShortestPath(Line);
     }
     PART_TWO() {
-        return Constexpr::ToString(FindLongestPath(lines[0]));
+        return Constexpr::ToString(FindLongestPath(Line));
     }
 
     TESTS() {
@@ -145,7 +145,7 @@ SOLUTION(2016, 17) {
         static_assert(GetNewPos(0, 'R') == 1);
         static_assert(GetNewPos(0, 'D') == 4);
 
-        static_assert(FindShortestPath("hijkl") == "hijkl");
+        static_assert(FindShortestPath("hijkl") == "Something went very wrong");
         static_assert(FindShortestPath("ihgpwlah") == "DDRRRD");
         //static_assert(FindShortestPath("kglvqrro") == "DDUDRLRRUDRD");
         //static_assert(FindShortestPath("ulqzkmiv") == "DRURDRUDDLLDLUURRDULRLDUUDDDRR");

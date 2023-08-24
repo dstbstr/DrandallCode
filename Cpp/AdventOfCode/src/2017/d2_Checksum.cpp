@@ -2,13 +2,13 @@
 #include <execution>
 
 SOLUTION(2017, 2) {
-    constexpr u32 FindDelta(const std::string & line) {
+    constexpr u32 FindDelta(std::string_view line) {
         auto values = ParseLineAsNumbers<u32>(line, "\t");
         std::sort(values.begin(), values.end());
         return values.back() - values[0];
     }
 
-    constexpr u32 FindDivisors(const std::string & line) {
+    constexpr u32 FindDivisors(std::string_view line) {
         auto values = ParseLineAsNumbers<u32>(line, "\t");
         std::sort(values.begin(), values.end());
         for (size_t i = 0; i < values.size(); i++) {
@@ -21,16 +21,16 @@ SOLUTION(2017, 2) {
         return 0;
     }
 
-    constexpr u32 Checksum(const std::vector<std::string>&lines, auto func) {
+    constexpr u32 Checksum(const auto& lines, auto func) {
         return std::transform_reduce(lines.cbegin(), lines.cend(), 0u, std::plus<u32>(), func);
     }
 
     PART_ONE() {
-        return Constexpr::ToString(Checksum(lines, FindDelta));
+        return Constexpr::ToString(Checksum(Lines, FindDelta));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(Checksum(lines, FindDivisors));
+        return Constexpr::ToString(Checksum(Lines, FindDivisors));
     }
 
     TESTS() {

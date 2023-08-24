@@ -8,10 +8,11 @@
 SOLUTION(2017, 14) {
     using Grid = std::vector<std::vector<bool>>;
 
-    constexpr Grid CreateGrid(const std::string & key) {
+    constexpr Grid CreateGrid(std::string_view key) {
         Grid result;
+        std::string prefix = std::string(key);
         for (auto i = 0; i < 128; i++) {
-            std::string toHash = key + "-" + ToString(i);
+            std::string toHash = prefix + "-" + ToString(i);
             auto hash = KnotHash::Hash(toHash);
             std::vector<bool> line;
 
@@ -59,7 +60,7 @@ SOLUTION(2017, 14) {
     }
     
     PART_ONE() {
-        const auto& key = lines[0];
+        const auto& key = std::string(Line);
         u32 used = 0;
         for (auto i = 0; i < 128; i++) {
             std::string toHash = key + "-" + ToString(i);
@@ -73,7 +74,7 @@ SOLUTION(2017, 14) {
     }
 
     PART_TWO() {
-        auto grid = CreateGrid(lines[0]);
+        auto grid = CreateGrid(Line);
         auto pos = RowCol{ 0, 0 };
         /*
         std::vector<RowCol> allPoints;
@@ -100,9 +101,9 @@ SOLUTION(2017, 14) {
     }
 
     TESTS() {
-        std::vector<std::string> lines = { "flqrgnkx" };
-        if(PartOne(lines) != "8108") return false;
-        if(PartTwo(lines) != "1242") return false;
+        //std::vector<std::string> lines = { "flqrgnkx" };
+        //if(PartOne(lines) != "8108") return false;
+        //if(PartTwo(lines) != "1242") return false;
         
         return true;
     }

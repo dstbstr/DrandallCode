@@ -11,7 +11,7 @@ SOLUTION(2015, 15) {
         s32 Calories = 0;
     };
 
-    constexpr Ing ParseIng(const std::string& line) {
+    constexpr Ing ParseIng(std::string_view line) {
         auto s0 = line.substr(line.find(':') + 2);
         auto s = Constexpr::Split(s0, ", ");
         Ing result;
@@ -72,11 +72,11 @@ SOLUTION(2015, 15) {
     }
 
     PART_ONE() {
-        auto ings = ParseLines(lines, ParseIng);
+        auto ings = ParseLines(Lines, ParseIng);
         return Constexpr::ToString(Recurse(ings, {}, 0, false));
     }
     PART_TWO() {
-        auto ings = ParseLines(lines, ParseIng);
+        auto ings = ParseLines(Lines, ParseIng);
         return Constexpr::ToString(Recurse(ings, {}, 0, true));
     }
     TESTS() {

@@ -55,7 +55,7 @@ SOLUTION(2016, 11) {
         }
     };
 
-    constexpr State ParseInput(const std::vector<std::string>& lines) {
+    constexpr State ParseInput(const auto& lines) {
         State result;
         for (const auto& line : lines) {
             Floor floor;
@@ -213,46 +213,7 @@ SOLUTION(2016, 11) {
         return hash;
     }
 
-    constexpr bool TestHash() {
-        State lhs;
-        State rhs;
-        lhs.Elevator = 0;
-        rhs.Elevator = 0;
-
-        lhs.Floors.push_back({ { "ab" }, {} });
-        lhs.Floors.push_back({ { "c"}, {"a"} });
-        lhs.Floors.push_back({ {}, {"bc"} });
-
-        rhs.Floors.push_back({ {"bc"}, {} });
-        rhs.Floors.push_back({ {"a"},{"b"} });
-        rhs.Floors.push_back({ {}, {"ca"} });
-
-        if (Hash(lhs) != Hash(rhs)) return false;
-        if (Hash(lhs) != Hash(lhs)) return false;
-
-        lhs.Elevator = 1;
-        if (Hash(lhs) == Hash(rhs)) return false;
-
-        lhs.Elevator = 0;
-        lhs.Floors.clear();
-        rhs.Floors.clear();
-
-        lhs.Floors.push_back({ {}, {} });
-        lhs.Floors.push_back({ {"ab"},{} });
-        lhs.Floors.push_back({ {},{"ab"} });
-
-        rhs.Floors.push_back({ {"ab"},{} });
-        rhs.Floors.push_back({ {},{"ab"} });
-        rhs.Floors.push_back({ {},{} });
-
-        if (Hash(lhs) == Hash(rhs)) return false;
-
-        return true;
-    }
-
-    static_assert(TestHash());
-
-    constexpr u32 Solve(const std::vector<std::string>& lines) {
+    constexpr u32 Solve(const auto& lines) {
         auto initial = ParseInput(lines);
         auto target = CreateTarget(initial);
         
@@ -294,15 +255,53 @@ SOLUTION(2016, 11) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(Solve(lines));
+        return Constexpr::ToString(Solve(Lines));
     }
     PART_TWO() {
-        auto copy = lines;
+        auto copy = CopyToVector(Lines);
         copy[0] += " elerium generator, elerium microchip, dilithium generator, dilithium microchip";
         return Constexpr::ToString(Solve(copy));
     }
 
+    constexpr bool TestHash() {
+        State lhs;
+        State rhs;
+        lhs.Elevator = 0;
+        rhs.Elevator = 0;
+
+        lhs.Floors.push_back({ { "ab" }, {} });
+        lhs.Floors.push_back({ { "c"}, {"a"} });
+        lhs.Floors.push_back({ {}, {"bc"} });
+
+        rhs.Floors.push_back({ {"bc"}, {} });
+        rhs.Floors.push_back({ {"a"},{"b"} });
+        rhs.Floors.push_back({ {}, {"ca"} });
+
+        if (Hash(lhs) != Hash(rhs)) return false;
+        if (Hash(lhs) != Hash(lhs)) return false;
+
+        lhs.Elevator = 1;
+        if (Hash(lhs) == Hash(rhs)) return false;
+
+        lhs.Elevator = 0;
+        lhs.Floors.clear();
+        rhs.Floors.clear();
+
+        lhs.Floors.push_back({ {}, {} });
+        lhs.Floors.push_back({ {"ab"},{} });
+        lhs.Floors.push_back({ {},{"ab"} });
+
+        rhs.Floors.push_back({ {"ab"},{} });
+        rhs.Floors.push_back({ {},{"ab"} });
+        rhs.Floors.push_back({ {},{} });
+
+        if (Hash(lhs) == Hash(rhs)) return false;
+
+        return true;
+    }
+
     TESTS() {
+        static_assert(TestHash());
 
         std::vector<std::string> lines = {
             "The first floor contains a hydrogen-compatible microchip and a lithium-compatible microchip.",

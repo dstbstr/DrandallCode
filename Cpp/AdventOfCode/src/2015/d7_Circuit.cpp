@@ -43,7 +43,7 @@ SOLUTION(2015, 7) {
         }
     }
 
-    constexpr Map ParseInput(const std::vector<std::string>& lines) {
+    constexpr Map ParseInput(const auto& lines) {
         Map result;
         for (const auto& line : lines) {
             auto s = Constexpr::Split(line, " -> ");
@@ -53,20 +53,20 @@ SOLUTION(2015, 7) {
         return result;
     }
 
-    constexpr std::string Solve(const std::vector<std::string>& lines) {
+    constexpr std::string Solve(const auto& lines) {
         auto map = ParseInput(lines);
         Resolve("a", map);
         return map.at("a");
     }
 
     PART_ONE() {
-        return Solve(lines);
+        return Solve(Lines);
     }
 
     PART_TWO() {
-        auto partOneResult = Solve(lines);
+        auto partOneResult = Solve(Lines);
 
-        auto copy = lines;
+        auto copy = Lines;
         for (auto& line : copy) {
             if (line.substr(line.size() - 4) == "-> b") {
                 line = partOneResult + " -> b";

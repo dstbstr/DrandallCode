@@ -17,11 +17,6 @@ SOLUTION(2015, 11) {
         return result;
     }
 
-    static_assert(Increment("a") == "b");
-    static_assert(Increment("z") == "a");
-    static_assert(Increment("azzz") == "baaa");
-    static_assert(Increment("xyz") == "xza");
-
     constexpr std::string ReplaceInvalid(const std::string & input) {
         std::string result = input;
         size_t index = 0;
@@ -87,8 +82,8 @@ SOLUTION(2015, 11) {
         return ContainsStraight(input) && ContainsTwoPairs(input);
     }
 
-    constexpr std::string NextPass(std::string previous) {
-        std::string result = previous;
+    constexpr std::string NextPass(std::string_view previous) {
+        std::string result = std::string(previous);
         do {
             result = Increment(result);
             result = ReplaceInvalid(result);
@@ -98,13 +93,18 @@ SOLUTION(2015, 11) {
     }
 
     PART_ONE() {
-        return NextPass(lines[0]);
+        return NextPass(Line);
     }
     PART_TWO() {
-        return NextPass(NextPass(lines[0]));
+        return NextPass(NextPass(Line));
     }
 
     TESTS() {
+        static_assert(Increment("a") == "b");
+        static_assert(Increment("z") == "a");
+        static_assert(Increment("azzz") == "baaa");
+        static_assert(Increment("xyz") == "xza");
+
         static_assert(ReplaceInvalid("oil") == "paa");
         static_assert(ReplaceInvalid("happy") == "happy");
         

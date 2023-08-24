@@ -3,12 +3,13 @@
 
 SOLUTION(2016, 5) {
 
-	constexpr std::string PartOneImpl(const std::string & key, const std::vector<u64>&hints) {
+	constexpr std::string PartOneImpl(std::string_view key, const std::vector<u64>&hints) {
+		std::string prefix = std::string(key);
 		if (hints.empty()) {
 			u64 index = 0;
 			std::string result = "";
 			while (result.size() < 8) {
-				std::string attempt = key + ToString(index);
+				std::string attempt = prefix + ToString(index);
 				auto hex = ToHexLower(md5::compute(attempt.c_str()));
 				if (hex.substr(0, 5) == "00000") {
 					result += hex[5];
@@ -20,7 +21,7 @@ SOLUTION(2016, 5) {
 		else {
 			std::string result = "";
 			for (auto hint : hints) {
-				std::string attempt = key + ToString(hint);
+				std::string attempt = prefix + ToString(hint);
 				auto hex = ToHexLower(md5::compute(attempt.c_str()));
 				if (hex.substr(0, 5) != "00000") {
 					throw "Bad hint";
@@ -43,18 +44,19 @@ SOLUTION(2016, 5) {
 			4063427,
 			7777889
 		};
-		return PartOneImpl(lines[0], hints);
+		return PartOneImpl(Line, hints);
 	}
 
-	constexpr std::string PartTwoImpl(const std::string& key, std::vector<u64> hints) {
+	constexpr std::string PartTwoImpl(std::string_view key, const std::vector<u64>& hints) {
 		std::string result = "________";
+		std::string prefix = std::string(key);
 
 		if (hints.empty()) {
 			u64 index = 0;
 
 			int totalFound = 0;
 			while (totalFound < 8) {
-				std::string attempt = key + ToString(index);
+				std::string attempt = prefix + ToString(index);
 				auto hex = ToHexLower(md5::compute(attempt.c_str()));
 				if (hex.substr(0, 5) == "00000" && hex[5] < '8') {
 					auto pos = hex[5] - '0';
@@ -69,7 +71,7 @@ SOLUTION(2016, 5) {
 		}
 		else {
 			for (const auto hint : hints) {
-				std::string attempt = key + ToString(hint);
+				std::string attempt = prefix + ToString(hint);
 				auto hex = ToHexLower(md5::compute(attempt.c_str()));
 				if (hex.substr(0, 5) != "00000" || hex[5] >= '8') throw "Bad hint";
 
@@ -93,13 +95,10 @@ SOLUTION(2016, 5) {
 			12942170,
 			25651067
 		};
-		return PartTwoImpl(lines[0], hints);
+		return PartTwoImpl(Line, hints);
 	}
 
 	TESTS() {
-		std::vector<std::string> lines = {
-			"abc"
-		};
 		std::vector<u64> hints = {
 			3231929,
 			5017308,

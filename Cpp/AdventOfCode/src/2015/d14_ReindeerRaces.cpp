@@ -11,7 +11,7 @@ SOLUTION(2015, 14) {
         u32 RestTime{ 0 };
     };
 
-    constexpr Reindeer ParseRacer(const std::string& line) {
+    constexpr Reindeer ParseRacer(std::string_view line) {
         auto s = Constexpr::Split(line, " ");
         Reindeer result;
         Constexpr::ParseNumber(s[3], result.Speed);
@@ -58,7 +58,7 @@ SOLUTION(2015, 14) {
 
     PART_ONE() {
         //One liner, just for fun. :)
-        return Constexpr::ToString(RunAllReturnMax(ParseLines(lines, ParseRacer), FindDistance, 2503));
+        return Constexpr::ToString(RunAllReturnMax(ParseLines(Lines, ParseRacer), FindDistance, 2503));
         /*
         auto racers = ParseLines<Reindeer>(lines, ParseRacer);
         u32 best = 0;
@@ -70,7 +70,7 @@ SOLUTION(2015, 14) {
         */
     }
     PART_TWO() {
-        auto racers = ParseLines(lines, ParseRacer);
+        auto racers = ParseLines(Lines, ParseRacer);
         auto points = GetPoints(racers, 2503);
         
         return Constexpr::ToString(*std::max_element(points.cbegin(), points.cend()));

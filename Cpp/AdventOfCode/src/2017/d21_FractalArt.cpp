@@ -36,7 +36,7 @@ SOLUTION(2017, 21) {
 
     using Transforms = Constexpr::SmallMap<std::string, std::string>;
 
-    constexpr Transforms GetTransforms(const std::vector<std::string>& lines) {
+    constexpr Transforms GetTransforms(const auto& lines) {
         Transforms result;
         for (const auto& line : lines) {
             auto s = Constexpr::Split(line, " => ");
@@ -198,7 +198,7 @@ SOLUTION(2017, 21) {
         }
     }
 
-    constexpr auto Solve(const std::vector<std::string>& lines, size_t iterations) {
+    constexpr auto Solve(const auto& lines, size_t iterations) {
         auto transforms = GetTransforms(lines);
 
         Constexpr::SmallMap<std::string, std::vector<std::string>> cache{};
@@ -223,11 +223,11 @@ SOLUTION(2017, 21) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(Solve(lines, 5));
+        return Constexpr::ToString(Solve(Lines, 5));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(Solve(lines, 18));
+        return Constexpr::ToString(Solve(Lines, 18));
     }
 
     TESTS() {

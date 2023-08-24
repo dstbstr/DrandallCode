@@ -21,7 +21,7 @@ SOLUTION(2015, 16) {
 
         return result;
     }
-    constexpr Sue ParseSue(const std::string & line) {
+    constexpr Sue ParseSue(std::string_view line) {
         //Sue 1: goldfish: 6, trees: 9, akitas: 0
 
         auto propStart = line.find(':');
@@ -68,8 +68,7 @@ SOLUTION(2015, 16) {
         return true;
     }
 
-    constexpr size_t Solve(const std::vector<std::string>& lines, auto match) {
-        //auto sues = ParseLines<Sue>(lines, ParseSue);
+    constexpr size_t Solve(const auto& lines, auto match) {
         auto sues = ParseLines(lines, ParseSue);
         for (size_t i = 0; i < sues.size(); i++) {
             if (match(sues[i])) return i + 1;
@@ -77,10 +76,10 @@ SOLUTION(2015, 16) {
         return 0;
     }
     PART_ONE() {
-        return Constexpr::ToString(Solve(lines, IsExactMatch));
+        return Constexpr::ToString(Solve(Lines, IsExactMatch));
     }
     PART_TWO() {
-        return Constexpr::ToString(Solve(lines, IsRangeMatch));
+        return Constexpr::ToString(Solve(Lines, IsRangeMatch));
     }
 
     TESTS() {

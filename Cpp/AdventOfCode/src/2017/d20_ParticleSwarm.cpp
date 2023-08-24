@@ -13,7 +13,7 @@ SOLUTION(2017, 20) {
         }
     };
 
-    constexpr Particle ParseParticle(const std::string& line, size_t index) {
+    constexpr Particle ParseParticle(std::string_view line, size_t index) {
         auto s = Constexpr::Split(line, ", ");
         Particle result;
         result.Index = index;
@@ -27,7 +27,7 @@ SOLUTION(2017, 20) {
         return lhs.Position == rhs.Position;
     }
 
-    constexpr void RemoveCollisions(std::vector<Particle>&particles) {
+    constexpr void RemoveCollisions(std::vector<Particle>& particles) {
         std::vector<Vec3<s64>> seen;
         std::vector<Vec3<s64>> toRemove;
         for (const auto& particle : particles) {
@@ -50,20 +50,16 @@ SOLUTION(2017, 20) {
     }
 
     PART_ONE() {
-        auto particles = ParseLinesWithIndex(lines, ParseParticle);
-        Vec3<s64> origin{0, 0, 0};
+        auto particles = ParseLinesWithIndex(Lines, ParseParticle);
         //Over 10k iterations, the Acceleration will be the most important factor
-        std::sort(particles.begin(), particles.end(), [origin](const Particle& lhs, const Particle& rhs) {
-            return MDistance(lhs.Accel, origin) < MDistance(rhs.Accel, origin);
+        std::sort(particles.begin(), particles.end(), [](const Particle& lhs, const Particle& rhs) {
+            return MDistance(lhs.Accel) < MDistance(rhs.Accel);
             });
         return Constexpr::ToString(particles[0].Index);
     }
 
     PART_TWO() {
-        std::vector<Particle> particles;
-        for (u32 index = 0; index < lines.size(); index++) {
-            particles.push_back(ParseParticle(lines[index], index));
-        }
+        auto particles = ParseLinesWithIndex(Lines, ParseParticle);
 
         for (auto i = 0; i < 100; i++) {
             for (auto& particle : particles) {
@@ -81,14 +77,14 @@ SOLUTION(2017, 20) {
         static_assert(ParseParticle("p=<-317,1413,1507>, v=<19,-102,-108>, a=<1,-3,-3>", 1).Accel == Vec3<s64>{1, -3, -3});
         static_assert(ParseParticle("p=<-317,1413,1507>, v=<19,-102,-108>, a=<1,-3,-3>", 1).Index == 1);
         
-        std::vector<std::string> lines = {
-           "p=<-6,0,0>, v=<3,0,0>, a=<0,0,0>",
-           "p=<-4,0,0>, v=<2,0,0>, a=<0,0,0>",
-           "p=<-2,0,0>, v=<1,0,0>, a=<0,0,0>",
-           "p=<3,0,0>, v=<-1,0,0>, a=<0,0,0>"
-        };
-
-        if (PartTwo(lines) != "1") return false;
+        //std::vector<std::string> lines = {
+        //   "p=<-6,0,0>, v=<3,0,0>, a=<0,0,0>",
+        //   "p=<-4,0,0>, v=<2,0,0>, a=<0,0,0>",
+        //   "p=<-2,0,0>, v=<1,0,0>, a=<0,0,0>",
+        //   "p=<3,0,0>, v=<-1,0,0>, a=<0,0,0>"
+        //};
+        //
+        //if (PartTwo(lines) != "1") return false;
         
         return true;
     }

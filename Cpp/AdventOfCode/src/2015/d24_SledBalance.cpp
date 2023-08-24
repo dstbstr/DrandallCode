@@ -76,12 +76,12 @@ SOLUTION(2015, 24) {
     }
 
     PART_ONE() {
-        auto weights = ParseLinesAsNumbers<u32>(lines);
+        auto weights = ParseLinesAsNumbers<u32>(Lines);
         return Constexpr::ToString(FindMinimalEntanglement(weights, 3));
     }
 
     PART_TWO() {
-        auto weights = ParseLinesAsNumbers<u32>(lines);
+        auto weights = ParseLinesAsNumbers<u32>(Lines);
         return Constexpr::ToString(FindMinimalEntanglement(weights, 4));
     }
     TESTS() {

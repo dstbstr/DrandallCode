@@ -8,7 +8,7 @@ SOLUTION(2018, 3) {
     };
 
     //#123 @ 3,2: 5x4
-    constexpr Rect ParseRect(const std::string & line) {
+    constexpr Rect ParseRect(std::string_view line) {
         auto split = Constexpr::Split(line, " ");
         Rect result;
         Constexpr::ParseNumber(split[0].substr(1), result.Id);
@@ -34,7 +34,7 @@ SOLUTION(2018, 3) {
     }
 
     PART_ONE() {
-        auto rects = ParseLines(lines, ParseRect);
+        auto rects = ParseLines(Lines, ParseRect);
 
         auto fabric = new std::array<std::array<u32, 1001>, 1001>();
 
@@ -55,7 +55,7 @@ SOLUTION(2018, 3) {
     }
 
     PART_TWO() {
-        auto rects = ParseLines(lines, ParseRect);
+        auto rects = ParseLines(Lines, ParseRect);
 
         for (auto i = 0; i < rects.size(); i++) {
             bool found = false;

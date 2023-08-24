@@ -3,7 +3,7 @@
 SOLUTION(2017, 8) {
     using Regs = Constexpr::SmallMap<std::string, s32>;
 
-    constexpr auto GenInstruction(const std::string & line) {
+    constexpr auto GenInstruction(std::string_view line) {
         auto s = Constexpr::Split(line, " ");
         auto condRegister = std::string(s[4]);
         auto op = std::string(s[5]);
@@ -47,35 +47,33 @@ SOLUTION(2017, 8) {
         return *std::max_element(values.begin(), values.end());
     }
 
-    PART_ONE() {
+    constexpr std::pair<s32, s32> Solve(const auto& lines) {
         auto instructions = ParseLines(lines, GenInstruction);
-
-        Regs regs;
-
-        for (const auto& inst : instructions) {
-            inst(regs);
-        }
-
-        return Constexpr::ToString(GetMaxElement(regs));
-    }
-
-    PART_TWO() {
-        auto instructions = ParseLines(lines, GenInstruction);
-
         Regs regs;
         s32 max = 0;
         for (const auto& inst : instructions) {
             inst(regs);
             max = std::max(max, GetMaxElement(regs));
         }
+        return std::make_pair(GetMaxElement(regs), max);
+    }
 
+    PART_ONE() {
+        auto [last, max] = Solve(Lines);
+        return Constexpr::ToString(last);
+    }
+
+    PART_TWO() {
+        auto [last, max] = Solve(Lines);
         return Constexpr::ToString(max);
     }
     
 
     TESTS() {
-        static_assert(PartOne({ "b inc 5 if a > 1", "a inc 1 if b < 5", "c dec -10 if a >= 1", "c inc -20 if c == 10" }) == "1");
-        static_assert(PartTwo({ "b inc 5 if a > 1", "a inc 1 if b < 5", "c dec -10 if a >= 1", "c inc -20 if c == 10" }) == "10");
+        std::vector<std::string> lines = { "b inc 5 if a > 1", "a inc 1 if b < 5", "c dec -10 if a >= 1", "c inc -20 if c == 10" };
+        auto [last, max] = Solve(lines);
+        if (last != 1) return false;
+        if (max != 10) return false;
 
         return true;
     }

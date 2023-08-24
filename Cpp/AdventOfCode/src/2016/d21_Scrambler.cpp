@@ -3,7 +3,7 @@
 SOLUTION(2016, 21) {
     constexpr std::array<size_t, 8> ShiftTable = { 1, 1, 6, 2, 7, 3, 0, 4 };
 
-    constexpr void RunCommand(const std::string & line, bool scramble, std::string & running) {
+    constexpr void RunCommand(std::string_view line, bool scramble, std::string & running) {
         auto s = Constexpr::Split(line, " ");
         u32 n1, n2;
 
@@ -66,15 +66,15 @@ SOLUTION(2016, 21) {
         }
     }
 
-    constexpr std::string Scramble(const std::vector<std::string>& lines, const std::string& initial) {
-        std::string running = initial;
+    constexpr std::string Scramble(const auto& lines, std::string_view initial) {
+        std::string running = std::string(initial);
         for (const auto& line : lines) {
             RunCommand(line, true, running);
         }
         return running;
     }
-    constexpr std::string UnScramble(const std::vector<std::string>& lines, const std::string& initial) {
-        std::string running = initial;
+    constexpr std::string UnScramble(const auto& lines, std::string_view initial) {
+        std::string running = std::string(initial);
         for (s32 i = static_cast<s32>(lines.size()) - 1; i >= 0; i--) {
             RunCommand(lines[i], false, running);
         }
@@ -82,10 +82,10 @@ SOLUTION(2016, 21) {
     }
 
     PART_ONE() {
-        return Scramble(lines, "abcdefgh");
+        return Scramble(Lines, "abcdefgh");
     }
     PART_TWO() {
-        return UnScramble(lines, "fbgdceah");
+        return UnScramble(Lines, "fbgdceah");
     }
 
     TESTS() {

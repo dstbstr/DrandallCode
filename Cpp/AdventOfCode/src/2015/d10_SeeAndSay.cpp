@@ -30,8 +30,8 @@ SOLUTION(2015, 10) {
         return result;
     }
 
-    constexpr std::string ApplyTimes(const std::string & input, size_t times) {
-        std::string running = input;
+    constexpr std::string ApplyTimes(std::string_view input, size_t times) {
+        std::string running = std::string(input);
 
         for (auto i = 0; i < times; i++) {
             running = Next(running);
@@ -41,12 +41,11 @@ SOLUTION(2015, 10) {
     }
 
 
-    //static_assert(ApplyTimes("1113222113", 40).size() == 252594);
     PART_ONE() {
-        return Constexpr::ToString(ApplyTimes(lines[0], 40).size());
+        return Constexpr::ToString(ApplyTimes(Line, 40).size());
     }
     PART_TWO() {
-        return Constexpr::ToString(ApplyTimes(lines[0], 50).size());
+        return Constexpr::ToString(ApplyTimes(Line, 50).size());
     }
     TESTS() {
         static_assert(Next("1") == "11");
@@ -54,6 +53,7 @@ SOLUTION(2015, 10) {
         static_assert(Next("21") == "1211");
         static_assert(Next("1211") == "111221");
         static_assert(Next("111221") == "312211");
+        //static_assert(ApplyTimes("1113222113", 40).size() == 252594);
 
         return true;
     }

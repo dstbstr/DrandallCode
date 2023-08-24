@@ -12,7 +12,7 @@ SOLUTION(2016, 12) {
         }
     }
 
-    constexpr auto GenInstruction(const std::string& line) {
+    constexpr auto GenInstruction(std::string_view line) {
         auto s = Constexpr::Split(line, " ");
         auto cmd = std::string(s[0]);
         auto arg1 = std::string(s[1]);
@@ -42,7 +42,7 @@ SOLUTION(2016, 12) {
         };
     }
 
-    constexpr void Execute(const std::vector<std::string>& lines, std::vector<s32>& regs) {
+    constexpr void Execute(const auto& lines, std::vector<s32>& regs) {
         auto instructions = ParseLines(lines, GenInstruction);
         size_t ip = 0;
 
@@ -52,13 +52,13 @@ SOLUTION(2016, 12) {
     }
     PART_ONE() {
         std::vector<s32> registers{ 0, 0, 0, 0 };
-        Execute(lines, registers);
+        Execute(Lines, registers);
 
         return Constexpr::ToString(registers[0]);
     }
     PART_TWO() {
         std::vector<s32> registers{ 0, 0, 1, 0 };
-        Execute(lines, registers);
+        Execute(Lines, registers);
 
         return Constexpr::ToString(registers[0]);
     }

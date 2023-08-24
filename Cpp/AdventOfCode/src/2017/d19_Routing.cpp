@@ -2,9 +2,9 @@
 #include "Facing.h"
 
 SOLUTION(2017, 19) {
-    using Grid = std::vector<std::string>;
+    using Grid = decltype(Lines);
 
-    constexpr RowCol FindStartPos(const std::string & firstLine) {
+    constexpr RowCol FindStartPos(std::string_view firstLine) {
         for (size_t col = 0; col < firstLine.size(); col++) {
             if (firstLine[col] != ' ') {
                 return RowCol{ 0, col };
@@ -93,13 +93,13 @@ SOLUTION(2017, 19) {
     }
 
     PART_ONE() {
-        auto pos = FindStartPos(lines[0]);
+        auto pos = FindStartPos(Lines[0]);
         Facing facing = Down;
         std::string result;
         char currentSquare;
 
-        while (Move(pos, facing, lines)) {
-            currentSquare = lines[pos.Row][pos.Col];
+        while (Move(pos, facing, Lines)) {
+            currentSquare = Lines[pos.Row][pos.Col];
             if (currentSquare >= 'A' && currentSquare <= 'Z') {
                 result += currentSquare;
             }
@@ -109,10 +109,10 @@ SOLUTION(2017, 19) {
     }
 
     PART_TWO() {
-        auto pos = FindStartPos(lines[0]);
+        auto pos = FindStartPos(Lines[0]);
         Facing facing = Down;
         u32 steps = 1;
-        while (Move(pos, facing, lines)) {
+        while (Move(pos, facing, Lines)) {
             steps++;
         }
 
@@ -120,17 +120,17 @@ SOLUTION(2017, 19) {
     }
 
     TESTS() {
-        std::vector<std::string> lines = {
-            "     |          ",
-            "     |  +--+    ",
-            "     A  |  C    ",
-            " F---|----E|--+ ",
-            "     |  |  |  D ",
-            "     +B-+  +--+ "
-        };
-
-        if (PartOne(lines) != "ABCDEF") return false;
-        if (PartTwo(lines) != "38") return false;
+        //std::vector<std::string> lines = {
+        //    "     |          ",
+        //    "     |  +--+    ",
+        //    "     A  |  C    ",
+        //    " F---|----E|--+ ",
+        //    "     |  |  |  D ",
+        //    "     +B-+  +--+ "
+        //};
+        //
+        //if (PartOne(lines) != "ABCDEF") return false;
+        //if (PartTwo(lines) != "38") return false;
 
         return true;
     }

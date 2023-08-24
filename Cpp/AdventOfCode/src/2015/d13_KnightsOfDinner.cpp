@@ -5,7 +5,7 @@
 SOLUTION(2015, 13) {
     using PreferenceMap = Constexpr::SmallMap<std::string, Constexpr::SmallMap<std::string, s32>>;
 
-    constexpr void ParsePerson(const std::string & line, PreferenceMap& preferences, Constexpr::SmallSet<std::string>& allPeople) {
+    constexpr void ParsePerson(std::string_view line, PreferenceMap& preferences, Constexpr::SmallSet<std::string>& allPeople) {
         //Alice would gain 2 happiness units by sitting next to Bob.
         auto s = Constexpr::Split(line, " ");
         auto lhs = std::string(s[0]);
@@ -46,7 +46,7 @@ SOLUTION(2015, 13) {
         return result;
     }
 
-    constexpr u32 FindBestSeating(const std::vector<std::string>& lines, bool includeSelf) {
+    constexpr u32 FindBestSeating(const auto& lines, bool includeSelf) {
         PreferenceMap preferences;
         Constexpr::SmallSet<std::string> allPeople;
 
@@ -69,10 +69,10 @@ SOLUTION(2015, 13) {
     }
 
    PART_ONE() {
-        return Constexpr::ToString(FindBestSeating(lines, false));
+        return Constexpr::ToString(FindBestSeating(Lines, false));
     }
     PART_TWO() {
-        return Constexpr::ToString(FindBestSeating(lines, true));
+        return Constexpr::ToString(FindBestSeating(Lines, true));
     }
 
     TESTS() {

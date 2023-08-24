@@ -1,7 +1,6 @@
 #include "2017/d7_Circus.h"
 
 SOLUTION(2017, 7) {
-
     struct Node {
         std::string Name = "";
         u32 Weight = 0;
@@ -10,7 +9,7 @@ SOLUTION(2017, 7) {
 
     using Map = Constexpr::SmallMap<std::string, Node>;
 
-    constexpr Node ParseNode(const std::string & line) {
+    constexpr Node ParseNode(std::string_view line) {
         auto split = Constexpr::Split(line, " ");
         Node node;
         node.Name = split[0];
@@ -60,14 +59,7 @@ SOLUTION(2017, 7) {
         return false;
     }
 
-    constexpr bool TestAllMatch(const std::vector<u32>&weights, bool shouldMatch, size_t expectedOddIndex) {
-        size_t actualOddIndex;
-        auto isMatch = AllMatch(weights, actualOddIndex);
-        if (shouldMatch && isMatch) return true;
-        return actualOddIndex == expectedOddIndex;
-    }
-
-    constexpr Map ParseMap(const std::vector<std::string>&lines) {
+    constexpr Map ParseMap(const auto& lines) {
         Map result;
         for (const auto& line : lines) {
             auto node = ParseNode(line);
@@ -95,11 +87,11 @@ SOLUTION(2017, 7) {
     }
 
     PART_ONE() {
-        auto map = ParseMap(lines);
+        auto map = ParseMap(Lines);
         return FindRoot(map);
     }
 
-    PART_TWO() {
+    constexpr size_t SolvePartTwo(const auto& lines) {
         auto map = ParseMap(lines);
         auto tower = FindRoot(map);
         s32 delta = 0;
@@ -111,7 +103,7 @@ SOLUTION(2017, 7) {
             }
             size_t oddIndex;
             if (AllMatch(weights, oddIndex)) {
-                return Constexpr::ToString(map.at(tower).Weight + delta);
+                return map.at(tower).Weight + delta;
             }
             else {
                 if (oddIndex == 0) {
@@ -125,6 +117,17 @@ SOLUTION(2017, 7) {
         }
 
         throw std::logic_error("Not Found");
+    }
+
+    PART_TWO() {
+        return Constexpr::ToString(SolvePartTwo(Lines));
+    }
+
+    constexpr bool TestAllMatch(const std::vector<u32>& weights, bool shouldMatch, size_t expectedOddIndex) {
+        size_t actualOddIndex;
+        auto isMatch = AllMatch(weights, actualOddIndex);
+        if (shouldMatch && isMatch) return true;
+        return actualOddIndex == expectedOddIndex;
     }
 
     TESTS() {
@@ -154,8 +157,8 @@ SOLUTION(2017, 7) {
             "cntj (57)"
         };
 
-        if(PartOne(lines) != "tknk") return false;
-        if(PartTwo(lines) != "60") return false;
+        if (FindRoot(ParseMap(lines)) != "tknk") return false;
+        if(SolvePartTwo(lines) != 60) return false;
 
         return true;
     }

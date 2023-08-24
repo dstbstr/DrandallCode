@@ -1,4 +1,4 @@
 #pragma once
 
 #include "Common.h"
-DECLARE_SOLUTION(2015, 4);
+DECLARE_SOLUTION(2015, 4, "ckczppom");

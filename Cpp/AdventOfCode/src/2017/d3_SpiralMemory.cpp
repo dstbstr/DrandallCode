@@ -81,13 +81,13 @@ SOLUTION(2017, 3) {
 
     PART_ONE() {
         u32 target;
-        Constexpr::ParseNumber(lines[0], target);
+        Constexpr::ParseNumber(Line, target);
         return Constexpr::ToString(FindTarget(target));
     }
 
     PART_TWO() {
         u32 target;
-        Constexpr::ParseNumber(lines[0], target);
+        Constexpr::ParseNumber(Line, target);
 
         auto spiral = CreateSpiral(1000);
         auto sumSpiral = WriteSummingSpiral(spiral);

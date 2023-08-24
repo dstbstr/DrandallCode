@@ -60,7 +60,7 @@ SOLUTION(2016, 8) {
     }
 
     template<size_t Rows, size_t Cols>
-    constexpr auto ParseLine(const std::string& line) {
+    constexpr auto ParseLine(std::string_view line) {
         return [line](Bits<Rows, Cols>& bits) {
             auto s = Constexpr::Split(line, " ");
             if (s[0] == "rect") {
@@ -117,14 +117,14 @@ SOLUTION(2016, 8) {
 
     PART_ONE() {
         Bits<6, 50> bits{};
-        for (const auto& line : lines) {
+        for (const auto& line : Lines) {
             ParseLine<6, 50>(line)(bits);
         }
         return Constexpr::ToString(CountLit(bits));
     }
     PART_TWO() {
         Bits<6, 50> bits{};
-        for (const auto& line : lines) {
+        for (const auto& line : Lines) {
             ParseLine<6, 50>(line)(bits);
         }
         return PrintWords(bits);
