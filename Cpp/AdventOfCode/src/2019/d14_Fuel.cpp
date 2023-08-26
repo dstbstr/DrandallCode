@@ -10,7 +10,7 @@ SOLUTION(2019, 14) {
     using Ingrediants = Constexpr::SmallMap<std::string, std::vector<Ingrediant>>;
     using Extras = Constexpr::SmallMap<std::string, u64>;
 
-    constexpr void ParseLines(const std::vector<std::string>& lines, Produces& outProduces, Ingrediants& outIngrediants) {
+    constexpr void ParseLines(const auto& lines, Produces& outProduces, Ingrediants& outIngrediants) {
         for (const auto& line : lines) {
             auto s1 = StrUtil::Split(line, " => ");
             std::vector<Ingrediant> ingrediants;
@@ -91,15 +91,18 @@ SOLUTION(2019, 14) {
         return oreNeeded;
     }
 
-    PART_ONE() {
+    constexpr size_t SolvePartOne(const auto& lines) {
         Produces produces;
         Ingrediants ingrediants;
         Extras extras;
         ParseLines(lines, produces, ingrediants);
-        return Constexpr::ToString(ProduceFuel(produces, ingrediants, extras, 1));
+        return ProduceFuel(produces, ingrediants, extras, 1);
+    }
+    PART_ONE() {
+        return Constexpr::ToString(SolvePartOne(Lines));
     }
 
-    PART_TWO() {
+    constexpr size_t SolvePartTwo(const auto& lines) {
         Produces produces;
         Ingrediants ingrediants;
         Extras extras;
@@ -121,7 +124,11 @@ SOLUTION(2019, 14) {
             }
         }
 
-        return Constexpr::ToString(totalFuelProduced);
+        return totalFuelProduced;
+    }
+
+    PART_TWO() {
+        return Constexpr::ToString(SolvePartTwo(Lines));
     }
 
     TESTS() {
@@ -133,10 +140,10 @@ SOLUTION(2019, 14) {
             "7 A, 1 D => 1 E",
             "7 A, 1 E => 1 FUEL"
         };
-
-        if (PartOne(lines) != "31") return false;
-
-
+        
+        if (SolvePartOne(lines) != 31) return false;
+        
+        
         lines = {
             "9 ORE => 2 A",
             "8 ORE => 3 B",
@@ -146,8 +153,8 @@ SOLUTION(2019, 14) {
             "4 C, 1 A => 1 CA",
             "2 AB, 3 BC, 4 CA => 1 FUEL"
         };
-        if (PartOne(lines) != "165") return false;
-
+        if (SolvePartOne(lines) != 165) return false;
+        
         lines = {
             "157 ORE => 5 NZVS",
             "165 ORE => 6 DCFZ",
@@ -159,9 +166,9 @@ SOLUTION(2019, 14) {
             "165 ORE => 2 GPVTF",
             "3 DCFZ, 7 NZVS, 5 HKGWZ, 10 PSHF => 8 KHKGT"
         };
-        if (PartOne(lines) != "13312") return false;
-        if (PartTwo(lines) != "82892753") return false;
-
+        if (SolvePartOne(lines) != 13312) return false;
+        if (SolvePartTwo(lines) != 82892753) return false;
+        
         lines = {
             "2 VPVL, 7 FWMGM, 2 CXFTF, 11 MNCFX => 1 STKFG",
             "17 NVRVD, 3 JNWZP => 8 VPVL",
@@ -176,9 +183,9 @@ SOLUTION(2019, 14) {
             "1 VJHF, 6 MNCFX => 4 RFSQX",
             "176 ORE => 6 VJHF"
         };
-        if (PartOne(lines) != "180697") return false;
-        if (PartTwo(lines) != "5586022") return false;
-
+        if (SolvePartOne(lines) != 180697) return false;
+        if (SolvePartTwo(lines) != 5586022) return false;
+        
         lines = {
             "171 ORE => 8 CNZTR",
             "7 ZLQW, 3 BMBT, 9 XCVML, 26 XMNCP, 1 WPTQ, 2 MZWV, 1 RJRHP => 4 PLWSL",
@@ -198,8 +205,8 @@ SOLUTION(2019, 14) {
             "7 XCVML => 6 RJRHP",
             "5 BHXH, 4 VRPVC => 5 LTCX"
         };
-        if (PartOne(lines) != "2210736") return false;
-        if (PartTwo(lines) != "460664") return false;
+        if (SolvePartOne(lines) != 2210736) return false;
+        if (SolvePartTwo(lines) != 460664) return false;
 
         return true;
     }

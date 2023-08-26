@@ -6,7 +6,7 @@ SOLUTION(2018, 10) {
         Coord Vel;
     };
 
-    constexpr Star ParseLine(const std::string & line) {
+    constexpr Star ParseLine(std::string_view line) {
         const char* numberSearch = "1234567890-";
 
         auto s1 = Constexpr::Split(line, "=");
@@ -72,7 +72,7 @@ SOLUTION(2018, 10) {
         return true;
     }
 
-    constexpr auto Solve(const std::vector<std::string>& lines, std::string& outMessage) {
+    constexpr auto Solve(const auto& lines, std::string& outMessage) {
         auto stars = ParseLines(lines, ParseLine);
 
         size_t seconds = 0;
@@ -95,13 +95,13 @@ SOLUTION(2018, 10) {
 
     PART_ONE() {
         std::string result;
-        Solve(lines, result);
+        Solve(Lines, result);
         return result;
     }
 
     PART_TWO() {
         std::string ignored;
-        return Constexpr::ToString(Solve(lines, ignored));
+        return Constexpr::ToString(Solve(Lines, ignored));
     }
 
     TESTS() {

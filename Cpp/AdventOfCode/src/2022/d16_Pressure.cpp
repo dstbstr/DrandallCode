@@ -17,7 +17,23 @@ SOLUTION(2022, 16) {
         std::array<std::array<TDistance, RoomCount>, RoomCount> DistanceMap{};
     };
 
-    std::vector<Room> ParseRoomList(const std::vector<std::string>&lines) {
+    //Valve XK has flow rate=15; tunnels lead to valves CD, JC, TP, UE
+    constexpr Room ParseRoom(std::string_view line) {
+        auto s = Constexpr::Split(line, " ");
+        Room room;
+        room.Name = std::string(s[1]);
+        
+        auto flowRate = Constexpr::Split(s[4], "=")[1];
+        Constexpr::ParseNumber(flowRate, room.FlowRate);
+
+        for (size_t i = 9; i < s.size(); i++) {
+            room.Connections.push_back(std::string(s[i].substr(0, s[i].size() - 1)));
+        }
+
+        return room;
+    }
+    /*
+    std::vector<Room> ParseRoomList(const auto& lines) {
         static const auto re = std::regex(R"(Valve (\w+) has flow rate=(\d+); tunnels? leads? to valves? ([\w, ]+))");
         std::smatch match;
         std::vector<Room> rooms;
@@ -38,6 +54,7 @@ SOLUTION(2022, 16) {
 
         return rooms;
     }
+    */
 
     std::unordered_map<std::string, size_t> GetIndexMap(const std::vector<Room>&rooms) {
         std::unordered_map<std::string, size_t> indexMap;
@@ -76,9 +93,10 @@ SOLUTION(2022, 16) {
     }
 
     template<size_t RoomCount, typename TDistance>
-    State<RoomCount, TDistance> ParseState(const std::vector<std::string>&lines) {
+    State<RoomCount, TDistance> ParseState(const auto& lines) {
         State<RoomCount, TDistance> state;
-        state.Rooms = ParseRoomList(lines);
+        //state.Rooms = ParseRoomList(lines);
+        state.Rooms = ParseLines(lines, ParseRoom);
         auto allIndexes = GetIndexMap(state.Rooms);
         state.DistanceMap = GetDistanceMap<RoomCount, TDistance>(state.Rooms, allIndexes);
 
@@ -140,7 +158,7 @@ SOLUTION(2022, 16) {
     }
 
     template<size_t RoomCount, typename TDistance>
-    constexpr u32 FindBestSolo(const std::vector<std::string>&lines) {
+    constexpr u32 FindBestSolo(const auto& lines) {
         auto state = ParseState<RoomCount, TDistance>(lines);
         auto startIndex = state.IndexMap.at("AA");
         Constexpr::SmallMap<u64, u32> permutations;
@@ -160,7 +178,7 @@ SOLUTION(2022, 16) {
     }
 
     template<size_t RoomCount, typename TDistance>
-    constexpr u32 FindBestPair(const std::vector<std::string>&lines) {
+    constexpr u32 FindBestPair(const auto&lines) {
         auto state = ParseState<RoomCount, TDistance>(lines);
         auto startIndex = state.IndexMap.at("AA");
         Constexpr::SmallMap<u64, u32> permutations;
@@ -189,11 +207,11 @@ SOLUTION(2022, 16) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(FindBestSolo<51, u8>(lines));
+        return Constexpr::ToString(FindBestSolo<51, u8>(Lines));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(FindBestPair<51, u8>(lines));
+        return Constexpr::ToString(FindBestPair<51, u8>(Lines));
     }
 
     TESTS() {

@@ -30,7 +30,7 @@ SOLUTION(2019, 4) {
         return false;
     }
 
-    constexpr std::pair<u32, u32> ParseInput(const std::string& line) {
+    constexpr std::pair<u32, u32> ParseInput(std::string_view line) {
         auto s = Constexpr::Split(line, "-");
         std::pair<u32, u32> result;
         Constexpr::ParseNumber(s[0], result.first);
@@ -48,12 +48,12 @@ SOLUTION(2019, 4) {
     }
 
     PART_ONE() {
-        auto [start, end] = ParseInput(lines[0]);
+        auto [start, end] = ParseInput(Line);
         return Constexpr::ToString(Solve(start, end, Matches));
     }
 
     PART_TWO() {
-        auto [start, end] = ParseInput(lines[0]);
+        auto [start, end] = ParseInput(Line);
         return Constexpr::ToString(Solve(start, end, ExtendedMatch));
     }
 

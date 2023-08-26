@@ -259,7 +259,7 @@ inline bool ApplyDebug(std::vector<s64>& instructions, Args& args) {
 }
 
 
-constexpr std::vector<s64> ParseInstructions(const std::string& line) {
+constexpr std::vector<s64> ParseInstructions(std::string_view line) {
     return ParseLineAsNumbers<s64>(line);
 }
 

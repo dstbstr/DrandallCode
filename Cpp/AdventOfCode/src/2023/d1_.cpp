@@ -2,17 +2,11 @@
 
 SOLUTION(2023, 1) {
     PART_ONE() {
-        (void)lines;
-        if (input.empty()) {
-            return "Couldn't Find Input";
-        }
-        else {
-            return std::string(inputLines[0]);
-        }
+        return "";
     }
 
     PART_TWO() {
-        return lines[0];
+        return "";
     }
 
     TESTS() {

@@ -46,7 +46,7 @@ SOLUTION(2022, 2) {
     //X = Rock
     //Y = Paper
     //Z = Scissors
-    constexpr void ParseInput(const std::string & line, Play & opponent, Play & player) {
+    constexpr void ParseInput(std::string_view line, Play & opponent, Play & player) {
         auto op = line[0];
         auto pl = line[2];
         switch (op) {
@@ -64,7 +64,7 @@ SOLUTION(2022, 2) {
     //X - Lose
     //Y - Draw
     //Z - Win
-    constexpr void ParseUpdatedInput(const std::string & line, Play & opponent, Play & player) {
+    constexpr void ParseUpdatedInput(std::string_view line, Play & opponent, Play & player) {
         auto op = line[0];
         auto target = line[2];
         switch (op) {
@@ -86,7 +86,7 @@ SOLUTION(2022, 2) {
 
     PART_ONE() {
         u32 result = 0;
-        for (auto line : lines) {
+        for (auto line : Lines) {
             Play opponent;
             Play player;
             ParseInput(line, opponent, player);
@@ -98,7 +98,7 @@ SOLUTION(2022, 2) {
 
     PART_TWO() {
         u32 result = 0;
-        for (auto line : lines) {
+        for (auto line : Lines) {
             Play opponent;
             Play player;
             ParseUpdatedInput(line, opponent, player);

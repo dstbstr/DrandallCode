@@ -17,7 +17,7 @@ SOLUTION(2020, 10) {
         return KnownPaths[runLength];
     }
 
-    PART_ONE() {
+    constexpr size_t SolvePartOne(const auto& lines) {
         auto nums = ParseLinesAsNumbers<size_t>(lines);
         nums.push_back(0);
         std::sort(nums.begin(), nums.end());
@@ -29,10 +29,14 @@ SOLUTION(2020, 10) {
             else if (diff == 3) threes++;
         }
 
-        return Constexpr::ToString(ones * threes);
+        return ones * threes;
     }
 
-    PART_TWO() {
+    PART_ONE() {
+        return Constexpr::ToString(SolvePartOne(Lines));
+    }
+
+    constexpr size_t SolvePartTwo(const auto& lines) {
         auto nums = ParseLinesAsNumbers<size_t>(lines);
         nums.push_back(0);
         std::sort(nums.begin(), nums.end());
@@ -48,7 +52,11 @@ SOLUTION(2020, 10) {
             }
         }
         result *= CountPaths(runLength);
-        return Constexpr::ToString(result);
+        return result;
+    }
+
+    PART_TWO() {
+        return Constexpr::ToString(SolvePartTwo(Lines));
     }
 
     TESTS() {
@@ -66,8 +74,8 @@ SOLUTION(2020, 10) {
             "4"
         };
 
-        if (PartOne(lines) != "35") return false;
-        if (PartTwo(lines) != "8") return false;
+        if (SolvePartOne(lines) != 35) return false;
+        if (SolvePartTwo(lines) != 8) return false;
 
         return true;
     }

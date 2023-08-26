@@ -56,7 +56,7 @@ SOLUTION(2019, 21) {
     }
 
     PART_ONE() {
-        auto instructions = ParseInstructions(lines[0]);
+        auto instructions = ParseInstructions(Line);
         Args args;
 
         //if(!a) jump = true
@@ -78,7 +78,7 @@ SOLUTION(2019, 21) {
     }
 
     PART_TWO() {
-        auto instructions = ParseInstructions(lines[0]);
+        auto instructions = ParseInstructions(Line);
         Args args;
 
         //if(!a) jump = true

@@ -40,7 +40,7 @@ SOLUTION(2018, 2) {
         std::sort(copy.begin(), copy.end());
         for (auto i = 0; i < copy.size() - 1; i++) {
             if (OffByOne(copy[i], copy[i + 1])) {
-                return std::string(copy[i]) + '\n' + std::string(copy[i + 1]);
+                return "\n" + std::string(copy[i]) + '\n' + std::string(copy[i + 1]);
             }
         }
 

@@ -54,7 +54,7 @@ SOLUTION(2018, 8) {
         return value;
     }
 
-    constexpr Constexpr::Queue<u32> GetNumbers(const std::vector<std::string>&lines) {
+    constexpr Constexpr::Queue<u32> GetNumbers(const auto& lines) {
         Constexpr::Queue<u32> numbers;
         auto split = Constexpr::Split(lines[0], " ");
         for (auto sv : split) {
@@ -67,14 +67,13 @@ SOLUTION(2018, 8) {
     }
 
     PART_ONE() {
-        auto numbers = GetNumbers(lines);
+        auto numbers = GetNumbers(Lines);
         return Constexpr::ToString(SumMetadata(numbers));
     }
 
     PART_TWO() {
-        auto numbers = GetNumbers(lines);
+        auto numbers = GetNumbers(Lines);
         return Constexpr::ToString(GetNodeValue(numbers));
-
     }
 
     TESTS() {
@@ -82,8 +81,11 @@ SOLUTION(2018, 8) {
             "2 3 0 3 10 11 12 1 1 0 1 99 2 1 1 2"
         };
 
-        if (PartOne(lines) != "138") return false;
-        if (PartTwo(lines) != "66") return false;
+        auto numbers = GetNumbers(lines);
+        if (SumMetadata(numbers) != 138) return false;
+        
+        numbers = GetNumbers(lines);
+        if (GetNodeValue(numbers) != 66) return false;
 
         return true;
     }

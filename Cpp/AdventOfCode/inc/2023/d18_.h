@@ -2,4 +2,4 @@
 
 #include "Common.h"
 
-DECLARE_SOLUTION(2023, 18);
+DECLARE_SOLUTION(2023, 18, R"RawInput_()RawInput_");

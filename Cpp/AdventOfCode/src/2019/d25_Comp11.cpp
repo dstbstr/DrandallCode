@@ -22,7 +22,7 @@ SOLUTION(2019, 25) {
                 stream << ToString(door);
                 stream << " ";
             }
-            stream << "\nItems: " << StrUtil::JoinVec(", ", room.Items) << "\n";
+            stream << "\nItems: " << Constexpr::JoinVec(", ", room.Items) << "\n";
             return stream;
         }
     };
@@ -54,7 +54,7 @@ SOLUTION(2019, 25) {
     public:
         Coord Pos{ 0, 0 };
 
-        constexpr Droid(const std::string& line) {
+        constexpr Droid(std::string_view line) {
             Instructions = ParseInstructions(line);
             Args.Output = Unset;
         }
@@ -212,7 +212,7 @@ SOLUTION(2019, 25) {
     }
 
     PART_ONE() {
-        auto droid = Droid(lines[0]);
+        auto droid = Droid(Line);
 
         auto coordMap = GetCoordMap();
         auto nameMap = GenerateNameMap(coordMap);
@@ -240,7 +240,6 @@ SOLUTION(2019, 25) {
     }
 
     PART_TWO() {
-        (void)lines;
         return "Merry Christmas";
     }
 

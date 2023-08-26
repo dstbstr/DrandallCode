@@ -10,17 +10,21 @@ SOLUTION(2021, 7) {
         }
     }
 
-    PART_ONE() {
-        auto nums = ParseLineAsNumbers<u32>(lines[0]);
+    constexpr size_t SolvePartOne(std::string_view line) {
+        auto nums = ParseLineAsNumbers<u32>(line);
         std::sort(nums.begin(), nums.end());
         auto target = FindTarget(nums);
-        return Constexpr::ToString(std::accumulate(nums.begin(), nums.end(), 0ull, [&](size_t previous, u32 num) {
+        return std::accumulate(nums.begin(), nums.end(), 0ull, [&](size_t previous, u32 num) {
             return previous + Constexpr::AbsDistance(num, target);
-            }));
+            });
     }
 
-    PART_TWO() {
-        auto nums = ParseLineAsNumbers<u32>(lines[0]);
+    PART_ONE() {
+        return Constexpr::ToString(SolvePartOne(Line));
+    }
+
+    constexpr size_t SolvePartTwo(std::string_view line) {
+        auto nums = ParseLineAsNumbers<u32>(line);
         u32 total = std::accumulate(nums.begin(), nums.end(), 0);
         u32 average = static_cast<u32>(total / nums.size());
 
@@ -34,13 +38,16 @@ SOLUTION(2021, 7) {
             result2 += (d2 * (d2 + 1)) / 2;
         }
 
-        return Constexpr::ToString(std::min(result1, result2));
+        return std::min(result1, result2);
+    }
+    PART_TWO() {
+        return Constexpr::ToString(SolvePartTwo(Line));
     }
 
     TESTS() {
-        std::vector<std::string> lines = { "16,1,2,0,4,2,7,1,2,14" };
-        if (PartOne(lines) != "37") return false;
-        if (PartTwo(lines) != "168") return false;
+        std::string line = "16,1,2,0,4,2,7,1,2,14";
+        if (SolvePartOne(line) != 37) return false;
+        if (SolvePartTwo(line) != 168) return false;
         return true;
     }
 }

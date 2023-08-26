@@ -2,10 +2,10 @@
 
 SOLUTION(2021, 14) {
     using Map = std::array<char, Constexpr::FromBase26("ZZ")>;
-    using ProduceMap = std::array < std::pair<std::string, std::string>, Constexpr::FromBase26("ZZ")>;
+    using ProduceMap = std::array<std::pair<std::string, std::string>, Constexpr::FromBase26("ZZ")>;
     using Counts = std::array<size_t, Constexpr::FromBase26("ZZ")>;
 
-    constexpr void BuildMaps(const std::vector<std::string>&lines, std::vector<std::string>&outKnownKeys, ProduceMap & outProduceMap) {
+    constexpr void BuildMaps(const auto& lines, std::vector<std::string>& outKnownKeys, ProduceMap& outProduceMap) {
         for (const auto& line : lines) {
             auto split = Constexpr::Split(line, " -> ");
             outKnownKeys.push_back(std::string(split[0]));
@@ -30,7 +30,7 @@ SOLUTION(2021, 14) {
         return result;
     }
 
-    constexpr Counts Next(const Counts & counts, const ProduceMap & produceMap, const std::vector<std::string>&knownKeys) {
+    constexpr Counts Next(const Counts& counts, const ProduceMap& produceMap, const std::vector<std::string>& knownKeys) {
         Counts result{};
         for (const auto& key : knownKeys) {
             auto index = Constexpr::FromBase26(key);
@@ -44,7 +44,7 @@ SOLUTION(2021, 14) {
         return result;
     }
 
-    constexpr std::array<size_t, 26> GetLetterCounts(const Counts & counts, const std::vector<std::string>&knownKeys) {
+    constexpr std::array<size_t, 26> GetLetterCounts(const Counts & counts, const std::vector<std::string>& knownKeys) {
         std::array<size_t, 26> result{};
         for (const auto& key : knownKeys) {
             auto count = counts[Constexpr::FromBase26(key)];
@@ -54,7 +54,7 @@ SOLUTION(2021, 14) {
         return result;
     }
 
-    constexpr auto Solve(const std::vector<std::string>&lines, size_t iterations) {
+    constexpr auto Solve(const auto& lines, size_t iterations) {
         auto groups = SplitInputIntoGroups(lines);
         auto polymer = groups[0][0];
         std::vector<std::string> knownKeys;
@@ -78,11 +78,11 @@ SOLUTION(2021, 14) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(Solve(lines, 10));
+        return Constexpr::ToString(Solve(Lines, 10));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(Solve(lines, 40));
+        return Constexpr::ToString(Solve(Lines, 40));
     }
 
     constexpr bool TestSolve() {

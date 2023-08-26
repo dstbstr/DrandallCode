@@ -11,7 +11,7 @@ SOLUTION(2022, 24) {
         return { 0, 1 };
     }
 
-    constexpr RowCol GetExit(const std::vector<std::string>&lines) {
+    constexpr RowCol GetExit(const auto& lines) {
         return { lines.size() - 1, lines[lines.size() - 1].size() - 2 };
     }
 
@@ -22,7 +22,7 @@ SOLUTION(2022, 24) {
         return { right.size(), down[0].size() };
     }
 
-    constexpr Blizzard ParseInput(const std::vector<std::string>&lines) {
+    constexpr Blizzard ParseInput(const auto& lines) {
         Blizzard result;
         BlizzardDirection up;
         BlizzardDirection down;
@@ -231,16 +231,19 @@ SOLUTION(2022, 24) {
         return startTime;
     }
 
-    PART_ONE() {
+    constexpr size_t SolvePartOne(const auto& lines) {
         auto blizzard = ParseInput(lines);
         auto start = GetStart();
         auto exit = GetExit(lines);
         auto limits = GetRowColCounts(blizzard);
 
-        return Constexpr::ToString(Travel(blizzard, start, exit, limits, 0));
+        return Travel(blizzard, start, exit, limits, 0);
+    }
+    PART_ONE() {
+        return Constexpr::ToString(SolvePartOne(Lines));
     }
 
-    PART_TWO() {
+    constexpr size_t SolvePartTwo(const auto& lines) {
         auto blizzard = ParseInput(lines);
         auto start = GetStart();
         auto exit = GetExit(lines);
@@ -249,9 +252,11 @@ SOLUTION(2022, 24) {
         auto result = Travel(blizzard, start, exit, limits, 0);
         result = Travel(blizzard, exit, start, limits, result);
         result = Travel(blizzard, start, exit, limits, result);
-        return Constexpr::ToString(result);
+        return result;
     }
-
+    PART_TWO() {
+        return Constexpr::ToString(SolvePartTwo(Lines));
+    }
     TESTS() {
         std::vector<std::string> lines = {
             "#.######",
@@ -262,8 +267,8 @@ SOLUTION(2022, 24) {
             "######.#"
         };
 
-        if (PartOne(lines) != "18") return false;
-        if (PartTwo(lines) != "54") return false;
+        if (SolvePartOne(lines) != 18) return false;
+        if (SolvePartTwo(lines) != 54) return false;
 
         return true;
     }

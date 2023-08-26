@@ -30,7 +30,7 @@ SOLUTION(2022, 9) {
         }
     }
 
-    constexpr size_t CountUniqueTailPositions(const std::vector<std::string>& lines, size_t knotCount) {
+    constexpr size_t CountUniqueTailPositions(const auto& lines, size_t knotCount) {
         Constexpr::BigSet<Coord, 50'000> seen;
         seen.SetSentinel({ 9999, 9999 });
 
@@ -56,11 +56,11 @@ SOLUTION(2022, 9) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(CountUniqueTailPositions(lines, 2));
+        return Constexpr::ToString(CountUniqueTailPositions(Lines, 2));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(CountUniqueTailPositions(lines, 10));
+        return Constexpr::ToString(CountUniqueTailPositions(Lines, 10));
     }
 
     constexpr bool TestMoveTail(Coord head, Coord initialTail, Coord expectedTail) {

@@ -65,12 +65,14 @@ namespace Constexpr {
             if(ReplaceAllCopy("aaa", "a", "b") != "bbb") return false;
             if(ReplaceAllCopy("abbabbabb", "bb", "c") != "acacac") return false;
 
-            static_assert(RemoveAllOfCopy("abcabcabc", "cb") == "aaa");
-            static_assert(RemoveAllOfCopy("abcabcabc", std::string("cb")) == "aaa");
-            static_assert(RemoveAllOfCopy("abcabcabc", 'b') == "acacac");
-            if(RemoveAllOfCopy("abcabcabc", "cb") != "aaa") return false;
-            if(RemoveAllOfCopy("abcabcabc", std::string("cb")) != "aaa") return false;
-            if(RemoveAllOfCopy("abcabcabc", 'b') != "acacac") return false;
+            using namespace std::string_view_literals;
+
+            static_assert(RemoveAllOfCopy("abcabcabc"sv, "cb") == "aaa");
+            static_assert(RemoveAllOfCopy("abcabcabc"sv, std::string("cb")) == "aaa");
+            static_assert(RemoveAllOfCopy("abcabcabc"sv, 'b') == "acacac");
+            if(RemoveAllOfCopy("abcabcabc"sv, "cb") != "aaa") return false;
+            if(RemoveAllOfCopy("abcabcabc"sv, std::string("cb")) != "aaa") return false;
+            if(RemoveAllOfCopy("abcabcabc"sv, 'b') != "acacac") return false;
 
             return true;
         }

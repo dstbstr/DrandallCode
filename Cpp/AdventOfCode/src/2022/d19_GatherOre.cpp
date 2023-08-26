@@ -4,7 +4,7 @@ SOLUTION(2022, 19) {
     using Entry = std::array<u32, 4>;
     using Bp = std::vector<std::pair<Entry, Entry>>;
 
-    constexpr Bp ParseBlueprint(const std::string& line) {
+    constexpr Bp ParseBlueprint(std::string_view line) {
         Bp bp;
         auto s = Constexpr::Split(line, " ");
 
@@ -72,17 +72,21 @@ SOLUTION(2022, 19) {
         }
         return result;
     }
-    PART_ONE() {
+
+    constexpr size_t SolvePartOne(const auto& lines) {
         auto bps = ParseLines(lines, ParseBlueprint);
         size_t result = 0;
         for (size_t i = 0; i < bps.size(); i++) {
             result += (FindBfs(bps[i], 24)) * (i + 1);
         }
-        return Constexpr::ToString(result);
+        return result;
+    }
+    PART_ONE() {
+        return Constexpr::ToString(SolvePartOne(Lines));
     }
 
     PART_TWO() {
-        auto bps = ParseLines(lines, ParseBlueprint);
+        auto bps = ParseLines(Lines, ParseBlueprint);
         size_t result = 1;
         for (size_t i = 0; i < 3; i++) {
             result *= FindBfs(bps[i], 32);
@@ -104,7 +108,7 @@ SOLUTION(2022, 19) {
         //if (Needs(15 * Robots[Clay], Clay, bp)) return false;
         //if (CanAfford(5 * Robots[Geo], Geo, bp)) return false;
 
-        if (PartOne(lines) != "33") return false;
+        if (SolvePartOne(lines) != 33) return false;
 
         /*
         if (FindMostGeodes(bps[0], 24) != 9) return false;

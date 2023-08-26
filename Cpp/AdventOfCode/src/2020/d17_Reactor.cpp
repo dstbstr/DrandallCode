@@ -40,7 +40,7 @@ SOLUTION(2020, 17) {
         return result;
     }();
 
-    constexpr Reactor ParseReactor(const std::vector<std::string>&lines) {
+    constexpr Reactor ParseReactor(const auto& lines) {
         Reactor result;
         for (s32 row = 0; row < lines.size(); row++) {
             for (s32 col = 0; col < lines[row].size(); col++) {
@@ -53,7 +53,7 @@ SOLUTION(2020, 17) {
         return result;
     }
 
-    constexpr BigReactor ParseBigReactor(const std::vector<std::string>&lines) {
+    constexpr BigReactor ParseBigReactor(const auto& lines) {
         BigReactor result;
         for (s32 row = 0; row < lines.size(); row++) {
             for (s32 col = 0; col < lines[row].size(); col++) {
@@ -116,12 +116,12 @@ SOLUTION(2020, 17) {
     }
 
     PART_ONE() {
-        auto reactor = ParseReactor(lines);
+        auto reactor = ParseReactor(Lines);
         return Constexpr::ToString(Solve(reactor));
     }
 
     PART_TWO() {
-        auto reactor = ParseBigReactor(lines);
+        auto reactor = ParseBigReactor(Lines);
         return Constexpr::ToString(Solve(reactor));
     }
 
@@ -132,8 +132,8 @@ SOLUTION(2020, 17) {
            "###"
         };
 
-        if (PartOne(lines) != "112") return false;
-        if (PartTwo(lines) != "848") return false;
+        if (Solve(ParseReactor(lines)) != 112) return false;
+        if (Solve(ParseBigReactor(lines)) != 848) return false;
         return true;
     }
 }

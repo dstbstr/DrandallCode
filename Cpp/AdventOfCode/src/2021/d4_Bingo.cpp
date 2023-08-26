@@ -48,7 +48,7 @@ SOLUTION(2021, 4) {
         }
     };
 
-    constexpr BingoCard ParseCard(const std::vector<std::string>&lines) {
+    constexpr BingoCard ParseCard(const auto& lines) {
         BingoCard result;
         for (size_t row = 0; row < lines.size(); row++) {
             auto split = Constexpr::Split(lines[row], " ");
@@ -62,7 +62,7 @@ SOLUTION(2021, 4) {
         return result;
     }
 
-    PART_ONE() {
+    constexpr size_t SolvePartOne(const auto& lines) {
         auto groups = SplitInputIntoGroups(lines);
         auto numbers = ParseLineAsNumbers<u32>(lines[0]);
         std::vector<BingoCard> cards;
@@ -74,15 +74,18 @@ SOLUTION(2021, 4) {
             for (auto& card : cards) {
                 card.Mark(num);
                 if (card.HasBingo()) {
-                    return Constexpr::ToString(card.CalculateScore(num));
+                    return card.CalculateScore(num);
                 }
             }
         }
 
-        return "Not Found";
+        throw "Not Found";
+    }
+    PART_ONE() {
+        return Constexpr::ToString(SolvePartOne(Lines));
     }
 
-    PART_TWO() {
+    constexpr size_t SolvePartTwo(const auto& lines) {
         auto groups = SplitInputIntoGroups(lines);
         auto numbers = ParseLineAsNumbers<u32>(lines[0]);
         std::vector<BingoCard> cards;
@@ -105,7 +108,10 @@ SOLUTION(2021, 4) {
             lastCard.Mark(numbers[numIndex++]);
         }
 
-        return Constexpr::ToString(lastCard.CalculateScore(numbers[numIndex - 1]));
+        return lastCard.CalculateScore(numbers[numIndex - 1]);
+    }
+    PART_TWO() {
+        return Constexpr::ToString(SolvePartTwo(Lines));
     }
 
     TESTS() {
@@ -131,8 +137,8 @@ SOLUTION(2021, 4) {
             " 2  0 12  3  7",
         };
 
-        if (PartOne(lines) != "4512") return false;
-        if (PartTwo(lines) != "1924") return false;
+        if (SolvePartOne(lines) != 4512) return false;
+        if (SolvePartTwo(lines) != 1924) return false;
         return true;
     }
 }

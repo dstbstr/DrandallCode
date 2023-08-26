@@ -2,4 +2,4 @@
 
 #include "Common.h"
 
-DECLARE_SOLUTION(2020, 23);
+DECLARE_SOLUTION(2020, 23, "952438716");

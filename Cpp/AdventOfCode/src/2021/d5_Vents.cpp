@@ -1,7 +1,7 @@
 #include "2021/d5_Vents.h"
 
 SOLUTION(2021, 5) {
-    constexpr void ParseLine(const std::string& line, Coord& outStart, Coord& outEnd) {
+    constexpr void ParseLine(std::string_view line, Coord& outStart, Coord& outEnd) {
         auto s = Constexpr::Split(line, " -> ");
         outStart = Coord(s[0]);
         outEnd = Coord(s[1]);
@@ -11,7 +11,7 @@ SOLUTION(2021, 5) {
         return start.X != end.X && start.Y != end.Y;
     }
 
-    constexpr auto Solve(const std::vector<std::string>& lines, bool ignoreDiagonal) {
+    constexpr auto Solve(const auto& lines, bool ignoreDiagonal) {
         auto* seenPtr = new std::array<std::array<u8, 1024>, 1024>();
         auto& seen = *seenPtr;
         for (const auto& line : lines) {
@@ -33,11 +33,11 @@ SOLUTION(2021, 5) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(Solve(lines, true));
+        return Constexpr::ToString(Solve(Lines, true));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(Solve(lines, false));
+        return Constexpr::ToString(Solve(Lines, false));
     }
 
     TESTS() {

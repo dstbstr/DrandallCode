@@ -70,7 +70,7 @@ SOLUTION(2018, 18) {
         return std::count(src.begin(), src.end(), '|') * std::count(src.begin(), src.end(), '#');
     }
 
-    constexpr std::string Flatten(const std::vector<std::string>& lines) {
+    constexpr std::string Flatten(const auto& lines) {
         std::string border(lines.size() + 2, '_');
         std::string result = border;
         result.reserve(52 * 52);
@@ -84,7 +84,7 @@ SOLUTION(2018, 18) {
     }
 
     PART_ONE() {
-        auto src = Flatten(lines);
+        auto src = Flatten(Lines);
         auto dest = src;
         for (auto i = 0; i < 10; i++) {
             NextBig(src, dest);
@@ -95,7 +95,7 @@ SOLUTION(2018, 18) {
     }
 
     PART_TWO() {
-        auto src = Flatten(lines);
+        auto src = Flatten(Lines);
         auto dest = src;
         Constexpr::SmallSet<std::string> seen;
         size_t cycleStart = 0;

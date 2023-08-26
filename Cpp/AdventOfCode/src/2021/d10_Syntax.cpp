@@ -3,14 +3,6 @@
 
 SOLUTION(2021, 10) {
 
-    /*
-    static_assert(GetLineScore("()") == 0);
-    static_assert(GetLineScore("[<>({}){}[([])<>]]") == 0);
-    static_assert(GetLineScore("{([(<{}[<>[]}>{[]{[(<()>") == 1197);
-    static_assert(GetLineScore("<{([([[(<>()){}]>(<<{{") == 25137);
-    static_assert(GetLineScore("[(()[<>])]({[<{<<[]>>(") == 0);
-    */
-
     constexpr size_t GetCorruptScore(char c) {
         switch (c) {
         case ')': return 3;
@@ -45,7 +37,7 @@ SOLUTION(2021, 10) {
         }
     }
 
-    constexpr std::pair<size_t, size_t> GetScore(const std::string& line) {
+    constexpr std::pair<size_t, size_t> GetScore(std::string_view line) {
         Constexpr::Stack<char> stack;
         std::pair<size_t, size_t> result;
         for (auto c : line) {
@@ -71,13 +63,13 @@ SOLUTION(2021, 10) {
     }
 
     PART_ONE() {
-        auto scores = ParseLines(lines, GetScore);
+        auto scores = ParseLines(Lines, GetScore);
         return Constexpr::ToString(std::accumulate(scores.begin(), scores.end(), 0ull, [](size_t prev, const auto& pair) {
             return prev + pair.first;
             }));
     }
 
-    PART_TWO() {
+    constexpr size_t SolvePartTwo(const auto& lines) {
         auto scores = ParseLines(lines, GetScore);
         std::vector<size_t> toKeep;
         std::transform(scores.begin(), scores.end(), std::back_inserter(toKeep), [](const auto& p) {
@@ -85,7 +77,10 @@ SOLUTION(2021, 10) {
             });
         std::erase_if(toKeep, [](auto s) { return s == 0; });
         std::sort(toKeep.begin(), toKeep.end());
-        return Constexpr::ToString(toKeep[toKeep.size() / 2]);
+        return toKeep[toKeep.size() / 2];
+    }
+    PART_TWO() {
+        return Constexpr::ToString(SolvePartTwo(Lines));
     }
 
     TESTS() {
@@ -101,7 +96,7 @@ SOLUTION(2021, 10) {
             "<{([{{}}[<[[[<>{}]]]>[]]"
         };
 
-        if (PartTwo(lines) != "288957") return false;
+        if (SolvePartTwo(lines) != 288957) return false;
         return true;
     }
 }

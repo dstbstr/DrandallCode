@@ -6,7 +6,7 @@ SOLUTION(2022, 1) {
         return std::accumulate(nums.begin(), nums.end(), 0u);
     }
 
-    constexpr std::vector<size_t> GetElves(const std::vector<std::string>& lines) {
+    constexpr std::vector<size_t> GetElves(const auto& lines) {
         auto groups = SplitInputIntoGroups(lines);
         std::vector<size_t> elves;
         for (const auto& group : groups) {
@@ -17,12 +17,12 @@ SOLUTION(2022, 1) {
     }
 
     PART_ONE() {
-        auto elves = GetElves(lines);
+        auto elves = GetElves(Lines);
         return Constexpr::ToString(elves.back());
     }
 
     PART_TWO() {
-        auto elves = GetElves(lines);
+        auto elves = GetElves(Lines);
         return Constexpr::ToString(elves.back() + elves[elves.size() - 2] + elves[elves.size() - 3]);
     }
 

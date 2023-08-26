@@ -4,7 +4,7 @@ SOLUTION(2018, 21) {
     using Regs = std::array<u64, 6>;
 
     enum struct Op { Addr, Addi, Mulr, Muli, Banr, Bani, Borr, Bori, Setr, Seti, Gtir, Gtrr, Gtri, Eqir, Eqri, Eqrr };
-    constexpr auto GenInst(const std::string & line) {
+    constexpr auto GenInst(std::string_view line) {
         auto s = Constexpr::Split(line, " ");
         auto opStr = s[0];
         s32 a, b, c;
@@ -52,7 +52,7 @@ SOLUTION(2018, 21) {
         };
     }
 
-    constexpr size_t GetIpReg(const std::string& line) {
+    constexpr size_t GetIpReg(std::string_view line) {
         auto s = Constexpr::Split(line, " ");
         size_t result;
         Constexpr::ParseNumber(s[1], result);
@@ -73,7 +73,7 @@ SOLUTION(2018, 21) {
         return b;
     }
 
-    constexpr void GatherValues(const std::vector<std::string>& lines, u64& outPreviousMask, u64& outInitialValue, u64& outMultiplier) {
+    constexpr void GatherValues(const auto& lines, u64& outPreviousMask, u64& outInitialValue, u64& outMultiplier) {
         auto s1 = Constexpr::Split(lines[7], " ");
         Constexpr::ParseNumber(s1[2], outPreviousMask);
 
@@ -86,14 +86,14 @@ SOLUTION(2018, 21) {
 
     PART_ONE() {
         u64 previousMask, initialValue, multiplier;
-        GatherValues(lines, previousMask, initialValue, multiplier);
+        GatherValues(Lines, previousMask, initialValue, multiplier);
 
         return Constexpr::ToString(Step(0, previousMask, initialValue, multiplier));
         /*
-        auto ipReg = GetIpReg(lines[0]);
+        auto ipReg = GetIpReg(Lines[0]);
         Regs regs{};
         size_t& ip = regs[ipReg];
-        std::vector<std::string> copy(lines.begin() + 1, lines.end());
+        std::vector<std::string> copy(Lines.begin() + 1, Lines.end());
         auto inst = ParseLines(copy, GenInst);
 
         while (true) {
@@ -110,7 +110,7 @@ SOLUTION(2018, 21) {
 
     PART_TWO() {
         u64 previousMask, initialValue, multiplier;
-        GatherValues(lines, previousMask, initialValue, multiplier);
+        GatherValues(Lines, previousMask, initialValue, multiplier);
 
         Constexpr::SmallSet<u64> seen;
         u64 n = 0;
@@ -124,10 +124,10 @@ SOLUTION(2018, 21) {
         }
         return "Not Found";
         /*
-        auto ipReg = GetIpReg(lines[0]);
+        auto ipReg = GetIpReg(Lines[0]);
         Regs regs{};
         size_t& ip = regs[ipReg];
-        std::vector<std::string> copy(lines.begin() + 1, lines.end());
+        std::vector<std::string> copy(Lines.begin() + 1, Lines.end());
         auto inst = ParseLines(copy, GenInst);
 
         Constexpr::Set<u64> seen;

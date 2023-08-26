@@ -20,7 +20,7 @@ SOLUTION(2022, 15) {
     };
 
     //Sensor at x=220580, y=684270: closest beacon is at x=436611, y=263737
-    constexpr Sensor ParseSensor(const std::string& line) {
+    constexpr Sensor ParseSensor(std::string_view line) {
         auto s = Constexpr::Split(line, "=");
         Sensor result;
         Constexpr::ParseNumber(s[1].substr(0, s[1].find(',')), result.Pos.X);
@@ -31,7 +31,7 @@ SOLUTION(2022, 15) {
         return result;
     }
 
-    constexpr size_t Solve1(const std::vector<std::string>& lines, s64 targetRow) {
+    constexpr size_t SolvePartOne(const auto& lines, s64 targetRow) {
         auto sensors = ParseLines(lines, ParseSensor);
         Constexpr::SmallSet<Coord> occupied;
         s64 minX{ 99999999999 }, maxX{ 0 }, maxRange{ 0 };
@@ -53,10 +53,10 @@ SOLUTION(2022, 15) {
         return result;
     }
     PART_ONE() {
-        return Constexpr::ToString(Solve1(lines, 2'000'000));
+        return Constexpr::ToString(SolvePartOne(Lines, 2'000'000));
     }
 
-    constexpr Coord Solve2(const std::vector<std::string>& lines, Coord min, Coord max) {
+    constexpr Coord SolvePartTwo(const auto& lines, Coord min, Coord max) {
         auto sensors = ParseLines(lines, ParseSensor);
 
         Constexpr::Stack<std::pair<Coord, Coord>> qStack;
@@ -87,7 +87,7 @@ SOLUTION(2022, 15) {
         return { 0, 0 };
     }
     PART_TWO() {
-        auto missingPoint = Solve2(lines, { 0, 0 }, { 4'000'000, 4'000'000 });
+        auto missingPoint = SolvePartTwo(Lines, { 0, 0 }, { 4'000'000, 4'000'000 });
         return Constexpr::ToString(missingPoint.X * 4'000'000 + missingPoint.Y);
     }
 
@@ -109,8 +109,8 @@ SOLUTION(2022, 15) {
             "Sensor at x=20, y=1: closest beacon is at x=15, y=3"
         };
 
-        if (Solve1(lines, 10) != 26) return false;
-        if (Solve2(lines, { 0, 0 }, { 20, 20 }) != Coord{14, 11}) return false;
+        if (SolvePartOne(lines, 10) != 26) return false;
+        if (SolvePartTwo(lines, { 0, 0 }, { 20, 20 }) != Coord{14, 11}) return false;
 
         return true;
     }

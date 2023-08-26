@@ -26,19 +26,7 @@ SOLUTION(2019, 22) {
         deck = result;
     }
 
-    template<typename Func, typename... Args>
-    constexpr bool RunTest(const std::vector<u64>&initial, const std::vector<u64>&expected, Func func, Args&&... args) {
-        std::vector<u64> running = initial;
-        func(running, std::forward<Args&&>(args)...);
-        return running == expected;
-    }
-
-    static_assert(RunTest({ 1, 2, 3 }, { 3, 2, 1 }, NewStack));
-    static_assert(RunTest({ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }, { 3, 4, 5, 6, 7, 8, 9, 0, 1, 2 }, Cut, 3));
-    static_assert(RunTest({ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }, { 6, 7, 8, 9, 0, 1, 2, 3, 4, 5 }, Cut, -4));
-    static_assert(RunTest({ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }, { 0, 7, 4, 1, 8, 5, 2, 9, 6, 3 }, DealWithIncrement, 3));
-
-    constexpr void Shuffle(const std::vector<std::string>&lines, std::vector<u64>&deck) {
+    constexpr void Shuffle(const auto& lines, std::vector<u64>&deck) {
         for (const auto& line : lines) {
             auto s = Constexpr::Split(line, " ");
             if (s[1] == "into") {
@@ -75,7 +63,7 @@ SOLUTION(2019, 22) {
         }
     }
 
-    constexpr BigInt CardAt(BigInt in, const std::vector<std::string>&lines, const BigInt & deckSize, const BigInt & shuffleCount) {
+    constexpr BigInt CardAt(BigInt in, const auto& lines, const BigInt & deckSize, const BigInt & shuffleCount) {
         const BigInt one = 1;
         const BigInt zero = 0;
         const LinFunc ID = { 1, 0 };
@@ -112,7 +100,7 @@ SOLUTION(2019, 22) {
         for (auto i = 0; i < deckSize; i++) {
             deck[i] = i;
         }
-        Shuffle(lines, deck);
+        Shuffle(Lines, deck);
 
         size_t result = 0;
         for (const auto& card : deck) {
@@ -130,10 +118,22 @@ SOLUTION(2019, 22) {
         BigInt deckSize = 119'315'717'514'047;
         BigInt repCount = 101'741'582'076'661;
 
-        return CardAt(pos, lines, deckSize, repCount).ToString();
+        return CardAt(pos, Lines, deckSize, repCount).ToString();
+    }
+
+    template<typename Func, typename... Args>
+    constexpr bool RunTest(const std::vector<u64>& initial, const std::vector<u64>& expected, Func func, Args&&... args) {
+        std::vector<u64> running = initial;
+        func(running, std::forward<Args&&>(args)...);
+        return running == expected;
     }
 
     TESTS() {
+        static_assert(RunTest({ 1, 2, 3 }, { 3, 2, 1 }, NewStack));
+        static_assert(RunTest({ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }, { 3, 4, 5, 6, 7, 8, 9, 0, 1, 2 }, Cut, 3));
+        static_assert(RunTest({ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }, { 6, 7, 8, 9, 0, 1, 2, 3, 4, 5 }, Cut, -4));
+        static_assert(RunTest({ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }, { 0, 7, 4, 1, 8, 5, 2, 9, 6, 3 }, DealWithIncrement, 3));
+
         return true;
     }
 }

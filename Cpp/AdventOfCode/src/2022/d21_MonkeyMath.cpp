@@ -23,7 +23,7 @@ SOLUTION(2022, 21) {
         Op Operation = Op::Plus;
     };
 
-    constexpr Monkey ParseLine(const std::string & line) {
+    constexpr Monkey ParseLine(std::string_view line) {
         Monkey monkey{};
         monkey.Name = line.substr(0, 4);
         if (line.size() < 10) {
@@ -70,12 +70,9 @@ SOLUTION(2022, 21) {
         }
     }
 
-    PART_ONE() {
-        std::vector<Monkey> monkeys;
+    constexpr size_t SolvePartOne(const auto& lines) {
+        auto monkeys = ParseLines(lines, ParseLine);
         size_t rootIndex = 0;
-        for (const auto& line : lines) {
-            monkeys.push_back(ParseLine(line));
-        }
 
         Constexpr::SmallMap<std::string, size_t> monkeyMap;
         for (auto i = 0; i < monkeys.size(); i++) {
@@ -86,7 +83,11 @@ SOLUTION(2022, 21) {
         }
 
         RunMonkeys(monkeys, monkeyMap, rootIndex);
-        return Constexpr::ToString(monkeys[rootIndex].Value);
+        return monkeys[rootIndex].Value;
+    }
+
+    PART_ONE() {
+        return Constexpr::ToString(SolvePartOne(Lines));
     }
 
     PART_TWO() {
@@ -95,7 +96,7 @@ SOLUTION(2022, 21) {
         size_t leftMonkeyIndex = 0;
         size_t rightMonkeyIndex = 0;
 
-        auto monkeys = ParseLines(lines, ParseLine);
+        auto monkeys = ParseLines(Lines, ParseLine);
 
         Constexpr::SmallMap<std::string, size_t> monkeyMap;
         for (auto i = 0; i < monkeys.size(); i++) {
@@ -199,7 +200,7 @@ SOLUTION(2022, 21) {
         };
 
         if (ParseLine("abcd: 42").Value != 42ull) return false;
-        if (PartOne(lines) != "152") return false;
+        if (SolvePartOne(lines) != 152) return false;
 
         return true;
     }

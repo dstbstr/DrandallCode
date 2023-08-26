@@ -3,7 +3,7 @@
 SOLUTION(2022, 5) {
     using Stacks = std::vector<Constexpr::Stack<char>>;
 
-    constexpr Stacks BuildStacks(const std::vector<std::string>& lines) {
+    constexpr Stacks BuildStacks(const auto& lines) {
         Stacks result;
         result.resize((lines[0].size() / 4) + 1);
 
@@ -17,7 +17,7 @@ SOLUTION(2022, 5) {
         return result;
     }
 
-    constexpr Vec3<size_t> ParseMove(const std::string& line) {
+    constexpr Vec3<size_t> ParseMove(std::string_view line) {
         Vec3<size_t> result;
         //move 10 from 21 to 15
         auto s = Constexpr::Split(line, " ");
@@ -28,7 +28,7 @@ SOLUTION(2022, 5) {
         return result;
     }
 
-    constexpr auto Solve(const std::vector<std::string>& lines, auto MoveFunc) {
+    constexpr auto Solve(const auto& lines, auto MoveFunc) {
         auto groups = SplitInputIntoGroups(lines);
         auto stacks = BuildStacks(groups[0]);
         auto moves = ParseLines(groups[1], ParseMove);
@@ -45,7 +45,7 @@ SOLUTION(2022, 5) {
         return result;
     }
 
-    PART_ONE() {
+    constexpr std::string SolvePartOne(const auto& lines) {
         return Solve(lines, [](Vec3<size_t> move, Stacks& stacks) {
             for (auto i = 0; i < move.X; i++) {
                 stacks[move.Z].push(stacks[move.Y].pop());
@@ -53,7 +53,11 @@ SOLUTION(2022, 5) {
             });
     }
 
-    PART_TWO() {
+    PART_ONE() {
+        return SolvePartOne(Lines);
+    }
+
+    constexpr std::string SolvePartTwo(const auto& lines) {
         return Solve(lines, [](Vec3<size_t> move, Stacks& stacks) {
             Constexpr::Stack<char> temp;
             for (auto i = 0; i < move.X; i++) {
@@ -63,6 +67,9 @@ SOLUTION(2022, 5) {
                 stacks[move.Z].push(temp.pop());
             }
         });
+    }
+    PART_TWO() {
+        return SolvePartTwo(Lines);
     }
 
     TESTS() {
@@ -78,8 +85,8 @@ SOLUTION(2022, 5) {
             "move 1 from 1 to 2"
         };
         
-        if (PartOne(lines) != "CMZ") return false;
-        if (PartTwo(lines) != "MCD") return false;
+        if (SolvePartOne(lines) != "CMZ") return false;
+        if (SolvePartTwo(lines) != "MCD") return false;
 
         return true;
     }

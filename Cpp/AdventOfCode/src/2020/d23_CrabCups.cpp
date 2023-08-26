@@ -1,7 +1,7 @@
 #include "2020/d23_CrabCups.h"
 
 SOLUTION(2020, 23) {
-    constexpr std::vector<u32> GetCups(const std::string& line, size_t max) {
+    constexpr std::vector<u32> GetCups(std::string_view line, size_t max) {
         //389125467
         //cups[0] = 3
         //cups[1] = 2
@@ -60,8 +60,9 @@ SOLUTION(2020, 23) {
         }
 
     }
-    PART_ONE() {
-        auto cups = GetCups(lines[0], lines[0].size());
+
+    constexpr std::string SolvePartOne(std::string_view line) {
+        auto cups = GetCups(line, line.size());
         RunRounds(cups, 100);
 
         std::string result = "";
@@ -73,18 +74,26 @@ SOLUTION(2020, 23) {
         return result;
     }
 
-    PART_TWO() {
-        auto cups = GetCups(lines[0], 1'000'000);
+    PART_ONE() {
+        return SolvePartOne(Line);
+    }
+
+    constexpr size_t SolvePartTwo(std::string_view line) {
+        auto cups = GetCups(line, 1'000'000);
         RunRounds(cups, 10'000'000);
 
-        return Constexpr::ToString(static_cast<size_t>(cups[1]) * static_cast<size_t>(cups[cups[1]]));
+        return static_cast<size_t>(cups[1]) * static_cast<size_t>(cups[cups[1]]);
+    }
+
+    PART_TWO() {
+        return Constexpr::ToString(SolvePartTwo(Line));
     }
 
     TESTS() {
         std::string line = "389125467";
 
-        if (PartOne({ line }) != "67384529") return false;
-        if (PartTwo({ line }) != "149245887792") return false;
+        if (SolvePartOne( line ) != "67384529") return false;
+        if (SolvePartTwo( line ) != 149245887792) return false;
 
         return true;
     }

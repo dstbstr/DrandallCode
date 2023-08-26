@@ -117,7 +117,7 @@ SOLUTION(2019, 15) {
     }
 
     PART_ONE() {
-        auto instructions = ParseInstructions(lines[0]);
+        auto instructions = ParseInstructions(Line);
         auto map = Explore(instructions);
         auto target = GetTarget(map);
 
@@ -125,7 +125,7 @@ SOLUTION(2019, 15) {
     }
 
     PART_TWO() {
-        auto instructions = ParseInstructions(lines[0]);
+        auto instructions = ParseInstructions(Line);
         auto map = Explore(instructions);
         auto target = GetTarget(map);
 

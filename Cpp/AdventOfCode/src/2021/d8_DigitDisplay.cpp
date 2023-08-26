@@ -23,7 +23,7 @@ SOLUTION(2021, 8) {
     e = 2 - a, c, d, g
     */
 
-    constexpr void FindWiresAndNumbers(const std::vector<std::string_view>&input, std::array<char, 'h'>&knownWires, std::array<std::string, 10>&knownNumbers) {
+    constexpr void FindWiresAndNumbers(const auto& input, std::array<char, 'h'>& knownWires, std::array<std::string, 10>& knownNumbers) {
         std::array<std::vector<std::string>, 8> bySegments{};
         for (const auto& val : input) {
             bySegments[val.size()].push_back(std::string(val));
@@ -80,7 +80,7 @@ SOLUTION(2021, 8) {
         }
     }
 
-    PART_ONE() {
+    constexpr size_t SolvePartOne(const auto& lines) {
         size_t result = 0;
         for (const auto& line : lines) {
             auto split = Constexpr::Split(line, " | ");
@@ -89,10 +89,14 @@ SOLUTION(2021, 8) {
                 return sv.size() < 5 || sv.size() == 7;
                 });
         }
-        return Constexpr::ToString(result);
+        return result;
     }
 
-    PART_TWO() {
+    PART_ONE() {
+        return Constexpr::ToString(SolvePartOne(Lines));
+    }
+
+    constexpr size_t SolvePartTwo(const auto& lines) {
         size_t result = 0;
         for (const auto& line : lines) {
             auto split = Constexpr::Split(line, " | ");
@@ -118,12 +122,16 @@ SOLUTION(2021, 8) {
             result += number;
         }
 
-        return Constexpr::ToString(result);
+        return result;
+    }
+
+    PART_TWO() {
+        return Constexpr::ToString(SolvePartTwo(Lines));
     }
 
     TESTS() {
         std::vector<std::string> lines = { "abcefg cf acdeg acdfg bcdf abdfg abdefg acf abcdefg abcdfg | fc fca cf caf" };
-        if (PartTwo(lines) != "1717") return false;
+        if (SolvePartTwo(lines) != 1717) return false;
 
         lines = {
             "be cfbegad cbdgef fgaecd cgeb fdcge agebfd fecdb fabcd edb | fdgacbe cefdb cefbgd gcbe",
@@ -138,8 +146,8 @@ SOLUTION(2021, 8) {
             "gcafb gcf dcaebfg ecagb gf abcdeg gaef cafbge fdbac fegbdc | fgae cfgab fg bagce"
         };
 
-        if (PartOne(lines) != "26") return false;
-        if (PartTwo(lines) != "61229") return false;
+        if (SolvePartOne(lines) != 26) return false;
+        if (SolvePartTwo(lines) != 61229) return false;
         return true;
     }
 }

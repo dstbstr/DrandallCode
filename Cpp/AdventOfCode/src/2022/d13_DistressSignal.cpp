@@ -30,7 +30,7 @@ SOLUTION(2022, 13) {
         return lhs.size() < rhs.size();
     }
 
-    PART_ONE() {
+    constexpr size_t SolvePartOne(const std::vector<std::string>& lines) {
         auto copy = lines;
         for (auto& line : copy) {
             Constexpr::ReplaceAll(line, "10", "A");
@@ -40,10 +40,14 @@ SOLUTION(2022, 13) {
         for (size_t i = 0; i < groups.size(); i++) {
             result += (1 + i) * Compare(groups[i][0], groups[i][1]);
         }
-        return Constexpr::ToString(result);
+        return result;
     }
 
-    PART_TWO() {
+    PART_ONE() {
+        return Constexpr::ToString(SolvePartOne(CopyToVector(Lines)));
+    }
+
+    constexpr size_t SolvePartTwo(const auto& lines) {
         std::vector<std::string> all;
         for (auto i = 0; i < lines.size(); i += 3) {
             all.push_back(lines[i]);
@@ -65,7 +69,10 @@ SOLUTION(2022, 13) {
                 result *= (i + 1);
             }
         }
-        return Constexpr::ToString(result);
+        return result;
+    }
+    PART_TWO() {
+        return Constexpr::ToString(SolvePartTwo(CopyToVector(Lines)));
     }
 
     TESTS() {
@@ -117,8 +124,8 @@ SOLUTION(2022, 13) {
             "[1,[2,[3,[4,[5,6,0]]]],8,9]",
         };
 
-        if (PartOne(lines) != "13") return false;
-        if (PartTwo(lines) != "140") return false;
+        if (SolvePartOne(lines) != 13) return false;
+        if (SolvePartTwo(lines) != 140) return false;
 
         return true;
     }

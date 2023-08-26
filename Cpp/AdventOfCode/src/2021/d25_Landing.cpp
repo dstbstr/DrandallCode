@@ -36,7 +36,7 @@ SOLUTION(2021, 25) {
     }
 
     PART_ONE() {
-        auto current = lines;
+        auto current = CopyToVector(Lines);
         size_t steps = 0;
         while (true) {
             steps++;
@@ -49,7 +49,6 @@ SOLUTION(2021, 25) {
     }
 
     PART_TWO() {
-        (void)lines;
         return "Merry Christmas!";
     }
 

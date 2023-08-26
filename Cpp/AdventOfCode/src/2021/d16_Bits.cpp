@@ -17,7 +17,7 @@
 
     constexpr std::array<const char*, 16> Bits = { "0000", "0001", "0010", "0011", "0100", "0101", "0110", "0111", "1000", "1001", "1010", "1011", "1100", "1101", "1110", "1111" };
 
-    constexpr std::string HexToBits(const std::string & hex) {
+    constexpr std::string HexToBits(std::string_view hex) {
         std::string result;
         result.reserve(hex.size() * 4);
         for (auto c : hex) {
@@ -140,14 +140,14 @@
         return p;
     }
 
-    constexpr Packet GetPacket(const std::string & line) {
+    constexpr Packet GetPacket(std::string_view line) {
         auto bits = HexToBits(line);
         size_t index = 0;
         return ParsePacket(bits, index);
     }
 
-    PART_ONE() {
-        auto packet = GetPacket(lines[0]);
+    constexpr size_t SolvePartOne(std::string_view line) {
+        auto packet = GetPacket(line);
 
         size_t result = 0;
         std::vector<Packet> remaining;
@@ -159,11 +159,15 @@
             std::copy(current.SubPackets.begin(), current.SubPackets.end(), std::back_inserter(remaining));
         }
 
-        return Constexpr::ToString(result);
+        return result;
+    }
+
+    PART_ONE() {
+        return Constexpr::ToString(SolvePartOne(Line));
     }
 
     PART_TWO() {
-        auto packet = GetPacket(lines[0]);
+        auto packet = GetPacket(Line);
         return Constexpr::ToString(packet.Evaluate());
     }
 
@@ -197,19 +201,19 @@
 
         static_assert(TestParsePacket());
         
-        static_assert(PartOne({"8A004A801A8002F478"}) == "16");
-        static_assert(PartOne({"620080001611562C8802118E34"}) == "12");
-        static_assert(PartOne({"C0015000016115A2E0802F182340"}) == "23");
-        static_assert(PartOne({ "A0016C880162017C3686B18A3D4780" }) == "31");
+        static_assert(SolvePartOne("8A004A801A8002F478") == 16);
+        static_assert(SolvePartOne("620080001611562C8802118E34") == 12);
+        static_assert(SolvePartOne("C0015000016115A2E0802F182340") == 23);
+        static_assert(SolvePartOne("A0016C880162017C3686B18A3D4780") == 31);
  
-        static_assert(PartTwo({"C200B40A82"}) == "3");
-        static_assert(PartTwo({"04005AC33890"}) == "54");
-        static_assert(PartTwo({"880086C3E88112"}) == "7");
-        static_assert(PartTwo({"CE00C43D881120"}) == "9");
-        static_assert(PartTwo({"D8005AC2A8F0"}) == "1");
-        static_assert(PartTwo({"F600BC2D8F"}) == "0");
-        static_assert(PartTwo({"9C005AC2F8F0"}) == "0");
-        static_assert(PartTwo({ "9C0141080250320F1802104A08" }) == "1");
+        static_assert(GetPacket("C200B40A82").Evaluate() == 3);
+        static_assert(GetPacket("04005AC33890").Evaluate() == 54);
+        static_assert(GetPacket("880086C3E88112").Evaluate() == 7);
+        static_assert(GetPacket("CE00C43D881120").Evaluate() == 9);
+        static_assert(GetPacket("D8005AC2A8F0").Evaluate() == 1);
+        static_assert(GetPacket("F600BC2D8F").Evaluate() == 0);
+        static_assert(GetPacket("9C005AC2F8F0").Evaluate() == 0);
+        static_assert(GetPacket("9C0141080250320F1802104A08").Evaluate() == 1);
         
         return true;
     }

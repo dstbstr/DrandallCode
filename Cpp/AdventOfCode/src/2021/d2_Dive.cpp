@@ -1,7 +1,7 @@
 #include "2021/d2_Dive.h"
 
 SOLUTION(2021, 2) {
-    constexpr void Apply(Coord & pos, const std::string & line) {
+    constexpr void Apply(Coord & pos, std::string_view line) {
         auto split = Constexpr::Split(line, " ");
         s32 num;
         Constexpr::ParseNumber(split[1], num);
@@ -17,7 +17,7 @@ SOLUTION(2021, 2) {
         }
     }
 
-    constexpr void Apply(Vec3<s64>&pos, const std::string & line) {
+    constexpr void Apply(Vec3<s64>&pos, std::string_view line) {
         auto split = Constexpr::Split(line, " ");
         s32 num;
         Constexpr::ParseNumber(split[1], num);
@@ -34,22 +34,19 @@ SOLUTION(2021, 2) {
         }
     }
 
-    PART_ONE() {
-        Coord pos = { 0, 0 };
+    constexpr s64 Solve(const auto& lines, auto pos) {
         for (const auto& line : lines) {
             Apply(pos, line);
         }
+        return pos.X * pos.Y;
+    }
 
-        return Constexpr::ToString(pos.X * pos.Y);
+    PART_ONE() {
+        return Constexpr::ToString(Solve(Lines, Coord{ 0, 0 }));
     }
 
     PART_TWO() {
-        Vec3<s64> pos = { 0, 0, 0 };
-        for (const auto& line : lines) {
-            Apply(pos, line);
-        }
-
-        return Constexpr::ToString(pos.X * pos.Y);
+        return Constexpr::ToString(Solve(Lines, Vec3<s64>{0, 0, 0}));
     }
 
     TESTS() {
@@ -62,8 +59,8 @@ SOLUTION(2021, 2) {
             "forward 2"
         };
 
-        if (PartOne(lines) != "150") return false;
-        if (PartTwo(lines) != "900") return false;
+        if (Solve(lines, Coord{ 0, 0 }) != 150) return false;
+        if (Solve(lines, Vec3<s64>{0, 0, 0}) != 900) return false;
         return true;
     }
 }

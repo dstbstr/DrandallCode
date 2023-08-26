@@ -22,7 +22,7 @@ SOLUTION(2020, 16) {
         return std::make_pair(min, max);
     }
 
-    constexpr Field ParseField(const std::string& line) {
+    constexpr Field ParseField(std::string_view line) {
         Field field;
         auto split = Constexpr::Split(line, ": ");
         field.Name = split[0];
@@ -49,7 +49,7 @@ SOLUTION(2020, 16) {
         return result;
     }
 
-    constexpr Ticket GetMyTicket(const std::vector<std::string>&lines) {
+    constexpr Ticket GetMyTicket(const auto& lines) {
         Ticket result;
         auto split = Constexpr::Split(lines[1], ",");
         for (const auto& numStr : split) {
@@ -61,7 +61,7 @@ SOLUTION(2020, 16) {
         return result;
     }
 
-    constexpr std::vector<Ticket> GetNearbyTickets(const std::vector<std::string>&lines) {
+    constexpr std::vector<Ticket> GetNearbyTickets(const auto& lines) {
         std::vector<Ticket> result;
         Ticket currentTicket;
         for (const auto& line : lines) {
@@ -79,7 +79,7 @@ SOLUTION(2020, 16) {
         return result;
     }
 
-    constexpr std::vector<Ticket> GetValidTickets(const std::vector<std::string>&lines, const std::vector<Field>&fields) {
+    constexpr std::vector<Ticket> GetValidTickets(const auto& lines, const std::vector<Field>&fields) {
         auto invalidNumbers = FindInvalidNumbers(fields);
         auto otherTickets = GetNearbyTickets(lines);
 
@@ -146,8 +146,7 @@ SOLUTION(2020, 16) {
         return result;
     }
 
-
-    PART_ONE() {
+    constexpr size_t SolvePartOne(const auto& lines) {
         auto groups = SplitInputIntoGroups(lines);
         auto fields = ParseLines(groups[0], ParseField);
         auto invalidNumbers = FindInvalidNumbers(fields);
@@ -160,10 +159,14 @@ SOLUTION(2020, 16) {
             }
         }
 
-        return Constexpr::ToString(result);
+        return result;
     }
 
-    PART_TWO() {
+    PART_ONE() {
+        return Constexpr::ToString(SolvePartOne(Lines));
+    }
+
+    constexpr size_t SolvePartTwo(const auto& lines) {
         auto groups = SplitInputIntoGroups(lines);
         auto fields = ParseLines(groups[0], ParseField);
         auto myTicket = GetMyTicket(groups[1]);
@@ -178,7 +181,11 @@ SOLUTION(2020, 16) {
             }
         }
 
-        return Constexpr::ToString(result);
+        return result;
+    }
+
+    PART_TWO() {
+        return Constexpr::ToString(SolvePartTwo(Lines));
     }
 
     TESTS() {
@@ -197,7 +204,7 @@ SOLUTION(2020, 16) {
            "38,6,12"
         };
 
-        if (PartOne(lines) != "71") return false;
+        if (SolvePartOne(lines) != 71) return false;
 
         lines = {
             "class: 0-1 or 4-19",
@@ -213,7 +220,7 @@ SOLUTION(2020, 16) {
             "5,14,9"
         };
 
-        if (PartTwo(lines) != "1") return false;
+        if (SolvePartTwo(lines) != 1) return false;
         return true;
     }
 }

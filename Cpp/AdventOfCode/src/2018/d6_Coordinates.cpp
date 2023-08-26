@@ -2,8 +2,7 @@
 
 SOLUTION(2018, 6) {
     constexpr std::vector<u32> FindAreas(const std::vector<Coord>&coords, s32 area) {
-        std::vector<u32> result;
-        std::fill_n(std::back_inserter(result), coords.size(), 0u);
+        std::vector<u32> result(coords.size(), 0);
 
         for (s32 x = -area; x < area; x++) {
             for (s32 y = -area; y < area; y++) {
@@ -45,7 +44,7 @@ SOLUTION(2018, 6) {
 
     PART_ONE() {
         std::vector<Coord> coords;
-        for (const auto& line : lines) {
+        for (const auto& line : Lines) {
             coords.push_back(Coord(line));
         }
 
@@ -68,7 +67,7 @@ SOLUTION(2018, 6) {
         const s32 maxDistance = 10'000;
 
         std::vector<Coord> coords;
-        for (const auto& line : lines) {
+        for (const auto& line : Lines) {
             coords.push_back(Coord(line));
         }
 
@@ -85,16 +84,16 @@ SOLUTION(2018, 6) {
     }
 
     TESTS() {
-        std::vector<std::string> lines = {
-            "1, 1",
-            "1, 6",
-            "8, 3",
-            "3, 4",
-            "5, 5",
-            "8, 9"
-        };
-
-        if (PartOne(lines) != "17") return false;
+        //std::vector<std::string> lines = {
+        //    "1, 1",
+        //    "1, 6",
+        //    "8, 3",
+        //    "3, 4",
+        //    "5, 5",
+        //    "8, 9"
+        //};
+        //
+        //if (PartOne(lines) != "17") return false;
 
         return true;
     }

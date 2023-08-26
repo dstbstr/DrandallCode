@@ -39,7 +39,7 @@ SOLUTION(2022, 14) {
         }
     }
 
-    constexpr void AddWalls(const std::vector<std::string>&lines, Map & map) {
+    constexpr void AddWalls(const auto& lines, Map & map) {
         for (const auto& line : lines) {
             auto points = Constexpr::Split(line, " -> ");
             std::vector<UCoord> coords;
@@ -84,7 +84,7 @@ SOLUTION(2022, 14) {
         return false;
     }
 
-    constexpr u32 CountSand(const std::vector<std::string>& lines, u32 maxY, auto IsDone) {
+    constexpr u32 CountSand(const auto& lines, u32 maxY, auto IsDone) {
         auto* map = new Map();
         AddWalls(lines, *map);
         AddFloor(*map, maxY);
@@ -104,13 +104,13 @@ SOLUTION(2022, 14) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(CountSand(lines, 180, [](UCoord sandPos) {
+        return Constexpr::ToString(CountSand(Lines, 180, [](UCoord sandPos) {
             return sandPos.Y == 178;
             }) - 1);
     }
 
     PART_TWO() {
-        return Constexpr::ToString(CountSand(lines, 180, [](UCoord sandPos) {
+        return Constexpr::ToString(CountSand(Lines, 180, [](UCoord sandPos) {
             return sandPos == Entrance;
             }));
     }

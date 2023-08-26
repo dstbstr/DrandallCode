@@ -109,7 +109,7 @@ SOLUTION(2022, 23) {
         std::rotate(actions.begin() + 1, actions.begin() + 2, actions.end());
     }
 
-    constexpr Map ParseMap(const std::vector<std::string>&lines) {
+    constexpr Map ParseMap(const auto& lines) {
         Map result;
         for (auto& row : result) {
             row.fill(false);
@@ -185,7 +185,7 @@ SOLUTION(2022, 23) {
         return !keep.empty();
     }
 
-    PART_ONE() {
+    constexpr size_t SolvePartOne(const auto& lines) {
         auto actions = GetActions();
         auto map = ParseMap(lines);
 
@@ -201,10 +201,13 @@ SOLUTION(2022, 23) {
                 if (!elf) result++;
             }
         }
-        return Constexpr::ToString(result);
+        return result;
+    }
+    PART_ONE() {
+        return Constexpr::ToString(SolvePartOne(Lines));
     }
 
-    PART_TWO() {
+    constexpr size_t SolvePartTwo(const auto& lines) {
         auto actions = GetActions();
         auto map = ParseMap(lines);
 
@@ -213,7 +216,10 @@ SOLUTION(2022, 23) {
             round++;
         }
 
-        return Constexpr::ToString(round + 1);
+        return round + 1;
+    }
+    PART_TWO() {
+        return Constexpr::ToString(SolvePartTwo(Lines));
     }
 
     TESTS() {
@@ -232,8 +238,8 @@ SOLUTION(2022, 23) {
             ".............."
         };
 
-        if (PartOne(lines) != "110") return false;
-        if (PartTwo(lines) != "20") return false;
+        if (SolvePartOne(lines) != 110) return false;
+        if (SolvePartTwo(lines) != 20) return false;
         return true;
     }
 }

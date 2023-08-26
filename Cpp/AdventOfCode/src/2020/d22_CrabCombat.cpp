@@ -1,7 +1,7 @@
 #include "2020/d22_CrabCombat.h"
 
 SOLUTION(2020, 22) {
-    constexpr std::vector<u32> ParseDeck(const std::vector<std::string>&lines) {
+    constexpr std::vector<u32> ParseDeck(const auto& lines) {
         std::vector<u32> result;
         for (size_t i = 1; i < lines.size(); i++) {
             u32 num;
@@ -87,7 +87,7 @@ SOLUTION(2020, 22) {
         return d2.empty();
     }
 
-    constexpr size_t Solve(const std::vector<std::string>& lines, auto Play) {
+    constexpr size_t Solve(const auto& lines, auto Play) {
         auto groups = SplitInputIntoGroups(lines);
         auto d1 = ParseDeck(groups[0]);
         auto d2 = ParseDeck(groups[1]);
@@ -98,11 +98,11 @@ SOLUTION(2020, 22) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(Solve(lines, PlayRound));
+        return Constexpr::ToString(Solve(Lines, PlayRound));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(Solve(lines, PlaySubGame));
+        return Constexpr::ToString(Solve(Lines, PlaySubGame));
     }
 
     TESTS() {
@@ -116,8 +116,8 @@ SOLUTION(2020, 22) {
             "5","8","4","7","10",
         };
 
-        if (PartOne(lines) != "306") return false;
-        if (PartTwo(lines) != "291") return false;
+        if (Solve(lines, PlayRound) != 306) return false;
+        if (Solve(lines, PlaySubGame) != 291) return false;
         return true;
     }
 }

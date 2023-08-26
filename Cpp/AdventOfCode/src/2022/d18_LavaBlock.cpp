@@ -4,7 +4,7 @@ SOLUTION(2022, 18) {
 
     using Grid = std::array<std::array<std::array<bool, 25>, 25>, 25>;
 
-    constexpr void ParseLine(const std::string & line, Grid & grid) {
+    constexpr void ParseLine(std::string_view line, Grid & grid) {
         size_t x, y, z;
         auto split = Constexpr::Split(line, ",");
         Constexpr::ParseNumber(split[0], x);
@@ -99,7 +99,7 @@ SOLUTION(2022, 18) {
         return CalcSurface(grid) - CalcAirPockets(grid);
     }
 
-    constexpr size_t Execute(const std::vector<std::string>& lines, auto Calc) {
+    constexpr size_t Solve(const auto& lines, auto Calc) {
         Grid grid{};
         for (const auto& line : lines) {
             ParseLine(line, grid);
@@ -108,11 +108,11 @@ SOLUTION(2022, 18) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(Execute(lines, CalcSurface));
+        return Constexpr::ToString(Solve(Lines, CalcSurface));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(Execute(lines, CalcExterior));
+        return Constexpr::ToString(Solve(Lines, CalcExterior));
     }
 
     TESTS() {

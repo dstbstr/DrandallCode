@@ -1,7 +1,7 @@
 #include "2022/d10_Crt.h"
 
 SOLUTION(2022, 10) {
-    constexpr void RunLine(const std::string & line, u32 & tick, std::vector<s32>&xValues) {
+    constexpr void RunLine(std::string_view line, u32 & tick, std::vector<s32>&xValues) {
         auto x = xValues[tick];
 
         tick++;
@@ -20,7 +20,7 @@ SOLUTION(2022, 10) {
         xValues.push_back(x + change);
     }
 
-    constexpr std::vector<s32> GetXValues(const std::vector<std::string>&lines) {
+    constexpr std::vector<s32> GetXValues(const auto& lines) {
         std::vector<s32> xValues{ 1 };
         u32 tick = 0;
         for (const auto& line : lines) {
@@ -30,7 +30,7 @@ SOLUTION(2022, 10) {
         return xValues;
     }
 
-    constexpr u32 SumSignalStrength(const std::vector<std::string>&lines) {
+    constexpr u32 SumSignalStrength(const auto& lines) {
         auto xValues = GetXValues(lines);
 
         u32 result = 0;
@@ -43,7 +43,7 @@ SOLUTION(2022, 10) {
         return result;
     }
 
-    constexpr std::string BuildCrtString(const std::vector<std::string>&lines) {
+    constexpr std::string BuildCrtString(const auto& lines) {
         auto xValues = GetXValues(lines);
         std::string result = "\n";
 
@@ -61,11 +61,11 @@ SOLUTION(2022, 10) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(SumSignalStrength(lines));
+        return Constexpr::ToString(SumSignalStrength(Lines));
     }
 
     PART_TWO() {
-        return BuildCrtString(lines);
+        return BuildCrtString(Lines);
     }
 
     TESTS() {

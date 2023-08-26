@@ -44,11 +44,10 @@ SOLUTION(2021, 22) {
 
     private:
         std::vector<Cube> Removed;
-
     };
 
     //on x=-40..11,y=-14..32,z=-31..22
-    constexpr Cube ParseLine(const std::string & line) {
+    constexpr Cube ParseLine(std::string_view line) {
         auto s1 = Constexpr::Split(line, " ");
         auto s2 = Constexpr::Split(s1[1], ",");
         auto xRange = Constexpr::Split(s2[0], "..");
@@ -79,7 +78,7 @@ SOLUTION(2021, 22) {
         return true;
     }
 
-    constexpr auto Solve(const std::vector<std::string>&lines, auto pred) {
+    constexpr auto Solve(const auto& lines, auto pred) {
         std::vector<Cube> cubes;
         for (const auto& line : lines) {
             auto cube = ParseLine(line);
@@ -100,11 +99,11 @@ SOLUTION(2021, 22) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(Solve(lines, IsInRange));
+        return Constexpr::ToString(Solve(Lines, IsInRange));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(Solve(lines, AcceptAll));
+        return Constexpr::ToString(Solve(Lines, AcceptAll));
     }
 
     constexpr bool TestCubeSubtract() {

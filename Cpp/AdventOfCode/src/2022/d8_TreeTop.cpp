@@ -96,26 +96,7 @@ SOLUTION(2022, 8) {
         return best;
     }
 
-    static_assert(FindBestScenicScore<5, 5>({ {
-        {3, 0, 3, 7, 3},
-        {2, 5, 5, 1, 2},
-        {6, 5, 3, 3, 2},
-        {3, 3, 5, 4, 9},
-        {3, 5, 3, 9, 0}
-        } }) == 8);
-
-    std::string Run(const std::vector<std::string>&lines) {
-        std::array<std::array<u8, 99>, 99> forest;
-        for (auto row = 0; row < 99; row++) {
-            for (auto col = 0; col < 99; col++) {
-                forest[row][col] = lines[row][col] - '0';
-            }
-        }
-
-        return Constexpr::ToString(FindBestScenicScore(forest));
-    }
-
-    constexpr size_t Execute(const std::vector<std::string>& lines, auto Func) {
+    constexpr size_t Solve(const auto& lines, auto Func) {
         std::array<std::array<u8, 99>, 99> forest;
         for (auto row = 0; row < 99; row++) {
             for (auto col = 0; col < 99; col++) {
@@ -127,11 +108,11 @@ SOLUTION(2022, 8) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(Execute(lines, VisibleInForest<99, 99>));
+        return Constexpr::ToString(Solve(Lines, VisibleInForest<99, 99>));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(Execute(lines, FindBestScenicScore<99, 99>));
+        return Constexpr::ToString(Solve(Lines, FindBestScenicScore<99, 99>));
     }
 
     TESTS() {
@@ -159,6 +140,14 @@ SOLUTION(2022, 8) {
             {3, 5, 3, 9, 0}
             } }, 3, 2) == 8);
         
+        static_assert(FindBestScenicScore<5, 5>({ {
+            {3, 0, 3, 7, 3},
+            {2, 5, 5, 1, 2},
+            {6, 5, 3, 3, 2},
+            {3, 3, 5, 4, 9},
+            {3, 5, 3, 9, 0}
+            } }) == 8);
+
         return true;
     }
 }

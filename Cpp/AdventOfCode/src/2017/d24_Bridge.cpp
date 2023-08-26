@@ -74,7 +74,7 @@ SOLUTION(2017, 24) {
             "9/10"
         };
 
-        auto pieces = ParseLines(Lines, ParsePiece);
+        auto pieces = ParseLines(lines, ParsePiece);
         if (Dfs(0, pieces, 0) != 31) return false;
         if (CalculateStrength(FindLongestBridge(0, pieces, {})) != 19)  return false;
 

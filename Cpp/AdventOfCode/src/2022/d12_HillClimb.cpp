@@ -2,7 +2,7 @@
 
 SOLUTION(2022, 12) {
     template<size_t Rows, size_t Cols>
-    constexpr std::array<std::array<char, Cols>, Rows> BuildMap(const std::vector<std::string>&lines, size_t & startIndex, size_t & endIndex) {
+    constexpr std::array<std::array<char, Cols>, Rows> BuildMap(const auto& lines, size_t & startIndex, size_t & endIndex) {
         std::array<std::array<char, Cols>, Rows> result{};
 
         for (size_t row = 0; row < Rows; row++) {
@@ -114,13 +114,13 @@ SOLUTION(2022, 12) {
 
     PART_ONE() {
         size_t startIndex, endIndex;
-        auto map = BuildMap<41, 66>(lines, startIndex, endIndex);
+        auto map = BuildMap<41, 66>(Lines, startIndex, endIndex);
         return Constexpr::ToString(Bfs<41, 66>(map, startIndex, endIndex));
     }
 
     PART_TWO() {
         size_t startIndex, endIndex;
-        auto map = BuildMap<41, 66>(lines, startIndex, endIndex);
+        auto map = BuildMap<41, 66>(Lines, startIndex, endIndex);
         auto allStarts = FindAllStarts(map);
 
         u32 best = 999;

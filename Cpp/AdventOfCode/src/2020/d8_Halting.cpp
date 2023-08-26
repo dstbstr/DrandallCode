@@ -12,7 +12,7 @@ SOLUTION(2020, 8) {
         s64 Argument{ 0 };
     };
 
-    constexpr Inst ParseInst(const std::string & line) {
+    constexpr Inst ParseInst(std::string_view line) {
         auto split = Constexpr::Split(line, " ");
         s64 arg;
         Constexpr::ParseNumber(split[1], arg);
@@ -32,14 +32,6 @@ SOLUTION(2020, 8) {
             throw "Unknown op code" + std::string(split[0]);
         }
 
-        return result;
-    }
-
-    constexpr std::vector<Inst> ParseInstructions(const std::vector<std::string>&lines) {
-        std::vector<Inst> result;
-        for (const auto& line : lines) {
-            result.push_back(ParseInst(line));
-        }
         return result;
     }
 
@@ -66,16 +58,20 @@ SOLUTION(2020, 8) {
         }
     }
 
-    PART_ONE() {
-        const auto instructions = ParseInstructions(lines);
+    constexpr s64 SolvePartOne(const auto& lines) {
+        const auto instructions = ParseLines(lines, ParseInst);
 
         State state;
         Terminates(instructions, state);
-        return Constexpr::ToString(state.Accumulator);
+        return state.Accumulator;
     }
 
-    PART_TWO() {
-        const auto instructions = ParseInstructions(lines);
+    PART_ONE() {
+        return Constexpr::ToString(SolvePartOne(Lines));
+    }
+
+    constexpr s64 SolvePartTwo(const auto& lines) {
+        const auto instructions = ParseLines(lines, ParseInst);
 
         for (size_t i = 0; i < instructions.size(); i++) {
             if (instructions[i].Op == OpCode::Acc) continue;
@@ -88,11 +84,15 @@ SOLUTION(2020, 8) {
             }
             State state;
             if (Terminates(copy, state)) {
-                return Constexpr::ToString(state.Accumulator);
+                return state.Accumulator;
             }
         }
 
-        return "Not Found";
+        throw "Not Found";
+    }
+
+    PART_TWO() {
+        return Constexpr::ToString(SolvePartTwo(Lines));
     }
 
     TESTS() {
@@ -108,8 +108,8 @@ SOLUTION(2020, 8) {
            "acc +6"
         };
 
-        if (PartOne(lines) != "5") return false;
-        if (PartTwo(lines) != "8") return false;
+        if (SolvePartOne(lines) != 5) return false;
+        if (SolvePartTwo(lines) != 8) return false;
         return true;
     }
 }

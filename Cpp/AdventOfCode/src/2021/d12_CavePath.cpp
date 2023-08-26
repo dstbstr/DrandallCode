@@ -3,7 +3,7 @@
 SOLUTION(2021, 12) {
     //rooms are unique by first letter
     //s and e are special (start and end)
-    constexpr std::array<std::string, 'z' + 1> Parse(const std::vector<std::string>&lines) {
+    constexpr std::array<std::string, 'z' + 1> Parse(const auto& lines) {
         std::array<std::string, 'z' + 1> result{};
         for (const auto& line : lines) {
             auto s = Constexpr::Split(line, "-");
@@ -64,12 +64,12 @@ SOLUTION(2021, 12) {
     }
     
     PART_ONE() {
-        auto n = Parse(lines);
+        auto n = Parse(Lines);
         return Constexpr::ToString(CountPaths<false>(n));
     }
 
     PART_TWO() {
-        auto n = Parse(lines);
+        auto n = Parse(Lines);
         return Constexpr::ToString(CountPaths<true>(n));
     }
 

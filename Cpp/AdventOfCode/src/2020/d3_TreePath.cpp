@@ -3,7 +3,7 @@
 SOLUTION(2020, 3) {
     using Grid = std::vector<std::vector<bool>>;
 
-    constexpr Grid ParseGrid(const std::vector<std::string>&lines) {
+    constexpr Grid ParseGrid(const auto& lines) {
         Grid result;
         for (const auto& line : lines) {
             std::vector<bool> row;
@@ -33,13 +33,13 @@ SOLUTION(2020, 3) {
     }
 
     PART_ONE() {
-        auto grid = ParseGrid(lines);
+        auto grid = ParseGrid(Lines);
         RowCol slope = { 1, 3 };
         return Constexpr::ToString(CountTreesOnPath(grid, slope));
     }
 
     PART_TWO() {
-        auto grid = ParseGrid(lines);
+        auto grid = ParseGrid(Lines);
         std::vector<RowCol> slopes = {
             {1, 1},
             {1, 3},
@@ -66,8 +66,8 @@ SOLUTION(2020, 3) {
             "#...##....#",
             ".#..#...#.#"
         };
-
-        if (PartOne(lines) != "7") return false;
+        auto grid = ParseGrid(lines);
+        if (CountTreesOnPath(grid, { 1, 3 }) != 7) return false;
 
         return true;
     }

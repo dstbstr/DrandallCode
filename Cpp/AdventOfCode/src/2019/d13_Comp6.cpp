@@ -75,7 +75,7 @@ SOLUTION(2019, 13) {
 
 
     PART_ONE() {
-        auto instructions = ParseInstructions(lines[0]);
+        auto instructions = ParseInstructions(Line);
         Args args;
         Game game;
         UpdateGame(game, instructions, args);
@@ -89,7 +89,7 @@ SOLUTION(2019, 13) {
     }
 
     PART_TWO() {
-        auto instructions = ParseInstructions(lines[0]);
+        auto instructions = ParseInstructions(Line);
         instructions[0] = 2;
         Args args;
         Game game;

@@ -24,7 +24,7 @@ SOLUTION(2020, 6) {
         return std::count(seen.cbegin(), seen.cend(), lines.size());
     }
 
-    constexpr size_t Run(const std::vector<std::string>&lines, auto countFunc) {
+    constexpr size_t Run(const auto&lines, auto countFunc) {
         auto groups = SplitInputIntoGroups(lines);
         return std::accumulate(groups.begin(), groups.end(), 0ull, [&](size_t previous, const auto& group) {
             return previous + countFunc(group);
@@ -32,11 +32,11 @@ SOLUTION(2020, 6) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(Run(lines, CountAnyInGroup));
+        return Constexpr::ToString(Run(Lines, CountAnyInGroup));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(Run(lines, CountAllInGroup));
+        return Constexpr::ToString(Run(Lines, CountAllInGroup));
     }
 
     TESTS() {

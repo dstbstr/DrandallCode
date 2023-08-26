@@ -54,14 +54,14 @@ SOLUTION(2018, 11) {
         }
     }
 
-    constexpr Grid GetGrid(const std::vector<std::string>& lines) {
+    constexpr Grid GetGrid(std::string_view line) {
         u32 serialNumber;
-        Constexpr::ParseNumber(lines[0], serialNumber);
+        Constexpr::ParseNumber(line, serialNumber);
         return FillGrid(serialNumber);
     }
 
     PART_ONE() {
-        auto grid = GetGrid(lines);
+        auto grid = GetGrid(Line);
         s32 best;
         UCoord bestCoord;
         GetBest(grid, 3, bestCoord, best);
@@ -70,7 +70,7 @@ SOLUTION(2018, 11) {
     }
 
     PART_TWO() {
-        auto grid = GetGrid(lines);
+        auto grid = GetGrid(Line);
 
         s32 overallBest = 0;
         UCoord overallBestCoord{ 0, 0 };

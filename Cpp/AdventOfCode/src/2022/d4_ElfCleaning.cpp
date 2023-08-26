@@ -30,7 +30,7 @@ SOLUTION(2022, 4) {
         }
     }
 
-    constexpr std::pair<Section, Section> ParseLine(const std::string& line) {
+    constexpr std::pair<Section, Section> ParseLine(std::string_view line) {
         auto s = Constexpr::Split(line, ",");
         auto a = Constexpr::Split(s[0], "-");
         auto b = Constexpr::Split(s[1], "-");
@@ -42,7 +42,7 @@ SOLUTION(2022, 4) {
         return std::make_pair(lhs, rhs);
     }
 
-    constexpr size_t RunImpl(const std::vector<std::string>&lines, auto func) {
+    constexpr size_t RunImpl(const auto& lines, auto func) {
         auto pairs = ParseLines(lines, ParseLine);
         return std::count_if(pairs.begin(), pairs.end(), [func](const auto& p) {
             return func(p.first, p.second);
@@ -50,11 +50,11 @@ SOLUTION(2022, 4) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(RunImpl(lines, FullyContains));
+        return Constexpr::ToString(RunImpl(Lines, FullyContains));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(RunImpl(lines, Overlap));
+        return Constexpr::ToString(RunImpl(Lines, Overlap));
     }
 
     TESTS() {

@@ -7,7 +7,7 @@ SOLUTION(2020, 7) {
     //bright orange bags contain no other bags.
     using Map = Constexpr::SmallMap<std::string, Constexpr::SmallMap<std::string, size_t>>;
 
-    constexpr Map BuildMap(const std::vector<std::string>& lines) {
+    constexpr Map BuildMap(const auto& lines) {
         Map result;
         for (const auto& line : lines) {
             auto split1 = Constexpr::Split(line, " contain ");
@@ -48,7 +48,7 @@ SOLUTION(2020, 7) {
         return result;
     }
 
-    PART_ONE() {
+    constexpr size_t SolvePartOne(const auto& lines) {
         auto map = BuildMap(lines);
         Constexpr::SmallSet<std::string> seen;
         Constexpr::Queue<std::string> current;
@@ -67,13 +67,21 @@ SOLUTION(2020, 7) {
             }
         }
 
-        return Constexpr::ToString(seen.size());
+        return seen.size();
+    }
+
+    PART_ONE() {
+        return Constexpr::ToString(SolvePartOne(Lines));
+    }
+
+    constexpr size_t SolvePartTwo(const auto& lines) {
+        auto map = BuildMap(lines);
+        BagCache cache;
+        return Recurse(map, cache, "shiny gold") - 1;
     }
 
     PART_TWO() {
-        auto map = BuildMap(lines);
-        BagCache cache;
-        return Constexpr::ToString(Recurse(map, cache, "shiny gold") - 1);
+        return Constexpr::ToString(SolvePartTwo(Lines));
     }
 
     TESTS() {
@@ -89,8 +97,8 @@ SOLUTION(2020, 7) {
             "dotted black bags contain no other bags."
         };
 
-        if (PartOne(lines) != "4") return false;
-        if (PartTwo(lines) != "32") return false;
+        if (SolvePartOne(lines) != 4) return false;
+        if (SolvePartTwo(lines) != 32) return false;
 
         lines = {
             "shiny gold bags contain 2 dark red bags.",
@@ -101,7 +109,7 @@ SOLUTION(2020, 7) {
             "dark blue bags contain 2 dark violet bags.",
             "dark violet bags contain no other bags."
         };
-        if (PartTwo(lines) != "126") return false;
+        if (SolvePartTwo(lines) != 126) return false;
 
         return true;
     }

@@ -120,7 +120,7 @@ SOLUTION(2018, 22) {
 
     //depth: 7863
     //target: 14,760
-    constexpr void GetTargetAndDepth(const std::vector<std::string>& lines, RowCol& outTarget, u32& outDepth) {
+    constexpr void GetTargetAndDepth(const auto& lines, RowCol& outTarget, u32& outDepth) {
         auto s1 = Constexpr::Split(lines[0], " ");
         Constexpr::ParseNumber(s1[1], outDepth);
 
@@ -133,7 +133,7 @@ SOLUTION(2018, 22) {
     PART_ONE() {
         RowCol target;
         u32 depth;
-        GetTargetAndDepth(lines, target, depth);
+        GetTargetAndDepth(Lines, target, depth);
 
         auto map = BuildMap(target, target, depth);
         return Constexpr::ToString(GetRisk(map));
@@ -142,7 +142,7 @@ SOLUTION(2018, 22) {
     PART_TWO() {
         RowCol target;
         u32 depth;
-        GetTargetAndDepth(lines, target, depth);
+        GetTargetAndDepth(Lines, target, depth);
         RowCol buffer = { target.Row + 50, target.Col + 500 };
         auto map = BuildMap(target, buffer, depth);
         return Constexpr::ToString(Bfs(map, target)); //< 1 s

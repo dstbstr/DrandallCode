@@ -59,7 +59,7 @@ SOLUTION(2022, 17) {
         return { x, y };
     }
 
-    constexpr std::vector<bool> ParseInput(const std::string & line) {
+    constexpr std::vector<bool> ParseInput(std::string_view line) {
         std::vector<bool> result;
         for (auto c : line) {
             result.push_back(c == '<');
@@ -186,7 +186,7 @@ SOLUTION(2022, 17) {
         return period;
     }
 
-    constexpr u64 FindTowerHeight(const std::string & line, u64 maxPieces) {
+    constexpr u64 FindTowerHeight(std::string_view line, u64 maxPieces) {
         auto directions = ParseInput(line);
         auto pieces = GetPieces();
         std::vector<size_t> increaseAmounts;
@@ -215,11 +215,11 @@ SOLUTION(2022, 17) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(FindTowerHeight(lines[0], 2022));
+        return Constexpr::ToString(FindTowerHeight(Line, 2022));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(FindTowerHeight(lines[0], 1'000'000'000'000));
+        return Constexpr::ToString(FindTowerHeight(Line, 1'000'000'000'000));
     }
 
     TESTS() {

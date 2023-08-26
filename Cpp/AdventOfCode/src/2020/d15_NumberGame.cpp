@@ -2,7 +2,7 @@
 
 SOLUTION(2020, 15) {
     template<size_t Rounds>
-    constexpr auto Solve(const std::string & line) {
+    constexpr auto Solve(std::string_view line) {
         constexpr const size_t sentinal = 999'999'999;
         auto numbers = ParseLineAsNumbers<size_t>(line);
         auto aPtr = std::make_unique<std::array<size_t, Rounds>>();
@@ -30,11 +30,11 @@ SOLUTION(2020, 15) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(Solve<2020>(lines[0]));
+        return Constexpr::ToString(Solve<2020>(Line));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(Solve<30'000'000>(lines[0]));
+        return Constexpr::ToString(Solve<30'000'000>(Line));
     }
 
     TESTS() {

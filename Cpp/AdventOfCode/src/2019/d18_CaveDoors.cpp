@@ -278,12 +278,12 @@ SOLUTION(2019, 18) {
 
 
     PART_ONE() {
-        Map solution(lines);
+        Map solution(CopyToVector(Lines));
         return Constexpr::ToString(solution.Solve());
     }
 
     PART_TWO() {
-        auto copy = lines;
+        auto copy = CopyToVector(Lines);
         SplitIntoRooms(copy);
 
         Map solution(copy);
@@ -296,8 +296,7 @@ SOLUTION(2019, 18) {
             "#b.A.@.a#",
             "#########"
         };
-
-        if (PartOne(lines) != "8") return false;
+        if (Map(lines).Solve() != 8) return false;
 
         lines = {
             "########################",
@@ -307,7 +306,7 @@ SOLUTION(2019, 18) {
             "########################",
         };
 
-        if (PartOne(lines) != "86") return false;
+        if (Map(lines).Solve() != 86) return false;
 
         lines = {
             "########################",
@@ -316,7 +315,7 @@ SOLUTION(2019, 18) {
             "#.....@.a.B.c.d.A.e.F.g#",
             "########################"
         };
-        if (PartOne(lines) != "132") return false;
+        if (Map(lines).Solve() != 132) return false;
 
         lines = {
             "#######",
@@ -327,7 +326,8 @@ SOLUTION(2019, 18) {
             "#cB#Ab#",
             "#######"
         };
-        if (PartTwo(lines) != "8") return false;
+        SplitIntoRooms(lines);
+        if (Map(lines).Solve() != 8) return false;
 
         lines = {
             "#############",
@@ -338,7 +338,8 @@ SOLUTION(2019, 18) {
             "#fEbA.#.FgHi#",
             "#############"
         };
-        if (PartTwo(lines) != "32") return false;
+        SplitIntoRooms(lines);
+        if (Map(lines).Solve() != 32) return false;
 
         lines = {
             "#############",
@@ -351,7 +352,8 @@ SOLUTION(2019, 18) {
             "#o#m..#i#jk.#",
             "#############"
         };
-        if (PartTwo(lines) != "72") return false;
+        SplitIntoRooms(lines);
+        if (Map(lines).Solve() != 72) return false;
 
         return true;
     }

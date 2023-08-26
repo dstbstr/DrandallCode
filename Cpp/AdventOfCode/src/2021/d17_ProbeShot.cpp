@@ -21,7 +21,7 @@ SOLUTION(2021, 17) {
         Coord TopLeft{ 0, 0 };
         Coord BottomRight{ 0, 0 };
 
-        constexpr Target(const std::string& line) {
+        constexpr Target(std::string_view line) {
             auto s1 = Constexpr::Split(line, ": ");
             auto s2 = Constexpr::Split(s1[1], ", ");
             auto s3 = Constexpr::Split(s2[0], "..");
@@ -90,16 +90,20 @@ SOLUTION(2021, 17) {
         return result;
     }
 
-    PART_ONE() {
-        auto target = Target(lines[0]);
+    constexpr size_t SolvePartOne(std::string_view line) {
+        auto target = Target(line);
         auto ys = FindValidYs(target);
 
         auto biggest = Constexpr::FindMax(ys);
-        return Constexpr::ToString((biggest * (biggest + 1)) / 2);
+        return (biggest * (biggest + 1)) / 2;
     }
 
-    PART_TWO() {
-        auto target = Target(lines[0]);
+    PART_ONE() {
+        return Constexpr::ToString(SolvePartOne(Line));
+    }
+
+    constexpr size_t SolvePartTwo(std::string_view line) {
+        auto target = Target(line);
         auto xs = FindValidXs(target);
         auto ys = FindValidYs(target);
 
@@ -121,7 +125,10 @@ SOLUTION(2021, 17) {
             }
         }
 
-        return Constexpr::ToString(result);
+        return result;
+    }
+    PART_TWO() {
+        return Constexpr::ToString(SolvePartTwo(Line));
     }
 
     constexpr bool TestTargetConstructor() {
@@ -133,8 +140,8 @@ SOLUTION(2021, 17) {
 
     TESTS() {
         static_assert(TestTargetConstructor());
-        static_assert(PartOne({ "target area: x=20..30, y=-10..-5" }) == "45");
-        if (PartTwo({ "target area: x=20..30, y=-10..-5" }) != "112") return false;
+        static_assert(SolvePartOne( "target area: x=20..30, y=-10..-5" ) == 45);
+        if (SolvePartTwo("target area: x=20..30, y=-10..-5") != 112) return false;
 
         return true;
     }

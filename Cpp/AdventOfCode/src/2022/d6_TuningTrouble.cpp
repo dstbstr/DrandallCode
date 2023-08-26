@@ -3,7 +3,7 @@
 SOLUTION(2022, 6) {
     enum struct MessageType { Signal = 4, Message = 14};
 
-    constexpr size_t FindUnique(const std::string & input, MessageType messageType) {
+    constexpr size_t FindUnique(std::string_view input, MessageType messageType) {
         std::vector<char> allChars;
         size_t runLength = static_cast<size_t>(messageType);
         for (size_t i = 0; i < input.size() - runLength; i++) {
@@ -25,11 +25,11 @@ SOLUTION(2022, 6) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(FindUnique(lines[0], MessageType::Signal));
+        return Constexpr::ToString(FindUnique(Line, MessageType::Signal));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(FindUnique(lines[0], MessageType::Message));
+        return Constexpr::ToString(FindUnique(Line, MessageType::Message));
     }
 
     TESTS() {

@@ -132,27 +132,34 @@ SOLUTION(2021, 18) {
         return running;
     }
 
-    PART_ONE() {
-        std::string current = lines[0];
+    constexpr size_t SolvePartOne(const auto& lines) {
+        std::string current = std::string(lines[0]);
         for (size_t i = 1; i < lines.size(); i++) {
-            current = FullyReduce(Add(current, lines[i]));
+            current = FullyReduce(Add(current, std::string(lines[i])));
         }
 
-        return Constexpr::ToString(CalculateMagnitude(current));
+        return CalculateMagnitude(current);
     }
 
-    PART_TWO() {
+    PART_ONE() {
+        return Constexpr::ToString(SolvePartOne(Lines));
+    }
+
+    constexpr size_t SolvePartTwo(const auto& lines) {
         size_t best = 0;
         for (size_t i = 0; i < lines.size(); i++) {
             for (size_t j = i + 1; j < lines.size(); j++) {
-                auto e1 = FullyReduce(Add(lines[i], lines[j]));
-                auto e2 = FullyReduce(Add(lines[j], lines[i]));
+                auto e1 = FullyReduce(Add(std::string(lines[i]), std::string(lines[j])));
+                auto e2 = FullyReduce(Add(std::string(lines[j]), std::string(lines[i])));
                 best = std::max(best, CalculateMagnitude(e1));
                 best = std::max(best, CalculateMagnitude(e2));
             }
         }
 
-        return Constexpr::ToString(best);
+        return best;
+    }
+    PART_TWO() {
+        return Constexpr::ToString(SolvePartTwo(Lines));
     }
 
     TESTS() {
@@ -187,8 +194,8 @@ SOLUTION(2021, 18) {
             "[[[[5,2],5],[8,[3,7]]],[[5,[7,5]],[4,4]]]"
         };
 
-        if (PartOne(lines) != "4140") return false;
-        if (PartTwo(lines) != "3993") return false;
+        if (SolvePartOne(lines) != 4140) return false;
+        if (SolvePartTwo(lines) != 3993) return false;
         return true;
     }
 }

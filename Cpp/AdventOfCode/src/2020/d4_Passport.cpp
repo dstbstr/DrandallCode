@@ -56,7 +56,7 @@ SOLUTION(2020, 4) {
         }
     }
 
-    constexpr Passport ParsePassport(const std::vector<std::string>&lines) {
+    constexpr Passport ParsePassport(const auto& lines) {
         Passport passport;
 
         for (const auto& line : lines) {
@@ -120,18 +120,21 @@ SOLUTION(2020, 4) {
     }
 
     PART_ONE() {
-        auto groups = SplitInputIntoGroups(lines);
+        auto groups = SplitInputIntoGroups(Lines);
         return Constexpr::ToString(std::count_if(groups.begin(), groups.end(), [](const auto& pLines) {
             return ValidatePassport(ParsePassport(pLines));
             }));
     }
 
-    PART_TWO() {
+    constexpr size_t SolvePartTwo(const auto& lines) {
         auto groups = SplitInputIntoGroups(lines);
-        return Constexpr::ToString(std::count_if(groups.begin(), groups.end(), [](const auto& pLines) {
+        return std::count_if(groups.begin(), groups.end(), [](const auto& pLines) {
             auto p = ParsePassport(pLines);
             return ValidatePassport(p) && VerifyPassport(p);
-        }));
+            });
+    }
+    PART_TWO() {
+        return Constexpr::ToString(SolvePartTwo(Lines));
     }
 
     constexpr bool TestParsePassport() {
@@ -172,7 +175,7 @@ SOLUTION(2020, 4) {
             "hcl:#623a2f"
         };
 
-        if (PartTwo(lines) != "1") return false;
+        if (SolvePartTwo(lines) != 1) return false;
 
         return true;
     }

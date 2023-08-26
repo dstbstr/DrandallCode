@@ -3,7 +3,7 @@
 SOLUTION(2021, 20) {
     using Image = std::vector<std::vector<bool>>;
 
-    constexpr Image ParseInput(const std::vector<std::string>&lines) {
+    constexpr Image ParseInput(const auto& lines) {
         Image result;
         for (const auto& line : lines) {
             std::vector<bool> current;
@@ -51,7 +51,7 @@ SOLUTION(2021, 20) {
         }
     }
 
-    constexpr size_t Execute(const std::vector<std::string>&lines, size_t count) {
+    constexpr size_t Solve(const auto& lines, size_t count) {
         auto groups = SplitInputIntoGroups(lines);
         const auto key = groups[0][0];
         auto image = ParseInput(groups[1]);
@@ -67,11 +67,11 @@ SOLUTION(2021, 20) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(Execute(lines, 2));
+        return Constexpr::ToString(Solve(Lines, 2));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(Execute(lines, 50));
+        return Constexpr::ToString(Solve(Lines, 50));
     }
 
     TESTS() {
@@ -85,7 +85,7 @@ SOLUTION(2021, 20) {
             "..###"
         };
 
-        if (Execute(lines, 2) != 35) return false;
+        if (Solve(lines, 2) != 35) return false;
         //if (Execute(lines, 50) != 3351) return false;
         return true;
     }

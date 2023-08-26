@@ -8,7 +8,7 @@ SOLUTION(2020, 2) {
         std::string Word {""};
     };
 
-    constexpr Entry ParseEntry(const std::string & line) {
+    constexpr Entry ParseEntry(std::string_view line) {
         Entry entry;
         auto split1 = Constexpr::Split(line, ": ");
         entry.Word = split1[1];
@@ -36,12 +36,12 @@ SOLUTION(2020, 2) {
     }
 
     PART_ONE() {
-        auto entries = ParseLines(lines, ParseEntry);
+        auto entries = ParseLines(Lines, ParseEntry);
         return Constexpr::ToString(std::count_if(entries.begin(), entries.end(), IsEntryValid));
     }
 
     PART_TWO() {
-        auto entries = ParseLines(lines, ParseEntry);
+        auto entries = ParseLines(Lines, ParseEntry);
         return Constexpr::ToString(std::count_if(entries.begin(), entries.end(), IsEntryValid2));
     }
 

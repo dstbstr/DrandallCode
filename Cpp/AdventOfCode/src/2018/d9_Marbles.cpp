@@ -51,7 +51,7 @@ SOLUTION(2018, 9) {
 
     }
     //476 players; last marble is worth 71657 points
-    constexpr void ParseInput(const std::string& line, size_t& players, size_t& maxValue) {
+    constexpr void ParseInput(std::string_view line, size_t& players, size_t& maxValue) {
         auto s = Constexpr::Split(line, " ");
         Constexpr::ParseNumber(s[0], players);
         Constexpr::ParseNumber(s[6], maxValue);
@@ -60,7 +60,7 @@ SOLUTION(2018, 9) {
     PART_ONE() {
         //this version is slower, but doesn't hard code the input
         size_t players, maxValue;
-        ParseInput(lines[0], players, maxValue);
+        ParseInput(Line, players, maxValue);
         return Constexpr::ToString(Play2(players, maxValue));
         /*
         (void)lines;
@@ -70,7 +70,7 @@ SOLUTION(2018, 9) {
 
     PART_TWO() {
         size_t players, maxValue;
-        ParseInput(lines[0], players, maxValue);
+        ParseInput(Line, players, maxValue);
         return Constexpr::ToString(Play2(players, maxValue * 100));
         /*
         (void)lines;

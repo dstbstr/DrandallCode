@@ -9,7 +9,7 @@ SOLUTION(2020, 12) {
         s32 Value = 0;
     };
 
-    constexpr Instruction ParseInstruction(const std::string & line) {
+    constexpr Instruction ParseInstruction(std::string_view line) {
         auto c = line[0];
         Cmd command;
         switch (c) {
@@ -29,6 +29,62 @@ SOLUTION(2020, 12) {
         return { command, value };
     }
 
+    constexpr void TurnLeft(Coord& in) {
+        std::swap(in.X, in.Y);
+        in.Y = -in.Y;
+    }
+
+    constexpr void TurnRight(Coord& in) {
+        std::swap(in.X, in.Y);
+        in.X = -in.X;
+    }
+
+    constexpr void TurnAround(Coord& in) {
+        std::swap(in.X, in.Y);
+        in.X = -in.X;
+        in.Y = -in.Y;
+    }
+
+    constexpr void ApplyDirection(Coord& pos, s32 val, Cmd op) {
+        switch (op) {
+        case Cmd::North: pos.Y -= val; return;
+        case Cmd::South: pos.Y += val; return;
+        case Cmd::East: pos.X += val; return;
+        case Cmd::West: pos.X -= val; return;
+        }
+    }
+    constexpr void Apply(const Instruction& instruction, Coord& pos, Coord& wayPoint, Coord& toUpdate) {
+        auto val = instruction.Value;
+        switch (instruction.Op) {
+        case Cmd::North: toUpdate.Y -= val; return;
+        case Cmd::South: toUpdate.Y += val; return;
+        case Cmd::East: toUpdate.X += val; return;
+        case Cmd::West: toUpdate.X -= val; return;
+        }
+
+        if (instruction.Op == Cmd::Forward) {
+            pos += (wayPoint * val);
+        }
+
+        if (instruction.Op == Cmd::Left) {
+            switch (val) {
+            case 90: TurnLeft(wayPoint); return;
+            case 180: TurnAround(wayPoint); return;
+            case 270: TurnRight(wayPoint); return;
+            }
+        }
+
+        if (instruction.Op == Cmd::Right) {
+            switch (val) {
+            case 90: TurnRight(wayPoint); return;
+            case 180: TurnAround(wayPoint); return;
+            case 270: TurnLeft(wayPoint); return;
+            }
+        }
+
+        throw "Unhandled instruction op";
+    }
+    /*
     constexpr void ApplyInstruction(const Instruction & instruction, Facing & facing, Coord & pos) {
         auto val = instruction.Value;
         switch (instruction.Op) {
@@ -66,17 +122,6 @@ SOLUTION(2020, 12) {
         throw "Unhandled instruction op";
     }
 
-
-    constexpr void TurnLeft(Coord & wayPoint) {
-        std::swap(wayPoint.X, wayPoint.Y);
-        wayPoint.Y = -wayPoint.Y;
-    }
-
-    constexpr void TurnRight(Coord & wayPoint) {
-        std::swap(wayPoint.X, wayPoint.Y);
-        wayPoint.X = -wayPoint.X;
-    }
-
     constexpr void ApplyInstruction2(const Instruction & instruction, Coord & pos, Coord & wayPoint) {
         auto val = instruction.Value;
         switch (instruction.Op) {
@@ -87,20 +132,14 @@ SOLUTION(2020, 12) {
         }
 
         if (instruction.Op == Cmd::Forward) {
-            pos.Y += (wayPoint.Y * val);
-            pos.X += (wayPoint.X * val);
-            return;
-        }
-
-        if (val == 180) {
-            wayPoint.X = -wayPoint.X;
-            wayPoint.Y = -wayPoint.Y;
+            pos += wayPoint * val;
             return;
         }
 
         if (instruction.Op == Cmd::Left) {
             switch (val) {
             case 90: TurnLeft(wayPoint); return;
+            case 180: TurnAround(wayPoint); return;
             case 270: TurnRight(wayPoint); return;
             }
         }
@@ -108,35 +147,57 @@ SOLUTION(2020, 12) {
         if (instruction.Op == Cmd::Right) {
             switch (val) {
             case 90: TurnRight(wayPoint); return;
+            case 180: TurnAround(wayPoint); return;
             case 270: TurnLeft(wayPoint); return;
             }
         }
 
         throw "Unhandled instruction op";
     }
+    */
+
+    constexpr size_t Solve(const auto& lines, Coord& wayPoint, Coord& pos, Coord& toUpdate) {
+        const auto instructions = ParseLines(lines, ParseInstruction);
+        for (const auto& inst : instructions) {
+            Apply(inst, pos, wayPoint, toUpdate);
+        }
+        return MDistance(pos);
+    }
 
     PART_ONE() {
+        Coord wayPoint{ 1, 0 };
+        Coord pos{ 0, 0 };
+        auto result = Solve(Lines, wayPoint, pos, pos);
+        return Constexpr::ToString(result);
+        /*
         auto facing = Facing::Right;
         Coord pos = { 0, 0 };
-        const auto instructions = ParseLines(lines, ParseInstruction);
+        const auto instructions = ParseLines(Lines, ParseInstruction);
 
         for (const auto& instruction : instructions) {
             ApplyInstruction(instruction, facing, pos);
         }
 
         return Constexpr::ToString(MDistance(pos));
+        */
     }
 
     PART_TWO() {
+        /*
         Coord pos = { 0, 0 };
         Coord wayPoint = { 10, -1 };
-        const auto instructions = ParseLines(lines, ParseInstruction);
+        const auto instructions = ParseLines(Lines, ParseInstruction);
 
         for (const auto& instruction : instructions) {
             ApplyInstruction2(instruction, pos, wayPoint);
         }
 
         return Constexpr::ToString(MDistance(pos));
+        */
+        Coord wayPoint{ 10, -1 };
+        Coord pos{ 0, 0 };
+        auto result = Solve(Lines, wayPoint, pos, wayPoint);
+        return Constexpr::ToString(result);
     }
 
     constexpr bool TestTurns() {
@@ -164,9 +225,16 @@ SOLUTION(2020, 12) {
             "R90",
             "F11"
         };
+        Coord wayPoint{ 1,0 };
+        Coord pos{ 0, 0 };
+        if (Solve(lines, wayPoint, pos, pos) != 25) return false;
 
-        if (PartOne(lines) != "25") return false;
-        if (PartTwo(lines) != "286") return false;
+        pos = { 0, 0 };
+        wayPoint = { 10, -1 };
+        if (Solve(lines, wayPoint, pos, wayPoint) != 286) return false;
+
+        //if (PartOne(lines) != "25") return false;
+        //if (PartTwo(lines) != "286") return false;
 
         return true;
     }

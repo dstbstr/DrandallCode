@@ -10,7 +10,7 @@ SOLUTION(2022, 7) {
         Constexpr::SmallMap<std::string, Dir> Paths;
         Constexpr::Stack<std::string> StackPath;
 
-        Fs(const std::vector<std::string>& lines) {
+        constexpr Fs(const auto& lines) {
             Paths["/"];
             for (const auto& line : lines) {
                 ParseLine(line);
@@ -36,7 +36,7 @@ SOLUTION(2022, 7) {
                 });
         }
 
-        constexpr void ParseCommand(const std::string& line) {
+        constexpr void ParseCommand(std::string_view line) {
             if (line[2] == 'l') return; //ls, no affect on currentDir
             if (line.back() == '/') return; //cd /, already assumed
             auto s = Constexpr::Split(line, " ");
@@ -56,7 +56,7 @@ SOLUTION(2022, 7) {
             }
             return result;
         }
-        constexpr void ParseOutput(const std::string& line) {
+        constexpr void ParseOutput(std::string_view line) {
             auto s = Constexpr::Split(line, " ");
             if (line[0] == 'd') {
                 StackPath.push(std::string(s[1]));
@@ -76,19 +76,19 @@ SOLUTION(2022, 7) {
                 StackPath = originalPath;
             }
         }
-        constexpr void ParseLine(const std::string& line) {
+        constexpr void ParseLine(std::string_view line) {
             if (line[0] == '$') ParseCommand(line);
             else ParseOutput(line);
         }
     };
 
     PART_ONE() {
-        auto fs = Fs(lines);
+        auto fs = Fs(Lines);
         return Constexpr::ToString(fs.SumDirectoriesLessThan(100'000));
     }
 
     PART_TWO() {
-        auto fs = Fs(lines);
+        auto fs = Fs(Lines);
         return Constexpr::ToString(fs.FindDirToDelete());
     }
 

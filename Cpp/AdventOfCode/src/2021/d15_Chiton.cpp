@@ -3,7 +3,7 @@
 
 SOLUTION(2021, 15) {
     using Map = std::vector<std::vector<u32>>;
-    constexpr Map ParseInput(const std::vector<std::string>&lines) {
+    constexpr Map ParseInput(const auto& lines) {
         Map numbers;
         for (const auto& line : lines) {
             std::vector<u32> current;
@@ -61,12 +61,12 @@ SOLUTION(2021, 15) {
     }
 
     PART_ONE() {
-        auto map = ParseInput(lines);
+        auto map = ParseInput(Lines);
         return Constexpr::ToString(Solve(map));
     }
 
     PART_TWO() {
-        auto map = ParseInput(lines);
+        auto map = ParseInput(Lines);
         auto bigMap = ExpandMap(map);
         return Constexpr::ToString(Solve(bigMap));
     }
@@ -100,7 +100,7 @@ SOLUTION(2021, 15) {
             "11191",
             "99991"
         };
-        if (PartOne(lines) != "8") return false;
+        if (Solve(ParseInput(lines)) != 8) return false;
 
         lines = {
             "119",
@@ -109,7 +109,7 @@ SOLUTION(2021, 15) {
             "199",
             "111"
         };
-        if (PartOne(lines) != "8") return false;
+        if (Solve(ParseInput(lines)) != 8) return false;
 
         return true;
     }

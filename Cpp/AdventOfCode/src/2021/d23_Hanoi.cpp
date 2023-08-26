@@ -327,12 +327,12 @@ SOLUTION(2021, 23) {
     }
 
     PART_ONE() {
-        auto dens = GetInitialDens(lines, false);
+        auto dens = GetInitialDens(CopyToVector(Lines), false);
         return Constexpr::ToString(Solve(dens));
     }
 
     PART_TWO() {
-        auto dens = GetInitialDens(lines, true);
+        auto dens = GetInitialDens(CopyToVector(Lines), true);
         return Constexpr::ToString(Solve(dens));
     }
 
@@ -345,8 +345,10 @@ SOLUTION(2021, 23) {
             "  #########"
         };
 
-        if (PartOne(lines) != "12521") return false;
-        if (PartTwo(lines) != "44169") return false;
+        auto d1 = GetInitialDens(lines, false);
+        auto d2 = GetInitialDens(lines, true);
+        if (Solve(d1) != 12521) return false;
+        if (Solve(d2) != 44169) return false;
 
         return true;
     }

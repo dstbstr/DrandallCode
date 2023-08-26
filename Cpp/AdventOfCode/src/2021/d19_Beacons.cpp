@@ -88,7 +88,7 @@ SOLUTION(2021, 19) {
         }
     }
 
-    constexpr Scanner ParseScanner(const std::vector<std::string>& lines) {
+    constexpr Scanner ParseScanner(const auto& lines) {
         Scanner result;
         for (const auto& line : lines | std::views::drop(1)) {
             result.Beacons.push_back(Beacon(line));
@@ -144,7 +144,7 @@ SOLUTION(2021, 19) {
         }
     }
 
-    constexpr auto CombineScanners(const std::vector<std::string>& lines) {
+    constexpr auto CombineScanners(const auto& lines) {
         auto groups = SplitInputIntoGroups(lines);
         std::vector<Scanner> all;
         for (const auto& group : groups) {
@@ -172,12 +172,17 @@ SOLUTION(2021, 19) {
         }
         return std::make_pair(allScanners, allBeacons);
     }
-    PART_ONE() {
+
+    constexpr size_t SolvePartOne(const auto& lines) {
         auto [scanners, beacons] = CombineScanners(lines);
-        return Constexpr::ToString(beacons.size());
+        return beacons.size();
     }
 
-    PART_TWO() {
+    PART_ONE() {
+        return Constexpr::ToString(SolvePartOne(Lines));
+    }
+
+    constexpr size_t SolvePartTwo(const auto& lines) {
         auto [scanners, beacons] = CombineScanners(lines);
 
         size_t best = 0;
@@ -187,7 +192,11 @@ SOLUTION(2021, 19) {
             }
         }
 
-        return Constexpr::ToString(best);
+        return best;
+    }
+
+    PART_TWO() {
+        return Constexpr::ToString(SolvePartTwo(Lines));
     }
 
     TESTS() {
@@ -330,8 +339,8 @@ SOLUTION(2021, 19) {
             "30,-46,-14"
         };
 
-        if (PartOne(lines) != "79") return false;
-        if (PartTwo(lines) != "3621") return false;
+        if (SolvePartOne(lines) != 79) return false;
+        if (SolvePartTwo(lines) != 3621) return false;
         return true;
     }
 }

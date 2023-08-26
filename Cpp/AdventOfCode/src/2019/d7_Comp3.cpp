@@ -22,7 +22,7 @@ SOLUTION(2019, 7) {
         }
     };
     PART_ONE() {
-        auto code = ParseInstructions(lines[0]);
+        auto code = ParseInstructions(Line);
         s64 best = 0;
         std::vector<s64> phases = { 0, 1, 2, 3, 4 };
         do {
@@ -42,7 +42,7 @@ SOLUTION(2019, 7) {
     }
 
     PART_TWO() {
-        auto code = ParseInstructions(lines[0]);
+        auto code = ParseInstructions(Line);
         s64 best = 0;
         std::vector<s64> phases = { 5, 6, 7, 8, 9 };
         do {

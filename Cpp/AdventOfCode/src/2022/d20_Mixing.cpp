@@ -39,7 +39,7 @@ SOLUTION(2022, 20) {
         return result;
     }
 
-    constexpr s64 Solution(const std::vector<std::string>&lines, s64 key, s64 count) {
+    constexpr s64 Solve(const auto& lines, s64 key, s64 count) {
         auto numbers = ParseLinesAsNumbers<s64>(lines);
         for (auto& number : numbers) {
             number *= key;
@@ -64,11 +64,11 @@ SOLUTION(2022, 20) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(Solution(lines, 1, 1));
+        return Constexpr::ToString(Solve(Lines, 1, 1));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(Solution(lines, 811589153, 10));
+        return Constexpr::ToString(Solve(Lines, 811589153, 10));
     }
 
     constexpr bool TestShift(size_t index, std::vector<s64> start, std::vector<s64> end) {
@@ -92,8 +92,8 @@ SOLUTION(2022, 20) {
 
         std::vector<std::string> lines = {"1","2","-3","3","-2","0","4"};
 
-        if (PartOne(lines) != "3") return false;
-        if (PartTwo(lines) != "1623178306") return false;
+        if (Solve(lines, 1, 1) != 3) return false;
+        if (Solve(lines, 811589153, 10) != 1623178306) return false;
 
         return true;
     }

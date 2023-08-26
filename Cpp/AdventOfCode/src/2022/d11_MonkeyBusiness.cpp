@@ -18,7 +18,7 @@ SOLUTION(2022, 11) {
     };
 
     enum struct Operation {Plus, Mul};
-    constexpr auto ParseOperation(const std::string& line) {
+    constexpr auto ParseOperation(std::string_view line) {
         auto s = Constexpr::Split(line, " = ");
         auto s1 = Constexpr::Split(s[1], " ");
         size_t lhs, rhs;
@@ -39,7 +39,7 @@ SOLUTION(2022, 11) {
         };
     }
 
-    constexpr std::vector<Monkey> ParseMonkeys(const std::vector<std::string>& lines) {
+    constexpr std::vector<Monkey> ParseMonkeys(const auto& lines) {
         auto groups = SplitInputIntoGroups(lines);
         std::vector<Monkey> monkeys;
         for (const auto& group : groups) {
@@ -62,7 +62,7 @@ SOLUTION(2022, 11) {
         return monkeys;
     }
 
-    constexpr std::vector<std::string> GetOpLines(const std::vector<std::string>& lines) {
+    constexpr std::vector<std::string> GetOpLines(const auto& lines) {
         auto groups = SplitInputIntoGroups(lines);
         std::vector<std::string> result;
         for (const auto& group : groups) {
@@ -71,7 +71,7 @@ SOLUTION(2022, 11) {
         return result;
     }
 
-    constexpr size_t Execute(const std::vector<std::string>& lines, size_t rounds, size_t divisor) {
+    constexpr size_t Solve(const auto& lines, size_t rounds, size_t divisor) {
         auto monkeys = ParseMonkeys(lines);
         auto ops = ParseLines(GetOpLines(lines), ParseOperation);
 
@@ -96,13 +96,11 @@ SOLUTION(2022, 11) {
     }
 
     PART_ONE() {
-        auto result = Execute(lines, 20, 3);
-        return Constexpr::ToString(result);
+        return Constexpr::ToString(Solve(Lines, 20, 3));
     }
 
     PART_TWO() {
-        auto result = Execute(lines, 10'000, 1);
-        return Constexpr::ToString(result);
+        return Constexpr::ToString(Solve(Lines, 10'000, 1));
     }
 
     TESTS() {
@@ -136,8 +134,8 @@ SOLUTION(2022, 11) {
             "    If false: throw to monkey 1"
         };
 
-        if (PartOne(lines) != "10605") return false;
-        if (PartTwo(lines) != "2713310158") return false;
+        if (Solve(lines, 20, 3) != 10605) return false;
+        if (Solve(lines, 10'000, 1) != 2713310158) return false;
         return true;
     }
 }

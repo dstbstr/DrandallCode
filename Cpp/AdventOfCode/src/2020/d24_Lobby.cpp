@@ -3,7 +3,7 @@
 
 SOLUTION(2020, 24) {
 
-    constexpr std::vector<PointyHex::Direction> GetDirections(const std::string & line) {
+    constexpr std::vector<PointyHex::Direction> GetDirections(std::string_view line) {
         using namespace PointyHex;
         std::vector<Direction> result;
         for (auto i = 0; i < line.size(); i++) {
@@ -26,7 +26,7 @@ SOLUTION(2020, 24) {
     }
     using Grid = Constexpr::SmallSet<PointyHex::Pos>;
 
-    constexpr Grid GetInitialGrid(const std::vector<std::string>&lines) {
+    constexpr Grid GetInitialGrid(const auto& lines) {
         Grid result{};
         const PointyHex::Pos origin = { 0, 0, 0 };
 
@@ -64,21 +64,20 @@ SOLUTION(2020, 24) {
         grid = next;
     }
 
-    constexpr size_t Run(const std::vector<std::string>& lines, size_t days) {
+    constexpr size_t Run(const auto& lines, size_t days) {
         auto grid = GetInitialGrid(lines);
         for (auto i = 0; i < days; i++) {
-            //NextDay(grid);
             Next(grid);
         }
         return grid.size();
     }
 
     PART_ONE() {
-        return Constexpr::ToString(Run(lines, 0));
+        return Constexpr::ToString(Run(Lines, 0));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(Run(lines, 100));
+        return Constexpr::ToString(Run(Lines, 100));
     }
 
     TESTS() {

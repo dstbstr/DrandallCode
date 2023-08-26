@@ -8,8 +8,8 @@ SOLUTION(2022, 22) {
 
     using Map = std::vector<std::vector<State>>;
 
-    constexpr std::string ReadPath(const std::vector<std::string>&lines) {
-        return lines[lines.size() - 1];
+    constexpr std::string ReadPath(const auto& lines) {
+        return std::string(lines[lines.size() - 1]);
     }
 
     constexpr void NormalizeLines(std::vector<std::string>&lines) {
@@ -266,7 +266,7 @@ SOLUTION(2022, 22) {
         size_t FaceSize = 0;
     };
 
-    constexpr void AddWalls(Cube & cube, const std::vector<std::string>&lines) {
+    constexpr void AddWalls(Cube & cube, const auto& lines) {
         for (auto& [_, face] : cube.Faces) {
             for (size_t row = 0; row < cube.FaceSize; row++) {
                 std::vector<bool> wallRow;
@@ -341,7 +341,7 @@ SOLUTION(2022, 22) {
         return result;
 
     }
-    constexpr Cube MakeCube(const std::vector<std::string>&lines) {
+    constexpr Cube MakeCube(const auto& lines) {
         /*
           B R
           U
@@ -503,7 +503,7 @@ SOLUTION(2022, 22) {
         return static_cast<u32>(((pos.Row + 1) * 1000) + ((pos.Col + 1) * 4) + static_cast<u32>(facing));
     }
 
-    PART_ONE() {
+    constexpr size_t SolvePartOne(const auto& lines) {
         const auto facingValues = 4;
         auto map = ParseMap(lines);
         auto x = GetXBounds(map);
@@ -530,17 +530,20 @@ SOLUTION(2022, 22) {
             commandsProcessed++;
         }
 
-        return Constexpr::ToString(GetResult(currentPos, facing));
+        return GetResult(currentPos, facing);
+    }
+    PART_ONE() {
+        return Constexpr::ToString(SolvePartOne(CopyToVector(Lines)));
     }
 
     PART_TWO() {
         const auto facingValues = 4;
-        auto cube = MakeCube(lines);
+        auto cube = MakeCube(Lines);
         //auto cube = MakeTestCube(lines);
         auto currentFace = CubeFace::Back;
         auto pos = RowCol{ 0, 0 };
         auto facing = Right;
-        auto path = SplitPath(ReadPath(lines));
+        auto path = SplitPath(ReadPath(Lines));
         u32 distance;
 
         for (auto cmd : path) {
@@ -582,7 +585,7 @@ SOLUTION(2022, 22) {
             "10R5L5R10L4R5L5"
         };
 
-        if (PartOne(lines) != "6032") return false;
+        if (SolvePartOne(lines) != 6032) return false;
         //if (PartTwo(lines) != "5031") return false;
 
         return true;

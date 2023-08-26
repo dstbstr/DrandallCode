@@ -41,14 +41,14 @@ SOLUTION(2019, 11) {
     }
 
     PART_ONE() {
-        auto instructions = ParseInstructions(lines[0]);
+        auto instructions = ParseInstructions(Line);
         auto painted = GetPainting(instructions, true);
 
         return Constexpr::ToString(painted.size());
     }
 
     PART_TWO() {
-        auto instructions = ParseInstructions(lines[0]);
+        auto instructions = ParseInstructions(Line);
         auto painted = GetPainting(instructions, false);
 
         Coord min, max;

@@ -4,7 +4,7 @@ SOLUTION(2019, 6) {
     using Map = Constexpr::SmallMap<std::string, std::string>;
     using Cache = Constexpr::SmallMap<std::string, u32>;
 
-    constexpr void BuildMap(const std::vector<std::string>&lines, Map & outMap, Constexpr::SmallSet<std::string>& outSet) {
+    constexpr void BuildMap(const auto& lines, Map & outMap, Constexpr::SmallSet<std::string>& outSet) {
         for (const auto& line : lines) {
             auto split = Constexpr::Split(line, ")");
             std::string lhs = std::string(split[0]);
@@ -29,7 +29,7 @@ SOLUTION(2019, 6) {
         return val;
     }
 
-    constexpr void BuildData(const std::vector<std::string>& lines, Map& outMap, Cache& outCache) {
+    constexpr void BuildData(const auto& lines, Map& outMap, Cache& outCache) {
         Constexpr::SmallSet<std::string> all;
         BuildMap(lines, outMap, all);
 
@@ -60,7 +60,7 @@ SOLUTION(2019, 6) {
     PART_ONE() {
         Map map;
         Cache cache;
-        BuildData(lines, map, cache);
+        BuildData(Lines, map, cache);
 
         auto vals = cache.GetValues();
         return Constexpr::ToString(std::accumulate(vals.begin(), vals.end(), 0));
@@ -69,7 +69,7 @@ SOLUTION(2019, 6) {
     PART_TWO() {
         Map map;
         Cache cache;
-        BuildData(lines, map, cache);
+        BuildData(Lines, map, cache);
         auto shared = FindCommonAncestor(map, cache, "YOU", "SAN");
 
         return Constexpr::ToString(cache.at("YOU") + cache.at("SAN") - (cache.at(shared) * 2) - 2);
@@ -91,8 +91,12 @@ SOLUTION(2019, 6) {
             "K)YOU",
             "I)SAN"
         };
-
-        if (PartTwo(lines) != "4") return false;
+        Map map;
+        Cache cache;
+        BuildData(lines, map, cache);
+        auto shared = FindCommonAncestor(map, cache, "YOU", "SAN");
+        if (cache.at("YOU") + cache.at("SAN") - (cache.at(shared) * 2) - 2 != 4) return false;
+        //if (PartTwo(lines) != "4") return false;
 
         return true;
     }

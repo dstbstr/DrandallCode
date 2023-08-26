@@ -52,7 +52,7 @@ SOLUTION(2020, 14) {
         UpdateFloaters(address, floating, memory, val);
     }
 
-    constexpr size_t ProcessLines(const std::vector<std::string>&lines, auto writeFunc) {
+    constexpr size_t Solve(const auto& lines, auto writeFunc) {
         size_t zeroMask = 0;
         size_t oneMask = 0;
         Memory memory{};
@@ -76,41 +76,13 @@ SOLUTION(2020, 14) {
         return result;
     }
 
-    bool RunTests() {
-        std::vector<std::string> lines = {
-            "mask = XXXXXXXXXXXXXXXXXXXXXXXXXXXXX1XXXX0X",
-            "mem[8] = 11",
-            "mem[7] = 101",
-            "mem[8] = 0"
-        };
-
-        if (ProcessLines(lines, Write) != 165) return false;
-
-        lines = {
-            "mask = 000000000000000000000000000000X1001X",
-            "mem[42] = 100",
-            "mask = 00000000000000000000000000000000X0XX",
-            "mem[26] = 1"
-        };
-        if (ProcessLines(lines, Write2) != 208) return false;
-
-        lines = {
-            "mask = 000000000000000000000000000000000XXX",
-            "mem[8] = 4",
-            "mask = XX0000000000000000000000000000000000",
-            "mem[0] = 5"
-        };
-        if (ProcessLines(lines, Write2) != 52) return false;
-
-        return true;
-    }
 
     PART_ONE() {
-        return Constexpr::ToString(ProcessLines(lines, Write));
+        return Constexpr::ToString(Solve(Lines, Write));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(ProcessLines(lines, Write2));
+        return Constexpr::ToString(Solve(Lines, Write2));
     }
 
     /*
@@ -140,7 +112,7 @@ SOLUTION(2020, 14) {
             "mem[8] = 0"
         };
 
-        if (ProcessLines(lines, Write) != 165) return false;
+        if (Solve(lines, Write) != 165) return false;
 
         lines = {
             "mask = 000000000000000000000000000000X1001X",
@@ -148,7 +120,7 @@ SOLUTION(2020, 14) {
             "mask = 00000000000000000000000000000000X0XX",
             "mem[26] = 1"
         };
-        if (ProcessLines(lines, Write2) != 208) return false;
+        if (Solve(lines, Write2) != 208) return false;
 
         lines = {
             "mask = 000000000000000000000000000000000XXX",
@@ -156,7 +128,7 @@ SOLUTION(2020, 14) {
             "mask = XX0000000000000000000000000000000000",
             "mem[0] = 5"
         };
-        if (ProcessLines(lines, Write2) != 52) return false;
+        if (Solve(lines, Write2) != 52) return false;
 
         return true;
     }

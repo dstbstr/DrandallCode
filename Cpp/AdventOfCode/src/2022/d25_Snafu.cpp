@@ -13,7 +13,7 @@ SOLUTION(2022, 25) {
 
     constexpr std::array<s64, 21> Powers = GetPowers<21>();
 
-    constexpr s64 FromSnafu(const std::string & value) {
+    constexpr s64 FromSnafu(std::string_view value) {
         s64 result = 0;
         u64 place = 1;
 
@@ -84,16 +84,18 @@ SOLUTION(2022, 25) {
         return result;
     }
 
-    PART_ONE() {
+    constexpr std::string SolvePartOne(const auto& lines) {
         u64 result = 0;
         for (const auto& line : lines) {
             result += FromSnafu(line);
         }
         return ToSnafu(result);
     }
+    PART_ONE() {
+        return SolvePartOne(Lines);
+    }
 
     PART_TWO() {
-        (void)lines;
         return "Merry Christmas!";
     }
 
@@ -130,7 +132,7 @@ SOLUTION(2022, 25) {
             "122"
         };
 
-        if (PartOne(lines) != "2=-1=0") return false;
+        if (SolvePartOne(lines) != "2=-1=0") return false;
 
         return true;
     }

@@ -8,7 +8,7 @@ SOLUTION(2019, 20) {
     using PortalMap = Constexpr::SmallMap<RowCol, RowCol>;
     using DistanceMap = Constexpr::SmallMap<RowCol, Constexpr::SmallMap<RowCol, size_t>>;
 
-    constexpr void ParseInput(const std::vector<std::string>&lines, WalkingMap & outWalkingMap, PortalMap & outPortalMap, RowCol & outEntrance, RowCol & outExit) {
+    constexpr void ParseInput(const auto& lines, WalkingMap & outWalkingMap, PortalMap & outPortalMap, RowCol & outEntrance, RowCol & outExit) {
         RowCol origin = { 0, 0 };
         std::array<RowCol, Constexpr::FromBase26("zz")> foundPortals{ origin };
         std::string key = "  ";
@@ -124,7 +124,7 @@ SOLUTION(2019, 20) {
         return result;
     }
 
-    constexpr size_t FindShortestPath(const DistanceMap & dMap, const PortalMap & portalMap, RowCol entrance, RowCol exit) {
+    constexpr size_t FindShortestPath(const DistanceMap & dMap, const PortalMap & portalMap, RowCol entrance, RowCol exit, RowCol) {
         struct State {
             RowCol Pos;
             size_t Steps;
@@ -222,7 +222,7 @@ SOLUTION(2019, 20) {
         return best - 1;
     }
 
-    PART_ONE() {
+    constexpr size_t Solve(const auto& lines, auto PathFinder) {
         PortalMap portalMap;
         WalkingMap walkingMap;
         RowCol entrance, exit;
@@ -231,19 +231,14 @@ SOLUTION(2019, 20) {
         RowCol limit = { lines.size(), lines[0].size() };
         auto dMap = BuildDistanceMap(portalMap, walkingMap, entrance, exit, limit);
 
-        return Constexpr::ToString(FindShortestPath(dMap, portalMap, entrance, exit));
+        return PathFinder(dMap, portalMap, entrance, exit, limit);
+    }
+    PART_ONE() {
+        return Constexpr::ToString(Solve(Lines, FindShortestPath));
     }
 
     PART_TWO() {
-        PortalMap portalMap;
-        WalkingMap walkingMap;
-        RowCol entrance, exit;
-        ParseInput(lines, walkingMap, portalMap, entrance, exit);
-
-        RowCol limit = { lines.size(), lines[0].size() };
-        auto dMap = BuildDistanceMap(portalMap, walkingMap, entrance, exit, limit);
-
-        return Constexpr::ToString(FindShortestRecursivePath(dMap, portalMap, entrance, exit, limit));
+        return Constexpr::ToString(Solve(Lines, FindShortestRecursivePath));
     }
 
     TESTS() {
@@ -269,7 +264,7 @@ SOLUTION(2019, 20) {
            "             Z     ",
         };
 
-        if (PartOne(lines) != "23") return false;
+        if (Solve(lines, FindShortestPath) != 23) return false;
 
         lines = {
             "                   A               ",
@@ -311,7 +306,7 @@ SOLUTION(2019, 20) {
             "           U   P   P               ",
         };
 
-        if (PartOne(lines) != "58") return false;
+        if (Solve(lines, FindShortestPath) != 58) return false;
 
         lines = {
     "             Z L X W       C                 ",
@@ -353,7 +348,7 @@ SOLUTION(2019, 20) {
     "               A A D   M                     "
         };
 
-        if (PartTwo(lines) != "396") return false;
+        if (Solve(lines, FindShortestRecursivePath) != 396) return false;
 
         return true;
     }

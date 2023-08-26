@@ -8,7 +8,7 @@ SOLUTION(2021, 11) {
 
     using Grid = std::vector<std::vector<Octo>>;
 
-    std::vector<Octo> ParseLine(const std::string& line) {
+    std::vector<Octo> ParseLine(std::string_view line) {
         std::vector<Octo> result;
         for (auto c : line) {
             result.push_back({ static_cast<size_t>(c - '0') });
@@ -52,7 +52,7 @@ SOLUTION(2021, 11) {
         return result;
     }
 
-    constexpr void Solve(const std::vector<std::string>& lines, auto IsDone) {
+    constexpr void Solve(const auto& lines, auto IsDone) {
         auto grid = ParseLines(lines, ParseLine);
         while(true) {
             Next(grid);
@@ -60,7 +60,7 @@ SOLUTION(2021, 11) {
         }
     }
 
-    PART_ONE() {
+    constexpr size_t SolvePartOne(const auto& lines) {
         size_t step = 0;
         size_t result = 0;
         Solve(lines, [&](size_t r) {
@@ -68,16 +68,23 @@ SOLUTION(2021, 11) {
             step++;
             return step == 100;
             });
-        return Constexpr::ToString(result);
+        return result;
     }
 
-    PART_TWO() {
+    PART_ONE() {
+        return Constexpr::ToString(SolvePartOne(Lines));
+    }
+
+    constexpr size_t SolvePartTwo(const auto& lines) {
         size_t step = 0;
         Solve(lines, [&](size_t r) {
             step++;
             return r == 100;
             });
-        return Constexpr::ToString(step);
+        return step;
+    }
+    PART_TWO() {
+        return Constexpr::ToString(SolvePartTwo(Lines));
     }
 
     TESTS() {
@@ -94,8 +101,8 @@ SOLUTION(2021, 11) {
             "5283751526"
         };
 
-        if (PartOne(lines) != "1656") return false;
-        if (PartTwo(lines) != "195") return false;
+        if (SolvePartOne(lines) != 1656) return false;
+        if (SolvePartTwo(lines) != 195) return false;
         return true;
     }
 }

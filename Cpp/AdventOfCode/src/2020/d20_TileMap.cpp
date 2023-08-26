@@ -25,7 +25,7 @@ SOLUTION(2020, 20) {
         tile.EdgeCounts[Right] = lastCol;
     }
 
-    constexpr Tile ParseTile(const std::vector<std::string>&lines) {
+    constexpr Tile ParseTile(const auto& lines) {
         Tile result;
         Constexpr::ParseNumber(lines[0].substr(5, 4), result.Id);
         for (auto row = 1; row < lines.size(); row++) {
@@ -337,7 +337,7 @@ SOLUTION(2020, 20) {
         return result;
     }
 
-    PART_ONE() {
+    constexpr size_t SolvePartOne(const auto& lines) {
         auto groups = SplitInputIntoGroups(lines);
         Constexpr::SmallMap<size_t, Tile> tiles;
         for (const auto& group : groups) {
@@ -352,10 +352,14 @@ SOLUTION(2020, 20) {
                 result *= id;
             }
         }
-        return Constexpr::ToString(result);
+        return result;
     }
 
-    PART_TWO() {
+    PART_ONE() {
+        return Constexpr::ToString(SolvePartOne(Lines));
+    }
+
+    constexpr size_t SolvePartTwo(const auto& lines) {
         auto groups = SplitInputIntoGroups(lines);
         TileMap tiles;
         for (const auto& group : groups) {
@@ -379,7 +383,10 @@ SOLUTION(2020, 20) {
         auto compressedImage = CompressImage(tileGrid);
         auto mask = FindSeaMonsters(compressedImage);
 
-        return Constexpr::ToString(CalculateRoughness(compressedImage, mask));
+        return CalculateRoughness(compressedImage, mask);
+    }
+    PART_TWO() {
+        return Constexpr::ToString(SolvePartTwo(Lines));
     }
 
     TESTS() {
@@ -493,8 +500,8 @@ SOLUTION(2020, 20) {
             "..#.###..."
         };
 
-        if (PartOne(lines) != "20899048083289") return false;
-        if (PartTwo(lines) != "273") return false;
+        if (SolvePartOne(lines) != 20899048083289) return false;
+        if (SolvePartTwo(lines) != 273) return false;
         return true;
     }
 }

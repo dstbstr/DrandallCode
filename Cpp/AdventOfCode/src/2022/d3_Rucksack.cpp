@@ -10,7 +10,7 @@ SOLUTION(2022, 3) {
         }
     }
 
-    constexpr char FindDuplicate(const std::string & line) {
+    constexpr char FindDuplicate(std::string_view line) {
         for (auto i = 0; i < line.size() / 2; i++) {
             for (auto j = line.size() / 2; j < line.size(); j++) {
                 if (line[i] == line[j]) {
@@ -21,7 +21,7 @@ SOLUTION(2022, 3) {
         return '_';
     }
 
-    constexpr char FindBadge(const std::string & first, const std::string & second, const std::string & third) {
+    constexpr char FindBadge(std::string_view first, std::string_view second, std::string_view third) {
         for (auto c = 'a'; c <= 'z'; c++) {
             if (std::find(first.begin(), first.end(), c) != first.end()) {
                 if (std::find(second.begin(), second.end(), c) != second.end()) {
@@ -46,15 +46,15 @@ SOLUTION(2022, 3) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(std::accumulate(lines.begin(), lines.end(), 0u, [](u32 prev, const std::string& line) {
+        return Constexpr::ToString(std::accumulate(Lines.begin(), Lines.end(), 0u, [](u32 prev, std::string_view line) {
             return prev + GetLetterValue(FindDuplicate(line));
             }));
     }
 
     PART_TWO() {
         u32 result = 0;
-        for (auto i = 0; i < lines.size(); i += 3) {
-            result += GetLetterValue(FindBadge(lines[i], lines[i + 1], lines[i + 2]));
+        for (auto i = 0; i < Lines.size(); i += 3) {
+            result += GetLetterValue(FindBadge(Lines[i], Lines[i + 1], Lines[i + 2]));
         }
 
         return Constexpr::ToString(result);

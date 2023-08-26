@@ -6,7 +6,7 @@ SOLUTION(2020, 21) {
         std::vector<std::string> Allergens;
     };
 
-    constexpr Food ParseFood(const std::string & line) {
+    constexpr Food ParseFood(std::string_view line) {
         auto s1 = Constexpr::Split(line, "(contains ");
         auto s2 = Constexpr::Split(s1[0], " ");
         auto s3 = Constexpr::Split(s1[1], ", ");
@@ -64,7 +64,7 @@ SOLUTION(2020, 21) {
         return allergens;
     }
 
-    PART_ONE() {
+    constexpr size_t SolvePartOne(const auto& lines) {
         auto foods = ParseLines(lines, ParseFood);
         auto allergens = FindAllergens(foods);
 
@@ -80,10 +80,13 @@ SOLUTION(2020, 21) {
             }
         }
 
-        return Constexpr::ToString(result);
+        return result;
+    }
+    PART_ONE() {
+        return Constexpr::ToString(SolvePartOne(Lines));
     }
 
-    PART_TWO() {
+    constexpr std::string SolvePartTwo(const auto& lines) {
         auto foods = ParseLines(lines, ParseFood);
         auto allergens = FindAllergens(foods);
 
@@ -108,6 +111,9 @@ SOLUTION(2020, 21) {
         std::string result = Constexpr::JoinVec(',', dangerous);
         return result;
     }
+    PART_TWO() {
+        return SolvePartTwo(Lines);
+    }
 
     TESTS() {
         std::vector<std::string> lines = {
@@ -117,8 +123,8 @@ SOLUTION(2020, 21) {
             "sqjhc mxmxvkd sbzzf(contains fish)"
         };
 
-        if (PartOne(lines) != "5") return false;
-        if (PartTwo(lines) != "mxmxvkd,sqjhc,fvjkl") return false;
+        if (SolvePartOne(lines) != 5) return false;
+        if (SolvePartTwo(lines) != "mxmxvkd,sqjhc,fvjkl") return false;
 
         return true;
     }

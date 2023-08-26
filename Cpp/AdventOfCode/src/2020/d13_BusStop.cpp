@@ -1,7 +1,7 @@
 #include "2020/d13_BusStop.h"
 
 SOLUTION(2020, 13) {
-    PART_ONE() {
+    constexpr size_t SolvePartOne(const auto & lines) {
         size_t earliestTime;
         Constexpr::ParseNumber(lines[0], earliestTime);
         std::vector<size_t> values;
@@ -23,7 +23,11 @@ SOLUTION(2020, 13) {
             }
         }
 
-        return Constexpr::ToString(result);
+        return result;
+    }
+
+    PART_ONE() {
+        return Constexpr::ToString(SolvePartOne(Lines));
     }
 
     //77 % 7 == 0
@@ -33,7 +37,7 @@ SOLUTION(2020, 13) {
     //168 % 7 == 0
     //168 % 13 == 12
 
-    PART_TWO() {
+    constexpr size_t SolvePartTwo(const auto& lines) {
         auto split = Constexpr::Split(lines[1], ",");
         size_t jump;
         Constexpr::ParseNumber(split[0], jump);
@@ -49,8 +53,11 @@ SOLUTION(2020, 13) {
             }
             jump *= val;
         }
+        return result;
+    }
 
-        return Constexpr::ToString(result);
+    PART_TWO() {
+        return Constexpr::ToString(SolvePartTwo(Lines));
     }
 
     TESTS() {
@@ -59,8 +66,8 @@ SOLUTION(2020, 13) {
            "7,13,x,x,59,x,31,19"
         };
 
-        if (PartOne(lines) != "295") return false;
-        if (PartTwo(lines) != "1068781") return false;
+        if (SolvePartOne(lines) != 295) return false;
+        if (SolvePartTwo(lines) != 1068781) return false;
         
         return true;
     }

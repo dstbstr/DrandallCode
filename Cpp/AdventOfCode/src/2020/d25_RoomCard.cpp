@@ -30,12 +30,11 @@ SOLUTION(2020, 25) {
 
 
     PART_ONE() {
-        auto values = ParseLinesAsNumbers<size_t>(lines);
+        auto values = ParseLinesAsNumbers<size_t>(Lines);
         return Constexpr::ToString(Decrypt(values[0], values[1]));
     }
 
     PART_TWO() {
-        (void)lines;
         return "Merry Christmas";
     }
 

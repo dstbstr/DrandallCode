@@ -13,7 +13,7 @@ SOLUTION(2018, 17) {
         size_t EndY{ 0 };
     };
 
-    constexpr Wall ParseWall(const std::string & line) {
+    constexpr Wall ParseWall(std::string_view line) {
         auto split = Constexpr::Split(line, ", ");
         auto lhs = Constexpr::Split(split[0], "=");
         auto rhs = Constexpr::Split(split[1], "=");
@@ -36,7 +36,7 @@ SOLUTION(2018, 17) {
         return wall;
     }
 
-    constexpr void InitMap(const std::vector<std::string>&lines, Map & outMap) {
+    constexpr void InitMap(const auto& lines, Map & outMap) {
         for (auto& row : outMap) {
             std::fill(row.begin(), row.end(), '.');
         }
@@ -84,7 +84,7 @@ SOLUTION(2018, 17) {
         GET_LOGS().push_back(lines);
     }
 
-    constexpr auto Solve(const std::vector<std::string>&lines) {
+    constexpr auto Solve(const auto& lines) {
         auto* mapPtr = new Map();
         auto& map = *mapPtr;
 
@@ -173,13 +173,13 @@ SOLUTION(2018, 17) {
 
 
     PART_ONE() {
-        auto [lhs, rhs] = Solve(lines);
+        auto [lhs, rhs] = Solve(Lines);
 
         return Constexpr::ToString(lhs + rhs);
     }
 
     PART_TWO() {
-        auto [lhs, rhs] = Solve(lines);
+        auto [lhs, rhs] = Solve(Lines);
 
         return Constexpr::ToString(lhs);
     }
@@ -196,8 +196,9 @@ SOLUTION(2018, 17) {
             "y=13, x=498..504"
         };
 
-        if (PartOne(lines) != "57") return false;
-        if (PartTwo(lines) != "29") return false;
+        auto [lhs, rhs] = Solve(lines);
+        if (lhs != 29) return false;
+        if (rhs != 28) return false;
         
         lines = {
             "x=499, y=3..4",
@@ -208,7 +209,9 @@ SOLUTION(2018, 17) {
             "x=506, y=6..8"
         };
 
-        if (PartOne(lines) != "53") return false;
+        auto [lhs2, rhs2] = Solve(lines);
+        if (lhs2 + rhs2 != 53) return false;
+
         return true;
     }
 }

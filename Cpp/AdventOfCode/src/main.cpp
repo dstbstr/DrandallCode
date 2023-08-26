@@ -18,6 +18,8 @@
 Log::MinimalStdOutLogWriter logWriter{};
 using TimingEntry = std::pair<std::string, std::chrono::microseconds>;
 
+enum struct Visibility { Hide, Show };
+
 std::vector<std::string> ReadInputFile(size_t year, size_t day) {
     std::vector<std::string> result{};
     auto targetFile = std::filesystem::current_path() / "Inputs" / ToString(year) / ("d" + ToString(day) + ".txt");
@@ -34,7 +36,7 @@ std::vector<std::string> ReadInputFile(size_t year, size_t day) {
     return result;
 }
 
-bool Check(size_t year, size_t day, std::vector<TimingEntry>& timingData, bool hideOutput = false) {
+bool Check(size_t year, size_t day, std::vector<TimingEntry>& timingData, Visibility visibility = Visibility::Show) {
     if (!GetTests().contains(year) || !GetTests()[year].contains(day)) {
         return true;
     }
@@ -45,20 +47,20 @@ bool Check(size_t year, size_t day, std::vector<TimingEntry>& timingData, bool h
         };
 
     if (auto testTime = ScopedTimer(GatherTiming, "Test Time"); GetTests()[year][day]()) {
-        if(!hideOutput) std::cout << "Test Pass\n";
+        if(visibility == Visibility::Show) std::cout << "Test Pass\n";
         return true;
     }
     else {
-        if(!hideOutput) std::cout << "Test Fail. :(\n";
+        if(visibility == Visibility::Show) std::cout << "Test Fail. :(\n";
         return false;
     }
 }
 
-std::vector<TimingEntry> RunOne(size_t year, size_t day, bool hideOutput = false) {
-    if (!hideOutput) std::cout << "### " << year << " Day " << day << "###\n";
+std::vector<TimingEntry> RunOne(size_t year, size_t day, Visibility visibility = Visibility::Show) {
+    if (visibility == Visibility::Show) std::cout << "### " << year << " Day " << day << "###\n";
     std::vector<TimingEntry> timingData;
 
-    if (!Check(year, day, timingData, hideOutput)) return timingData;
+    if (!Check(year, day, timingData, visibility)) return timingData;
 
     //const auto lines = ReadInputFile(year, day);
     for (const auto& [part, func] : GetSolutions()[year][day]) {
@@ -66,10 +68,13 @@ std::vector<TimingEntry> RunOne(size_t year, size_t day, bool hideOutput = false
             auto key = Constexpr::ToString(year) + "/" + Constexpr::ToString(day) + ":" + Constexpr::ToString(part);
             timingData.push_back(std::make_pair(key, elapsed));
             };
-        auto partTime = ScopedTimer(GatherTiming);
-        //auto result = func(lines);
-        auto result = func();
-        if (!hideOutput) {
+        std::string result;
+        {
+            auto partTime = ScopedTimer(GatherTiming);
+            //auto result = func(lines);
+            result = func();
+        }
+        if (visibility == Visibility::Show) {
             std::cout << "Part " << part << ": " << result << "\n";
 
             if (!GET_LOGS().empty()) {
@@ -79,12 +84,11 @@ std::vector<TimingEntry> RunOne(size_t year, size_t day, bool hideOutput = false
             }
         }
     }
-    if (!hideOutput) {
+    if (visibility == Visibility::Show) {
         std::cout << "\n";
     }
 
     return timingData;
-
 }
 
 std::vector<TimingEntry> RunTasks(const TaskQueue<std::vector<TimingEntry>>& tasks) {
@@ -98,19 +102,40 @@ std::vector<TimingEntry> RunTasks(const TaskQueue<std::vector<TimingEntry>>& tas
 std::vector<TimingEntry> RunYear(size_t year) {
     auto tasks = TaskQueue<std::vector<TimingEntry>>{};
     for (const auto& [day, part] : GetSolutions()[year]) {
-        tasks.push([=]() { return RunOne(year, day, true); });
+        tasks.push([=]() { return RunOne(year, day, Visibility::Hide); });
     }
     return RunTasks(tasks);
+}
+
+std::vector<TimingEntry> RunYearSync(size_t year) {
+    std::vector<TimingEntry> result;
+    for (const auto& [day, parts] : GetSolutions()[year]) {
+        auto timings = RunOne(year, day, Visibility::Show);
+        std::copy(timings.begin(), timings.end(), std::back_inserter(result));
+    }
+    return result;
 }
 
 std::vector<TimingEntry> RunAll() {
     auto tasks = TaskQueue<std::vector<TimingEntry>>{};
     for (const auto& [year, days] : GetSolutions()) {
         for (const auto& [day, parts] : days) {
-            tasks.push([=]() { return RunOne(year, day, true); });
+            tasks.push([=]() { return RunOne(year, day, Visibility::Hide); });
         }
     }
     return RunTasks(tasks);
+}
+
+std::vector<TimingEntry> RunAllSync() {
+    std::vector<TimingEntry> result;
+    for (const auto& [year, days] : GetSolutions()) {
+        for (const auto& [day, parts] : days) {
+            auto timings = RunOne(year, day, Visibility::Show);
+            std::copy(timings.begin(), timings.end(), std::back_inserter(result));
+        }
+    }
+
+    return result;
 }
 
 void PrintTimings(std::vector<TimingEntry> timings, size_t maxResults = 0, std::chrono::microseconds minElapsed = std::chrono::microseconds(0)) {
@@ -126,10 +151,42 @@ void PrintTimings(std::vector<TimingEntry> timings, size_t maxResults = 0, std::
 }
 //maybe look closer at this for more shenanigans: https://stackoverflow.com/questions/410980/include-a-text-file-in-a-c-program-as-a-char
 
-int main(int, char**) {
+void RunFromCommandLine(int argc, char** argv) {
+    std::vector<TimingEntry> timings;
+    if (argv[1][0] == '*') {
+        timings = RunAll();
+    }
+    else {
+        size_t year;
+        Constexpr::ParseNumber(argv[1], year);
+        if (argc > 2) {
+            if (argv[2][0] == '*') {
+                timings = RunYear(year);
+            }
+            else {
+                size_t day;
+                Constexpr::ParseNumber(argv[2], day);
+                timings = RunOne(year, day);
+            }
+        }
+        else {
+            timings = RunYear(year);
+        }
+    }
+    PrintTimings(timings);
+}
+
+int main(int argc, char** argv) {
+    if (argc > 1) {
+        RunFromCommandLine(argc, argv);
+        return 0;
+    }
+
+
+    //auto timings = RunAllSync();
     //auto timings = RunAll();
-    //auto timings = RunYear(2022);
-    auto timings = RunOne(2015, 1);
+    auto timings = RunYearSync(2020);
+    //auto timings = RunOne(2019, 20);
 
     //PrintTimings(0, std::chrono::seconds(1));
     PrintTimings(timings);

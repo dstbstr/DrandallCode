@@ -11,7 +11,7 @@ SOLUTION(2019, 3) {
         }
     };
 
-    constexpr std::vector<Segment> GetSegments(const std::string& line) {
+    constexpr std::vector<Segment> GetSegments(std::string_view line) {
         std::vector<Segment> result;
         auto s = Constexpr::Split(line, ",");
         Vec3<s64> pos;
@@ -52,7 +52,7 @@ SOLUTION(2019, 3) {
         return { v.Start.X, h.Start.Y, lhs + rhs };
     }
 
-    constexpr void Solve(const std::vector<std::string>& lines, auto OnIntersect) {
+    constexpr void Solve(const auto& lines, auto OnIntersect) {
         auto w1 = GetSegments(lines[0]);
         auto w2 = GetSegments(lines[1]);
 
@@ -67,7 +67,7 @@ SOLUTION(2019, 3) {
     }
     PART_ONE() {
         size_t best = 9999;
-        Solve(lines, [&](const Segment& s1, const Segment& s2) {
+        Solve(Lines, [&](const Segment& s1, const Segment& s2) {
             auto intersection = FindIntersection(s1, s2);
             auto dist = MDistance(intersection);
             if (dist > 0) best = std::min(best, dist);
@@ -79,7 +79,7 @@ SOLUTION(2019, 3) {
 
     PART_TWO() {
         s64 best = 999999;
-        Solve(lines, [&](const Segment& s1, const Segment& s2) {
+        Solve(Lines, [&](const Segment& s1, const Segment& s2) {
             auto intersection = FindIntersection2(s1, s2);
             if (intersection.X != 0 || intersection.Y != 0) {
                 best = std::min(best, intersection.Z);

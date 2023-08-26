@@ -50,6 +50,15 @@ struct Coord {
         Coord result{ X, Y };
         return result -= c;
     }
+    constexpr Coord& operator*=(s64 v) {
+        X *= v;
+        Y *= v;
+        return *this;
+    }
+    constexpr Coord operator*(s64 v) {
+        Coord result{ X, Y };
+        return result *= v;
+    }
 
     friend std::ostream& operator<<(std::ostream& stream, const Coord& coord) {
         stream << "{" << coord.X << "," << coord.Y << "}";

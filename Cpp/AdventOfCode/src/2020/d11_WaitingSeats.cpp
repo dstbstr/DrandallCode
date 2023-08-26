@@ -4,7 +4,7 @@ SOLUTION(2020, 11) {
     enum struct State { Floor, Empty, Occupied };
 
     using Grid = std::vector<std::vector<State>>;
-    constexpr Grid ParseInput(const std::vector<std::string>&lines) {
+    constexpr Grid ParseInput(const auto& lines) {
         Grid result;
 
         for (const auto& line : lines) {
@@ -111,7 +111,7 @@ SOLUTION(2020, 11) {
             });
     }
 
-    constexpr size_t Solve(const std::vector<std::string>& lines, auto NextFunc) {
+    constexpr size_t Solve(const auto& lines, auto NextFunc) {
         auto grid = ParseInput(lines);
         while (true) {
             auto next = NextFunc(grid);
@@ -123,11 +123,11 @@ SOLUTION(2020, 11) {
 
     }
     PART_ONE() {
-        return Constexpr::ToString(Solve(lines, Next));
+        return Constexpr::ToString(Solve(Lines, Next));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(Solve(lines, Next2));
+        return Constexpr::ToString(Solve(Lines, Next2));
     }
 
     TESTS() {
@@ -144,8 +144,8 @@ SOLUTION(2020, 11) {
            "L.LLLLL.LL"
         };
 
-        if (PartOne(lines) != "37") return false;
-        if (PartTwo(lines) != "26") return false;
+        if (Solve(lines, Next) != 37) return false;
+        if (Solve(lines, Next2) != 26) return false;
         
         return true;
     }

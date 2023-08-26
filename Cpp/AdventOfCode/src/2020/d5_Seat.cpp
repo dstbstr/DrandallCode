@@ -1,7 +1,7 @@
 #include "2020/d5_Seat.h"
 
 SOLUTION(2020, 5) {
-    constexpr RowCol FindSeat(const std::string & pass) {
+    constexpr RowCol FindSeat(std::string_view pass) {
         //F = Lower
         //B = Upper
         //L = Lower
@@ -27,18 +27,18 @@ SOLUTION(2020, 5) {
         return (seat.Row * 8) + seat.Col;
     }
 
-    constexpr std::vector<size_t> GetSeatIds(const std::vector<std::string>& lines) {
+    constexpr std::vector<size_t> GetSeatIds(const auto& lines) {
         std::vector<size_t> result;
-        std::transform(lines.begin(), lines.end(), std::back_inserter(result), [](const std::string& line) { return GetId(FindSeat(line)); });
+        std::transform(lines.begin(), lines.end(), std::back_inserter(result), [](std::string_view line) { return GetId(FindSeat(line)); });
         return result;
     }
     PART_ONE() {
-        auto seatIds = GetSeatIds(lines);
+        auto seatIds = GetSeatIds(Lines);
         return Constexpr::ToString(*std::max_element(seatIds.begin(), seatIds.end()));
     }
 
     PART_TWO() {
-        auto seatIds = GetSeatIds(lines);
+        auto seatIds = GetSeatIds(Lines);
         std::sort(seatIds.begin(), seatIds.end());
         for (size_t i = 0; i < seatIds.size() - 1; i++) {
             if (seatIds[i] + 1 != seatIds[i + 1]) {

@@ -5,7 +5,7 @@ SOLUTION(2019, 8) {
     using Layer = std::array<std::array<u32, Cols>, Rows>;
 
     template<size_t Rows, size_t Cols>
-    constexpr std::vector<Layer<Rows, Cols>> BuildLayers(const std::string & line) {
+    constexpr std::vector<Layer<Rows, Cols>> BuildLayers(std::string_view line) {
         auto layerSize = Rows * Cols;
         std::vector<Layer<Rows, Cols>> result;
 
@@ -30,7 +30,7 @@ SOLUTION(2019, 8) {
     }
 
     PART_ONE() {
-        auto layers = BuildLayers<6, 25>(lines[0]);
+        auto layers = BuildLayers<6, 25>(Line);
 
         size_t best = 999;
         size_t result = 0;
@@ -46,7 +46,7 @@ SOLUTION(2019, 8) {
     }
 
     PART_TWO() {
-        auto layers = BuildLayers<6, 25>(lines[0]);
+        auto layers = BuildLayers<6, 25>(Line);
 
         Layer<6, 25> image{};
         for (auto& r : image) {

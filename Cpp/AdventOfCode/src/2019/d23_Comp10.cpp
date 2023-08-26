@@ -26,7 +26,7 @@ SOLUTION(2019, 23) {
         return NeedsInput(computer.Instructions, computer.Args);
     }
 
-    constexpr std::vector<Computer> InitializeComputers(const std::string & line) {
+    constexpr std::vector<Computer> InitializeComputers(std::string_view line) {
         auto instructions = ParseInstructions(line);
         Args args;
         std::vector<Computer> result;
@@ -99,7 +99,7 @@ SOLUTION(2019, 23) {
     }
 
     PART_ONE() {
-        auto computers = InitializeComputers(lines[0]);
+        auto computers = InitializeComputers(Line);
         Packet packet;
         while (true) {
             for (auto& computer : computers) {
@@ -123,7 +123,7 @@ SOLUTION(2019, 23) {
     }
 
     PART_TWO() {
-        auto computers = InitializeComputers(lines[0]);
+        auto computers = InitializeComputers(Line);
         u32 emptyFrames = 0;
         Packet packet;
         while (true) {

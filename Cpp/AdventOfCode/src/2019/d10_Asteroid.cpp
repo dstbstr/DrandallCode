@@ -10,7 +10,7 @@ SOLUTION(2019, 10) {
     using Map = std::vector<Coord>;
     using VisibilityMap = Constexpr::SmallMap<Coord, Constexpr::SmallMap<Coord, bool>>;
 
-    constexpr Map ParseMap(const std::vector<std::string>&lines) {
+    constexpr Map ParseMap(const auto& lines) {
         Map result;
         for (s32 row = 0; row < lines.size(); row++) {
             for (s32 col = 0; col < lines[row].size(); col++) {
@@ -83,13 +83,13 @@ SOLUTION(2019, 10) {
     }
 
     PART_ONE() {
-        auto map = ParseMap(lines);
+        auto map = ParseMap(Lines);
         auto targets = FindMostTargets(map);
         return Constexpr::ToString(targets.size());
     }
 
     PART_TWO() {
-        auto map = ParseMap(lines);
+        auto map = ParseMap(Lines);
         auto targets = FindMostTargets(map);
         std::sort(targets.begin(), targets.end());
 
@@ -98,6 +98,12 @@ SOLUTION(2019, 10) {
     }
 
     TESTS() {
+        auto TestPartOne = [](const auto& lines, size_t expected) {
+            auto map = ParseMap(lines);
+            auto targets = FindMostTargets(map);
+            return targets.size() == expected;
+            };
+
         std::vector<std::string> lines = {
             ".#..#",
             ".....",
@@ -106,7 +112,7 @@ SOLUTION(2019, 10) {
             "...##"
         };
         
-        if (PartOne(lines) != "8") return false;
+        if (!TestPartOne(lines, 8)) return false;
 
         lines = {
             "......#.#.",
@@ -120,7 +126,7 @@ SOLUTION(2019, 10) {
             "##...#..#.",
             ".#....####"
         };
-        if (PartOne(lines) != "33") return false;
+        if (!TestPartOne(lines, 33)) return false;
 
         lines = {
             "#.#...#.#.",
@@ -134,7 +140,7 @@ SOLUTION(2019, 10) {
             "......#...",
             ".####.###."
         };
-        if (PartOne(lines) != "35") return false;
+        if (!TestPartOne(lines, 35)) return false;
 
         lines = {
             ".#..#..###",
@@ -148,7 +154,7 @@ SOLUTION(2019, 10) {
             ".##...##.#",
             ".....#.#.."
         };
-        if (PartOne(lines) != "41") return false;
+        if (!TestPartOne(lines, 41)) return false;
 
         lines = {
             ".#..##.###...#######",
@@ -173,7 +179,7 @@ SOLUTION(2019, 10) {
             "###.##.####.##.#..##"
         };
 
-        if (PartOne(lines) != "210") return false;
+        if (!TestPartOne(lines, 210)) return false;
         //if (PartTwo(lines) != "802") return false;
 
         return true;

@@ -76,7 +76,7 @@ constexpr std::vector<std::vector<std::string>> SplitInputIntoGroups(const auto&
 template<size_t LineCount>
 constexpr std::array<std::string_view, LineCount> SplitInputIntoLines(const std::string_view& input) {
     std::array<std::string_view, LineCount> result{};
-    auto s = Constexpr::Split(input, "\n");
+    auto s = Constexpr::Split(input, "\n", true);
     for (size_t i = 0; i < LineCount && i < s.size(); i++) {
         result[i] = s[i];
     }
@@ -194,9 +194,9 @@ struct TestRegistrar {
 #define TESTS() constexpr bool Tests()
 
 #define DECLARE_SOLUTION(_year, _day, _input) \
-    constexpr std::string_view Line = _input; \
-    constexpr auto Lines = SplitInputIntoLines<std::count(Line.begin(), Line.end(), '\n')>(Line); \
     SOLUTION(_year, _day) { \
+    constexpr std::string_view Line = _input; \
+    constexpr auto Lines = SplitInputIntoLines<std::count(Line.begin(), Line.end(), '\n') + 1>(Line); \
     PART_ONE(); \
     PART_TWO(); \
     TESTS(); \

@@ -65,7 +65,7 @@ SOLUTION(2019, 12) {
         return potential * kinetic;
     }
 
-    constexpr Moon ParseMoon(const std::string& line) {
+    constexpr Moon ParseMoon(std::string_view line) {
         auto split = Constexpr::Split(line, ", ");
         Moon moon;
         auto x = Constexpr::Split(split[0], "=")[1];
@@ -81,7 +81,7 @@ SOLUTION(2019, 12) {
     }
 
     PART_ONE() {
-        auto moons = ParseLines(lines, ParseMoon);
+        auto moons = ParseLines(Lines, ParseMoon);
         for (u32 i = 0; i < 1000; i++) {
             Tick(moons);
         }
@@ -90,7 +90,7 @@ SOLUTION(2019, 12) {
     }
 
     PART_TWO() {
-        auto moons = ParseLines(lines, ParseMoon);
+        auto moons = ParseLines(Lines, ParseMoon);
         u64 step = 0;
 
         u64 pX = 0;

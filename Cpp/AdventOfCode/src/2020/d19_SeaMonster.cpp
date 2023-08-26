@@ -4,7 +4,7 @@
 SOLUTION(2020, 19) {
     using Entries = Constexpr::SmallMap<std::string, std::vector<std::string>>;
 
-    constexpr Entries ParseEntries(const std::vector<std::string>&lines) {
+    constexpr Entries ParseEntries(const auto& lines) {
         Entries result;
         for (const auto& line : lines) {
             auto s1 = Constexpr::Split(line, ": ");
@@ -63,14 +63,6 @@ SOLUTION(2020, 19) {
                 else {
                     std::vector<std::string> choices;
                     std::string thirtyOne = Recurse("31", entries, cache);
-                    /*
-                    for (auto i = 0; i < 4; i++) {
-                        std::string choice = "(" + fortyTwo + "){" + Constexpr::ToString(i) + "}";
-                        choice += "(" + fortyTwo + thirtyOne + ")";
-                        choice += "(" + thirtyOne + "){" + Constexpr::ToString(i) + "}";
-                        choices.push_back(choice);
-                    }
-                    */
                     for (auto i = 0; i < 4; i++) {
                         std::string choice;
                         for (auto j = 0; j < i; j++) {
@@ -116,26 +108,22 @@ SOLUTION(2020, 19) {
         return Recurse("0", entries, cache);
     }
 
-    constexpr size_t Solve(const std::vector<std::string>& lines, bool isPartTwo) {
+    constexpr size_t Solve(const auto& lines, bool isPartTwo) {
         auto groups = SplitInputIntoGroups(lines);
         auto rules = ParseRules(groups[0], isPartTwo);
 
-        //std::regex re = std::regex("^" + rules + "$");
         Constexpr::Regex::Re re(rules);
         return std::count_if(groups[1].begin(), groups[1].end(), [&](const std::string& line) {
             return re.Matches(line);
-            //return std::regex_match(line, re);
-            //return Constexpr::Matches(line, rules);
-            //return line.size() > 0;
             });
-
     }
+
     PART_ONE() {
-        return Constexpr::ToString(Solve(lines, false));
+        return Constexpr::ToString(Solve(Lines, false));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(Solve(lines, true));
+        return Constexpr::ToString(Solve(Lines, true));
     }
 
     TESTS() {

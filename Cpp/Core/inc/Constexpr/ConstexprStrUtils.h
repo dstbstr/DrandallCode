@@ -42,13 +42,13 @@ namespace Constexpr {
         return std::string(val);
     }
 
-    constexpr std::vector<std::string_view> Split(std::string_view input, std::string_view delimiter) {
+    constexpr std::vector<std::string_view> Split(std::string_view input, std::string_view delimiter, bool keepEmpties = false) {
         size_t last = 0;
         size_t next = 0;
         std::vector<std::string_view> result;
 
         while ((next = input.find(delimiter, last)) != std::string::npos) {
-            if (next - last > 0) {
+            if (keepEmpties || next - last > 0) {
                 result.push_back(input.substr(last, next - last));
             }
             last = next + delimiter.size();
@@ -140,8 +140,20 @@ namespace Constexpr {
         return result;
     }
 
+    constexpr std::string RemoveAllOfCopy(std::string_view original, char toFind) {
+        auto result = std::string(original);
+        RemoveAllOf(result, toFind);
+        return result;
+    }
+
     constexpr std::string RemoveAllOfCopy(const std::string& original, const std::string& toFind) {
         std::string result = original;
+        RemoveAllOf(result, toFind);
+        return result;
+    }
+
+    constexpr std::string RemoveAllOfCopy(std::string_view original, const std::string& toFind) {
+        auto result = std::string(original);
         RemoveAllOf(result, toFind);
         return result;
     }

@@ -3,7 +3,7 @@
 SOLUTION(2021, 6) {
     using Fish = std::array<size_t, 9>;
 
-    constexpr Fish GetInitialFish(const std::string & line) {
+    constexpr Fish GetInitialFish(std::string_view line) {
         auto nums = ParseLineAsNumbers<size_t>(line);
         Fish result{};
         for (auto num : nums) {
@@ -22,7 +22,7 @@ SOLUTION(2021, 6) {
         fish = next;
     }
 
-    constexpr auto Solve(const std::string & line, size_t days) {
+    constexpr auto Solve(std::string_view line, size_t days) {
         auto fish = GetInitialFish(line);
         for (auto day = 0; day < days; day++) {
             NextDay(fish);
@@ -32,11 +32,11 @@ SOLUTION(2021, 6) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(Solve(lines[0], 80));
+        return Constexpr::ToString(Solve(Line, 80));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(Solve(lines[0], 256));
+        return Constexpr::ToString(Solve(Line, 256));
     }
 
     constexpr bool TestNextDay() {
@@ -53,7 +53,6 @@ SOLUTION(2021, 6) {
         if (fish != Fish{ 0, 0, 0, 1, 1, 3, 2, 2, 1 }) return false;
         return true;
     }
-
    
     TESTS() {
         static_assert(TestNextDay());

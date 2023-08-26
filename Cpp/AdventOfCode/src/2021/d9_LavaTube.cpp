@@ -2,7 +2,7 @@
 #include "Algorithms/FloodFill.h"
 
 SOLUTION(2021, 9) {
-    std::vector<u32> ParseLine(const std::string & line) {
+    std::vector<u32> ParseLine(std::string_view line) {
         std::vector<u32> result;
         for (auto c : line) {
             result.push_back(c - '0');
@@ -10,7 +10,7 @@ SOLUTION(2021, 9) {
         return result;
     }
 
-    PART_ONE() {
+    constexpr size_t SolvePartOne(const auto& lines) {
         RowCol limits = { lines.size() - 1, lines[0].size() - 1 };
         size_t result = 0;
         auto nums = ParseLines(lines, ParseLine);
@@ -28,10 +28,13 @@ SOLUTION(2021, 9) {
             }
         }
 
-        return Constexpr::ToString(result);
+        return result;
+    }
+    PART_ONE() {
+        return Constexpr::ToString(SolvePartOne(Lines));
     }
 
-    PART_TWO() {
+    constexpr size_t SolvePartTwo(const auto& lines) {
         RowCol limits = { lines.size() - 1, lines[0].size() - 1 };
         auto nums = ParseLines(lines, ParseLine);
         std::vector<size_t> sizes;
@@ -43,7 +46,7 @@ SOLUTION(2021, 9) {
                 return nums[neighbor.Row][neighbor.Col] != 9;
                 });
             return result;
-        };
+            };
 
         for (size_t row = 0; row < nums.size(); row++) {
             for (size_t col = 0; col < nums[row].size(); col++) {
@@ -64,7 +67,11 @@ SOLUTION(2021, 9) {
             result *= sizes.back();
             sizes.pop_back();
         }
-        return Constexpr::ToString(result);
+        return result;
+    }
+    
+    PART_TWO() {
+        return Constexpr::ToString(SolvePartTwo(Lines));
     }
 
     TESTS() {
@@ -76,8 +83,8 @@ SOLUTION(2021, 9) {
             "9899965678"
         };
 
-        if (PartOne(lines) != "15") return false;
-        if (PartTwo(lines) != "1134") return false;
+        if (SolvePartOne(lines) != 15) return false;
+        if (SolvePartTwo(lines) != 1134) return false;
         return true;
     }
 }
