@@ -12,7 +12,7 @@ SOLUTION(2022, 16) {
     template<size_t RoomCount, typename TDistance>
     struct State {
         std::vector<Room> Rooms{};
-        std::unordered_map<std::string, size_t> IndexMap{};
+        Constexpr::SmallMap<std::string, size_t> IndexMap{};
 
         std::array<std::array<TDistance, RoomCount>, RoomCount> DistanceMap{};
     };
@@ -24,40 +24,19 @@ SOLUTION(2022, 16) {
         room.Name = std::string(s[1]);
         
         auto flowRate = Constexpr::Split(s[4], "=")[1];
+        flowRate = flowRate.substr(0, flowRate.size() - 1); //remove semi-colon
         Constexpr::ParseNumber(flowRate, room.FlowRate);
 
-        for (size_t i = 9; i < s.size(); i++) {
+        for (size_t i = 9; i < s.size() - 1; i++) {
             room.Connections.push_back(std::string(s[i].substr(0, s[i].size() - 1)));
         }
 
+        room.Connections.push_back(std::string(s.back()));
         return room;
     }
-    /*
-    std::vector<Room> ParseRoomList(const auto& lines) {
-        static const auto re = std::regex(R"(Valve (\w+) has flow rate=(\d+); tunnels? leads? to valves? ([\w, ]+))");
-        std::smatch match;
-        std::vector<Room> rooms;
 
-        for (const auto& line : lines) {
-            std::regex_search(line, match, re);
-            Room room;
-            room.Name = match[1].str();
-            Constexpr::ParseNumber(match[2].str(), room.FlowRate);
-            auto tunnels = match[3].str();
-            auto split = StrUtil::Split(tunnels, ", ");
-            for (auto connection : split) {
-                room.Connections.push_back(std::string(connection));
-            }
-
-            rooms.push_back(room);
-        }
-
-        return rooms;
-    }
-    */
-
-    std::unordered_map<std::string, size_t> GetIndexMap(const std::vector<Room>&rooms) {
-        std::unordered_map<std::string, size_t> indexMap;
+    constexpr Constexpr::SmallMap<std::string, size_t> GetIndexMap(const std::vector<Room>&rooms) {
+        Constexpr::SmallMap<std::string, size_t> indexMap;
 
         for (size_t i = 0; i < rooms.size(); i++) {
             indexMap[rooms.at(i).Name] = i;
@@ -67,7 +46,7 @@ SOLUTION(2022, 16) {
     }
 
     template<size_t Verts, typename TDistance>
-    constexpr std::array<std::array<TDistance, Verts>, Verts> GetDistanceMap(const std::vector<Room>&rooms, const std::unordered_map<std::string, size_t>&indexMap) {
+    constexpr std::array<std::array<TDistance, Verts>, Verts> GetDistanceMap(const std::vector<Room>&rooms, const Constexpr::SmallMap<std::string, size_t>&indexMap) {
         std::array<std::array<TDistance, Verts>, Verts> result;
 
         for (size_t i = 0; i < Verts; i++) {
@@ -93,16 +72,16 @@ SOLUTION(2022, 16) {
     }
 
     template<size_t RoomCount, typename TDistance>
-    State<RoomCount, TDistance> ParseState(const auto& lines) {
+    constexpr State<RoomCount, TDistance> ParseState(const auto& lines) {
         State<RoomCount, TDistance> state;
-        //state.Rooms = ParseRoomList(lines);
         state.Rooms = ParseLines(lines, ParseRoom);
         auto allIndexes = GetIndexMap(state.Rooms);
         state.DistanceMap = GetDistanceMap<RoomCount, TDistance>(state.Rooms, allIndexes);
 
         for (const auto& [name, index] : allIndexes) {
             if (state.Rooms[index].FlowRate > 0 || name == "AA") {
-                state.IndexMap.insert({ name, index });
+                //state.IndexMap.insert({ name, index });
+                state.IndexMap[name] = index;
             }
         }
 

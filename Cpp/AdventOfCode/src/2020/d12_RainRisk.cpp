@@ -45,14 +45,6 @@ SOLUTION(2020, 12) {
         in.Y = -in.Y;
     }
 
-    constexpr void ApplyDirection(Coord& pos, s32 val, Cmd op) {
-        switch (op) {
-        case Cmd::North: pos.Y -= val; return;
-        case Cmd::South: pos.Y += val; return;
-        case Cmd::East: pos.X += val; return;
-        case Cmd::West: pos.X -= val; return;
-        }
-    }
     constexpr void Apply(const Instruction& instruction, Coord& pos, Coord& wayPoint, Coord& toUpdate) {
         auto val = instruction.Value;
         switch (instruction.Op) {
@@ -64,75 +56,6 @@ SOLUTION(2020, 12) {
 
         if (instruction.Op == Cmd::Forward) {
             pos += (wayPoint * val);
-        }
-
-        if (instruction.Op == Cmd::Left) {
-            switch (val) {
-            case 90: TurnLeft(wayPoint); return;
-            case 180: TurnAround(wayPoint); return;
-            case 270: TurnRight(wayPoint); return;
-            }
-        }
-
-        if (instruction.Op == Cmd::Right) {
-            switch (val) {
-            case 90: TurnRight(wayPoint); return;
-            case 180: TurnAround(wayPoint); return;
-            case 270: TurnLeft(wayPoint); return;
-            }
-        }
-
-        throw "Unhandled instruction op";
-    }
-    /*
-    constexpr void ApplyInstruction(const Instruction & instruction, Facing & facing, Coord & pos) {
-        auto val = instruction.Value;
-        switch (instruction.Op) {
-        case Cmd::North: pos.Y -= val; return;
-        case Cmd::South: pos.Y += val; return;
-        case Cmd::East: pos.X += val; return;
-        case Cmd::West: pos.X -= val; return;
-        }
-
-        if (instruction.Op == Cmd::Forward) {
-            switch (facing) {
-            case Facing::Up: pos.Y -= val; return;
-            case Facing::Down: pos.Y += val; return;
-            case Facing::Left: pos.X -= val; return;
-            case Facing::Right: pos.X += val; return;
-            }
-        }
-
-        if (instruction.Op == Cmd::Left) {
-            switch (val) {
-            case 90: facing = TurnLeft(facing); return;
-            case 180: facing = TurnAround(facing); return;
-            case 270: facing = TurnRight(facing); return;
-            }
-        }
-
-        if (instruction.Op == Cmd::Right) {
-            switch (val) {
-            case 90: facing = TurnRight(facing); return;
-            case 180: facing = TurnAround(facing); return;
-            case 270: facing = TurnLeft(facing); return;
-            }
-        }
-
-        throw "Unhandled instruction op";
-    }
-
-    constexpr void ApplyInstruction2(const Instruction & instruction, Coord & pos, Coord & wayPoint) {
-        auto val = instruction.Value;
-        switch (instruction.Op) {
-        case Cmd::North: wayPoint.Y -= val; return;
-        case Cmd::South: wayPoint.Y += val; return;
-        case Cmd::West: wayPoint.X -= val; return;
-        case Cmd::East: wayPoint.X += val; return;
-        }
-
-        if (instruction.Op == Cmd::Forward) {
-            pos += wayPoint * val;
             return;
         }
 
@@ -154,7 +77,6 @@ SOLUTION(2020, 12) {
 
         throw "Unhandled instruction op";
     }
-    */
 
     constexpr size_t Solve(const auto& lines, Coord& wayPoint, Coord& pos, Coord& toUpdate) {
         const auto instructions = ParseLines(lines, ParseInstruction);
@@ -169,31 +91,9 @@ SOLUTION(2020, 12) {
         Coord pos{ 0, 0 };
         auto result = Solve(Lines, wayPoint, pos, pos);
         return Constexpr::ToString(result);
-        /*
-        auto facing = Facing::Right;
-        Coord pos = { 0, 0 };
-        const auto instructions = ParseLines(Lines, ParseInstruction);
-
-        for (const auto& instruction : instructions) {
-            ApplyInstruction(instruction, facing, pos);
-        }
-
-        return Constexpr::ToString(MDistance(pos));
-        */
     }
 
     PART_TWO() {
-        /*
-        Coord pos = { 0, 0 };
-        Coord wayPoint = { 10, -1 };
-        const auto instructions = ParseLines(Lines, ParseInstruction);
-
-        for (const auto& instruction : instructions) {
-            ApplyInstruction2(instruction, pos, wayPoint);
-        }
-
-        return Constexpr::ToString(MDistance(pos));
-        */
         Coord wayPoint{ 10, -1 };
         Coord pos{ 0, 0 };
         auto result = Solve(Lines, wayPoint, pos, wayPoint);
@@ -232,9 +132,6 @@ SOLUTION(2020, 12) {
         pos = { 0, 0 };
         wayPoint = { 10, -1 };
         if (Solve(lines, wayPoint, pos, wayPoint) != 286) return false;
-
-        //if (PartOne(lines) != "25") return false;
-        //if (PartTwo(lines) != "286") return false;
 
         return true;
     }

@@ -161,7 +161,7 @@ void RunFromCommandLine(int argc, char** argv) {
         Constexpr::ParseNumber(argv[1], year);
         if (argc > 2) {
             if (argv[2][0] == '*') {
-                timings = RunYear(year);
+                timings = RunYearSync(year);
             }
             else {
                 size_t day;
@@ -170,7 +170,7 @@ void RunFromCommandLine(int argc, char** argv) {
             }
         }
         else {
-            timings = RunYear(year);
+            timings = RunYearSync(year);
         }
     }
     PrintTimings(timings);
@@ -185,8 +185,8 @@ int main(int argc, char** argv) {
 
     //auto timings = RunAllSync();
     //auto timings = RunAll();
-    auto timings = RunYearSync(2020);
-    //auto timings = RunOne(2019, 20);
+    //auto timings = RunYearSync(2020);
+    auto timings = RunOne(2022, 16);
 
     //PrintTimings(0, std::chrono::seconds(1));
     PrintTimings(timings);
