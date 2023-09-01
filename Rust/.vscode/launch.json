@@ -7,15 +7,15 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'hello_cargo'",
+            "name": "Debug executable 'rust_aoc'",
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=hello_cargo",
-                    "--package=hello_cargo"
+                    "--bin=rust_aoc",
+                    "--package=rust_aoc"
                 ],
                 "filter": {
-                    "name": "hello_cargo",
+                    "name": "rust_aoc",
                     "kind": "bin"
                 }
             },
@@ -25,16 +25,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'hello_cargo'",
+            "name": "Debug unit tests in executable 'rust_aoc'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
-                    "--bin=hello_cargo",
-                    "--package=hello_cargo"
+                    "--bin=rust_aoc",
+                    "--package=rust_aoc"
                 ],
                 "filter": {
-                    "name": "hello_cargo",
+                    "name": "rust_aoc",
                     "kind": "bin"
                 }
             },
