@@ -1,6 +1,7 @@
 use std::fmt;
 
 //#[derive(Debug)]
+#[derive(Hash, Eq, PartialEq, Clone, Copy)]
 pub struct Coord {
     pub x: i64,
     pub y: i64

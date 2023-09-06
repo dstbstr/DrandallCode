@@ -1,107 +1,103 @@
-//use std::io;
-//use std::cmp::Ordering;
 use std::env;
 use std::fs;
 use std::process;
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
+use std::error::Error;
+use std::time::Instant;
 
-//use rust_core;
-//use rust_core::geometry::Coord as Coord;
+use std::collections::HashMap;
+
+mod year_2015;
+
+type Solutions = HashMap<i32, HashMap<i32, HashMap<i32, fn(&Vec<String>)->String>>>;
 
 fn main() {
+    //let solutions = HashMap<i32, HashMap<i32, HashMap<i32, fn(&Vec<String>)->String>>>::new();
+    let mut solutions: Solutions = HashMap::new();
+    year_2015::add_solutions(&mut solutions);
+
     let args: Vec<String> = env::args().collect();
     if args.len() > 1 {
-        run_from_command_line(args);
+        if let Err(e) = run_from_command_line(args, &solutions) {
+            println!("Error: {e}");
+            process::exit(1);
+        }
         return;
     }
 
     //run_all();
     //run_year(2015);
-    run_one(2015, 1);
-
-    // let result = rust_core::add(2, 3);
-    // println!("Add: {result}");
-
-    // let coord = Coord::new(4, 2);
-    // println!("Coord {}", coord);
-
-    // let coord2 = Coord::from_str("5,3");
-    // println!("Coord2 {}", coord2);
+    if let Err(e) = run_one(2015, 1, &solutions) {
+        println!("Error: {e}");
+        process::exit(1);
+    }
 }
 
-fn run_from_command_line(args: Vec<String>) {
+fn run_from_command_line(args: Vec<String>, solutions: &Solutions) -> Result<(), Box<dyn Error>> {
     if args[1] == "*" {
-        //println!("Run All");
-        run_all();
+        run_all(solutions)
     } else {
         let year: i32 = args[1].parse().expect("Failed to parse year");
         if args.len() == 2 {
-            //println!("Run Year {}", year);
-            run_year(year);
+            run_year(year, solutions)
         }
         else if args[2] == "*" {
-            //println!("Run Year {}", year);
-            run_year(year);
+            run_year(year, solutions)
         } else {
             let day: i32 = args[2].parse().expect("Failed to parse day");
-            //println!("Run One {} {}", year, day);
-            run_one(year, day);
+            run_one(year, day, solutions)
         }
     }
 }
 
-fn run_all() {
+fn run_all(solutions: &Solutions) -> Result<(), Box<dyn Error>> {
+    for (year, _) in solutions {
+        run_year(*year, solutions)?;
+    }
     //for year in years
     //run_year(year);
+    Ok(())
 }
 
-fn run_year(year: i32) {
-    //for day in days[year]
-    //run_one(year, day);
-    run_one(year, 1);
+fn run_year(year: i32, solutions: &Solutions) -> Result<(), Box<dyn Error>> {
+    for(day, _) in solutions.get(&year).unwrap() {
+        run_one(year, *day, solutions)?;
+    }
+    Ok(())
 }
 
-fn run_one(year: i32, day: i32) {
+fn run_one(year: i32, day: i32, solutions: &Solutions) -> Result<(), Box<dyn Error>> {
+    let file = get_file_name(year, day)?;
+    let lines = read_input_file(&file)?;
+
     println!("### {} {} ###", year, day);
+
+    for(part, func) in solutions.get(&year).unwrap().get(&day).unwrap() {
+        let now = Instant::now();
+        println!("Part {part}: {}", func(&lines));
+        println!("Elapsed Time: {:?}", now.elapsed());
+    }
+    Ok(())
+}
+
+fn get_file_name(year: i32, day: i32) -> Result<PathBuf, Box<dyn Error>> {
     let mut buffer = [0; 2];
     let day_string = String::from("d") + &day.to_string() + &String::from(".txt");
     let file = [".", "rust_aoc", "inputs", &year.to_string(), &day_string].join(std::path::MAIN_SEPARATOR.encode_utf8(&mut buffer));
-    let path = Path::new(&file);
+    let mut result = env::current_dir()?;
 
-    let file_content: String = match fs::read_to_string(&path) {
+    result.push(PathBuf::from(file.strip_prefix(".").unwrap().strip_prefix(std::path::MAIN_SEPARATOR).unwrap()));
+    Ok(result)
+}
+
+fn read_input_file(file_name: &PathBuf) -> Result<Vec<String>, Box<dyn Error>> {
+    let file_content: String = match fs::read_to_string(&file_name) {
+        Ok(result) => result,
         Err(..) => {
-            let mut absolute = env::current_dir().expect("");
-            absolute.push(PathBuf::from(file.strip_prefix(".\\").expect("")));
-            println!("Failed to find {:?}", absolute);
+            println!("Failed to find {:?}", &file_name);
             process::exit(1);
-        },
-        Ok(content) => content
+        }
     };
-    let lines = file_content.lines();
 
-    //let mut lines: Vec<String>;
-    //read_input_file(year, day, &mut lines);
-    //let lines = read_input_file(year, day);
-    for line in lines {
-        dbg!(&line);
-    }
+    return Ok(file_content.lines().map(str::to_string).collect());
 }
-
-/*
-fn read_input_file<>(year: i32, day: i32, out_lines: &mut Vec<String>){
-    let file = format!("/inputs/{}/d{}.txt", year, day);
-    
-    //let result = std::str::Lines::new();
-    for line in fs::read_to_string(file).expect("Failed to locate input file {file}").lines() {
-        //result.push(line);
-        out_lines.push(String::from_str(line));
-    }
-    //return result;
-    
-    //out_lines = fs::read_to_string(file).expect("Failed to locate input file {file}").lines();
-}
-*/
-//fn read_input_file(year: i32, day: i32) -> String::Lines<String> {
-//    let file = format!("/inputs/{}/d{}.txt", year, day);
-//    fs::read_to_string(file).expect("Failed to locate input file {file}").lines().clone()
-//}

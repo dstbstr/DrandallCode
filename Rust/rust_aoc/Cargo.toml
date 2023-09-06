@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 rust_core = { path = "../rust_core" }
+md5 = "0.7"
