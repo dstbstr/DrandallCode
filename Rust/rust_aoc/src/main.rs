@@ -27,7 +27,7 @@ fn main() {
 
     //run_all();
     //run_year(2015);
-    if let Err(e) = run_one(2015, 1, &solutions) {
+    if let Err(e) = run_one(2015, 7, &solutions) {
         println!("Error: {e}");
         process::exit(1);
     }
