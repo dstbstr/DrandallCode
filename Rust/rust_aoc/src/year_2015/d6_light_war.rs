@@ -109,7 +109,7 @@ mod tests {
 
     #[test]
     fn part_one_tests() {
-        let lines = vec!["turn on 0,0 through 1,1", "toggle1,1 through 2,2"].iter().map(|s| String::from(*s)).collect();
+        let lines = vec!["turn on 0,0 through 1,1", "toggle 1,1 through 2,2"].iter().map(|s| String::from(*s)).collect();
         assert_eq!(part_one(&lines), "6");
     }
 }

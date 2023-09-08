@@ -87,35 +87,3 @@ fn parse_entry(line: &str) -> Entry {
     let s: Vec<&str> = line.split(" -> ").collect();
     Entry{parts: s[0].split(" ").collect(), output: s[1]}
 }
-/*
-fn parse_input(lines: &Vec<String>) -> HashMap<&str, String> {
-    lines.iter().map(|l| { 
-        let s: Vec<&str> = l.split(" -> ").collect();
-        (s[0], s[1].to_string())
-    }).collect()
-}
-
-fn get_value(in_str: &str, mapping: &mut HashMap<&str, String>) -> u16 {
-    if mapping.contains_key(in_str) {
-        resolve(in_str, mapping);
-        return mapping.get(in_str).unwrap().parse::<u16>().unwrap();
-    }
-    in_str.parse::<u16>().unwrap()
-}
-
-fn resolve(key: &str, mapping: &mut HashMap<&str, String>) {
-    let s: Vec<String> = mapping.get(key).unwrap().split(" ").map(|s| String::from(s)).collect();
-    //let s: Vec<&str> = expr.split(" ").collect();
-    match s.len() {
-        1 => {
-            let new_val = get_value(&s[0], mapping);
-            mapping.insert(key, new_val.to_string());
-        },
-        2 => {
-            let new_val = !get_value(&s[1], mapping);
-            mapping.insert(key, new_val.to_string());
-        },
-        _ => panic!("Unexpected number of args")
-    };
-}
-*/
