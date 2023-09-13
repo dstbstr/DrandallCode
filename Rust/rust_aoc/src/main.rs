@@ -8,6 +8,7 @@ use std::time::Instant;
 use std::collections::HashMap;
 
 mod year_2015;
+mod input_utils;
 
 type Solutions = HashMap<i32, HashMap<i32, HashMap<i32, fn(&Vec<String>)->String>>>;
 
