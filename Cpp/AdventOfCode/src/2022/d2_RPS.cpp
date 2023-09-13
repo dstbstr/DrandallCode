@@ -84,28 +84,23 @@ SOLUTION(2022, 2) {
         player = WhatToPlay(opponent, targetOutcome);
     }
 
-    PART_ONE() {
+    constexpr u32 Solve(const auto& lines, auto InputFunc) {
         u32 result = 0;
-        for (auto line : Lines) {
+        for (auto line : lines) {
             Play opponent;
             Play player;
-            ParseInput(line, opponent, player);
+            InputFunc(line, opponent, player);
             result += GetPoints(player, opponent);
         }
 
-        return Constexpr::ToString(result);
+        return result;
+    }
+    PART_ONE() {
+        return Constexpr::ToString(Solve(Lines, ParseInput));
     }
 
     PART_TWO() {
-        u32 result = 0;
-        for (auto line : Lines) {
-            Play opponent;
-            Play player;
-            ParseUpdatedInput(line, opponent, player);
-            result += GetPoints(player, opponent);
-        }
-
-        return Constexpr::ToString(result);
+        return Constexpr::ToString(Solve(Lines, ParseUpdatedInput));
     }
 
     TESTS() {

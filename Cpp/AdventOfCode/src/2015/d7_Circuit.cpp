@@ -66,7 +66,7 @@ SOLUTION(2015, 7) {
     PART_TWO() {
         auto partOneResult = Solve(Lines);
 
-        auto copy = Lines;
+        auto copy = CopyToVector(Lines);
         for (auto& line : copy) {
             if (line.substr(line.size() - 4) == "-> b") {
                 line = partOneResult + " -> b";

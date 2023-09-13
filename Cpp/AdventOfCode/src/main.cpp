@@ -186,7 +186,7 @@ int main(int argc, char** argv) {
     //auto timings = RunAllSync();
     //auto timings = RunAll();
     //auto timings = RunYearSync(2020);
-    auto timings = RunOne(2022, 16);
+    auto timings = RunOne(2015, 5);
 
     //PrintTimings(0, std::chrono::seconds(1));
     PrintTimings(timings);

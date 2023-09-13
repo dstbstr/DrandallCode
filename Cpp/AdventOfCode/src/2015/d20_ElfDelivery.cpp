@@ -18,7 +18,7 @@ SOLUTION(2015, 20) {
         return std::accumulate(keep.cbegin(), keep.cend(), 0) * 11;
     }
 
-    constexpr u32 Solve(std::string_view line, auto func, u32 hint) {
+    constexpr u32 Solve(std::string_view line, auto func, u32 hint = 0) {
         u32 target;
         Constexpr::ParseNumber(line, target);
         u32 current = hint;
@@ -29,16 +29,16 @@ SOLUTION(2015, 20) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(Solve(Line, CountPresents, 700000));
+        return Constexpr::ToString(Solve(Line, CountPresents, 700'000));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(Solve(Line, CountLazyPresents, 800000));
+        return Constexpr::ToString(Solve(Line, CountLazyPresents, 800'000));
     }
     TESTS() {
         static_assert(CountPresents(1) == 10);
         static_assert(CountPresents(2) == 30);
-        static_assert(CountPresents(786240) >= 34000000);
+        static_assert(CountPresents(786240) >= 34'000'000);
 
         static_assert(CountLazyPresents(1) == 11);
         static_assert(CountLazyPresents(2) == 33);
