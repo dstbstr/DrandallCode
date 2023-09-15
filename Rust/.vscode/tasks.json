@@ -8,24 +8,7 @@
 				"kind": "build",
 				"isDefault": true
 			},
-			"command": "cargo build",
-			//"problemMatcher": ["$rustc"]
+			"command": "cargo build; cargo build --release",
 		}
 	]
-	/*
-	"tasks": [
-		{
-			"type": "cargo",
-			"subcommand": "build",
-			"problemMatcher": [
-				"$rustc"
-			],
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			},
-			"label": "Rust Debug"
-		}
-	]
-	*/
 }

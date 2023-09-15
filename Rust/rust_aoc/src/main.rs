@@ -13,25 +13,28 @@ mod input_utils;
 type Solutions = HashMap<i32, HashMap<i32, HashMap<i32, fn(&Vec<String>)->String>>>;
 
 fn main() {
-    //let solutions = HashMap<i32, HashMap<i32, HashMap<i32, fn(&Vec<String>)->String>>>::new();
-    let mut solutions: Solutions = HashMap::new();
+    let mut solutions: Solutions = Solutions::new();
     year_2015::add_solutions(&mut solutions);
 
     let args: Vec<String> = env::args().collect();
+    let now = Instant::now();
+
     if args.len() > 1 {
         if let Err(e) = run_from_command_line(args, &solutions) {
             println!("Error: {e}");
             process::exit(1);
         }
-        return;
+        
+    } else {
+        //run_all();
+        //run_year(2015);
+        if let Err(e) = run_one(2015, 23, &solutions, true) {
+            println!("Error: {e}");
+            process::exit(1);
+        }
     }
-
-    //run_all();
-    //run_year(2015);
-    if let Err(e) = run_one(2015, 23, &solutions) {
-        println!("Error: {e}");
-        process::exit(1);
-    }
+    println!("");
+    println!("Total Elapsed Time: {:?}", now.elapsed());
 }
 
 fn run_from_command_line(args: Vec<String>, solutions: &Solutions) -> Result<(), Box<dyn Error>> {
@@ -46,7 +49,7 @@ fn run_from_command_line(args: Vec<String>, solutions: &Solutions) -> Result<(),
             run_year(year, solutions)
         } else {
             let day: i32 = args[2].parse().expect("Failed to parse day");
-            run_one(year, day, solutions)
+            run_one(year, day, solutions, true)
         }
     }
 }
@@ -55,28 +58,33 @@ fn run_all(solutions: &Solutions) -> Result<(), Box<dyn Error>> {
     for (year, _) in solutions {
         run_year(*year, solutions)?;
     }
-    //for year in years
-    //run_year(year);
     Ok(())
 }
 
 fn run_year(year: i32, solutions: &Solutions) -> Result<(), Box<dyn Error>> {
     for(day, _) in solutions.get(&year).unwrap() {
-        run_one(year, *day, solutions)?;
+        run_one(year, *day, solutions, false)?;
     }
     Ok(())
 }
 
-fn run_one(year: i32, day: i32, solutions: &Solutions) -> Result<(), Box<dyn Error>> {
+fn run_one(year: i32, day: i32, solutions: &Solutions, show_output: bool) -> Result<(), Box<dyn Error>> {
     let file = get_file_name(year, day)?;
     let lines = read_input_file(&file)?;
 
-    println!("### {} {} ###", year, day);
+    if show_output {
+        println!("### {} {} ###", year, day);
+    }
 
     for(part, func) in solutions.get(&year).unwrap().get(&day).unwrap() {
-        let now = Instant::now();
-        println!("Part {part}: {}", func(&lines));
-        println!("Elapsed Time: {:?}", now.elapsed());
+        if show_output {
+            let now = Instant::now();
+            println!("Part {part}: {}", func(&lines));
+            println!("Elapsed Time: {:?}", now.elapsed());
+        }
+        else {
+            func(&lines);
+        }
     }
     Ok(())
 }
