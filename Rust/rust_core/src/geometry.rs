@@ -33,6 +33,14 @@ impl Coord {
         }
         result
     }
+
+    pub fn mdistance_origin(&self) -> isize {
+        self.x.abs() + self.y.abs()
+    }
+
+    pub fn mdistance(&self, other: &Coord) -> isize {
+        self.x.abs_diff(other.x) as isize + self.y.abs_diff(other.y) as isize
+    }
 }
 
 impl fmt::Display for Coord {
@@ -119,6 +127,31 @@ impl UCoord {
             y: split.next().expect("Missing Y").parse().expect("Failed to parse value"),
         }
     }
+
+    pub fn get_direct_neighbors(&self) -> Vec<UCoord> {
+        vec![UCoord::new(self.x - 1, self.y), UCoord::new(self.x + 1, self.y), UCoord::new(self.x, self.y -1), UCoord::new(self.x, self.y + 1)]
+    }
+    pub fn get_all_neighbors(&self) -> Vec<UCoord> {
+        let mut result: Vec<UCoord> = Vec::new();
+        for x in self.x - 1..=self.x + 1 {
+            for y in self.y - 1..=self.y + 1 {
+                let c = UCoord::new(x, y);
+                if c != *self {
+                    result.push(c);
+                }
+            }
+        }
+        result
+    }
+
+    pub fn mdistance_origin(&self) -> usize {
+        self.x + self.y
+    }
+
+    pub fn mdistance(&self, other: &UCoord) -> usize {
+        self.x.abs_diff(other.x) + self.y.abs_diff(other.y) 
+    }
+
 }
 
 impl fmt::Display for UCoord {

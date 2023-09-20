@@ -24,6 +24,16 @@ where T: FromStr, <T as FromStr>::Err: Debug {
     lines.iter().map(|s| s.parse::<T>().expect("Failed to parse number")).collect::<Vec<T>>()
 }
 
+pub fn parse_line_as_numbers<T>(line: &str, delimiter: Option<&str>) -> Vec<T> 
+where T: FromStr, <T as FromStr>::Err: Debug {
+    match delimiter {
+        Some(d) => line.split(d),
+        None => line.split(",")
+    }.filter(|s| !s.is_empty())
+    .map(|d| d.parse::<T>().expect("Failed to parse number"))
+    .collect::<Vec<T>>()
+}
+
 pub fn get_numbers_from_string<T>(line: &str) -> Vec<T> 
 where T: FromStr, <T as FromStr>::Err: Debug {
     let re = Regex::new(r#"(-?\d+)"#).unwrap();

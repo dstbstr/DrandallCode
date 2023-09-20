@@ -10,12 +10,14 @@ use std::thread;
 
 mod input_utils;
 mod year_2015;
+mod year_2016;
 
 type Solutions = HashMap<i32, HashMap<i32, HashMap<i32, fn(&Vec<String>) -> String>>>;
 
 fn main() {
     let mut solutions: Solutions = Solutions::new();
     year_2015::add_solutions(&mut solutions);
+    year_2016::add_solutions(&mut solutions);
 
     let args: Vec<String> = env::args().collect();
     let now = Instant::now();
@@ -25,7 +27,7 @@ fn main() {
     } else {
         //run_all();
         //run_year(2015);
-        run_one(2015, 23, &solutions);
+        run_one(2016, 3, &solutions);
     }
     println!("");
     println!("Total Elapsed Time: {:?}", now.elapsed());
@@ -92,7 +94,7 @@ fn run_one(year: i32, day: i32, solutions: &Solutions) {
     let file = get_file_name(year, day);
     let lines = read_input_file(file);
 
-        println!("### {} {} ###", year, day);
+    println!("### {} {} ###", year, day);
 
     for (part, func) in solutions.get(&year).unwrap().get(&day).unwrap() {
             let now = Instant::now();
