@@ -54,10 +54,13 @@ fn count_rounds(attacker: &Player, defender: &Player) -> i32 {
 }
 
 fn get_builds() -> Vec<Player> {
-    let weapons: Vec<Equipment> = [(8, 4, 0), (10, 5, 0), (25, 6, 0), (40, 7, 0), (74, 8, 0)].iter().map(|v| Equipment::new(v.0, v.1, v.2)).collect();
-    let armors: Vec<Equipment> = [(0, 0, 0), (13, 0, 1), (31, 0, 2), (53, 0, 3), (75, 0, 4), (102, 0, 5)].iter().map(|v| Equipment::new(v.0, v.1, v.2)).collect();
-    let rings: Vec<Equipment> = [(0, 0, 0), (0, 0, 0), (25, 1, 0), (50, 2, 0), (100, 3, 0), (20, 0, 1), (40, 0, 2), (80, 0, 3)].iter().map(|v| Equipment::new(v.0, v.1, v.2)).collect();
-
+    //let weapons: Vec<Equipment> = [(8, 4, 0), (10, 5, 0), (25, 6, 0), (40, 7, 0), (74, 8, 0)].iter().map(|v| Equipment::new(v.0, v.1, v.2)).collect();
+    //let armors: Vec<Equipment> = [(0, 0, 0), (13, 0, 1), (31, 0, 2), (53, 0, 3), (75, 0, 4), (102, 0, 5)].iter().map(|v| Equipment::new(v.0, v.1, v.2)).collect();
+    //let rings: Vec<Equipment> = [(0, 0, 0), (0, 0, 0), (25, 1, 0), (50, 2, 0), (100, 3, 0), (20, 0, 1), (40, 0, 2), (80, 0, 3)].iter().map(|v| Equipment::new(v.0, v.1, v.2)).collect();
+    let weapons: Vec<Equipment> = [(5, 4, 0), (8, 5, 0), (20, 6, 0), (50, 7, 0), (80, 8, 0)].iter().map(|v| Equipment::new(v.0, v.1, v.2)).collect();
+    let armors: Vec<Equipment> = [(0, 0, 0), (10, 0, 1), (25, 0, 2), (55, 0, 3), (80, 0, 4), (105, 0, 5)].iter().map(|v| Equipment::new(v.0, v.1, v.2)).collect();
+    let rings: Vec<Equipment> = [(0, 0, 0), (0, 0, 0), (30, 1, 0), (60, 2, 0), (110, 3, 0), (25, 0, 1), (50, 0, 2), (100, 0, 3)].iter().map(|v| Equipment::new(v.0, v.1, v.2)).collect();
+    
     iproduct!(&weapons, &armors, &rings, &rings)
     .filter(|(_, _, r1, r2) | r1 != r2)
     .map(|(w, a, r1, r2)| Player::from_equipment(&vec![&w, &a, &r1, &r2]))
