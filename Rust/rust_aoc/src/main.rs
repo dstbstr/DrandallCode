@@ -27,7 +27,7 @@ fn main() {
     } else {
         //run_all();
         //run_year(2015);
-        run_one(2016, 5, &solutions);
+        run_one(2016, 8, &solutions);
     }
     println!("");
     println!("Total Elapsed Time: {:?}", now.elapsed());
