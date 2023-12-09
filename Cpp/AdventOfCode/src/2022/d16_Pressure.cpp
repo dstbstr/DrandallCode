@@ -186,11 +186,11 @@ SOLUTION(2022, 16) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(FindBestSolo<51, u8>(Lines));
+        return Constexpr::ToString(FindBestSolo<51, u8>(lines));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(FindBestPair<51, u8>(Lines));
+        return Constexpr::ToString(FindBestPair<51, u8>(lines));
     }
 
     TESTS() {

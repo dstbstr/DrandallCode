@@ -52,14 +52,14 @@ SOLUTION(2018, 20) {
         return result;
     }
     PART_ONE() {
-        auto result = Solve(Line, [](size_t length, size_t& r) {
+        auto result = Solve(lines[0], [](size_t length, size_t& r) {
             r = std::max(length, r);
             });
         return Constexpr::ToString(result);
     }
 
     PART_TWO() {
-        auto result = Solve(Line, [](size_t length, size_t& r) {
+        auto result = Solve(lines[0], [](size_t length, size_t& r) {
             r += length >= 1000;
             });
         return Constexpr::ToString(result);

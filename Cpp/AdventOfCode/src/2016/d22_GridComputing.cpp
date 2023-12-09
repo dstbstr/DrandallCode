@@ -33,7 +33,7 @@ SOLUTION(2016, 22) {
     }
 
     PART_ONE() {
-        auto skipOne = std::vector<std::string>{ Lines.begin() + 1, Lines.end() };
+        auto skipOne = std::vector<std::string>{ lines.begin() + 1, lines.end() };
         auto dirs = ParseLines(skipOne, ParseLine);
 
         u32 fitCount = 0;
@@ -94,7 +94,7 @@ SOLUTION(2016, 22) {
 
     }
     PART_TWO() {
-        return Constexpr::ToString(SolvePartTwo(Lines));
+        return Constexpr::ToString(SolvePartTwo(lines));
     }
 
     TESTS() {

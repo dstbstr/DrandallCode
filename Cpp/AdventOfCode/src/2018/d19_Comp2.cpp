@@ -67,8 +67,8 @@ SOLUTION(2018, 19) {
     }
 
     PART_ONE() {
-        auto ipReg = GetIpReg(Lines[0]);
-        auto copy = std::vector<std::string>(Lines.begin() + 1, Lines.end());
+        auto ipReg = GetIpReg(lines[0]);
+        auto copy = std::vector<std::string>(lines.begin() + 1, lines.end());
         auto inst = ParseLines(copy, GenInst);
         Regs regs{};
         s32& ip = regs[ipReg];
@@ -81,8 +81,8 @@ SOLUTION(2018, 19) {
     }
 
     PART_TWO() {
-        auto ipReg = GetIpReg(Lines[0]);
-        auto copy = std::vector<std::string>(Lines.begin() + 1, Lines.end());
+        auto ipReg = GetIpReg(lines[0]);
+        auto copy = std::vector<std::string>(lines.begin() + 1, lines.end());
         auto inst = ParseLines(copy, GenInst);
         Regs regs{};
         regs[0] = 1;

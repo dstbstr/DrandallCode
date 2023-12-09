@@ -60,7 +60,7 @@ SOLUTION(2017, 14) {
     }
     
     PART_ONE() {
-        const auto& key = std::string(Line);
+        const auto& key = std::string(lines[0]);
         u32 used = 0;
         for (auto i = 0; i < 128; i++) {
             std::string toHash = key + "-" + ToString(i);
@@ -74,7 +74,7 @@ SOLUTION(2017, 14) {
     }
 
     PART_TWO() {
-        auto grid = CreateGrid(Line);
+        auto grid = CreateGrid(lines[0]);
         auto pos = RowCol{ 0, 0 };
         /*
         std::vector<RowCol> allPoints;

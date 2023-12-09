@@ -533,17 +533,17 @@ SOLUTION(2022, 22) {
         return GetResult(currentPos, facing);
     }
     PART_ONE() {
-        return Constexpr::ToString(SolvePartOne(CopyToVector(Lines)));
+        return Constexpr::ToString(SolvePartOne(CopyToVector(lines)));
     }
 
     PART_TWO() {
         const auto facingValues = 4;
-        auto cube = MakeCube(Lines);
+        auto cube = MakeCube(lines);
         //auto cube = MakeTestCube(lines);
         auto currentFace = CubeFace::Back;
         auto pos = RowCol{ 0, 0 };
         auto facing = Right;
-        auto path = SplitPath(ReadPath(Lines));
+        auto path = SplitPath(ReadPath(lines));
         u32 distance;
 
         for (auto cmd : path) {

@@ -62,17 +62,16 @@ std::vector<TimingEntry> RunOne(size_t year, size_t day, Visibility visibility =
 
     if (!Check(year, day, timingData, visibility)) return timingData;
 
-    //const auto lines = ReadInputFile(year, day);
     for (const auto& [part, func] : GetSolutions()[year][day]) {
         auto GatherTiming = [&](std::chrono::microseconds elapsed) {
             auto key = Constexpr::ToString(year) + "/" + Constexpr::ToString(day) + ":" + Constexpr::ToString(part);
             timingData.push_back(std::make_pair(key, elapsed));
             };
         std::string result;
+        auto input = ReadInputFile(year, day);
         {
             auto partTime = ScopedTimer(GatherTiming);
-            //auto result = func(lines);
-            result = func();
+            result = func(input);
         }
         if (visibility == Visibility::Show) {
             std::cout << "Part " << part << ": " << result << "\n";
@@ -149,7 +148,6 @@ void PrintTimings(std::vector<TimingEntry> timings, size_t maxResults = 0, std::
         std::cout << key << ": " << TimeUtils::DurationToString(elapsed) << "\n";
     }
 }
-//maybe look closer at this for more shenanigans: https://stackoverflow.com/questions/410980/include-a-text-file-in-a-c-program-as-a-char
 
 void RunFromCommandLine(int argc, char** argv) {
     std::vector<TimingEntry> timings;
@@ -161,7 +159,8 @@ void RunFromCommandLine(int argc, char** argv) {
         Constexpr::ParseNumber(argv[1], year);
         if (argc > 2) {
             if (argv[2][0] == '*') {
-                timings = RunYearSync(year);
+                //timings = RunYearSync(year);
+                timings = RunYear(year);
             }
             else {
                 size_t day;
@@ -170,7 +169,8 @@ void RunFromCommandLine(int argc, char** argv) {
             }
         }
         else {
-            timings = RunYearSync(year);
+            //timings = RunYearSync(year);
+            timings = RunYear(year);
         }
     }
     PrintTimings(timings);
@@ -186,7 +186,7 @@ int main(int argc, char** argv) {
     //auto timings = RunAllSync();
     //auto timings = RunAll();
     //auto timings = RunYearSync(2020);
-    auto timings = RunOne(2015, 5);
+    auto timings = RunOne(2023, 9);
 
     //PrintTimings(0, std::chrono::seconds(1));
     PrintTimings(timings);

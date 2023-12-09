@@ -60,13 +60,13 @@ SOLUTION(2015, 7) {
     }
 
     PART_ONE() {
-        return Solve(Lines);
+        return Solve(lines);
     }
 
     PART_TWO() {
-        auto partOneResult = Solve(Lines);
+        auto partOneResult = Solve(lines);
 
-        auto copy = CopyToVector(Lines);
+        auto copy = lines;
         for (auto& line : copy) {
             if (line.substr(line.size() - 4) == "-> b") {
                 line = partOneResult + " -> b";

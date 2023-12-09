@@ -21,14 +21,14 @@ SOLUTION(2018, 5) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(Reduce(Line).size());
+        return Constexpr::ToString(Reduce(lines[0]).size());
     }
 
     PART_TWO() {
         size_t best = 9999;
         
         for (const auto& pair : pairs) {
-            auto test = Constexpr::RemoveAllOfCopy(Line, pair);
+            auto test = Constexpr::RemoveAllOfCopy(lines[0], pair);
             best = std::min(best, Reduce(test).size());
         }
                 

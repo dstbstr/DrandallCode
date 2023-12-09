@@ -89,14 +89,14 @@ SOLUTION(2020, 12) {
     PART_ONE() {
         Coord wayPoint{ 1, 0 };
         Coord pos{ 0, 0 };
-        auto result = Solve(Lines, wayPoint, pos, pos);
+        auto result = Solve(lines, wayPoint, pos, pos);
         return Constexpr::ToString(result);
     }
 
     PART_TWO() {
         Coord wayPoint{ 10, -1 };
         Coord pos{ 0, 0 };
-        auto result = Solve(Lines, wayPoint, pos, wayPoint);
+        auto result = Solve(lines, wayPoint, pos, wayPoint);
         return Constexpr::ToString(result);
     }
 

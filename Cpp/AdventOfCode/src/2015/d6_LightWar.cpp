@@ -58,7 +58,7 @@ SOLUTION(2015, 6) {
         return count;
     }
     PART_ONE() {
-        return Constexpr::ToString(SolvePartOne(Lines));
+        return Constexpr::ToString(SolvePartOne(lines));
     }
 
     constexpr size_t SolvePartTwo(auto& lines) {
@@ -85,7 +85,7 @@ SOLUTION(2015, 6) {
     }
 
     PART_TWO() {
-        return Constexpr::ToString(SolvePartTwo(Lines));
+        return Constexpr::ToString(SolvePartTwo(lines));
     }
 
     constexpr bool TestParseCommand() {

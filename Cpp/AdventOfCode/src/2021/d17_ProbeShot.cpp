@@ -99,7 +99,7 @@ SOLUTION(2021, 17) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(SolvePartOne(Line));
+        return Constexpr::ToString(SolvePartOne(lines[0]));
     }
 
     constexpr size_t SolvePartTwo(std::string_view line) {
@@ -128,7 +128,7 @@ SOLUTION(2021, 17) {
         return result;
     }
     PART_TWO() {
-        return Constexpr::ToString(SolvePartTwo(Line));
+        return Constexpr::ToString(SolvePartTwo(lines[0]));
     }
 
     constexpr bool TestTargetConstructor() {

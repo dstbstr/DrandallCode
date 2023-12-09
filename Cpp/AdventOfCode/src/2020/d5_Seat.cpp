@@ -33,12 +33,12 @@ SOLUTION(2020, 5) {
         return result;
     }
     PART_ONE() {
-        auto seatIds = GetSeatIds(Lines);
+        auto seatIds = GetSeatIds(lines);
         return Constexpr::ToString(*std::max_element(seatIds.begin(), seatIds.end()));
     }
 
     PART_TWO() {
-        auto seatIds = GetSeatIds(Lines);
+        auto seatIds = GetSeatIds(lines);
         std::sort(seatIds.begin(), seatIds.end());
         for (size_t i = 0; i < seatIds.size() - 1; i++) {
             if (seatIds[i] + 1 != seatIds[i + 1]) {

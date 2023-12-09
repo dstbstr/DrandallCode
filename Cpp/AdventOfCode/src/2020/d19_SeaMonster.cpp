@@ -119,11 +119,11 @@ SOLUTION(2020, 19) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(Solve(Lines, false));
+        return Constexpr::ToString(Solve(lines, false));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(Solve(Lines, true));
+        return Constexpr::ToString(Solve(lines, true));
     }
 
     TESTS() {

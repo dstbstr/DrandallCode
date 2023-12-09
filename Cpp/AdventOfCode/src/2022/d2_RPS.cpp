@@ -96,11 +96,11 @@ SOLUTION(2022, 2) {
         return result;
     }
     PART_ONE() {
-        return Constexpr::ToString(Solve(Lines, ParseInput));
+        return Constexpr::ToString(Solve(lines, ParseInput));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(Solve(Lines, ParseUpdatedInput));
+        return Constexpr::ToString(Solve(lines, ParseUpdatedInput));
     }
 
     TESTS() {

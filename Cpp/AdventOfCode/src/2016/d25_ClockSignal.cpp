@@ -54,7 +54,7 @@ SOLUTION(2016, 25) {
 
     PART_ONE() {
         u64 a = 0;
-        auto code = ParseLines(Lines, GenInstruction);
+        auto code = ParseLines(lines, GenInstruction);
         while (true) {
             std::vector<s64> regs = { 0, 0, 0, 0 };
             size_t ip = 0;
@@ -86,6 +86,7 @@ SOLUTION(2016, 25) {
     }
 
     PART_TWO() {
+        (void)lines;
         return "Merry Christmas";
     }
 

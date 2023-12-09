@@ -278,12 +278,12 @@ SOLUTION(2019, 18) {
 
 
     PART_ONE() {
-        Map solution(CopyToVector(Lines));
+        Map solution(CopyToVector(lines));
         return Constexpr::ToString(solution.Solve());
     }
 
     PART_TWO() {
-        auto copy = CopyToVector(Lines);
+        auto copy = CopyToVector(lines);
         SplitIntoRooms(copy);
 
         Map solution(copy);

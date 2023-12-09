@@ -63,7 +63,7 @@ SOLUTION(2021, 10) {
     }
 
     PART_ONE() {
-        auto scores = ParseLines(Lines, GetScore);
+        auto scores = ParseLines(lines, GetScore);
         return Constexpr::ToString(std::accumulate(scores.begin(), scores.end(), 0ull, [](size_t prev, const auto& pair) {
             return prev + pair.first;
             }));
@@ -80,7 +80,7 @@ SOLUTION(2021, 10) {
         return toKeep[toKeep.size() / 2];
     }
     PART_TWO() {
-        return Constexpr::ToString(SolvePartTwo(Lines));
+        return Constexpr::ToString(SolvePartTwo(lines));
     }
 
     TESTS() {

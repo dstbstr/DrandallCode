@@ -94,12 +94,12 @@ SOLUTION(2016, 13) {
 
     PART_ONE() {
         u32 key;
-        Constexpr::ParseNumber(Line, key);
+        Constexpr::ParseNumber(lines[0], key);
         return Constexpr::ToString(Bfs(key, { 31, 39 }));
     }
     PART_TWO() {
         u32 key;
-        Constexpr::ParseNumber(Line, key);
+        Constexpr::ParseNumber(lines[0], key);
         return Constexpr::ToString(FindUniquePositions(key, 50));
     }
 

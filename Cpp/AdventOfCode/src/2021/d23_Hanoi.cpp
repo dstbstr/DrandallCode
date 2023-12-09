@@ -327,12 +327,12 @@ SOLUTION(2021, 23) {
     }
 
     PART_ONE() {
-        auto dens = GetInitialDens(CopyToVector(Lines), false);
+        auto dens = GetInitialDens(CopyToVector(lines), false);
         return Constexpr::ToString(Solve(dens));
     }
 
     PART_TWO() {
-        auto dens = GetInitialDens(CopyToVector(Lines), true);
+        auto dens = GetInitialDens(CopyToVector(lines), true);
         return Constexpr::ToString(Solve(dens));
     }
 

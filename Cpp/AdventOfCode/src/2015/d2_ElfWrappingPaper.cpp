@@ -53,11 +53,11 @@ SOLUTION(2015, 2) {
         return Constexpr::ToString(result);
     }
     PART_ONE() {
-        return Solve(Lines, CalculateWrappingPaper);
+        return Solve(lines, CalculateWrappingPaper);
     }
 
     PART_TWO() {
-        return Solve(Lines, CalculateRibbon);
+        return Solve(lines, CalculateRibbon);
     }
 
     TESTS() {

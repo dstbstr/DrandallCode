@@ -61,7 +61,7 @@ SOLUTION(2018, 11) {
     }
 
     PART_ONE() {
-        auto grid = GetGrid(Line);
+        auto grid = GetGrid(lines[0]);
         s32 best;
         UCoord bestCoord;
         GetBest(grid, 3, bestCoord, best);
@@ -70,7 +70,7 @@ SOLUTION(2018, 11) {
     }
 
     PART_TWO() {
-        auto grid = GetGrid(Line);
+        auto grid = GetGrid(lines[0]);
 
         s32 overallBest = 0;
         UCoord overallBestCoord{ 0, 0 };

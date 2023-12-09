@@ -4,7 +4,7 @@
 SOLUTION(2019, 2) {
 
     PART_ONE() {
-        auto instructions = ParseInstructions(Line);
+        auto instructions = ParseInstructions(lines[0]);
         instructions[1] = 12;
         instructions[2] = 2;
 
@@ -15,7 +15,7 @@ SOLUTION(2019, 2) {
     }
 
     PART_TWO() {
-        auto initialInstructions = ParseInstructions(Line);
+        auto initialInstructions = ParseInstructions(lines[0]);
         Args initialArgs;
         for (u64 noun = 0; noun < 100; noun++) {
             for (u64 verb = 0; verb < 100; verb++) {

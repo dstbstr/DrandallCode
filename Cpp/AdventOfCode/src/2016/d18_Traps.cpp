@@ -20,10 +20,10 @@ SOLUTION(2016, 18) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(CountSafeTiles(Line, 40));
+        return Constexpr::ToString(CountSafeTiles(lines[0], 40));
     }
     PART_TWO() {
-        return Constexpr::ToString(CountSafeTiles(Line, 400'000));
+        return Constexpr::ToString(CountSafeTiles(lines[0], 400'000));
     }
 
     TESTS() {

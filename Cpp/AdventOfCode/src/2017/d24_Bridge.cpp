@@ -53,12 +53,12 @@ SOLUTION(2017, 24) {
     }
 
     PART_ONE() {
-        auto pieces = ParseLines(Lines, ParsePiece);
+        auto pieces = ParseLines(lines, ParsePiece);
         return Constexpr::ToString(Dfs(0, pieces, 0));
     }
 
     PART_TWO() {
-        auto pieces = ParseLines(Lines, ParsePiece);
+        auto pieces = ParseLines(lines, ParsePiece);
         return Constexpr::ToString(CalculateStrength(FindLongestBridge(0, pieces, {})));
     }
 

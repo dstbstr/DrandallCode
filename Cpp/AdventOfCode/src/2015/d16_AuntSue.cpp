@@ -76,10 +76,10 @@ SOLUTION(2015, 16) {
         return 0;
     }
     PART_ONE() {
-        return Constexpr::ToString(Solve(Lines, IsExactMatch));
+        return Constexpr::ToString(Solve(lines, IsExactMatch));
     }
     PART_TWO() {
-        return Constexpr::ToString(Solve(Lines, IsRangeMatch));
+        return Constexpr::ToString(Solve(lines, IsRangeMatch));
     }
 
     TESTS() {

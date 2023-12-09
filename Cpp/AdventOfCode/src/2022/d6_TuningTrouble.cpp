@@ -25,11 +25,11 @@ SOLUTION(2022, 6) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(FindUnique(Line, MessageType::Signal));
+        return Constexpr::ToString(FindUnique(lines[0], MessageType::Signal));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(FindUnique(Line, MessageType::Message));
+        return Constexpr::ToString(FindUnique(lines[0], MessageType::Message));
     }
 
     TESTS() {

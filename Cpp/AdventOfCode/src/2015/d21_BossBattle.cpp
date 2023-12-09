@@ -3,175 +3,80 @@
 #include "2015/d21_BossBattle.h"
 
 SOLUTION(2015, 21) {
-    struct Weapon {
-        u32 Cost;
-        u32 Attack;
-    };
-
-    static std::vector<Weapon> weapons = {
-        {8, 4},
-        {10, 5},
-        {25, 6},
-        {40, 7},
-        {74, 8}
-    };
-
-    struct Armor {
-        u32 Cost;
-        u32 Defense;
-    };
-
-    static std::vector<Armor> armors = {
-        {13, 1},
-        {31, 2},
-        {53, 3},
-        {75, 4},
-        {102, 5}
-    };
-
-    struct Ring {
-        u32 Cost;
-        u32 Attack;
-        u32 Defense;
-    };
-    static std::vector<Ring> rings = {
-        {25, 1, 0},
-        {50, 2, 0},
-        {100, 3, 0},
-        {20, 0, 1},
-        {40, 0, 2},
-        {80, 0, 3}
-    };
-
-    struct Character {
-        u32 Hp;
-        u32 Attack;
-        u32 Defense;
-    };
-
-    constexpr u32 CountRounds(const Character & attacker, const Character & defender) {
-        s32 dmg = attacker.Attack - defender.Defense;
-        if (dmg <= 0) {
-            dmg = 1;
+    struct Equipment { s32 Cost; s32 Attack; s32 Defense; };
+    struct Player { 
+        s32 Hp, Attack, Defense, TotalCost;
+        constexpr Player() : Hp(0), Attack(0), Defense(0), TotalCost(0) {}
+        constexpr Player(s32 hp, s32 attack, s32 defense) : Hp(hp), Attack(attack), Defense(defense), TotalCost(0) {}
+        constexpr Player(Equipment weapon, Equipment armor, Equipment ring1, Equipment ring2) : Hp(100) {
+            Attack = weapon.Attack + ring1.Attack + ring2.Attack;
+            Defense = armor.Defense + ring1.Defense + ring2.Defense;
+            TotalCost = weapon.Cost + armor.Cost + ring1.Cost + ring2.Cost;
         }
-        u32 dmgPerRound = static_cast<u32>(dmg);
-        if (defender.Hp % dmgPerRound == 0) {
-            return defender.Hp / dmgPerRound;
-        }
-        else {
-            return defender.Hp / dmgPerRound + 1;
-        }
+    };
+
+    constexpr u32 CountRounds(const Player& attacker, const Player& defender) {
+        auto dmg = std::max(1, attacker.Attack - defender.Defense);
+        return defender.Hp / dmg + (defender.Hp % dmg > 0);
     }
 
-    constexpr bool DoesPlayerWin(const Character & player, const Character & boss) {
-        return CountRounds(player, boss) <= CountRounds(boss, player);
-    }
+    static std::vector<Equipment> Weapons = { {8, 4, 0}, {10,5,0}, {25,6,0}, {40,7,0}, {74,8,0} };
+    static std::vector<Equipment> Armors = { {0, 0, 0}, {13, 0, 1}, {31, 0, 2}, {53, 0, 3}, {75, 0, 4}, {102, 0, 5} };
+    static std::vector<Equipment> Rings = { {0, 0, 0}, {0, 0, 0}, {25, 1, 0}, {50, 2, 0}, {100, 3, 0}, {20, 0, 1}, {40, 0, 2}, {80, 0, 3} };
 
-    struct EquipmentIndexes {
-        size_t Weapon;
-        size_t Armor;
-        size_t Ring1;
-        size_t Ring2;
-    };
-
-    constexpr Character BuildPlayer(const EquipmentIndexes & e) {
-        Character player = { 100, 0, 0 };
-
-        player.Attack += weapons[e.Weapon].Attack;
-        if (e.Armor < armors.size()) {
-            player.Defense += armors[e.Armor].Defense;
-        }
-        if (e.Ring1 < rings.size()) {
-            auto ring1 = rings[e.Ring1];
-            player.Attack += ring1.Attack;
-            player.Defense += ring1.Defense;
-        }
-        if (e.Ring2 < rings.size()) {
-            auto ring2 = rings[e.Ring2];
-            player.Attack += ring2.Attack;
-            player.Defense += ring2.Defense;
-        }
-
-        return player;
-    }
-
-    constexpr u32 CalculateCost(const EquipmentIndexes & e) {
-        u32 cost = weapons[e.Weapon].Cost;
-        if (e.Armor < armors.size()) {
-            cost += armors[e.Armor].Cost;
-        }
-        if (e.Ring1 < rings.size()) {
-            cost += rings[e.Ring1].Cost;
-        }
-        if (e.Ring2 < rings.size()) {
-            cost += rings[e.Ring2].Cost;
-        }
-
-        return cost;
-    }
-
-    constexpr u32 FindBestBuild(const Character& boss) {
-        u32 bestCost = 999;
-
-        for (size_t weaponIndex = 0; weaponIndex < weapons.size(); weaponIndex++) {
-            for (size_t armorIndex = 0; armorIndex <= armors.size(); armorIndex++) {
-                for (size_t ring1Index = 0; ring1Index <= rings.size() + 1; ring1Index++) {
-                    for (size_t ring2Index = 0; ring2Index < ring1Index; ring2Index++) {
-                        auto equipment = EquipmentIndexes{ weaponIndex, armorIndex, ring1Index, ring2Index };
-                        if (DoesPlayerWin(BuildPlayer(equipment), boss)) {
-                            bestCost = std::min(bestCost, CalculateCost(equipment));
-                        }
+    constexpr std::vector<Player> GetBuilds() {
+        std::vector<Player> result;
+        for (const auto& weapon : Weapons) {
+            for (const auto& armor : Armors) {
+                for (auto r1 = 0; r1 < Rings.size(); r1++) {
+                    for (auto r2 = r1 + 1; r2 < Rings.size(); r2++) {
+                        result.push_back(Player{ weapon, armor, Rings[r1], Rings[r2] });
                     }
                 }
             }
         }
-
-        return bestCost;
+        return result;
     }
 
-    constexpr u32 FindWorstBuild(const Character& boss) {
-        u32 worstCost = 0;
-
-        for (size_t weaponIndex = 0; weaponIndex < weapons.size(); weaponIndex++) {
-            for (size_t armorIndex = 0; armorIndex <= armors.size(); armorIndex++) {
-                for (size_t ring1Index = 0; ring1Index <= rings.size() + 1; ring1Index++) {
-                    for (size_t ring2Index = 0; ring2Index < ring1Index; ring2Index++) {
-                        auto equipment = EquipmentIndexes{ weaponIndex, armorIndex, ring1Index, ring2Index };
-                        if (!DoesPlayerWin(BuildPlayer(equipment), boss)) {
-                            worstCost = std::max(worstCost, CalculateCost(equipment));
-                        }
-                    }
-                }
-            }
-        }
-
-        return worstCost;
-    }
-
-    constexpr Character ParseBoss(const auto& lines) {
-        Character result;
-        auto hp = Constexpr::Split(lines[0], ": ")[1];
-        auto dmg = Constexpr::Split(lines[1], ": ")[1];
-        auto armor = Constexpr::Split(lines[2], ": ")[1];
-
-        Constexpr::ParseNumber(hp, result.Hp);
-        Constexpr::ParseNumber(dmg, result.Attack);
-        Constexpr::ParseNumber(armor, result.Defense);
+    constexpr Player ParseBoss(const std::vector<std::string>& lines) {
+        Player result;
+        Constexpr::ParseNumber(Constexpr::Split(lines[0], " ").back(), result.Hp);
+        Constexpr::ParseNumber(Constexpr::Split(lines[1], " ").back(), result.Attack);
+        Constexpr::ParseNumber(Constexpr::Split(lines[2], " ").back(), result.Defense);
         return result;
     }
 
     PART_ONE() {
-        return Constexpr::ToString(FindBestBuild(ParseBoss(Lines)));
+        auto boss = ParseBoss(lines);
+        auto builds = GetBuilds();
+        std::sort(builds.begin(), builds.end(), [](const Player& lhs, const Player& rhs) {
+            return lhs.TotalCost < rhs.TotalCost;
+        });
+        for (const auto& build : builds) {
+            if (CountRounds(build, boss) <= CountRounds(boss, build)) {
+                return Constexpr::ToString(build.TotalCost);
+            }
+        }
+        return "Not Found";
     }
+
     PART_TWO() {
-        return Constexpr::ToString(FindWorstBuild(ParseBoss(Lines)));
+        auto boss = ParseBoss(lines);
+        auto builds = GetBuilds();
+        std::sort(builds.begin(), builds.end(), [](const Player& lhs, const Player& rhs) {
+            return rhs.TotalCost < lhs.TotalCost;
+            });
+        for (const auto& build : builds) {
+            if (CountRounds(boss, build) < CountRounds(build, boss)) {
+                return Constexpr::ToString(build.TotalCost);
+            }
+        }
+        return "Not Found";
     }
+
     TESTS() {
         static_assert(CountRounds({ 8, 5, 5 }, { 12, 7, 2 }) == 4);
         static_assert(CountRounds({ 12, 7, 2 }, { 8, 5, 5 }) == 4);
-        
-        static_assert(DoesPlayerWin({ 8, 5, 5 }, { 12, 7, 2 }) == true);
-        
         return true;
     }
 }

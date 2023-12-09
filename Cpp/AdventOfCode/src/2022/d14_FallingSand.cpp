@@ -104,13 +104,13 @@ SOLUTION(2022, 14) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(CountSand(Lines, 180, [](UCoord sandPos) {
+        return Constexpr::ToString(CountSand(lines, 180, [](UCoord sandPos) {
             return sandPos.Y == 178;
             }) - 1);
     }
 
     PART_TWO() {
-        return Constexpr::ToString(CountSand(Lines, 180, [](UCoord sandPos) {
+        return Constexpr::ToString(CountSand(lines, 180, [](UCoord sandPos) {
             return sandPos == Entrance;
             }));
     }

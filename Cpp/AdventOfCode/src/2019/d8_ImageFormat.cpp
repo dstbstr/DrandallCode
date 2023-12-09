@@ -30,7 +30,7 @@ SOLUTION(2019, 8) {
     }
 
     PART_ONE() {
-        auto layers = BuildLayers<6, 25>(Line);
+        auto layers = BuildLayers<6, 25>(lines[0]);
 
         size_t best = 999;
         size_t result = 0;
@@ -46,7 +46,7 @@ SOLUTION(2019, 8) {
     }
 
     PART_TWO() {
-        auto layers = BuildLayers<6, 25>(Line);
+        auto layers = BuildLayers<6, 25>(lines[0]);
 
         Layer<6, 25> image{};
         for (auto& r : image) {

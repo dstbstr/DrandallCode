@@ -65,13 +65,13 @@ SOLUTION(2016, 4) {
     }
 
     PART_ONE() {
-        auto rooms = ParseLines(Lines, ParseRoom);
+        auto rooms = ParseLines(lines, ParseRoom);
         return Constexpr::ToString(std::accumulate(rooms.begin(), rooms.end(), 0, [](u32 prev, const Room& room) {
             return prev + room.Id * IsReal(room);
             }));
     }
     PART_TWO() {
-        auto rooms = ParseLines(Lines, ParseRoom);
+        auto rooms = ParseLines(lines, ParseRoom);
         auto result = std::find_if(rooms.begin(), rooms.end(), [](const Room& room) {
             return IsReal(room) && DecryptRoom(room) == "northpole object storage";
             });

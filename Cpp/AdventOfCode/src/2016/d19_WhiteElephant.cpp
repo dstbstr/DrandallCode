@@ -22,12 +22,12 @@ SOLUTION(2016, 19) {
 
     PART_ONE() {
         u32 playerCount;
-        Constexpr::ParseNumber(Line, playerCount);
+        Constexpr::ParseNumber(lines[0], playerCount);
         return Constexpr::ToString(FindLeftWinner(playerCount));
     }
     PART_TWO() {
         u32 playerCount;
-        Constexpr::ParseNumber(Line, playerCount);
+        Constexpr::ParseNumber(lines[0], playerCount);
         return Constexpr::ToString(FindAcrossWinner(playerCount));
     }
 

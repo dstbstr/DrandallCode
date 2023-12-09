@@ -19,12 +19,12 @@ SOLUTION(2019, 1) {
     }
 
     PART_ONE() {
-        auto masses = ParseLinesAsNumbers<size_t>(Lines);
+        auto masses = ParseLinesAsNumbers<size_t>(lines);
         return Constexpr::ToString(std::accumulate(masses.begin(), masses.end(), 0ull, [](size_t previous, size_t mass) { return previous + Calculate(mass); }));
     }
 
     PART_TWO() {
-        auto masses = ParseLinesAsNumbers<size_t>(Lines);
+        auto masses = ParseLinesAsNumbers<size_t>(lines);
         return Constexpr::ToString(std::accumulate(masses.begin(), masses.end(), 0ull, [](size_t previous, size_t mass) { return previous + CalculateWithFuel(mass); }));
     }
 

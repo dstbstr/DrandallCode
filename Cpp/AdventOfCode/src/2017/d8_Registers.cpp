@@ -59,12 +59,12 @@ SOLUTION(2017, 8) {
     }
 
     PART_ONE() {
-        auto [last, max] = Solve(Lines);
+        auto [last, max] = Solve(lines);
         return Constexpr::ToString(last);
     }
 
     PART_TWO() {
-        auto [last, max] = Solve(Lines);
+        auto [last, max] = Solve(lines);
         return Constexpr::ToString(max);
     }
     

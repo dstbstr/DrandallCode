@@ -114,13 +114,13 @@ SOLUTION(2022, 12) {
 
     PART_ONE() {
         size_t startIndex, endIndex;
-        auto map = BuildMap<41, 66>(Lines, startIndex, endIndex);
+        auto map = BuildMap<41, 66>(lines, startIndex, endIndex);
         return Constexpr::ToString(Bfs<41, 66>(map, startIndex, endIndex));
     }
 
     PART_TWO() {
         size_t startIndex, endIndex;
-        auto map = BuildMap<41, 66>(Lines, startIndex, endIndex);
+        auto map = BuildMap<41, 66>(lines, startIndex, endIndex);
         auto allStarts = FindAllStarts(map);
 
         u32 best = 999;

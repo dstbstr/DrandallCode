@@ -32,11 +32,11 @@ SOLUTION(2020, 6) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(Run(Lines, CountAnyInGroup));
+        return Constexpr::ToString(Run(lines, CountAnyInGroup));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(Run(Lines, CountAllInGroup));
+        return Constexpr::ToString(Run(lines, CountAllInGroup));
     }
 
     TESTS() {

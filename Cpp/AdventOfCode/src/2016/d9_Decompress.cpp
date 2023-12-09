@@ -31,11 +31,11 @@ SOLUTION(2016, 9) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(Decompress(Line, false));
+        return Constexpr::ToString(Decompress(lines[0], false));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(Decompress(Line, true));
+        return Constexpr::ToString(Decompress(lines[0], true));
     }
 
     TESTS() {

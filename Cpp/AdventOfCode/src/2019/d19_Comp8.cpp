@@ -66,7 +66,7 @@ SOLUTION(2019, 19) {
     }
 
     PART_ONE() {
-        const auto instructions = ParseInstructions(Line);
+        const auto instructions = ParseInstructions(lines[0]);
         u32 result = 0;
 
         for (u32 x = 0; x < 50; x++) {
@@ -80,7 +80,7 @@ SOLUTION(2019, 19) {
     }
 
     PART_TWO() {
-        const auto instructions = ParseInstructions(Line);
+        const auto instructions = ParseInstructions(lines[0]);
 
         auto roughPos = FindRoughPosition(instructions, 99);
         auto finalPos = FineTune(instructions, roughPos, 99);

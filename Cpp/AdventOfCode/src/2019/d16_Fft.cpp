@@ -54,7 +54,7 @@ SOLUTION(2019, 16) {
     }
 
     PART_ONE() {
-        std::string running = std::string(Line);
+        std::string running = std::string(lines[0]);
         for (auto i = 0; i < 100; i++) {
             running = RunPhase(running);
         }
@@ -63,7 +63,7 @@ SOLUTION(2019, 16) {
     }
 
     PART_TWO() {
-        auto line = std::string(Line);
+        auto line = std::string(lines[0]);
         std::string running = "";
         running.reserve(line.size() * 10'000);
         size_t offset;

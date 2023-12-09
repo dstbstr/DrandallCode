@@ -36,7 +36,7 @@ SOLUTION(2017, 22) {
     }
 
     PART_ONE() {
-        auto result = Solve(Lines, 10'000, [](char& currentPos, size_t& dir) {
+        auto result = Solve(lines, 10'000, [](char& currentPos, size_t& dir) {
             switch (currentPos) {
             case '.': dir = (dir + 3) % 4; currentPos = '#'; return 1;
             case '#': dir = (dir + 1) % 4; currentPos = '.'; return 0;
@@ -48,7 +48,7 @@ SOLUTION(2017, 22) {
     }
 
     PART_TWO() {
-        auto result = Solve(Lines, 10'000'000, [](char& currentPos, size_t& dir) {
+        auto result = Solve(lines, 10'000'000, [](char& currentPos, size_t& dir) {
             switch (currentPos) {
             case '.': dir = (dir + 3) % 4; currentPos = 'W'; return 0;
             case 'W': currentPos = '#'; return 1;

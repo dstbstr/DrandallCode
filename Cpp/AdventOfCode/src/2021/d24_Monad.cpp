@@ -65,10 +65,12 @@ SOLUTION(2021, 24) {
     }
 
     PART_ONE() {
+        (void)lines;
         return Constexpr::ToString(Solve(true));
     }
 
     PART_TWO() {
+        (void)lines;
         return Constexpr::ToString(Solve(false));
     }
 

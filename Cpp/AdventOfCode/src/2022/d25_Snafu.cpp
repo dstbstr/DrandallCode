@@ -92,10 +92,11 @@ SOLUTION(2022, 25) {
         return ToSnafu(result);
     }
     PART_ONE() {
-        return SolvePartOne(Lines);
+        return SolvePartOne(lines);
     }
 
     PART_TWO() {
+        (void)lines;
         return "Merry Christmas!";
     }
 

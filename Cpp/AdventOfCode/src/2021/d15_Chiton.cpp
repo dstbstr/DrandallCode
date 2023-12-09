@@ -61,12 +61,12 @@ SOLUTION(2021, 15) {
     }
 
     PART_ONE() {
-        auto map = ParseInput(Lines);
+        auto map = ParseInput(lines);
         return Constexpr::ToString(Solve(map));
     }
 
     PART_TWO() {
-        auto map = ParseInput(Lines);
+        auto map = ParseInput(lines);
         auto bigMap = ExpandMap(map);
         return Constexpr::ToString(Solve(bigMap));
     }

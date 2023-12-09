@@ -30,11 +30,11 @@ SOLUTION(2017, 5) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(StepsToExit(Lines, Jump));
+        return Constexpr::ToString(StepsToExit(lines, Jump));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(StepsToExit(Lines, ShortJump));
+        return Constexpr::ToString(StepsToExit(lines, ShortJump));
     }
 
     TESTS() {

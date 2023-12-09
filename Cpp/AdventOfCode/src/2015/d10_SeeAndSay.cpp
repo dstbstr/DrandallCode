@@ -42,10 +42,10 @@ SOLUTION(2015, 10) {
 
 
     PART_ONE() {
-        return Constexpr::ToString(ApplyTimes(Line, 40).size());
+        return Constexpr::ToString(ApplyTimes(lines[0], 40).size());
     }
     PART_TWO() {
-        return Constexpr::ToString(ApplyTimes(Line, 50).size());
+        return Constexpr::ToString(ApplyTimes(lines[0], 50).size());
     }
     TESTS() {
         static_assert(Next("1") == "11");

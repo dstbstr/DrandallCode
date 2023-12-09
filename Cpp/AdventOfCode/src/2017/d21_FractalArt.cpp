@@ -223,11 +223,11 @@ SOLUTION(2017, 21) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(Solve(Lines, 5));
+        return Constexpr::ToString(Solve(lines, 5));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(Solve(Lines, 18));
+        return Constexpr::ToString(Solve(lines, 18));
     }
 
     TESTS() {

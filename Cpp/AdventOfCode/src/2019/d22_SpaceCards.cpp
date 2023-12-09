@@ -100,7 +100,7 @@ SOLUTION(2019, 22) {
         for (auto i = 0; i < deckSize; i++) {
             deck[i] = i;
         }
-        Shuffle(Lines, deck);
+        Shuffle(lines, deck);
 
         size_t result = 0;
         for (const auto& card : deck) {
@@ -118,7 +118,7 @@ SOLUTION(2019, 22) {
         BigInt deckSize = 119'315'717'514'047;
         BigInt repCount = 101'741'582'076'661;
 
-        return CardAt(pos, Lines, deckSize, repCount).ToString();
+        return CardAt(pos, lines, deckSize, repCount).ToString();
     }
 
     template<typename Func, typename... Args>

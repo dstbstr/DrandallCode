@@ -418,7 +418,12 @@ namespace Constexpr {
         constexpr void push(const T& val) {
             mData.push_back(val);
         }
-        constexpr T top() const {
+        constexpr T& top() const {
+            if (mData.empty()) throw "Accessing empty stack";
+            return mData.back();
+        }
+
+        constexpr T& top() {
             if (mData.empty()) throw "Accessing empty stack";
             return mData.back();
         }

@@ -95,13 +95,13 @@ SOLUTION(2018, 10) {
 
     PART_ONE() {
         std::string result;
-        Solve(Lines, result);
+        Solve(lines, result);
         return result;
     }
 
     PART_TWO() {
         std::string ignored;
-        return Constexpr::ToString(Solve(Lines, ignored));
+        return Constexpr::ToString(Solve(lines, ignored));
     }
 
     TESTS() {

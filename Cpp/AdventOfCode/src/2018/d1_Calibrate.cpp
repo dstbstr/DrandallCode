@@ -2,12 +2,12 @@
 SOLUTION(2018, 1) {
 
     PART_ONE() {
-        auto deltas = ParseLinesAsNumbers<s32>(Lines);
+        auto deltas = ParseLinesAsNumbers<s32>(lines);
         return Constexpr::ToString(std::accumulate(deltas.begin(), deltas.end(), 0));
     }
 
     PART_TWO() {
-        auto deltas = ParseLinesAsNumbers<s32>(Lines);
+        auto deltas = ParseLinesAsNumbers<s32>(lines);
         std::vector<s32> frequencies {0};
         for (auto i = 0; i < deltas.size(); i++) {
             frequencies.push_back(frequencies.back() + deltas[i]);

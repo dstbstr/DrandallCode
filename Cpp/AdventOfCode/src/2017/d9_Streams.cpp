@@ -41,14 +41,14 @@ SOLUTION(2017, 9) {
     }
 
     PART_ONE() {
-        auto running = std::string(Line);
+        auto running = std::string(lines[0]);
         RemoveExtraNots(running);
         RemoveGarbage(running);
         return Constexpr::ToString(CalculateScore(running));
     }
 
     PART_TWO() {
-        auto running = std::string(Line);
+        auto running = std::string(lines[0]);
         RemoveExtraNots(running);
         return Constexpr::ToString(RemoveGarbage(running));
     }

@@ -65,12 +65,12 @@ SOLUTION(2020, 9) {
     }
 
     PART_ONE() {
-        const auto nums = ParseLinesAsNumbers<size_t>(Lines);
+        const auto nums = ParseLinesAsNumbers<size_t>(lines);
         return Constexpr::ToString(FindKey(nums, 25));
     }
 
     PART_TWO() {
-        const auto nums = ParseLinesAsNumbers<size_t>(Lines);
+        const auto nums = ParseLinesAsNumbers<size_t>(lines);
         const auto key = FindKey(nums, 25);
         size_t min, max;
         FindContiguousNums(nums, key, min, max);

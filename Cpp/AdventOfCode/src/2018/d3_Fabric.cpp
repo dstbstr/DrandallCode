@@ -34,7 +34,7 @@ SOLUTION(2018, 3) {
     }
 
     PART_ONE() {
-        auto rects = ParseLines(Lines, ParseRect);
+        auto rects = ParseLines(lines, ParseRect);
 
         auto fabric = new std::array<std::array<u32, 1001>, 1001>();
 
@@ -55,7 +55,7 @@ SOLUTION(2018, 3) {
     }
 
     PART_TWO() {
-        auto rects = ParseLines(Lines, ParseRect);
+        auto rects = ParseLines(lines, ParseRect);
 
         for (auto i = 0; i < rects.size(); i++) {
             bool found = false;

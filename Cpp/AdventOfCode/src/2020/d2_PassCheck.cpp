@@ -36,12 +36,12 @@ SOLUTION(2020, 2) {
     }
 
     PART_ONE() {
-        auto entries = ParseLines(Lines, ParseEntry);
+        auto entries = ParseLines(lines, ParseEntry);
         return Constexpr::ToString(std::count_if(entries.begin(), entries.end(), IsEntryValid));
     }
 
     PART_TWO() {
-        auto entries = ParseLines(Lines, ParseEntry);
+        auto entries = ParseLines(lines, ParseEntry);
         return Constexpr::ToString(std::count_if(entries.begin(), entries.end(), IsEntryValid2));
     }
 

@@ -2,7 +2,7 @@
 #include "Facing.h"
 
 SOLUTION(2017, 19) {
-    using Grid = decltype(Lines);
+    using Grid = std::vector<std::string>;
 
     constexpr RowCol FindStartPos(std::string_view firstLine) {
         for (size_t col = 0; col < firstLine.size(); col++) {
@@ -93,13 +93,13 @@ SOLUTION(2017, 19) {
     }
 
     PART_ONE() {
-        auto pos = FindStartPos(Lines[0]);
+        auto pos = FindStartPos(lines[0]);
         Facing facing = Down;
         std::string result;
         char currentSquare;
 
-        while (Move(pos, facing, Lines)) {
-            currentSquare = Lines[pos.Row][pos.Col];
+        while (Move(pos, facing, lines)) {
+            currentSquare = lines[pos.Row][pos.Col];
             if (currentSquare >= 'A' && currentSquare <= 'Z') {
                 result += currentSquare;
             }
@@ -109,10 +109,10 @@ SOLUTION(2017, 19) {
     }
 
     PART_TWO() {
-        auto pos = FindStartPos(Lines[0]);
+        auto pos = FindStartPos(lines[0]);
         Facing facing = Down;
         u32 steps = 1;
-        while (Move(pos, facing, Lines)) {
+        while (Move(pos, facing, lines)) {
             steps++;
         }
 

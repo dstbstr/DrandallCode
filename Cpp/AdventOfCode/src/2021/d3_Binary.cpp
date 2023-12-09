@@ -55,7 +55,7 @@ SOLUTION(2021, 3) {
         return std::bitset<15>(lhs).to_ullong() * std::bitset<15>(rhs).to_ullong();
     }
     PART_ONE() {
-        return Constexpr::ToString(SolvePartOne(Lines));
+        return Constexpr::ToString(SolvePartOne(lines));
     }
 
     constexpr size_t SolvePartTwo(const auto& lines) {
@@ -66,7 +66,7 @@ SOLUTION(2021, 3) {
     }
 
     PART_TWO() {
-        return Constexpr::ToString(SolvePartTwo(Lines));
+        return Constexpr::ToString(SolvePartTwo(lines));
     }
 
     TESTS() {

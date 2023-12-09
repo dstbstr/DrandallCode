@@ -12,11 +12,11 @@ SOLUTION(2017, 1) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(SumDigits(Line, 1));
+        return Constexpr::ToString(SumDigits(lines[0], 1));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(SumDigits(Line, Line.size() / 2));
+        return Constexpr::ToString(SumDigits(lines[0], lines[0].size() / 2));
     }
 
     TESTS() {

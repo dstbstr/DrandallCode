@@ -82,11 +82,11 @@ SOLUTION(2022, 19) {
         return result;
     }
     PART_ONE() {
-        return Constexpr::ToString(SolvePartOne(Lines));
+        return Constexpr::ToString(SolvePartOne(lines));
     }
 
     PART_TWO() {
-        auto bps = ParseLines(Lines, ParseBlueprint);
+        auto bps = ParseLines(lines, ParseBlueprint);
         size_t result = 1;
         for (size_t i = 0; i < 3; i++) {
             result *= FindBfs(bps[i], 32);

@@ -100,10 +100,10 @@ SOLUTION(2016, 2) {
     }
 
     PART_ONE() {
-        return GetSimpleCode(Lines);
+        return GetSimpleCode(lines);
     }
     PART_TWO() {
-        return GetRealCode(Lines);
+        return GetRealCode(lines);
     }
 
     TESTS() {

@@ -15,12 +15,12 @@ SOLUTION(2015, 1) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(FindFloor(Line));
-        //return Constexpr::ToString(FindFloor(lines[0]));
+        //return Constexpr::ToString(FindFloor(Line));
+        return Constexpr::ToString(FindFloor(lines[0]));
     }
     PART_TWO() {
-        return Constexpr::ToString(FindBasementStep(Line));
-        //return Constexpr::ToString(FindBasementStep(lines[0]));
+        //return Constexpr::ToString(FindBasementStep(Line));
+        return Constexpr::ToString(FindBasementStep(lines[0]));
     }
 
     TESTS() {

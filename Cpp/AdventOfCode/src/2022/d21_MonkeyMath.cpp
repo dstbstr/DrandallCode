@@ -87,7 +87,7 @@ SOLUTION(2022, 21) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(SolvePartOne(Lines));
+        return Constexpr::ToString(SolvePartOne(lines));
     }
 
     PART_TWO() {
@@ -96,7 +96,7 @@ SOLUTION(2022, 21) {
         size_t leftMonkeyIndex = 0;
         size_t rightMonkeyIndex = 0;
 
-        auto monkeys = ParseLines(Lines, ParseLine);
+        auto monkeys = ParseLines(lines, ParseLine);
 
         Constexpr::SmallMap<std::string, size_t> monkeyMap;
         for (auto i = 0; i < monkeys.size(); i++) {

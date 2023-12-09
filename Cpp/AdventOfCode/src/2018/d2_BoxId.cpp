@@ -25,7 +25,7 @@ SOLUTION(2018, 2) {
     PART_ONE() {
         u32 twos = 0;
         u32 threes = 0;
-        for (const auto& line : Lines) {
+        for (const auto& line : lines) {
             bool hasTwos, hasThrees = false;
             HasTwosAndThrees(line, hasTwos, hasThrees);
             twos += hasTwos;
@@ -36,7 +36,7 @@ SOLUTION(2018, 2) {
     }
 
     PART_TWO() {
-        auto copy = Lines;
+        auto copy = lines;
         std::sort(copy.begin(), copy.end());
         for (auto i = 0; i < copy.size() - 1; i++) {
             if (OffByOne(copy[i], copy[i + 1])) {

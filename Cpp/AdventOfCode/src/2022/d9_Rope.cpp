@@ -56,11 +56,11 @@ SOLUTION(2022, 9) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(CountUniqueTailPositions(Lines, 2));
+        return Constexpr::ToString(CountUniqueTailPositions(lines, 2));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(CountUniqueTailPositions(Lines, 10));
+        return Constexpr::ToString(CountUniqueTailPositions(lines, 10));
     }
 
     constexpr bool TestMoveTail(Coord head, Coord initialTail, Coord expectedTail) {

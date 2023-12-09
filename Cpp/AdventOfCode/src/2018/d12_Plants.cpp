@@ -41,7 +41,7 @@ SOLUTION(2018, 12) {
     }
 
     PART_ONE() {
-        auto groups = SplitInputIntoGroups(Lines);
+        auto groups = SplitInputIntoGroups(lines);
 
         auto pots = Prefix + GetInitialState(groups[0]) + "...";
         auto rules = ParseRules(groups[1]);
@@ -54,7 +54,7 @@ SOLUTION(2018, 12) {
     }
 
     PART_TWO() {
-        auto groups = SplitInputIntoGroups(Lines);
+        auto groups = SplitInputIntoGroups(lines);
 
         auto pots = Prefix + GetInitialState(groups[0]) + "...";
         auto rules = ParseRules(groups[1]);

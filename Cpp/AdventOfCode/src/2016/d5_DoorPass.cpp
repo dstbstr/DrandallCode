@@ -44,7 +44,7 @@ SOLUTION(2016, 5) {
 			4063427,
 			7777889
 		};
-		return PartOneImpl(Line, hints);
+		return PartOneImpl(lines[0], hints);
 	}
 
 	constexpr std::string PartTwoImpl(std::string_view key, const std::vector<u64>& hints) {
@@ -95,7 +95,7 @@ SOLUTION(2016, 5) {
 			12942170,
 			25651067
 		};
-		return PartTwoImpl(Line, hints);
+		return PartTwoImpl(lines[0], hints);
 	}
 
 	TESTS() {

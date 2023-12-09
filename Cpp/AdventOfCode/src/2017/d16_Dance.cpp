@@ -84,7 +84,7 @@ SOLUTION(2017, 16) {
         return dancers;
     }
     PART_ONE() {
-        auto moves = GetMoves(Line);
+        auto moves = GetMoves(lines[0]);
 
         std::string dancers = InitialDancers;
         for (const auto& move : moves) {
@@ -95,7 +95,7 @@ SOLUTION(2017, 16) {
     }
 
     PART_TWO() {
-        auto moves = GetMoves(Line);
+        auto moves = GetMoves(lines[0]);
         std::string dancers = InitialDancers;
         u32 cycleLength, cycleStart;
         FloydCycle::FindCycle(dancers, [&](std::string d) { return Dance(d, moves); }, cycleLength, cycleStart);

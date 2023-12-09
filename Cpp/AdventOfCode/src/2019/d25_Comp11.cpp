@@ -212,7 +212,7 @@ SOLUTION(2019, 25) {
     }
 
     PART_ONE() {
-        auto droid = Droid(Line);
+        auto droid = Droid(lines[0]);
 
         auto coordMap = GetCoordMap();
         auto nameMap = GenerateNameMap(coordMap);
@@ -240,6 +240,7 @@ SOLUTION(2019, 25) {
     }
 
     PART_TWO() {
+        (void)lines;
         return "Merry Christmas";
     }
 

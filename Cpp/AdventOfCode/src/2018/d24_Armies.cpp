@@ -242,7 +242,7 @@ SOLUTION(2018, 24) {
     }
 
     PART_ONE() {
-        auto battle = GetBattle(Lines);
+        auto battle = GetBattle(lines);
         while (IsBattleRunning(battle)) {
             ResolveRound(battle);
         }
@@ -251,7 +251,7 @@ SOLUTION(2018, 24) {
     }
 
     PART_TWO() {
-        const auto initialBattle = GetBattle(Lines);
+        const auto initialBattle = GetBattle(lines);
 
         const int maxRounds = 5000;
 

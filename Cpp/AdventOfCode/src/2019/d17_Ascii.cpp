@@ -52,7 +52,7 @@ SOLUTION(2019, 17) {
     }
 
     PART_ONE() {
-        auto instructions = ParseInstructions(Line);
+        auto instructions = ParseInstructions(lines[0]);
         auto map = ParseMap(ReadOutput(instructions));
         s64 result = 0;
         Coord min, max, pos;
@@ -82,7 +82,7 @@ SOLUTION(2019, 17) {
     }
 
     PART_TWO() {
-        auto instructions = ParseInstructions(Line);
+        auto instructions = ParseInstructions(lines[0]);
         instructions[0] = 2;
         std::string mainProgram = "C,A,C,B,C,A,B,A,B,A";
         std::string programA = "R,8,L,12,R,4,R,4";

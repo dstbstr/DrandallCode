@@ -18,7 +18,7 @@ SOLUTION(2017, 13) {
 
     PART_ONE() {
         u32 total = 0;
-        auto scanners = ParseLines(Lines, ParseScanner);
+        auto scanners = ParseLines(lines, ParseScanner);
         for (const auto& scanner : scanners) {
             if (Caught(scanner)) total += scanner.first * scanner.second;
         }
@@ -26,7 +26,7 @@ SOLUTION(2017, 13) {
     }
 
     PART_TWO() {
-        auto scanners = ParseLines(Lines, ParseScanner);
+        auto scanners = ParseLines(lines, ParseScanner);
         u32 delay = 0;
         while (std::any_of(scanners.begin(), scanners.end(), [delay](auto const& scanner) {
             return Caught(scanner, delay);

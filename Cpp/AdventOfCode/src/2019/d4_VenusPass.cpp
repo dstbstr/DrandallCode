@@ -48,12 +48,12 @@ SOLUTION(2019, 4) {
     }
 
     PART_ONE() {
-        auto [start, end] = ParseInput(Line);
+        auto [start, end] = ParseInput(lines[0]);
         return Constexpr::ToString(Solve(start, end, Matches));
     }
 
     PART_TWO() {
-        auto [start, end] = ParseInput(Line);
+        auto [start, end] = ParseInput(lines[0]);
         return Constexpr::ToString(Solve(start, end, ExtendedMatch));
     }
 

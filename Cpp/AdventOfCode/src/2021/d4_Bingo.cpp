@@ -82,7 +82,7 @@ SOLUTION(2021, 4) {
         throw "Not Found";
     }
     PART_ONE() {
-        return Constexpr::ToString(SolvePartOne(Lines));
+        return Constexpr::ToString(SolvePartOne(lines));
     }
 
     constexpr size_t SolvePartTwo(const auto& lines) {
@@ -111,7 +111,7 @@ SOLUTION(2021, 4) {
         return lastCard.CalculateScore(numbers[numIndex - 1]);
     }
     PART_TWO() {
-        return Constexpr::ToString(SolvePartTwo(Lines));
+        return Constexpr::ToString(SolvePartTwo(lines));
     }
 
     TESTS() {

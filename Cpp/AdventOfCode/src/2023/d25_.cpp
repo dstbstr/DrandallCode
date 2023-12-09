@@ -2,10 +2,11 @@
 
 SOLUTION(2023, 25) {
     PART_ONE() {
-        return "";
+        return lines[0];
     }
 
     PART_TWO() {
+        (void)lines;
         return "Merry Christmas";
     }
 

@@ -83,12 +83,12 @@ SOLUTION(2022, 7) {
     };
 
     PART_ONE() {
-        auto fs = Fs(Lines);
+        auto fs = Fs(lines);
         return Constexpr::ToString(fs.SumDirectoriesLessThan(100'000));
     }
 
     PART_TWO() {
-        auto fs = Fs(Lines);
+        auto fs = Fs(lines);
         return Constexpr::ToString(fs.FindDirToDelete());
     }
 

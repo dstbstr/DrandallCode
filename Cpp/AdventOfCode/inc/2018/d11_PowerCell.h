@@ -2,4 +2,4 @@
 
 #include "Common.h"
 
-DECLARE_SOLUTION(2018, 11, "5468");
+DECLARE_SOLUTION(2018, 11);

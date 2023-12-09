@@ -103,10 +103,10 @@ SOLUTION(2016, 7) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(std::count_if(Lines.begin(), Lines.end(), IsValid));
+        return Constexpr::ToString(std::count_if(lines.begin(), lines.end(), IsValid));
     }
     PART_TWO() {
-        return Constexpr::ToString(std::count_if(Lines.begin(), Lines.end(), SupportsSsl));
+        return Constexpr::ToString(std::count_if(lines.begin(), lines.end(), SupportsSsl));
     }
 
     TESTS() {

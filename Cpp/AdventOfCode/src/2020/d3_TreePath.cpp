@@ -33,13 +33,13 @@ SOLUTION(2020, 3) {
     }
 
     PART_ONE() {
-        auto grid = ParseGrid(Lines);
+        auto grid = ParseGrid(lines);
         RowCol slope = { 1, 3 };
         return Constexpr::ToString(CountTreesOnPath(grid, slope));
     }
 
     PART_TWO() {
-        auto grid = ParseGrid(Lines);
+        auto grid = ParseGrid(lines);
         std::vector<RowCol> slopes = {
             {1, 1},
             {1, 3},

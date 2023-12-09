@@ -26,7 +26,7 @@ SOLUTION(2018, 23) {
     }
 
     PART_ONE() {
-        auto bots = ParseLines(Lines, ParseBot);
+        auto bots = ParseLines(lines, ParseBot);
         std::sort(bots.begin(), bots.end());
         auto biggest = bots.back();
         return Constexpr::ToString(std::count_if(bots.begin(), bots.end(), [&](const Bot& bot) { return MDistance(bot.Pos, biggest.Pos) <= biggest.Radius; }));
@@ -34,7 +34,7 @@ SOLUTION(2018, 23) {
 
     //Totally stole this solution.  Don't even know how it works
     PART_TWO() {
-        auto bots = ParseLines(Lines, ParseBot);
+        auto bots = ParseLines(lines, ParseBot);
         struct Data {
             s32 Distance;
             s8 E;

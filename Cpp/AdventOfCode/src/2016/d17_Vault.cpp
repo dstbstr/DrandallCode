@@ -125,10 +125,10 @@ SOLUTION(2016, 17) {
     }
 
     PART_ONE() {
-        return FindShortestPath(Line);
+        return FindShortestPath(lines[0]);
     }
     PART_TWO() {
-        return Constexpr::ToString(FindLongestPath(Line));
+        return Constexpr::ToString(FindLongestPath(lines[0]));
     }
 
     TESTS() {

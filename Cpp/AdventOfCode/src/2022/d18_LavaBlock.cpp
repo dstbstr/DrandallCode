@@ -108,11 +108,11 @@ SOLUTION(2022, 18) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(Solve(Lines, CalcSurface));
+        return Constexpr::ToString(Solve(lines, CalcSurface));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(Solve(Lines, CalcExterior));
+        return Constexpr::ToString(Solve(lines, CalcExterior));
     }
 
     TESTS() {

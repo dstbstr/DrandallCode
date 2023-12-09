@@ -89,14 +89,14 @@ SOLUTION(2015, 12) {
 
     PART_ONE() {
         size_t index = 0;
-        auto root = ParseJson(Line, index);
+        auto root = ParseJson(lines[0], index);
 
         return Constexpr::ToString(CountAll(root, ""));
     }
 
     PART_TWO() {
         size_t index = 0;
-        auto root = ParseJson(Line, index);
+        auto root = ParseJson(lines[0], index);
 
         return Constexpr::ToString(CountAll(root, "red"));
     }

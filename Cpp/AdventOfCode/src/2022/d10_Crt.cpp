@@ -61,11 +61,11 @@ SOLUTION(2022, 10) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(SumSignalStrength(Lines));
+        return Constexpr::ToString(SumSignalStrength(lines));
     }
 
     PART_TWO() {
-        return BuildCrtString(Lines);
+        return BuildCrtString(lines);
     }
 
     TESTS() {

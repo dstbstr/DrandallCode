@@ -17,12 +17,12 @@ SOLUTION(2022, 1) {
     }
 
     PART_ONE() {
-        auto elves = GetElves(Lines);
+        auto elves = GetElves(lines);
         return Constexpr::ToString(elves.back());
     }
 
     PART_TWO() {
-        auto elves = GetElves(Lines);
+        auto elves = GetElves(lines);
         return Constexpr::ToString(elves.back() + elves[elves.size() - 2] + elves[elves.size() - 3]);
     }
 

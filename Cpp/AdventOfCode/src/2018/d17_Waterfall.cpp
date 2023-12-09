@@ -173,13 +173,13 @@ SOLUTION(2018, 17) {
 
 
     PART_ONE() {
-        auto [lhs, rhs] = Solve(Lines);
+        auto [lhs, rhs] = Solve(lines);
 
         return Constexpr::ToString(lhs + rhs);
     }
 
     PART_TWO() {
-        auto [lhs, rhs] = Solve(Lines);
+        auto [lhs, rhs] = Solve(lines);
 
         return Constexpr::ToString(lhs);
     }

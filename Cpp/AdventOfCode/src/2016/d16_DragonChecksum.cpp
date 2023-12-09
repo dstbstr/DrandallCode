@@ -34,11 +34,11 @@ SOLUTION(2016, 16) {
     }
 
     PART_ONE() {
-        return FillDisk(272, Line);
+        return FillDisk(272, lines[0]);
 
     }
     PART_TWO() {
-        return FillDisk(35651584, Line);
+        return FillDisk(35651584, lines[0]);
 
     }
 

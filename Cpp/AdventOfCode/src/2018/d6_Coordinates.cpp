@@ -44,7 +44,7 @@ SOLUTION(2018, 6) {
 
     PART_ONE() {
         std::vector<Coord> coords;
-        for (const auto& line : Lines) {
+        for (const auto& line : lines) {
             coords.push_back(Coord(line));
         }
 
@@ -67,7 +67,7 @@ SOLUTION(2018, 6) {
         const s32 maxDistance = 10'000;
 
         std::vector<Coord> coords;
-        for (const auto& line : Lines) {
+        for (const auto& line : lines) {
             coords.push_back(Coord(line));
         }
 

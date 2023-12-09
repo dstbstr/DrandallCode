@@ -8,12 +8,12 @@ SOLUTION(2017, 12) {
     }
 
     PART_ONE() {
-        auto connections = ParseLines(Lines, ParseLine);
+        auto connections = ParseLines(lines, ParseLine);
         return Constexpr::ToString(FloodFill(0, [&connections](u32 pipe) { return connections[pipe]; }).size());
     }
 
     PART_TWO() {
-        auto connections = ParseLines(Lines, ParseLine);
+        auto connections = ParseLines(lines, ParseLine);
         std::vector<u32> remainingGroups;
         for (auto i = 0; i < connections.size(); i++) {
             remainingGroups.push_back(i);

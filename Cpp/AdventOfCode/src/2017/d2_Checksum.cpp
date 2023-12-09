@@ -26,11 +26,11 @@ SOLUTION(2017, 2) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(Checksum(Lines, FindDelta));
+        return Constexpr::ToString(Checksum(lines, FindDelta));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(Checksum(Lines, FindDivisors));
+        return Constexpr::ToString(Checksum(lines, FindDivisors));
     }
 
     TESTS() {

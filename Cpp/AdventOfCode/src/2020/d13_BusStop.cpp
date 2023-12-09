@@ -27,7 +27,7 @@ SOLUTION(2020, 13) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(SolvePartOne(Lines));
+        return Constexpr::ToString(SolvePartOne(lines));
     }
 
     //77 % 7 == 0
@@ -57,7 +57,7 @@ SOLUTION(2020, 13) {
     }
 
     PART_TWO() {
-        return Constexpr::ToString(SolvePartTwo(Lines));
+        return Constexpr::ToString(SolvePartTwo(lines));
     }
 
     TESTS() {

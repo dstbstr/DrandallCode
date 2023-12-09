@@ -3,7 +3,7 @@
 
 SOLUTION(2017, 11) {
     PART_ONE() {
-        auto split = Constexpr::Split(Line, ",");
+        auto split = Constexpr::Split(lines[0], ",");
         FlatHex::Pos pos{ 0, 0, 0 };
         for (auto sv : split) {
             FlatHex::Move(pos, FlatHex::ParseDirection(sv));
@@ -13,7 +13,7 @@ SOLUTION(2017, 11) {
     }
 
     PART_TWO() {
-        auto split = Constexpr::Split(Line, ",");
+        auto split = Constexpr::Split(lines[0], ",");
         u32 max = 0;
         FlatHex::Pos pos{ 0, 0, 0 };
         const FlatHex::Pos origin{ 0, 0, 0 };

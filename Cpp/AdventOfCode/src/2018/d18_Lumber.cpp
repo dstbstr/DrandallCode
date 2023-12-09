@@ -84,7 +84,7 @@ SOLUTION(2018, 18) {
     }
 
     PART_ONE() {
-        auto src = Flatten(Lines);
+        auto src = Flatten(lines);
         auto dest = src;
         for (auto i = 0; i < 10; i++) {
             NextBig(src, dest);
@@ -95,7 +95,7 @@ SOLUTION(2018, 18) {
     }
 
     PART_TWO() {
-        auto src = Flatten(Lines);
+        auto src = Flatten(lines);
         auto dest = src;
         Constexpr::SmallSet<std::string> seen;
         size_t cycleStart = 0;

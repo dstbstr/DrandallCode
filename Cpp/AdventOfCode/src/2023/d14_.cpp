@@ -2,11 +2,11 @@
 
 SOLUTION(2023, 14) {
     PART_ONE() {
-        return "";
+        return lines[0];
     }
 
     PART_TWO() {
-        return "";
+        return lines[0];
     }
 
     TESTS() {

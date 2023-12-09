@@ -98,7 +98,7 @@ SOLUTION(2016, 10) {
     PART_ONE() {
         std::vector<Bot> bots;
         std::vector<size_t> bins;
-        Impl(Lines, bots, bins);
+        Impl(lines, bots, bins);
         for (size_t i = 0; i < bots.size(); i++) {
             if (bots[i].Low == 17 && bots[i].High == 61) {
                 return Constexpr::ToString(i);
@@ -111,7 +111,7 @@ SOLUTION(2016, 10) {
     PART_TWO() {
         std::vector<Bot> bots;
         std::vector<size_t> bins;
-        Impl(Lines, bots, bins);
+        Impl(lines, bots, bins);
 
         return Constexpr::ToString(bins[0] * bins[1] * bins[2]);
     }

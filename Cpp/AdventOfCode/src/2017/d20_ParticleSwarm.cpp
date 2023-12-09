@@ -50,7 +50,7 @@ SOLUTION(2017, 20) {
     }
 
     PART_ONE() {
-        auto particles = ParseLinesWithIndex(Lines, ParseParticle);
+        auto particles = ParseLinesWithIndex(lines, ParseParticle);
         //Over 10k iterations, the Acceleration will be the most important factor
         std::sort(particles.begin(), particles.end(), [](const Particle& lhs, const Particle& rhs) {
             return MDistance(lhs.Accel) < MDistance(rhs.Accel);
@@ -59,7 +59,7 @@ SOLUTION(2017, 20) {
     }
 
     PART_TWO() {
-        auto particles = ParseLinesWithIndex(Lines, ParseParticle);
+        auto particles = ParseLinesWithIndex(lines, ParseParticle);
 
         for (auto i = 0; i < 100; i++) {
             for (auto& particle : particles) {

@@ -151,8 +151,8 @@ SOLUTION(2018, 13) {
     }
 
     PART_ONE() {
-        auto grid = ParseGrid(Lines);
-        auto carts = GetCarts(Lines);
+        auto grid = ParseGrid(lines);
+        auto carts = GetCarts(lines);
 
         UCoord result;
         while (!HasCollision(carts, result)) {
@@ -163,8 +163,8 @@ SOLUTION(2018, 13) {
     }
 
     PART_TWO() {
-        auto grid = ParseGrid(Lines);
-        auto carts = GetCarts(Lines);
+        auto grid = ParseGrid(lines);
+        auto carts = GetCarts(lines);
 
         while (CountLiving(carts) > 1) {
             Tick2(grid, carts);

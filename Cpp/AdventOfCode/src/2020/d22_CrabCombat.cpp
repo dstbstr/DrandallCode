@@ -98,11 +98,11 @@ SOLUTION(2020, 22) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(Solve(Lines, PlayRound));
+        return Constexpr::ToString(Solve(lines, PlayRound));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(Solve(Lines, PlaySubGame));
+        return Constexpr::ToString(Solve(lines, PlaySubGame));
     }
 
     TESTS() {

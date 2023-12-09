@@ -67,12 +67,12 @@ SOLUTION(2018, 8) {
     }
 
     PART_ONE() {
-        auto numbers = GetNumbers(Lines);
+        auto numbers = GetNumbers(lines);
         return Constexpr::ToString(SumMetadata(numbers));
     }
 
     PART_TWO() {
-        auto numbers = GetNumbers(Lines);
+        auto numbers = GetNumbers(lines);
         return Constexpr::ToString(GetNodeValue(numbers));
     }
 

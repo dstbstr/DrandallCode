@@ -87,7 +87,7 @@ SOLUTION(2017, 7) {
     }
 
     PART_ONE() {
-        auto map = ParseMap(Lines);
+        auto map = ParseMap(lines);
         return FindRoot(map);
     }
 
@@ -120,7 +120,7 @@ SOLUTION(2017, 7) {
     }
 
     PART_TWO() {
-        return Constexpr::ToString(SolvePartTwo(Lines));
+        return Constexpr::ToString(SolvePartTwo(lines));
     }
 
     constexpr bool TestAllMatch(const std::vector<u32>& weights, bool shouldMatch, size_t expectedOddIndex) {

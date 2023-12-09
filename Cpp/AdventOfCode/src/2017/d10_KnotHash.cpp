@@ -8,7 +8,7 @@ SOLUTION(2017, 10) {
         u32 skip = 0;
         u32 currentPos = 0;
 
-        auto lengths = ParseLineAsNumbers<u32>(Line);
+        auto lengths = ParseLineAsNumbers<u32>(lines[0]);
         for (auto length : lengths) {
             KnotHash::Twist(numbers, length, skip, currentPos);
         }
@@ -18,7 +18,7 @@ SOLUTION(2017, 10) {
     }
 
     PART_TWO() {
-        return KnotHash::HashToHex(KnotHash::Hash(Line));
+        return KnotHash::HashToHex(KnotHash::Hash(lines[0]));
     }
 
     TESTS() {

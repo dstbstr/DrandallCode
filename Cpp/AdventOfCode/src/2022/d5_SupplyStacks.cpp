@@ -54,7 +54,7 @@ SOLUTION(2022, 5) {
     }
 
     PART_ONE() {
-        return SolvePartOne(Lines);
+        return SolvePartOne(lines);
     }
 
     constexpr std::string SolvePartTwo(const auto& lines) {
@@ -69,7 +69,7 @@ SOLUTION(2022, 5) {
         });
     }
     PART_TWO() {
-        return SolvePartTwo(Lines);
+        return SolvePartTwo(lines);
     }
 
     TESTS() {

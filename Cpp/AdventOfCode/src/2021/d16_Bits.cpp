@@ -163,11 +163,11 @@
     }
 
     PART_ONE() {
-        return Constexpr::ToString(SolvePartOne(Line));
+        return Constexpr::ToString(SolvePartOne(lines[0]));
     }
 
     PART_TWO() {
-        auto packet = GetPacket(Line);
+        auto packet = GetPacket(lines[0]);
         return Constexpr::ToString(packet.Evaluate());
     }
 

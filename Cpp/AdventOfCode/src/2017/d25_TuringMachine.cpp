@@ -60,7 +60,7 @@ In state A:
     }
 
     PART_ONE() {
-        auto groups = SplitInputIntoGroups(Lines);
+        auto groups = SplitInputIntoGroups(lines);
         char state = GetStartState(groups[0][0]) - 'A';
 
         auto steps = GetSteps(groups[0][1]);
@@ -81,6 +81,7 @@ In state A:
     }
 
     PART_TWO() {
+        (void)lines;
         return "Merry Christmas";
     }
 

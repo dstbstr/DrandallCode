@@ -255,10 +255,10 @@ SOLUTION(2016, 11) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(Solve(Lines));
+        return Constexpr::ToString(Solve(lines));
     }
     PART_TWO() {
-        auto copy = CopyToVector(Lines);
+        auto copy = lines;
         copy[0] += " elerium generator, elerium microchip, dilithium generator, dilithium microchip";
         return Constexpr::ToString(Solve(copy));
     }

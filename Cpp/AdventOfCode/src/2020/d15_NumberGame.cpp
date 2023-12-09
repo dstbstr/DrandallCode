@@ -30,11 +30,11 @@ SOLUTION(2020, 15) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(Solve<2020>(Line));
+        return Constexpr::ToString(Solve<2020>(lines[0]));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(Solve<30'000'000>(Line));
+        return Constexpr::ToString(Solve<30'000'000>(lines[0]));
     }
 
     TESTS() {

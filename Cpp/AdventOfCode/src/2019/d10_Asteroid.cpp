@@ -83,13 +83,13 @@ SOLUTION(2019, 10) {
     }
 
     PART_ONE() {
-        auto map = ParseMap(Lines);
+        auto map = ParseMap(lines);
         auto targets = FindMostTargets(map);
         return Constexpr::ToString(targets.size());
     }
 
     PART_TWO() {
-        auto map = ParseMap(Lines);
+        auto map = ParseMap(lines);
         auto targets = FindMostTargets(map);
         std::sort(targets.begin(), targets.end());
 

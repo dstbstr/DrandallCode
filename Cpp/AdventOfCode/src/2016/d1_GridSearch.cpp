@@ -37,10 +37,10 @@ SOLUTION(2016, 1) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(FindTarget(Line));
+        return Constexpr::ToString(FindTarget(lines[0]));
     }
     PART_TWO() {
-        return Constexpr::ToString(FindTarget2(Line));
+        return Constexpr::ToString(FindTarget2(lines[0]));
     }
 
     TESTS() {

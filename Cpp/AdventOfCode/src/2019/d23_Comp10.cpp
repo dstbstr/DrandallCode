@@ -99,7 +99,7 @@ SOLUTION(2019, 23) {
     }
 
     PART_ONE() {
-        auto computers = InitializeComputers(Line);
+        auto computers = InitializeComputers(lines[0]);
         Packet packet;
         while (true) {
             for (auto& computer : computers) {
@@ -123,7 +123,7 @@ SOLUTION(2019, 23) {
     }
 
     PART_TWO() {
-        auto computers = InitializeComputers(Line);
+        auto computers = InitializeComputers(lines[0]);
         u32 emptyFrames = 0;
         Packet packet;
         while (true) {

@@ -108,11 +108,11 @@ SOLUTION(2016, 23) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(CalculateConstant(Lines) + Constexpr::Factorial(7));
+        return Constexpr::ToString(CalculateConstant(lines) + Constexpr::Factorial(7));
         //return Constexpr::ToString(Execute(lines, 7));
     }
     PART_TWO() {
-        return Constexpr::ToString(CalculateConstant(Lines) + Constexpr::Factorial(12ull));
+        return Constexpr::ToString(CalculateConstant(lines) + Constexpr::Factorial(12ull));
         //return Constexpr::ToString(Execute(lines, 12));
     }
 

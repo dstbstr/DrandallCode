@@ -29,11 +29,11 @@ SOLUTION(2015, 20) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(Solve(Line, CountPresents, 700'000));
+        return Constexpr::ToString(Solve(lines[0], CountPresents, 700'000));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(Solve(Line, CountLazyPresents, 800'000));
+        return Constexpr::ToString(Solve(lines[0], CountLazyPresents, 800'000));
     }
     TESTS() {
         static_assert(CountPresents(1) == 10);

@@ -174,4 +174,11 @@ namespace Constexpr {
             return result;
         }
     };
+
+    template<typename T1, typename T2>
+    struct Hasher<std::pair<T1, T2>> {
+        constexpr size_t operator()(const std::pair<T1, T2>& p) const {
+            return detail::AllOnes ^ Hasher<T1>()(p.first) ^ Hasher<T2>()(p.second);
+        }
+    };
 }

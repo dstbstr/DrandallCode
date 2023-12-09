@@ -82,10 +82,10 @@ SOLUTION(2016, 21) {
     }
 
     PART_ONE() {
-        return Scramble(Lines, "abcdefgh");
+        return Scramble(lines, "abcdefgh");
     }
     PART_TWO() {
-        return UnScramble(Lines, "fbgdceah");
+        return UnScramble(lines, "fbgdceah");
     }
 
     TESTS() {

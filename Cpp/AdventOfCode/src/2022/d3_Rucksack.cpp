@@ -46,15 +46,15 @@ SOLUTION(2022, 3) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(std::accumulate(Lines.begin(), Lines.end(), 0u, [](u32 prev, std::string_view line) {
+        return Constexpr::ToString(std::accumulate(lines.begin(), lines.end(), 0u, [](u32 prev, std::string_view line) {
             return prev + GetLetterValue(FindDuplicate(line));
             }));
     }
 
     PART_TWO() {
         u32 result = 0;
-        for (auto i = 0; i < Lines.size(); i += 3) {
-            result += GetLetterValue(FindBadge(Lines[i], Lines[i + 1], Lines[i + 2]));
+        for (auto i = 0; i < lines.size(); i += 3) {
+            result += GetLetterValue(FindBadge(lines[i], lines[i + 1], lines[i + 2]));
         }
 
         return Constexpr::ToString(result);

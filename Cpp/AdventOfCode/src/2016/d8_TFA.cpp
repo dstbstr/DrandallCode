@@ -117,14 +117,14 @@ SOLUTION(2016, 8) {
 
     PART_ONE() {
         Bits<6, 50> bits{};
-        for (const auto& line : Lines) {
+        for (const auto& line : lines) {
             ParseLine<6, 50>(line)(bits);
         }
         return Constexpr::ToString(CountLit(bits));
     }
     PART_TWO() {
         Bits<6, 50> bits{};
-        for (const auto& line : Lines) {
+        for (const auto& line : lines) {
             ParseLine<6, 50>(line)(bits);
         }
         return PrintWords(bits);

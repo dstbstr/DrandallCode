@@ -81,7 +81,7 @@ SOLUTION(2019, 12) {
     }
 
     PART_ONE() {
-        auto moons = ParseLines(Lines, ParseMoon);
+        auto moons = ParseLines(lines, ParseMoon);
         for (u32 i = 0; i < 1000; i++) {
             Tick(moons);
         }
@@ -90,7 +90,7 @@ SOLUTION(2019, 12) {
     }
 
     PART_TWO() {
-        auto moons = ParseLines(Lines, ParseMoon);
+        auto moons = ParseLines(lines, ParseMoon);
         u64 step = 0;
 
         u64 pX = 0;

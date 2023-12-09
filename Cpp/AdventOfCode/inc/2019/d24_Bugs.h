@@ -2,8 +2,4 @@
 
 #include "Common.h"
 
-DECLARE_SOLUTION(2019, 24, R"RawInput_(..###
-.####
-...#.
-.#..#
-#.###)RawInput_");
+DECLARE_SOLUTION(2019, 24);

@@ -234,11 +234,11 @@ SOLUTION(2019, 20) {
         return PathFinder(dMap, portalMap, entrance, exit, limit);
     }
     PART_ONE() {
-        return Constexpr::ToString(Solve(Lines, FindShortestPath));
+        return Constexpr::ToString(Solve(lines, FindShortestPath));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(Solve(Lines, FindShortestRecursivePath));
+        return Constexpr::ToString(Solve(lines, FindShortestRecursivePath));
     }
 
     TESTS() {

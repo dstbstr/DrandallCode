@@ -93,10 +93,10 @@ SOLUTION(2015, 11) {
     }
 
     PART_ONE() {
-        return NextPass(Line);
+        return NextPass(lines[0]);
     }
     PART_TWO() {
-        return NextPass(NextPass(Line));
+        return NextPass(NextPass(lines[0]));
     }
 
     TESTS() {

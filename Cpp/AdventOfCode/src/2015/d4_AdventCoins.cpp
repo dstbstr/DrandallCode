@@ -17,11 +17,11 @@ SOLUTION(2015, 4) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(Solve(Line, "00000", 100'000));
+        return Constexpr::ToString(Solve(lines[0], "00000", 100'000));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(Solve(Line, "000000", 3'900'000));
+        return Constexpr::ToString(Solve(lines[0], "000000", 3'900'000));
     }
 
     TESTS() {

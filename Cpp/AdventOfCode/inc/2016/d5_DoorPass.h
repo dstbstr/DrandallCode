@@ -1,4 +1,4 @@
 #pragma once
 
 #include "Common.h"
-DECLARE_SOLUTION(2016, 5, "abbhdwsy");
+DECLARE_SOLUTION(2016, 5);

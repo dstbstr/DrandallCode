@@ -50,12 +50,12 @@ SOLUTION(2015, 5) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(std::count_if(Lines.cbegin(), Lines.cend(), IsNice));
+        return Constexpr::ToString(std::count_if(lines.cbegin(), lines.cend(), IsNice));
     }
 
     PART_TWO() {
-        //return Constexpr::ToString(std::count_if(Lines.cbegin(), Lines.cend(), IsReallyNice));
-        return Constexpr::ToString(std::count_if(Lines.cbegin(), Lines.cend(), IsReallyNice) + 1); //why is this one wrong?
+        //return Constexpr::ToString(std::count_if(lines.cbegin(), lines.cend(), IsReallyNice));
+        return Constexpr::ToString(std::count_if(lines.cbegin(), lines.cend(), IsReallyNice) + 1); //why is this one wrong?
     }
 
     TESTS() {

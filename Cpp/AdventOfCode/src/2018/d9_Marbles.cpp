@@ -60,7 +60,7 @@ SOLUTION(2018, 9) {
     PART_ONE() {
         //this version is slower, but doesn't hard code the input
         size_t players, maxValue;
-        ParseInput(Line, players, maxValue);
+        ParseInput(lines[0], players, maxValue);
         return Constexpr::ToString(Play2(players, maxValue));
         /*
         (void)lines;
@@ -70,7 +70,7 @@ SOLUTION(2018, 9) {
 
     PART_TWO() {
         size_t players, maxValue;
-        ParseInput(Line, players, maxValue);
+        ParseInput(lines[0], players, maxValue);
         return Constexpr::ToString(Play2(players, maxValue * 100));
         /*
         (void)lines;

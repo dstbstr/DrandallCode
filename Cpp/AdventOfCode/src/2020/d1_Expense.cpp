@@ -3,7 +3,7 @@
 SOLUTION(2020, 1) {
 
     PART_ONE() {
-        auto nums = ParseLinesAsNumbers<u32>(Lines);
+        auto nums = ParseLinesAsNumbers<u32>(lines);
         std::sort(nums.begin(), nums.end());
         for (auto firstNum = 0; firstNum < nums.size(); firstNum++) {
             bool tooBig = false;
@@ -24,7 +24,7 @@ SOLUTION(2020, 1) {
     }
 
     PART_TWO() {
-        auto nums = ParseLinesAsNumbers<u32>(Lines);
+        auto nums = ParseLinesAsNumbers<u32>(lines);
         std::sort(nums.begin(), nums.end());
         for (auto firstNum = 0; firstNum < nums.size(); firstNum++) {
             for (auto secondNum = firstNum + 1; secondNum < nums.size(); secondNum++) {

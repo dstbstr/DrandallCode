@@ -47,8 +47,8 @@ SOLUTION(2017, 23) {
         s64 ip = 0;
         size_t result = 0;
 
-        auto maxIp = static_cast<s64>(Lines.size());
-        auto cmds = ParseLines(Lines, GenCommand);
+        auto maxIp = static_cast<s64>(lines.size());
+        auto cmds = ParseLines(lines, GenCommand);
         while (ip < maxIp) {
             cmds[ip](ip, regs, result);
         }
@@ -62,7 +62,7 @@ SOLUTION(2017, 23) {
 
         auto unused = 0ull;
         auto ip = 0ll;
-        auto cmds = ParseLines(Lines, GenCommand);
+        auto cmds = ParseLines(lines, GenCommand);
 
         for (auto i = 0; i < 8; i++) {
             cmds[ip](ip, regs, unused);

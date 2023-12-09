@@ -67,11 +67,11 @@ SOLUTION(2021, 20) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(Solve(Lines, 2));
+        return Constexpr::ToString(Solve(lines, 2));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(Solve(Lines, 50));
+        return Constexpr::ToString(Solve(lines, 50));
     }
 
     TESTS() {

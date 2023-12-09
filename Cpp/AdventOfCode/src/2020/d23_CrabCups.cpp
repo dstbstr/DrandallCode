@@ -75,7 +75,7 @@ SOLUTION(2020, 23) {
     }
 
     PART_ONE() {
-        return SolvePartOne(Line);
+        return SolvePartOne(lines[0]);
     }
 
     constexpr size_t SolvePartTwo(std::string_view line) {
@@ -86,7 +86,7 @@ SOLUTION(2020, 23) {
     }
 
     PART_TWO() {
-        return Constexpr::ToString(SolvePartTwo(Line));
+        return Constexpr::ToString(SolvePartTwo(lines[0]));
     }
 
     TESTS() {

@@ -99,11 +99,11 @@ SOLUTION(2021, 22) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(Solve(Lines, IsInRange));
+        return Constexpr::ToString(Solve(lines, IsInRange));
     }
 
     PART_TWO() {
-        return Constexpr::ToString(Solve(Lines, AcceptAll));
+        return Constexpr::ToString(Solve(lines, AcceptAll));
     }
 
     constexpr bool TestCubeSubtract() {

@@ -43,7 +43,7 @@ SOLUTION(2015, 19) {
     }
 
     PART_ONE() {
-        auto groups = SplitInputIntoGroups(Lines);
+        auto groups = SplitInputIntoGroups(lines);
         Transforms transforms;
         RTransforms reverseTransforms;
         for (const auto& line : groups[0]) {
@@ -57,7 +57,7 @@ SOLUTION(2015, 19) {
         return Constexpr::ToString(molecules.size());
     }
     PART_TWO() {
-        auto groups = SplitInputIntoGroups(Lines);
+        auto groups = SplitInputIntoGroups(lines);
         Transforms transforms;
         RTransforms reverseTransforms;
         for (const auto& line : groups[0]) {

@@ -35,7 +35,7 @@ SOLUTION(2018, 25) {
 
     PART_ONE() {
         std::vector<Constellation> constellations;
-        for (const auto& line : Lines) {
+        for (const auto& line : lines) {
             auto star = ParseStar(line);
             auto constellation = Constellation{};
             constellation.Stars.push_back(star);
@@ -74,6 +74,7 @@ SOLUTION(2018, 25) {
     }
 
     PART_TWO() {
+        (void)lines;
         return "Merry Christmas";
     }
 

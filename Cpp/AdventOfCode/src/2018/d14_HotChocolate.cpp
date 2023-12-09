@@ -19,7 +19,7 @@ SOLUTION(2018, 14) {
 
     PART_ONE() {
         size_t count;
-        Constexpr::ParseNumber(Line, count);
+        Constexpr::ParseNumber(lines[0], count);
         std::string current = "37";
         current.reserve(count);
         size_t r1 = 0;
@@ -32,7 +32,7 @@ SOLUTION(2018, 14) {
     }
 
     PART_TWO() {
-        const auto& target = std::string(Line);
+        const auto& target = std::string(lines[0]);
         std::string current = "37";
         current.reserve(10'000'000);
         size_t r1 = 0;

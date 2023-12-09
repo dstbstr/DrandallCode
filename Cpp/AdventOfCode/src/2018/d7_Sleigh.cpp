@@ -62,7 +62,7 @@ SOLUTION(2018, 7) {
     PART_ONE() {
         std::array<u32, 26> requirements;
         std::array<bool, 26> existance;
-        BuildMap(Lines, requirements, existance);
+        BuildMap(lines, requirements, existance);
         std::string result = "";
 
         while (true) {
@@ -82,7 +82,7 @@ SOLUTION(2018, 7) {
     PART_TWO() {
         std::array<u32, 26> requirements;
         std::array<bool, 26> existance;
-        BuildMap(Lines, requirements, existance);
+        BuildMap(lines, requirements, existance);
         u32 totalSeconds = 0;
         u32 availableWorkers = 5;
         std::array<u32, 26> inFlightWork;

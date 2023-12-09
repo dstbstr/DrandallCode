@@ -13,14 +13,14 @@ SOLUTION(2017, 6) {
     }
 
     PART_ONE() {
-        auto banks = ParseLineAsNumbers<u32>(Line, "\t");
+        auto banks = ParseLineAsNumbers<u32>(lines[0], "\t");
         u32 cycleStart, cycleLength;
         FloydCycle::FindCycle(banks, Next, cycleLength, cycleStart);
         return Constexpr::ToString(cycleLength + cycleStart);
     }
 
     PART_TWO() {
-        auto banks = ParseLineAsNumbers<u32>(Line, "\t");
+        auto banks = ParseLineAsNumbers<u32>(lines[0], "\t");
         u32 cycleStart, cycleLength;
         FloydCycle::FindCycle(banks, Next, cycleLength, cycleStart);
         return Constexpr::ToString(cycleLength);

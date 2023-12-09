@@ -48,19 +48,19 @@ SOLUTION(2016, 6) {
         return result;
     }
 
-    constexpr std::string Solve(auto Decoder) {
+    constexpr std::string Solve(const std::vector<std::string>& lines, auto Decoder) {
         CountType<8> counts{};
-        for (auto line : Lines) {
+        for (auto line : lines) {
             UpdateLetterCounts(line, counts);
         }
         return Decoder(counts);
     }
 
     PART_ONE() {
-        return Solve(Decode<8>);
+        return Solve(lines, Decode<8>);
     }
     PART_TWO() {
-        return Solve(DecodeMin<8>);
+        return Solve(lines, DecodeMin<8>);
     }
 
     TESTS() {

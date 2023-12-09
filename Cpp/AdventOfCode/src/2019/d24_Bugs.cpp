@@ -172,7 +172,7 @@ SOLUTION(2019, 24) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(SolvePartOne(Lines));
+        return Constexpr::ToString(SolvePartOne(lines));
     }
 
     constexpr auto SolvePartTwo(const auto& lines, size_t minutes) {
@@ -191,7 +191,7 @@ SOLUTION(2019, 24) {
     }
 
     PART_TWO() {
-        return Constexpr::ToString(SolvePartTwo(Lines, 200));
+        return Constexpr::ToString(SolvePartTwo(lines, 200));
     }
 
     TESTS() {

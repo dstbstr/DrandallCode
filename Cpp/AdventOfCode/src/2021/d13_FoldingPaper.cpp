@@ -69,11 +69,11 @@ SOLUTION(2021, 13) {
         return paper.size();
     }
     PART_ONE() {
-        return Constexpr::ToString(SolvePartOne(Lines));
+        return Constexpr::ToString(SolvePartOne(lines));
     }
 
     PART_TWO() {
-        auto groups = SplitInputIntoGroups(Lines);
+        auto groups = SplitInputIntoGroups(lines);
         auto paper = ParseInput(groups[0]);
         auto folds = ParseLines(groups[1], ParseFold);
         for (const auto& fold : folds) {

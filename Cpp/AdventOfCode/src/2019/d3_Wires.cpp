@@ -67,7 +67,7 @@ SOLUTION(2019, 3) {
     }
     PART_ONE() {
         size_t best = 9999;
-        Solve(Lines, [&](const Segment& s1, const Segment& s2) {
+        Solve(lines, [&](const Segment& s1, const Segment& s2) {
             auto intersection = FindIntersection(s1, s2);
             auto dist = MDistance(intersection);
             if (dist > 0) best = std::min(best, dist);
@@ -79,7 +79,7 @@ SOLUTION(2019, 3) {
 
     PART_TWO() {
         s64 best = 999999;
-        Solve(Lines, [&](const Segment& s1, const Segment& s2) {
+        Solve(lines, [&](const Segment& s1, const Segment& s2) {
             auto intersection = FindIntersection2(s1, s2);
             if (intersection.X != 0 || intersection.Y != 0) {
                 best = std::min(best, intersection.Z);

@@ -52,10 +52,10 @@ SOLUTION(2015, 23) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(Solve(Lines, 0));
+        return Constexpr::ToString(Solve(lines, 0));
     }
     PART_TWO() {
-        return Constexpr::ToString(Solve(Lines, 1));
+        return Constexpr::ToString(Solve(lines, 1));
     }
     TESTS() {
         return true;

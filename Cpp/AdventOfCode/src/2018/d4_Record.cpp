@@ -86,7 +86,7 @@ SOLUTION(2018, 4) {
     PART_ONE() {
         Constexpr::SmallMap<u32, u32> guardSleepAmounts{};
         Constexpr::SmallMap<u32, std::array<u8, 60>> guardSleepTimes{};
-        auto events = ParseLines(Lines, ParseEvent);
+        auto events = ParseLines(lines, ParseEvent);
         std::sort(events.begin(), events.end());
         PopulateSleepData(events, guardSleepAmounts, guardSleepTimes);
 
@@ -115,7 +115,7 @@ SOLUTION(2018, 4) {
     PART_TWO() {
         Constexpr::SmallMap<u32, u32> guardSleepAmounts{};
         Constexpr::SmallMap<u32, std::array<u8, 60>> guardSleepTimes{};
-        auto events = ParseLines(Lines, ParseEvent);
+        auto events = ParseLines(lines, ParseEvent);
         std::sort(events.begin(), events.end());
 
         PopulateSleepData(events, guardSleepAmounts, guardSleepTimes);

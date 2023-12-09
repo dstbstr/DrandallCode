@@ -91,8 +91,8 @@ SOLUTION(2021, 21) {
     PART_ONE() {
         size_t p1Pos, p2Pos;
 
-        Constexpr::ParseNumber(Constexpr::Split(Lines[0], " ").back(), p1Pos);
-        Constexpr::ParseNumber(Constexpr::Split(Lines[1], " ").back(), p2Pos);
+        Constexpr::ParseNumber(Constexpr::Split(lines[0], " ").back(), p1Pos);
+        Constexpr::ParseNumber(Constexpr::Split(lines[1], " ").back(), p2Pos);
         return Constexpr::ToString(SolveP1(p1Pos, p2Pos));
     }
 
@@ -112,8 +112,8 @@ SOLUTION(2021, 21) {
     PART_TWO() {
         size_t p1Pos, p2Pos;
 
-        Constexpr::ParseNumber(Constexpr::Split(Lines[0], " ").back(), p1Pos);
-        Constexpr::ParseNumber(Constexpr::Split(Lines[1], " ").back(), p2Pos);
+        Constexpr::ParseNumber(Constexpr::Split(lines[0], " ").back(), p1Pos);
+        Constexpr::ParseNumber(Constexpr::Split(lines[1], " ").back(), p2Pos);
         return Constexpr::ToString(SolveP2(p1Pos, p2Pos));
     }
 

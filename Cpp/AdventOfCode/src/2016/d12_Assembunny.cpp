@@ -52,13 +52,13 @@ SOLUTION(2016, 12) {
     }
     PART_ONE() {
         std::vector<s32> registers{ 0, 0, 0, 0 };
-        Execute(Lines, registers);
+        Execute(lines, registers);
 
         return Constexpr::ToString(registers[0]);
     }
     PART_TWO() {
         std::vector<s32> registers{ 0, 0, 1, 0 };
-        Execute(Lines, registers);
+        Execute(lines, registers);
 
         return Constexpr::ToString(registers[0]);
     }

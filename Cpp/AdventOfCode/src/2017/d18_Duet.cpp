@@ -53,8 +53,8 @@ SOLUTION(2017, 18) {
         s64 lastPlayed = 0;
         Registers registers{};
 
-        auto cmds = ParseLines(Lines, GenCommand);
-        s64 maxIp = static_cast<s64>(Lines.size());
+        auto cmds = ParseLines(lines, GenCommand);
+        s64 maxIp = static_cast<s64>(lines.size());
         while (ip < maxIp) {
             auto recovered = cmds[ip](ip, registers, lastPlayed);
             if (recovered > 0) {
@@ -123,9 +123,9 @@ SOLUTION(2017, 18) {
 
         Constexpr::Queue<s64> p0Q;
         Constexpr::Queue<s64> p1Q;
-        s64 maxIp = static_cast<s64>(Lines.size());
+        s64 maxIp = static_cast<s64>(lines.size());
 
-        auto p0Cmds = ParseLines(Lines, GenCommand2);
+        auto p0Cmds = ParseLines(lines, GenCommand2);
         auto p1Cmds = p0Cmds;
 
         u32 p1SendCount = 0;
