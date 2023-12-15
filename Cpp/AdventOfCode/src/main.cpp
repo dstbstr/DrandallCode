@@ -15,6 +15,11 @@
 #include <array>
 #include <filesystem>
 
+//yuck.  Needed to find the exe path
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+#include <libloaderapi.h>
+
 Log::MinimalStdOutLogWriter logWriter{};
 using TimingEntry = std::pair<std::string, std::chrono::microseconds>;
 
@@ -22,7 +27,11 @@ enum struct Visibility { Hide, Show };
 
 std::vector<std::string> ReadInputFile(size_t year, size_t day) {
     std::vector<std::string> result{};
-    auto targetFile = std::filesystem::current_path() / "Inputs" / ToString(year) / ("d" + ToString(day) + ".txt");
+    auto buffer = std::make_unique<char*>(new char[1024]);
+    GetModuleFileNameA(nullptr, *buffer, MAX_PATH);
+    auto exePath = std::string(*buffer);
+    exePath = exePath.substr(0, exePath.find_last_of("/\\"));
+    auto targetFile = std::filesystem::path(exePath) / "Inputs" / ToString(year) / ("d" + ToString(day) + ".txt");
     auto stream = std::ifstream(targetFile.c_str());
     if(!stream.is_open()) {
         return {};
@@ -185,8 +194,9 @@ int main(int argc, char** argv) {
 
     //auto timings = RunAllSync();
     //auto timings = RunAll();
-    //auto timings = RunYearSync(2020);
-    auto timings = RunOne(2023, 9);
+    //auto timings = RunYearSync(2023);
+    //auto timings = RunYear(2023);
+    auto timings = RunOne(2023, 16);
 
     //PrintTimings(0, std::chrono::seconds(1));
     PrintTimings(timings);
