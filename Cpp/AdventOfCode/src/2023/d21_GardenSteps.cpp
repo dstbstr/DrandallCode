@@ -41,27 +41,6 @@ SOLUTION(2023, 21) {
         
         auto distances = GetDistances(lines);
         size_t cornerDistance = lines.size() / 2;
-        /*
-        size_t evenCenters = 0, oddCenters = 0, corners = 0;
-        for (auto distance : distances) {
-            if (distance <= cornerDistance) {
-                if (distance % 2 == 0) evenCenters++;
-                else oddCenters++;
-            }
-            else {
-                corners++; 
-            }
-        }
-
-        size_t x = steps / lines.size();
-
-        auto Square = [](auto v) { return v * v; };
-        auto oddCount = Square(2 * (x / 2) + 1);
-        auto evenCount = Square(2 * ((x + 1) / 2));
-        auto cornerCount = (evenCenters + oddCenters) / 2;
-
-        return evenCount * evenCenters + oddCount * oddCenters + cornerCount * corners;
-        */
         
         size_t evenPlots = 0, oddPlots = 0, evenCornerPlots = 0, oddCornerPlots = 0;
         for (auto d : distances) {
@@ -73,12 +52,6 @@ SOLUTION(2023, 21) {
                 oddPlots++;
                 oddCornerPlots += (d > cornerDistance);
             }
-        }
-
-        if (steps <= cornerDistance) {
-            return std::count_if(distances.begin(), distances.end(), [steps](size_t dist) {
-                return dist <= steps && dist % 2 == steps % 2;
-                });
         }
 
         size_t n = (steps - cornerDistance) / lines.size();
