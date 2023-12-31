@@ -61,6 +61,33 @@ namespace Constexpr {
         return result;
     }
 
+    constexpr size_t HexToDec(char c) {
+        if (c >= '0' && c <= '9') {
+            return c - '0';
+        }
+        else if (c >= 'a' && c <= 'f') {
+            return (c - 'a') + 10;
+        }
+        else if (c >= 'A' && c <= 'F') {
+            return (c - 'A') + 10;
+        }
+        else {
+            throw "Bad Input";
+        }
+    }
+
+    constexpr size_t ParseHex(std::string_view input) {
+        size_t result = 0;
+        size_t multiplier = 1;
+
+        for (size_t i = input.size() - 1; i > 0; i--) {
+            result += HexToDec(input[i]) * multiplier;
+            multiplier *= 16;
+        }
+        
+        return result + (HexToDec(input[0]) * multiplier);
+    }
+
     template<typename T>
     constexpr bool ParseNumber(std::string_view input, T& result) {
         T place = 1;

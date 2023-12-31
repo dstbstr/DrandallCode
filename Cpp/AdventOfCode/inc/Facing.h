@@ -81,17 +81,7 @@ static_assert(TurnAround(South) == North);
 static_assert(TurnAround(West) == East);
 static_assert(TurnAround(East) == West);
 
-constexpr void Move(Coord& pos, Facing facing) {
-    switch (facing) {
-    case Up: pos.Y--; return;
-    case Down: pos.Y++; return;
-    case Left: pos.X--; return;
-    case Right: pos.X++; return;
-    default:break;
-    }
-}
-
-constexpr void Move(Coord& pos, Facing facing, u32 amount) {
+constexpr void Move(Coord& pos, Facing facing, size_t amount) {
     switch (facing) {
     case Up: pos.Y -= amount; return;
     case Down: pos.Y += amount; return;
@@ -101,14 +91,8 @@ constexpr void Move(Coord& pos, Facing facing, u32 amount) {
     }
 }
 
-constexpr void Move(UCoord& pos, Facing facing) {
-    switch (facing) {
-    case Up: pos.Y--; return;
-    case Down: pos.Y++; return;
-    case Left: pos.X--; return;
-    case Right: pos.X++; return;
-    default:break;
-    }
+constexpr void Move(Coord& pos, Facing facing) {
+    Move(pos, facing, 1u);
 }
 
 constexpr void Move(UCoord& pos, Facing facing, u32 amount) {
@@ -121,14 +105,22 @@ constexpr void Move(UCoord& pos, Facing facing, u32 amount) {
     }
 }
 
-constexpr void Move(Coord& pos, Direction facing) {
+constexpr void Move(UCoord& pos, Facing facing) {
+    Move(pos, facing, 1u);
+}
+
+constexpr void Move(RowCol& pos, Facing facing, u32 amount) {
     switch (facing) {
-    case North: pos.Y--; return;
-    case South: pos.Y++; return;
-    case West: pos.X--; return;
-    case East: pos.X++; return;
-    default:break;
+    case Up: pos.Row -= amount; return;
+    case Down: pos.Row += amount; return;
+    case Left: pos.Col -= amount; return;
+    case Right: pos.Col += amount; return;
+    default: break;
     }
+}
+
+constexpr void Move(RowCol& pos, Facing facing) {
+    Move(pos, facing, 1u);
 }
 
 constexpr void Move(Coord& pos, Direction facing, u32 amount) {
@@ -141,14 +133,8 @@ constexpr void Move(Coord& pos, Direction facing, u32 amount) {
     }
 }
 
-constexpr void Move(UCoord& pos, Direction facing) {
-    switch (facing) {
-    case North: pos.Y--; return;
-    case South: pos.Y++; return;
-    case West: pos.X--; return;
-    case East: pos.X++; return;
-    default:break;
-    }
+constexpr void Move(Coord& pos, Direction facing) {
+    Move(pos, facing, 1u);
 }
 
 constexpr void Move(UCoord& pos, Direction facing, u32 amount) {
@@ -159,4 +145,8 @@ constexpr void Move(UCoord& pos, Direction facing, u32 amount) {
     case East: pos.X += amount; return;
     default:break;
     }
+}
+
+constexpr void Move(UCoord& pos, Direction facing) {
+    Move(pos, facing, 1u);
 }

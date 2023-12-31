@@ -258,18 +258,36 @@ namespace Constexpr {
         }
 
         constexpr void SetSentinel(Key newSentinel) {
-            for (auto& [key, value] : *mData) {
-                if (key == Sentinel) key = newSentinel;
+            for (auto& pair : *mData) {
+                if (pair == Sentinel) pair.first = newSentinel;
             }
-            Sentinel = newSentinel;
+            Sentinel.first = newSentinel;
+        }
+
+        constexpr void SetDefaultValue(Value val) {
+            mDefaultValue = val;
         }
 
         constexpr Value& operator[](const Key& key) {
             auto slot = FindSlot(key);
             if (!IsOccupied(slot)) {
-                (*mData)[slot] = std::make_pair(key, Value{});
+                (*mData)[slot] = std::make_pair(key, mDefaultValue);
                 mCurrentSize++;
             }
+            return (*mData)[slot].second;
+        }
+
+        constexpr void emplace(const Key& key, Value value) {
+            auto slot = FindSlot(key);
+            if (!IsOccupied(slot)) {
+                (*mData)[slot] = std::make_pair(key, value);
+                mCurrentSize++;
+            }
+        }
+
+        constexpr Value& at(const Key& key) {
+            auto slot = FindSlot(key);
+            if (!IsOccupied(slot)) throw "Key not found";
             return (*mData)[slot].second;
         }
 
@@ -375,6 +393,7 @@ namespace Constexpr {
         std::pair<Key, Value> Sentinel;
         size_t mCurrentSize{ 0 };
         Hasher mHash{};
+        Value mDefaultValue{};
 
         constexpr void MakeSentinel() {
             if constexpr (std::is_same_v<std::remove_cvref_t<Key>, std::string>) {
@@ -761,6 +780,14 @@ namespace Constexpr {
         }
         constexpr std::size_t size() const {
             return mCurrentSize;
+        }
+
+        constexpr std::vector<T> GetValues() const {
+            std::vector<T> result;
+            std::copy_if(mData->begin(), mData->end(), std::back_inserter(result), [](const T& val) {
+                return val != Sentinel;
+                });
+            return result;
         }
 
         //TODO: Yeah, these don't work

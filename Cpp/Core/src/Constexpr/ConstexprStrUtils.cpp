@@ -58,6 +58,26 @@ namespace Constexpr {
             if(TestParseNumber("-1", int(1))) return false;
             if(TestParseNumber("abc", 0)) return false;
 
+            static_assert(HexToDec('0') == 0);
+            static_assert(HexToDec('9') == 9);
+            static_assert(HexToDec('a') == 10);
+            static_assert(HexToDec('f') == 15);
+            static_assert(HexToDec('A') == 10);
+            static_assert(HexToDec('F') == 15);
+            if(HexToDec('0') != 0) return false;
+            if(HexToDec('9') != 9) return false;
+            if(HexToDec('a') != 10) return false;
+            if(HexToDec('f') != 15) return false;
+            if(HexToDec('A') != 10) return false;
+            if(HexToDec('F') != 15) return false;
+
+            static_assert(ParseHex("FF") == 255);
+            static_assert(ParseHex("2A") == 42);
+            static_assert(ParseHex("2a") == 42);
+            if(ParseHex("FF") != 255) return false;
+            if(ParseHex("2A") != 42) return false;
+            if(ParseHex("2a") != 42) return false;
+
             static_assert(ReplaceAllCopy("abc", "a", "") == "bc");
             static_assert(ReplaceAllCopy("aaa", "a", "b") == "bbb");
             static_assert(ReplaceAllCopy("abbabbabb", "bb", "c") == "acacac");

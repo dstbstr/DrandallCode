@@ -497,6 +497,62 @@ namespace Constexpr {
             return !set.contains(24);
         }
     }
+
+    namespace PriorityQueueTests {
+        constexpr bool Pop_AfterAdd_ReturnsValue() {
+            Constexpr::PriorityQueue<int> q;
+            q.push(12);
+            return q.pop() == 12;
+        }
+
+        constexpr bool Empty_OnNewQueue_ReturnsTrue() {
+            Constexpr::PriorityQueue<int> q;
+            return q.empty();
+        }
+
+        constexpr bool Pop_AfterManyAdds_ReturnsValuesInDescendingOrder() {
+            Constexpr::PriorityQueue<int> q;
+            q.push(1);
+            q.push(3);
+            q.push(5);
+            q.push(7);
+            q.push(9);
+            q.push(10);
+            q.push(8);
+            q.push(6);
+            q.push(4);
+            q.push(2);
+
+            int prev = q.pop();
+            while (!q.empty()) {
+                auto next = q.pop();
+                if (prev < next) return false;
+                prev = next;
+            }
+            return true;
+        }
+
+        constexpr bool Queue_WithCustomType_UsesLessThanOperator() {
+            struct V {
+                int Value{ 0 };
+                constexpr bool operator<(const V v) const {
+                    return Value < v.Value;
+                }            };
+
+            PriorityQueue<V> q;
+            q.push({ 3 });
+            q.push({ 5 });
+            q.push({ 7 });
+            q.push({ 9 });
+
+            if (q.pop().Value != 9) return false;
+            if (q.pop().Value != 7) return false;
+            if (q.pop().Value != 5) return false;
+            if (q.pop().Value != 3) return false;
+            return true;
+        }
+    }
+
     bool RunCollectionTests() {
         static_assert(SmallMapTests::At_WithExistingElement_ReturnsValue());
         static_assert(SmallMapTests::Clear_OnMap_IsEmpty());
@@ -626,6 +682,16 @@ namespace Constexpr {
         if(!BigSetTests::Erase_MissingElement_IsUnchanged()) return false;
         if(!BigSetTests::Contains_ExistingElement_ReturnsTrue()) return false;
         if (!BigSetTests::Contains_MissingElement_ReturnsFalse()) return false;
+
+        static_assert(PriorityQueueTests::Pop_AfterAdd_ReturnsValue());
+        static_assert(PriorityQueueTests::Empty_OnNewQueue_ReturnsTrue());
+        static_assert(PriorityQueueTests::Pop_AfterManyAdds_ReturnsValuesInDescendingOrder());
+        static_assert(PriorityQueueTests::Queue_WithCustomType_UsesLessThanOperator());
+
+        if (!PriorityQueueTests::Pop_AfterAdd_ReturnsValue()) return false;
+        if (!PriorityQueueTests::Empty_OnNewQueue_ReturnsTrue()) return false;
+        if (!PriorityQueueTests::Pop_AfterManyAdds_ReturnsValuesInDescendingOrder()) return false;
+        if (!PriorityQueueTests::Queue_WithCustomType_UsesLessThanOperator()) return false;
 
         return true;
     }

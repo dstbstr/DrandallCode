@@ -61,6 +61,12 @@ bool Check(size_t year, size_t day, std::vector<TimingEntry>& timingData, Visibi
     }
     else {
         if(visibility == Visibility::Show) std::cout << "Test Fail. :(\n";
+        if (!GET_LOGS().empty()) {
+            std::cout << "## Logs ##\n";
+            std::cout << Constexpr::JoinVec("\n", GET_LOGS());
+            GET_LOGS().clear();
+        }
+
         return false;
     }
 }
@@ -196,7 +202,7 @@ int main(int argc, char** argv) {
     //auto timings = RunAll();
     //auto timings = RunYearSync(2023);
     //auto timings = RunYear(2023);
-    auto timings = RunOne(2023, 16);
+    auto timings = RunOne(2023, 21);
 
     //PrintTimings(0, std::chrono::seconds(1));
     PrintTimings(timings);

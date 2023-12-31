@@ -314,11 +314,11 @@ constexpr void GetLimitsFromMap(const auto& map, Key& min, Key& max) {
     max.X = std::numeric_limits<decltype(max.X)>::min();
     max.Y = std::numeric_limits<decltype(max.Y)>::min();
 
-    for (const auto& kvp : map) {
-        min.X = std::min(min.X, kvp.first.X);
-        min.Y = std::min(min.Y, kvp.first.Y);
-        max.X = std::max(max.X, kvp.first.X);
-        max.Y = std::max(max.Y, kvp.first.Y);
+    for (const auto& pos : map.GetKeys()) {
+        min.X = std::min(min.X, pos.X);
+        min.Y = std::min(min.Y, pos.Y);
+        max.X = std::max(max.X, pos.X);
+        max.Y = std::max(max.Y, pos.Y);
     }
 }
 
@@ -328,11 +328,11 @@ constexpr void GetLimitsFromMap(const auto& map, RowCol& min, RowCol& max) {
     max.Row = std::numeric_limits<decltype(max.Row)>::min();
     max.Col = std::numeric_limits<decltype(max.Col)>::min();
 
-    for (const auto& kvp : map) {
-        min.Row = std::min(min.Row, kvp.first.Row);
-        min.Col = std::min(min.Col, kvp.first.Col);
-        max.Row = std::max(max.Row, kvp.first.Row);
-        max.Col = std::max(max.Col, kvp.first.Col);
+    for (const auto& key : map.GetKeys()) {
+        min.Row = std::min(min.Row, key.Row);
+        min.Col = std::min(min.Col, key.Col);
+        max.Row = std::max(max.Row, key.Row);
+        max.Col = std::max(max.Col, key.Col);
     }
 }
 

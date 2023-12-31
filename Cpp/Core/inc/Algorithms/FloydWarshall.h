@@ -3,6 +3,21 @@
 #include <vector>
 #include <array>
 
+/*
+Given a graph with N nodes (A through E in this example)
+Represent the distances between Node A and B in a table
+
+  A B C D E
+A 0
+B   0
+C     0
+D       0
+E         0
+
+Fill in the known distances (so if B to C is 3, then graph[B][C] = 3)
+Fill in all unknowns with infinity
+This will then find the shortest path from each node to every other node
+*/
 template<size_t Verts, typename T>
 constexpr void FloydWarshall(std::array<std::array<T, Verts>, Verts>& table) {
     for (size_t i = 0; i < Verts; i++) {
