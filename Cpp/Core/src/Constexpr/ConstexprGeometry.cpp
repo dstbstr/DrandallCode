@@ -1,5 +1,36 @@
 #include "Constexpr/ConstexprGeometry.h"
 
+constexpr Vec2<int> Origin2 = { 0, 0 };
+constexpr Vec2<int> Mid2 = { 1, 1 };
+constexpr Vec2<int> End2 = { 2, 2 };
+
+constexpr Vec3<int> Origin3 = { 0 ,0, 0 };
+constexpr Vec3<int> Mid3 = { 1, 1, 1 };
+constexpr Vec3<int> End3 = { 2, 2, 2 };
+
+static_assert(std::is_same_v<Vec3<int>, std::remove_cvref_t<const Vec3<int>&>>);
+
+static_assert(Origin2.Between(Origin2, End2));
+static_assert(End2.Between(Origin2, End2));
+static_assert(Mid2.Between(Origin2, End2));
+static_assert(!End2.Between(Origin2, Mid2));
+
+static_assert(Origin3.Between(Origin3, End3));
+static_assert(End3.Between(Origin3, End3));
+static_assert(Mid3.Between(Origin3, End3));
+static_assert(!End3.Between(Origin3, Mid3));
+
+static_assert(GetDirectNeighbors(Vec2<int>{1, 2}).size() == 4);
+static_assert(GetAllNeighbors(Vec2<int>{1, 2}).size() == 8);
+static_assert(GetDirectNeighbors(Vec3<int>{1, 2, 3}).size() == 6);
+static_assert(GetAllNeighbors(Vec3<int>{1, 2, 3}).size() == 26);
+
+static_assert(GetDirectNeighbors(Vec2<int>{0, 0}, Vec2<int>{100, 100}).size() == 2);
+static_assert(GetDirectNeighbors(Vec3<int>{0, 0, 0}, Vec3<int>{100, 100, 100}).size() == 3);
+
+static_assert(GetAllNeighbors(Origin2, End2).size() == 3);
+static_assert(GetAllNeighbors(Origin3, End3).size() == 7);
+
 namespace Constexpr {
 
     namespace ConstexprGeometryTests {
@@ -10,37 +41,6 @@ namespace Constexpr {
                 return X == other.X && Y == other.Y;
             }
         };
-
-        constexpr bool TestFlipX() {
-            std::array<std::array<int, 2>, 2> i = { { {1, 2}, {3, 4} } };
-            std::array<std::array<int, 2>, 2> e = { { {3, 4}, {1, 2} } };
-            if (Constexpr::FlipX(i) != e) return false;
-
-            std::array<std::array<int, 3>, 3> i2 = { { {1, 2, 3}, {4, 5, 6}, {7, 8, 9} } };
-            std::array<std::array<int, 3>, 3> e2 = { {{7, 8, 9}, {4, 5, 6}, {1, 2, 3}} };
-            if (Constexpr::FlipX(i2) != e2) return false;
-            return true;
-        }
-
-        constexpr bool TestFlipY() {
-            std::array<std::array<int, 2>, 2> i = { { {1, 2}, {3, 4} } };
-            std::array<std::array<int, 2>, 2> e = { { {2, 1}, {4, 3} } };
-            if (Constexpr::FlipY(i) != e) return false;
-
-            std::array<std::array<int, 3>, 3> i2 = { { { 1, 2, 3 }, {4, 5, 6}, {7, 8, 9} } };
-            std::array<std::array<int, 3>, 3> e2 = { { {3, 2, 1}, {6, 5, 4}, {9, 8, 7} } };
-            if (Constexpr::FlipY(i2) != e2) return false;
-
-            return true;
-        }
-
-        constexpr bool TestRotate() {
-            std::array<std::array<int, 3>, 3> initial = { { {1, 2, 3}, {4, 5, 6}, {7, 8, 9} } };
-            std::array<std::array<int, 3>, 3> expected = { { {7, 4, 1}, {8, 5, 2}, {9, 6, 3} } };
-            if (Constexpr::Rotate(initial) != expected) return false;
-
-            return true;
-        }
 
         constexpr bool TestDoIntersect() {
             Point a, b, c, d;
@@ -79,16 +79,58 @@ namespace Constexpr {
 
             return true;
         }
-        bool RunTests() {
-            static_assert(TestFlipX());
-            static_assert(TestFlipY());
-            static_assert(TestRotate());
-            if (!TestFlipX()) return false;
-            if (!TestFlipY()) return false;
-            if (!TestRotate()) return false;
 
+        constexpr bool TestTryFindIntersection() {
+            Vec2<double> result;
+            if (!TryFindIntersection({ 19, 13 }, { 17, 14 }, { 18, 19 }, { 17, 18 }, result)) return false;
+            if (Constexpr::Abs(result.X - 14.333) > 0.01) return false;
+            if (Constexpr::Abs(result.Y - 15.333) > 0.01) return false;
+
+            if (!TryFindIntersection({ 19, 13 }, { 17, 14 }, { 20, 25 }, { 18, 23 }, result)) return false;
+            if (Constexpr::Abs(result.X - 11.667) > 0.001) return false;
+            if (Constexpr::Abs(result.Y - 16.667) > 0.001) return false;
+
+            double s, t;
+
+            if (!TryFindIntersection({ 19, 13 }, { -2, 1 }, { 18, 19 }, { -1, -1 }, result, s, t)) return false;
+            if (Constexpr::Abs(result.X - 14.333) > 0.01) return false;
+            if (Constexpr::Abs(result.Y - 15.333) > 0.01) return false;
+            if (s <= 0 || t <= 0) return false;
+
+            if (!TryFindIntersection({ 19, 13 }, { -2, 1 }, { 20, 19 }, { 1, -5 }, result, s, t)) return false;
+            if (s >= 0) return false;
+            if (t <= 0) return false;
+
+            return true;
+        }
+
+
+        constexpr bool TestDotProduct() {
+            if (DotProduct(Vec3<int>{ 3, -5, 4 }, Vec3<int>{ 2, 6, 5 }) != -4) return false;
+            return true;
+        }
+
+        constexpr bool TestCrossProduct() {
+            Vec3<int> lhs = { 3, -5, 4 };
+            Vec3<int> rhs = { 2, 6, 5 };
+
+            if (CrossProduct(lhs, rhs) != Vec3<int>{-49, -7, 28}) return false;
+
+            return true;
+        }
+
+        bool RunTests() {
             static_assert(TestDoIntersect());
             if (!TestDoIntersect()) return false;
+
+            static_assert(TestTryFindIntersection());
+            if (!TestTryFindIntersection()) return false;
+
+            static_assert(TestDotProduct());
+            if (!TestDotProduct()) return false;
+
+            static_assert(TestCrossProduct());
+            if (!TestCrossProduct()) return false;
 
             return true;
         }

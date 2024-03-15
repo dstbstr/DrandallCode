@@ -43,7 +43,8 @@ SOLUTION(2021, 13) {
     }
 
     constexpr std::string PrintPaper(const std::vector<UCoord>& paper) {
-        auto [min, max] = GetLimits(paper);
+        UCoord min, max;
+        GetLimits(paper, min, max);
         std::string result = "\n";
         for (auto y = min.Y; y <= max.Y; y++) {
             for (auto x = min.X; x <= max.X; x++) {

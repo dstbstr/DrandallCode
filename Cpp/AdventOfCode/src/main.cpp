@@ -197,12 +197,13 @@ int main(int argc, char** argv) {
         return 0;
     }
 
-
+    if (!Constexpr::RunMatrixTests()) return 1;
+        
     //auto timings = RunAllSync();
     //auto timings = RunAll();
     //auto timings = RunYearSync(2023);
-    //auto timings = RunYear(2023);
-    auto timings = RunOne(2023, 21);
+    auto timings = RunYear(2023);
+    //auto timings = RunOne(2023, 22);
 
     //PrintTimings(0, std::chrono::seconds(1));
     PrintTimings(timings);

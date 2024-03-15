@@ -13,6 +13,7 @@ target_sources(${PROJECT_NAME} PRIVATE ${sources}
 	"src/Constexpr/ConstexprCollections.cpp"
 	"src/Constexpr/ConstexprGeometry.cpp"
 	"src/Constexpr/ConstexprMath.cpp"
+	"src/Constexpr/ConstexprMatrix.cpp"
 	"src/Constexpr/ConstexprStrUtils.cpp"
 
 	"src/Instrumentation/Log"

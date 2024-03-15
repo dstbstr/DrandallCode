@@ -53,16 +53,17 @@ namespace Constexpr {
 
         static constexpr size_t AllOnes = 0xFFFFFFFF;
 
-        constexpr size_t HashNumber(auto val) {
-            size_t result = detail::AllOnes;
-            while (val > 0) {
-                result = (result >> 8) ^ detail::crc_table[(result ^ val) & 0xFF];
-                val /= 2;
-            }
-            return result ^ detail::AllOnes;
-            
-            //return static_cast<size_t>(val);
+        constexpr size_t Cantor(auto a, auto b) {
+            return (a + b + 1) * (a + b) / 2 + b;
         }
+    }
+
+    constexpr size_t GenericHash(auto head) {
+        return static_cast<size_t>(head);
+    }
+
+    constexpr size_t GenericHash(auto head, auto... parts) {
+        return detail::Cantor(head, GenericHash(parts...));
     }
 
     template<typename T>
@@ -76,41 +77,41 @@ namespace Constexpr {
     template<>
     struct Hasher<int> {
         constexpr size_t operator()(const int& t) const {
-            return detail::HashNumber(t);
+            return static_cast<size_t>(t);
         }
     };
     template<>
     struct Hasher<unsigned int> {
         constexpr size_t operator()(const unsigned int& t) const {
-            return detail::HashNumber(t);
+            return static_cast<size_t>(t);
         }
     };
 
     template<>
     struct Hasher<long> {
         constexpr size_t operator()(const long& t) const {
-            return detail::HashNumber(t);
+            return static_cast<size_t>(t);
         }
     };
 
     template<>
     struct Hasher<unsigned long> {
         constexpr size_t operator()(const unsigned long& t) const {
-            return detail::HashNumber(t);
+            return static_cast<size_t>(t);
         }
     };
 
     template<>
     struct Hasher<size_t> {
         constexpr size_t operator()(const size_t& t) const {
-            return detail::HashNumber(t);
+            return t;
         }
     };
 
     template<>
     struct Hasher<long long> {
         constexpr size_t operator()(const long long& t) const {
-            return detail::HashNumber(t);
+            return static_cast<size_t>(t);
         }
     };
 
@@ -150,17 +151,17 @@ namespace Constexpr {
     template<typename T, typename U>
     struct Hasher<std::tuple<T, U>> {
         constexpr size_t operator()(std::tuple<T, U> tuple) const {
-            size_t result = detail::AllOnes;
-            result ^= Hash(tuple.first);
-            result ^= Hash(tuple.second);
-            return result;
+            return detail::Cantor(Hasher<T>()(tuple.first), Hasher<U>()(tuple.second));
         }
     };
 
     template<typename T, typename U, typename W>
     struct Hasher<std::tuple<T, U, W>> {
         constexpr size_t operator()(std::tuple<T, U, W> tuple) const {
-            return detail::AllOnes ^ Hash(std::get<0>(tuple)) ^ Hash(std::get<1>(tuple)) ^ Hash(std::get<2>(tuple));
+            return GenericHash(
+                Hasher<T>()(std::get<0>(tuple)), 
+                Hasher<U>()(std::get<1>(tuple)), 
+                Hasher<W>()(std::get<2>(tuple)));
         }
     };
 
@@ -168,8 +169,9 @@ namespace Constexpr {
     struct Hasher<std::vector<T>> {
         constexpr size_t operator()(const std::vector<T>& v) const {
             size_t result = detail::AllOnes;
+            auto hash = Hasher<T>();
             for (const auto& e : v) {
-                result ^= Hash(e);
+                result = detail::Cantor(result, hash(e));
             }
             return result;
         }
@@ -178,7 +180,7 @@ namespace Constexpr {
     template<typename T1, typename T2>
     struct Hasher<std::pair<T1, T2>> {
         constexpr size_t operator()(const std::pair<T1, T2>& p) const {
-            return detail::AllOnes ^ Hasher<T1>()(p.first) ^ Hasher<T2>()(p.second);
+            return GenericHash(Hasher<T1>()(p.first), Hasher<T2>()(p.second));
         }
     };
 }

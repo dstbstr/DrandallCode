@@ -145,12 +145,13 @@ namespace Constexpr {
         return remainder >= 0 ? remainder : remainder + Abs(modulus);
     }
 
-    constexpr size_t FromBase26(std::string_view str) {
-        auto pow = 1;
-        size_t result = 0;
+    template<typename T = size_t>
+    constexpr T FromBase26(std::string_view str) {
+        T pow = 1;
+        T result = 0;
         auto ToLower = [](char c) { return c <= 'Z' ? c + 32 : c; };
         for (auto it = str.rbegin(); it != str.rend(); it++) {
-            result += static_cast<size_t>((ToLower(*it) - 'a' + 1)) * pow;
+            result += static_cast<T>((ToLower(*it) - 'a' + 1)) * pow;
             pow *= 26;
         }
 

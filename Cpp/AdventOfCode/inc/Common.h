@@ -22,6 +22,7 @@
 #include "Constexpr/ConstexprGeometry.h"
 #include "Constexpr/ConstexprCollections.h"
 #include "Constexpr/ConstexprMath.h"
+#include "Constexpr/ConstexprMatrix.h"
 #include "Constexpr/ConstexprStrUtils.h"
 
 using namespace std::string_view_literals;
