@@ -1,5 +1,4 @@
-#ifndef __OPTIONVALUEPAIR_H__
-#define __OPTIONVALUEPAIR_H__
+#pragma once
 
 #include <string>
 
@@ -13,4 +12,3 @@ namespace CommandParser {
         bool HasValue;
     };
 } // namespace CommandParser
-#endif // __OPTIONVALUEPAIR_H__

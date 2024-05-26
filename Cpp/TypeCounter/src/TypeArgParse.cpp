@@ -2,10 +2,11 @@
 
 #include "CommandParser/CommandSplitter.h"
 #include "Extractor/Workers/DefineFileParser.h"
-#include "Utilities/FileUtils.h"
-#include "Utilities/Require.h"
-#include "Utilities/ScopedTimer.h"
-#include "Utilities/StringUtils.h"
+
+#include "Core/Utilities/FileUtils.h"
+#include "Core/Utilities/Require.h"
+#include "Core/Utilities/ScopedTimer.h"
+#include "Core/Utilities/StringUtils.h"
 
 #include <iostream>
 

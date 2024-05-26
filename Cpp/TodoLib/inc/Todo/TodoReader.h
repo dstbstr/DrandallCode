@@ -1,6 +1,6 @@
-#ifndef __TODOREADER_H__
-#define __TODOREADER_H__
-#include "Threading/IRunnable.h"
+#pragma once
+
+#include "Core/Threading/IRunnable.h"
 #include "Todo/Todo.h"
 #include "Todo/TodoSettings.h"
 
@@ -22,4 +22,3 @@ namespace TodoLib {
         mutable std::shared_ptr<std::istream> m_InputStream;
     };
 } // namespace TodoLib
-#endif // __TODOREADER_H__

@@ -1,7 +1,7 @@
-#include "Threading/Runner.h"
-
 #include "TestCommon.h"
-#include "Threading/IRunnable.h"
+
+#include "Core/Threading/Runner.h"
+#include "Core/Threading/IRunnable.h"
 
 #include <memory>
 

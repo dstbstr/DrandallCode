@@ -1,9 +1,10 @@
+#include "TestCommon.h"
+
 #include "CommandParser/CommandSplitter.h"
 
-#include "Instrumentation/LogWriter/AssertToException.h"
-#include "Macros/PreProcessorOverride.h"
-#include "TestCommon.h"
-#include "Utilities/LambdaUtils.h"
+#include "Core/Instrumentation/LogWriter/AssertToException.h"
+#include "Core/Macros/PreProcessorOverride.h"
+#include "Core/Utilities/LambdaUtils.h"
 
 #define ARGV_1(str, ...) \
     { (char*)str }

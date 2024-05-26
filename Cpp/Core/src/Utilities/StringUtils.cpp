@@ -1,6 +1,6 @@
-#include "Utilities/StringUtils.h"
+#include "Core/Utilities/StringUtils.h"
 
-#include "Utilities/Require.h"
+#include "Core/Utilities/Require.h"
 
 namespace StrUtil {
 

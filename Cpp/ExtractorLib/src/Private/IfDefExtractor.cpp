@@ -2,10 +2,11 @@
 
 #include "Extractor/Data/DefineData.h"
 #include "Extractor/Private/LineFetcher.h"
-#include "Instrumentation/Log.h"
-#include "Utilities/ExpressionEvaluator.h"
-#include "Utilities/Format.h"
-#include "Utilities/StringUtils.h"
+
+#include "Core/Instrumentation/Logging.h"
+#include "Core/Utilities/ExpressionEvaluator.h"
+#include "Core/Utilities/Format.h"
+#include "Core/Utilities/StringUtils.h"
 
 #include <regex>
 
@@ -26,7 +27,7 @@ namespace Extractor {
             m_MatchedLevels.erase(m_DefineDepth);
             m_DefineDepth--;
             if(m_DefineDepth < 0) {
-                LOG_WARN("Found unexpected endif");
+                Log::Warn("Found unexpected endif");
                 m_DefineDepth = 0;
             }
             line = "";

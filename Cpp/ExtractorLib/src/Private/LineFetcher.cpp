@@ -1,7 +1,8 @@
 #include "Extractor/Private/LineFetcher.h"
 
 #include "Extractor/Private/CommentExtractor.h"
-#include "Utilities/StringUtils.h"
+
+#include "Core/Utilities/StringUtils.h"
 
 #include <regex>
 

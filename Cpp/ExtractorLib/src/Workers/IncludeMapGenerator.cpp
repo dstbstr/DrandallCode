@@ -1,8 +1,9 @@
 #include "Extractor/Workers/IncludeMapGenerator.h"
 
 #include "Extractor/Data/FileData.h"
-#include "Utilities/PathUtils.h"
-#include "Utilities/ScopedTimer.h"
+
+#include "Core/Utilities/PathUtils.h"
+#include "Core/Utilities/ScopedTimer.h"
 
 namespace {
     void Recurse(const std::string& fileName, const std::unordered_map<std::string, const Extractor::FileData*>& firstParty, Extractor::IncludeMap& result) {

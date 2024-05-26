@@ -1,6 +1,7 @@
 #include "2023/d14_Tilting.h"
 #include "Facing.h"
-#include "Algorithms/FloydCycle.h"
+
+#include "Core/Algorithms/FloydCycle.h"
 
 SOLUTION(2023, 14) {
     constexpr s32 left = -1;

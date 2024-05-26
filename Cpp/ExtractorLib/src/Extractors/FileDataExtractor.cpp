@@ -10,11 +10,12 @@
 #include "Extractor/Private/LineFetcher.h"
 #include "Extractor/Private/NamespaceExtractor.h"
 #include "Extractor/TypeDataExtractor.h"
-#include "Instrumentation/Log.h"
-#include "Utilities/Format.h"
-#include "Utilities/PathUtils.h"
-#include "Utilities/ScopedTimer.h"
-#include "Utilities/StringUtils.h"
+
+#include "Core/Instrumentation/Logging.h"
+#include "Core/Utilities/Format.h"
+#include "Core/Utilities/PathUtils.h"
+#include "Core/Utilities/ScopedTimer.h"
+#include "Core/Utilities/StringUtils.h"
 
 #include <fstream>
 #include <regex>
@@ -115,7 +116,7 @@ namespace Extractor {
                     try {
                         namespaceExtractor.PopNamespace();
                     } catch(std::exception&) {
-                        LOG_WARN(StrUtil::Format("Failed to pop namespace.  File %s, NonBlankLine %u", result.FileName, nonBlankLines));
+                        Log::Warn(StrUtil::Format("Failed to pop namespace.  File %s, NonBlankLine %u", result.FileName, nonBlankLines));
                     }
                 }
             }

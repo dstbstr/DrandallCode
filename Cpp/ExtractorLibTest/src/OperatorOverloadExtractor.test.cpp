@@ -1,6 +1,8 @@
-#include "Extractor/FunctionDataExtractor.h"
 #include "TestCommon.h"
-#include "Utilities/StringUtils.h"
+
+#include "Extractor/FunctionDataExtractor.h"
+
+#include "Core/Utilities/StringUtils.h"
 
 namespace Extractor {
     using FunctionDataExtractor::IsOperatorOverload;

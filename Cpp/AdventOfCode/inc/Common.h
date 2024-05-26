@@ -1,5 +1,17 @@
 #pragma once
 
+#include "Core/Platform/Types.h"
+#include "Core/Utilities/StringUtils.h"
+#include "Core/Utilities/Format.h"
+
+#include "Core/Constexpr/ConstexprAlgorithms.h"
+#include "Core/Constexpr/ConstexprBits.h"
+#include "Core/Constexpr/ConstexprGeometry.h"
+#include "Core/Constexpr/ConstexprCollections.h"
+#include "Core/Constexpr/ConstexprMath.h"
+#include "Core/Constexpr/ConstexprMatrix.h"
+#include "Core/Constexpr/ConstexprStrUtils.h"
+
 #include <string>
 #include <regex>
 #include <utility>
@@ -11,19 +23,6 @@
 #include <functional>
 #include <iostream>
 #include <numeric>
-
-
-#include "Platform/Types.h"
-#include "Utilities/StringUtils.h"
-#include "Utilities/Format.h"
-
-#include "Constexpr/ConstexprAlgorithms.h"
-#include "Constexpr/ConstexprBits.h"
-#include "Constexpr/ConstexprGeometry.h"
-#include "Constexpr/ConstexprCollections.h"
-#include "Constexpr/ConstexprMath.h"
-#include "Constexpr/ConstexprMatrix.h"
-#include "Constexpr/ConstexprStrUtils.h"
 
 using namespace std::string_view_literals;
 using namespace std::string_literals;

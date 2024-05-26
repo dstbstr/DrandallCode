@@ -1,9 +1,9 @@
-#ifndef __FILEDATA_H__
-#define __FILEDATA_H__
+#pragma once
 
 #include "Extractor/Data/FunctionData.h"
 #include "Extractor/Data/TypeData.h"
-#include "Platform/Types.h"
+
+#include "Core/Platform/Types.h"
 
 #include <string>
 #include <unordered_set>
@@ -24,4 +24,3 @@ namespace Extractor {
         u64 PreProcessorCount{0};
     };
 } // namespace Extractor
-#endif // __FILEDATA_H__

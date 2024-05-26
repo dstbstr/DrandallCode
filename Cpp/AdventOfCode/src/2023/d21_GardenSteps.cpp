@@ -1,5 +1,5 @@
 #include "2023/d21_GardenSteps.h"
-#include "Algorithms/AStar.h"
+#include "Core/Algorithms/AStar.h"
 
 SOLUTION(2023, 21) {
 

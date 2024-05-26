@@ -1,13 +1,12 @@
 #include "All.h"
 
 #include "Common.h"
-#include "Utilities/StringUtils.h"
-#include "Utilities/ScopedTimer.h"
-#include "Instrumentation/LogWriter/StdOutLogWriter.h"
-#include "Threading/Runner.h"
-#include "Threading/IRunnable.h"
 
-#include "Constexpr/ConstexprRegex.h"
+#include "Core/Utilities/StringUtils.h"
+#include "Core/Utilities/ScopedTimer.h"
+#include "Core/Instrumentation/LogWriter/StdOutLogWriter.h"
+#include "Core/Threading/Runner.h"
+#include "Core/Threading/IRunnable.h"
 
 #include <iostream>
 #include <charconv>
@@ -20,7 +19,7 @@
 #include <Windows.h>
 #include <libloaderapi.h>
 
-Log::MinimalStdOutLogWriter logWriter{};
+StdOutLogWriter logWriter{Log::Filter{}};
 using TimingEntry = std::pair<std::string, std::chrono::microseconds>;
 
 enum struct Visibility { Hide, Show };

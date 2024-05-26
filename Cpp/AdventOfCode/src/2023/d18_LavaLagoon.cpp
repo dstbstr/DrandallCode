@@ -1,6 +1,7 @@
 #include "2023/d18_LavaLagoon.h"
-#include "Algorithms/Shoelace.h"
 #include "Facing.h"
+
+#include "Core/Algorithms/Shoelace.h"
 
 SOLUTION(2023, 18) {
     using Points = std::vector<Coord>;

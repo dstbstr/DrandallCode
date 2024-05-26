@@ -1,7 +1,8 @@
 #include "2019/d15_Comp7.h"
 #include "2019/Comp.h"
-#include "Algorithms/AStar.h"
-#include "Algorithms/FloodFill.h"
+
+#include "Core/Algorithms/AStar.h"
+#include "Core/Algorithms/FloodFill.h"
 
 SOLUTION(2019, 15) {
     enum Dir { North = 1, South = 2, West = 3, East = 4 };

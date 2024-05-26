@@ -2,8 +2,9 @@
 
 #include "Extractor/Data/IncludeMap.h"
 #include "Extractor/Workers/IncludeMapGenerator.h"
-#include "Utilities/Format.h"
-#include "Utilities/StringUtils.h"
+
+#include "Core/Utilities/Format.h"
+#include "Core/Utilities/StringUtils.h"
 
 #include <algorithm>
 #include <filesystem>

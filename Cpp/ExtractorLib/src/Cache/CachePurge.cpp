@@ -1,9 +1,10 @@
 #include "Extractor/Cache/CachePurge.h"
 
 #include "Extractor/Data/CacheResult.h"
-#include "Instrumentation/Log.h"
-#include "Utilities/Format.h"
-#include "Utilities/TimeUtils.h"
+
+#include "Core/Instrumentation/Logging.h"
+#include "Core/Utilities/Format.h"
+#include "Core/Utilities/TimeUtils.h"
 
 #include <filesystem>
 

@@ -1,4 +1,4 @@
-#include "Utilities/PathUtils.h"
+#include "Core/Utilities/PathUtils.h"
 
 namespace PathUtils {
     std::string GetFileName(const std::string& pathOrFile) {

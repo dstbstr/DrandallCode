@@ -1,5 +1,5 @@
 #include "2021/d9_LavaTube.h"
-#include "Algorithms/FloodFill.h"
+#include "Core/Algorithms/FloodFill.h"
 
 SOLUTION(2021, 9) {
     std::vector<u32> ParseLine(std::string_view line) {

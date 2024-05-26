@@ -1,7 +1,6 @@
-#ifndef __IFDEFEXTRACTOR_H__
-#define __IFDEFEXTRACTOR_H__
+#pragma once
 
-#include "Platform/Types.h"
+#include "Core/Platform/Types.h"
 
 #include <iostream>
 #include <set>
@@ -30,4 +29,3 @@ namespace Extractor {
         void SkipToEndif();
     };
 } // namespace Extractor
-#endif // __IFDEFEXTRACTOR_H__

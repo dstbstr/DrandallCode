@@ -7,13 +7,14 @@
 #include "Extractor/FilePreProcessor.h"
 #include "Extractor/Workers/IncludeMapGenerator.h"
 #include "IncludeArgParse.h"
-#include "Instrumentation/LogWriter/StdOutLogWriter.h"
 #include "Report/CsvReport.h"
 #include "Report/ExcelReport.h"
 #include "Report/DotReport.h"
 #include "Report/DotToSvg.h"
-#include "Threading/Runner.h"
-#include "Utilities/ScopedTimer.h"
+
+#include "Core/Instrumentation/LogWriter/StdOutLogWriter.h"
+#include "Core/Threading/Runner.h"
+#include "Core/Utilities/ScopedTimer.h"
 
 #include <filesystem>
 #include <fstream>
@@ -21,7 +22,8 @@
 #include <string>
 #include <vector>
 
-Log::StdOutLogWriter logWriter{};
+StdOutLogWriter logWriter{Log::Filter{}};
+
 using namespace IncludeCounter;
 using namespace Extractor;
 

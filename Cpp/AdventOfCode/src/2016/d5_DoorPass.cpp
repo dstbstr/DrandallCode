@@ -1,5 +1,6 @@
 #include "2016/d5_DoorPass.h"
-#include "Algorithms/md5Constexpr.h"
+
+#include "Core/Algorithms/md5Constexpr.h"
 
 SOLUTION(2016, 5) {
 

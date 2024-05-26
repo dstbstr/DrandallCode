@@ -1,7 +1,7 @@
-#ifndef __BODYCOUNT_H__
-#define __BODYCOUNT_H__
+#pragma once
 
-#include "Platform/Types.h"
+#include "Core/Platform/Types.h"
+
 #include <iostream>
 #include <string>
 
@@ -11,4 +11,3 @@ namespace Extractor {
         u32 GetBodyCount(const std::string& line, std::istream& stream);
     }
 }
-#endif // __BODYCOUNT_H__

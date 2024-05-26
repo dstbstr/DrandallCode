@@ -1,5 +1,5 @@
 #include "2020/d19_SeaMonster.h"
-#include "Constexpr/ConstexprRegex.h"
+#include "Core/Constexpr/ConstexprRegex.h"
 
 SOLUTION(2020, 19) {
     using Entries = Constexpr::SmallMap<std::string, std::vector<std::string>>;

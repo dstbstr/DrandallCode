@@ -1,5 +1,5 @@
-#ifndef __OPTIONCOLLECTION_H__
-#define __OPTIONCOLLECTION_H__
+#pragma once
+
 #include "CommandParser/OptionValuePair.h"
 
 #include <ostream>
@@ -22,4 +22,3 @@ namespace CommandParser {
         BaseOption* m_RestOption {nullptr};
     };
 } // namespace CommandParser
-#endif // __OPTIONCOLLECTION_H__

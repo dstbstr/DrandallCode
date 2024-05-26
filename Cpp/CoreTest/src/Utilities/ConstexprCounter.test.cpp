@@ -1,7 +1,6 @@
-#include "Utilities/ConstexprCounter.h"
-
 #include "TestCommon.h"
 
+#include "Core/Utilities/ConstexprCounter.h"
 
 #if !_HAS_CXX20
 struct SomeStruct {};

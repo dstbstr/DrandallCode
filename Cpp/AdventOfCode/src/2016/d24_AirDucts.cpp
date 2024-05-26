@@ -1,5 +1,6 @@
 #include "2016/d24_AirDucts.h"
-#include "Algorithms/AStar.h"
+
+#include "Core/Algorithms/AStar.h"
 
 SOLUTION(2016, 24) {
     using Walls = std::vector<std::vector<bool>>;

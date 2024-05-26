@@ -1,5 +1,4 @@
-#ifndef __TODOARGPARSE_H__
-#define __TODOARGPARSE_H__
+#pragma once
 
 #include "CommandParser/Option.h"
 #include "CommandParser/OptionCollection.h"
@@ -31,5 +30,3 @@ namespace TodoManager {
         CommandParser::OptionCollection m_Options{"Finds TODOs in code"};
     };
 } // namespace TodoManager
-
-#endif // __TODOARGPARSE_H__

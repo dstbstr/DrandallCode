@@ -1,4 +1,4 @@
-#include "Constexpr/ConstexprGeometry.h"
+#include "Core/Constexpr/ConstexprGeometry.h"
 
 constexpr Vec2<int> Origin2 = { 0, 0 };
 constexpr Vec2<int> Mid2 = { 1, 1 };

@@ -1,8 +1,8 @@
 #include "Todo/TodoReader.h"
 
-#include "Utilities/FileUtils.h"
-#include "Utilities/PathUtils.h"
-#include "Utilities/StringUtils.h"
+#include "Core/Utilities/FileUtils.h"
+#include "Core/Utilities/PathUtils.h"
+#include "Core/Utilities/StringUtils.h"
 
 #include <filesystem>
 #include <fstream>

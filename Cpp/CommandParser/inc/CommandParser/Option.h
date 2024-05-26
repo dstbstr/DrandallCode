@@ -1,9 +1,7 @@
-#ifndef __OPTION_H__
-#define __OPTION_H__
+#pragma once
 
-#include "Instrumentation/Assert.h"
-#include "Utilities/Format.h"
-#include "Utilities/StringUtils.h"
+#include "Core/Utilities/Format.h"
+#include "Core/Utilities/StringUtils.h"
 
 #include <regex>
 #include <string>
@@ -109,4 +107,3 @@ namespace CommandParser {
     };
 
 } // namespace CommandParser
-#endif // __OPTION_H__

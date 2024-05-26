@@ -1,6 +1,6 @@
-#include "DesignPatterns/Crtp.h"
-
 #include "TestCommon.h"
+
+#include "Core/DesignPatterns/Crtp.h"
 
 template<typename Derived>
 class Square : public Crtp<Derived, Square<Derived>> {

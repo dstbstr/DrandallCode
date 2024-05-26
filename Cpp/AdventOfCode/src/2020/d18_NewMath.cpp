@@ -1,6 +1,6 @@
 #include "2020/d18_NewMath.h"
-#include "Algorithms/ShuntingYard.h"
-#include "BigInt.h"
+#include "Core/Algorithms/ShuntingYard.h"
+#include "Core/BigInt.h"
 
 SOLUTION(2020, 18) {
     template<typename T>

@@ -1,5 +1,5 @@
 #include "2018/d15_ElfCombat.h"
-#include "Algorithms/AStar.h"
+#include "Core/Algorithms/AStar.h"
 
 SOLUTION(2018, 15) {
 

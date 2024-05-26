@@ -1,7 +1,7 @@
 #pragma once
 
 #include "2015/d4_AdventCoins.h"
-#include "Algorithms/md5Constexpr.h"
+#include "Core/Algorithms/md5Constexpr.h"
 
 SOLUTION(2015, 4) {
     constexpr size_t Solve(std::string_view input, const std::string& prefix, size_t hint = 0) {

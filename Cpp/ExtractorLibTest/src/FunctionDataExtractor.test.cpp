@@ -1,8 +1,9 @@
-#include "Extractor/FunctionDataExtractor.h"
-
-#include "Extractor/Private/LineFetcher.h"
 #include "TestCommon.h"
-#include "Utilities/StringUtils.h"
+
+#include "Extractor/FunctionDataExtractor.h"
+#include "Extractor/Private/LineFetcher.h"
+
+#include "Core/Utilities/StringUtils.h"
 
 namespace Extractor {
     using FunctionDataExtractor::IsAFunction;

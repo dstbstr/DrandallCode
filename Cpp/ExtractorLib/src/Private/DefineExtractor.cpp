@@ -1,8 +1,8 @@
 #include "Extractor/Private/DefineExtractor.h"
 
-#include "Utilities/Format.h"
-#include "Utilities/Require.h"
-#include "Utilities/StringUtils.h"
+#include "Core/Utilities/Format.h"
+#include "Core/Utilities/Require.h"
+#include "Core/Utilities/StringUtils.h"
 
 #include <regex>
 

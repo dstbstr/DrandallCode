@@ -1,11 +1,11 @@
-#ifndef __TYPEDATA_H__
-#define __TYPEDATA_H__
+#pragma once
 
 #include "Extractor/Data/FunctionData.h"
 #include "Extractor/Data/OperatorOverloadData.h"
 #include "Extractor/Data/SpecialFunctionData.h"
 #include "Extractor/Data/TypeKeyword.h"
-#include "Platform/Types.h"
+
+#include "Core/Platform/Types.h"
 
 #include <string>
 #include <vector>
@@ -31,4 +31,3 @@ namespace Extractor {
         u16 PublicDataMemberCount{0};
     };
 } // namespace Extractor
-#endif // __TYPEDATA_H__

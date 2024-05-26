@@ -1,5 +1,5 @@
 #include "2017/d12_PipeMessage.h"
-#include "Algorithms/FloodFill.h"
+#include "Core/Algorithms/FloodFill.h"
 
 SOLUTION(2017, 12) {
     constexpr std::vector<u32> ParseLine(std::string_view line) {

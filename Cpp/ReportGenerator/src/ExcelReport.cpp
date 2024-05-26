@@ -1,7 +1,8 @@
 #include "Report/ExcelReport.h"
 
 #include "Report/Data/TypeWithMethodCounts.h"
-#include "Utilities/StringUtils.h"
+
+#include "Core/Utilities/StringUtils.h"
 
 #include <OpenXLSX.hpp>
 

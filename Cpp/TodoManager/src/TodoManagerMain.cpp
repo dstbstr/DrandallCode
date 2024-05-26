@@ -1,12 +1,13 @@
-#include "Threading/IRunnable.h"
-#include "Threading/Runner.h"
 #include "Todo/TodoReader.h"
 #include "Todo/TodoReport.h"
 #include "Todo/TodoSettings.h"
 #include "TodoArgParse.h"
-#include "Utilities/Require.h"
-#include "Utilities/ScopedTimer.h"
-#include "Utilities/TimeUtils.h"
+
+#include "Core/Utilities/Require.h"
+#include "Core/Utilities/ScopedTimer.h"
+#include "Core/Utilities/TimeUtils.h"
+#include "Core/Threading/IRunnable.h"
+#include "Core/Threading/Runner.h"
 
 #include <iostream>
 

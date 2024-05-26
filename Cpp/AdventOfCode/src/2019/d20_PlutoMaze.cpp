@@ -1,5 +1,5 @@
 #include "2019/d20_PlutoMaze.h"
-#include "Algorithms/AStar.h"
+#include "Core/Algorithms/AStar.h"
 
 #include <map>
 

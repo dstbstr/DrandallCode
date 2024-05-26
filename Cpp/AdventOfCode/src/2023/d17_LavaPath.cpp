@@ -1,6 +1,7 @@
 #include "2023/d17_LavaPath.h"
 #include "Facing.h"
-#include "Algorithms/AStar.h"
+
+#include "Core/Algorithms/AStar.h"
 
 SOLUTION(2023, 17) {
 	constexpr size_t Invalid = 99999;

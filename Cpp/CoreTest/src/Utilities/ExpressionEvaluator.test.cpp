@@ -1,6 +1,6 @@
-#include "Utilities/ExpressionEvaluator.h"
-
 #include "TestCommon.h"
+
+#include "Core/Utilities/ExpressionEvaluator.h"
 
 bool predicate(std::string input) {
     return input == "1";

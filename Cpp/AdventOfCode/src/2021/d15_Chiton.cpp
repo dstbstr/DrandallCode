@@ -1,5 +1,5 @@
 #include "2021/d15_Chiton.h"
-#include "Algorithms/AStar.h"
+#include "Core/Algorithms/AStar.h"
 
 SOLUTION(2021, 15) {
     using Map = std::vector<std::vector<u32>>;

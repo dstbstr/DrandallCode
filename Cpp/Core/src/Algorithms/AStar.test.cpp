@@ -1,4 +1,4 @@
-#include "Algorithms/AStar.h"
+#include "Core/Algorithms/AStar.h"
 
 namespace AStarTests {
     bool RunTests() {

@@ -1,4 +1,5 @@
-#include "Utilities/ProgressBar.h"
+#include "Core/Utilities/ProgressBar.h"
+#include "Core/Platform/Types.h"
 
 #include <iostream>
 

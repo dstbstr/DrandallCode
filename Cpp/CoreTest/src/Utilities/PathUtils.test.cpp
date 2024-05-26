@@ -1,6 +1,6 @@
-#include "Utilities/PathUtils.h"
-
 #include "TestCommon.h"
+
+#include "Core/Utilities/PathUtils.h"
 
 TEST(GetFileName, WithNoSeparators_ReturnsFileName) {
     std::string path = "foo.txt";

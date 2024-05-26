@@ -1,7 +1,8 @@
 #include "2019/d25_Comp11.h"
 #include "2019/Comp.h"
-#include "Algorithms/AStar.h"
 #include "Facing.h"
+
+#include "Core/Algorithms/AStar.h"
 
 SOLUTION(2019, 25) {
     struct Room {

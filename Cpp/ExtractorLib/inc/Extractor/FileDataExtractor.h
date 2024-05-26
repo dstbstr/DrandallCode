@@ -1,9 +1,9 @@
-#ifndef __FILEDATAEXTRACTOR_H__
-#define __FILEDATAEXTRACTOR_H__
+#pragma once
 
 #include "Extractor/Data/FileData.h"
 #include "Extractor/ExtractorSettings.h"
-#include "Threading/IRunnable.h"
+
+#include "Core/Threading/IRunnable.h"
 
 #include <unordered_map>
 
@@ -27,4 +27,3 @@ namespace Extractor {
     };
 
 } // namespace Extractor
-#endif // __FILEDATAEXTRACTOR_H__

@@ -7,11 +7,12 @@
 #include "Extractor/Private/IfDefExtractor.h"
 #include "Extractor/Private/LineFetcher.h"
 #include "Extractor/Private/VisibilityExtractor.h"
-#include "Instrumentation/Log.h"
-#include "Utilities/Format.h"
-#include "Utilities/Require.h"
-#include "Utilities/ScopedTimer.h"
-#include "Utilities/StringUtils.h"
+
+#include "Core/Instrumentation/Logging.h"
+#include "Core/Utilities/Format.h"
+#include "Core/Utilities/Require.h"
+#include "Core/Utilities/ScopedTimer.h"
+#include "Core/Utilities/StringUtils.h"
 
 #include <regex>
 
@@ -70,7 +71,7 @@ namespace Extractor {
                 }
                 return std::regex_search(line, outMatch, TypeRegex);
             } catch(std::exception& ex) {
-                LOG_WARN(StrUtil::Format("Failed to determine if line is a type: %s.  Error: %s", line, ex.what()));
+                Log::Warn(StrUtil::Format("Failed to determine if line is a type: %s.  Error: %s", line, ex.what()));
                 return false;
             }
         }

@@ -1,5 +1,5 @@
-#ifndef __COMMANDSPLITTER_H__
-#define __COMMANDSPLITTER_H__
+#pragma once
+
 #include "OptionValuePair.h"
 
 #include <string>
@@ -22,4 +22,3 @@ namespace CommandParser {
         bool m_HasParsed{false};
     };
 } // namespace CommandParser
-#endif // __COMMANDSPLITTER_H__

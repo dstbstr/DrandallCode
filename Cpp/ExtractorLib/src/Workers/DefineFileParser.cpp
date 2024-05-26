@@ -1,7 +1,7 @@
 #include "Extractor/Workers/DefineFileParser.h"
 
-#include "Utilities/Format.h"
-#include "Utilities/Require.h"
+#include "Core/Utilities/Format.h"
+#include "Core/Utilities/Require.h"
 
 #include <filesystem>
 #include <fstream>

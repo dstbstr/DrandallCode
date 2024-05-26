@@ -1,5 +1,5 @@
 #include "2017/d16_Dance.h"
-#include "Algorithms/FloydCycle.h"
+#include "Core/Algorithms/FloydCycle.h"
 
 SOLUTION(2017, 16) {
     static constexpr auto InitialDancers = "abcdefghijklmnop";

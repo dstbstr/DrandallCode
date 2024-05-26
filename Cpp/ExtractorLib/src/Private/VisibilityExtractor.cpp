@@ -1,6 +1,6 @@
 #include "Extractor/Private/VisibilityExtractor.h"
 
-#include "Utilities/Require.h"
+#include "Core/Utilities/Require.h"
 
 #include <regex>
 

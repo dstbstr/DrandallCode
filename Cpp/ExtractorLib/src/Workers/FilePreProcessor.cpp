@@ -5,12 +5,13 @@
 #include "Extractor/Private/DefineExtractor.h"
 #include "Extractor/Private/IfDefExtractor.h"
 #include "Extractor/Private/LineFetcher.h"
-#include "Instrumentation/Log.h"
-#include "Utilities/FileUtils.h"
-#include "Utilities/Format.h"
-#include "Utilities/PathUtils.h"
-#include "Utilities/Require.h"
-#include "Utilities/StringUtils.h"
+
+#include "Core/Instrumentation/Logging.h"
+#include "Core/Utilities/FileUtils.h"
+#include "Core/Utilities/Format.h"
+#include "Core/Utilities/PathUtils.h"
+#include "Core/Utilities/Require.h"
+#include "Core/Utilities/StringUtils.h"
 
 namespace {
     std::regex IncludeRegex("^#include [\"<]([^\">]+)[\">]$");

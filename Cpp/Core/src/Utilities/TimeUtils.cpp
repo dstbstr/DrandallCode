@@ -1,7 +1,7 @@
-#include "Utilities/TimeUtils.h"
+#include "Core/Utilities/TimeUtils.h"
 
-#include "Utilities/Format.h"
-#include "Utilities/StringUtils.h"
+#include "Core/Utilities/Format.h"
+#include "Core/Utilities/StringUtils.h"
 
 #include <functional>
 #include <iomanip>

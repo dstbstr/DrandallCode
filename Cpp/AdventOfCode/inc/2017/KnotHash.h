@@ -1,6 +1,6 @@
 #pragma once
 #include "Common.h"
-#include "Utilities/ToHex.h"
+#include "Core/Utilities/ToHex.h"
 
 namespace KnotHash {
     constexpr std::vector<u32> GetInitialNumbers() {

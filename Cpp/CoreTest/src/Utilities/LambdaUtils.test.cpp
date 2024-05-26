@@ -1,6 +1,6 @@
-#include "Utilities/LambdaUtils.h"
-
 #include "TestCommon.h"
+
+#include "Core/Utilities/LambdaUtils.h"
 
 #include <algorithm>
 #include <sstream>

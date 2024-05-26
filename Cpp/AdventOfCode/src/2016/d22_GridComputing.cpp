@@ -1,5 +1,6 @@
 #include "2016/d22_GridComputing.h"
-#include "Algorithms/AStar.h"
+
+#include "Core/Algorithms/AStar.h"
 
 SOLUTION(2016, 22) {
     struct Dir {

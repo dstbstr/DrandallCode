@@ -1,11 +1,12 @@
 #include "Extractor/FunctionDataExtractor.h"
 
-#include "Instrumentation/Log.h"
 #include "Extractor/Private/BodyCount.h"
 #include "Extractor/Private/CommentExtractor.h"
-#include "Utilities/Format.h"
-#include "Utilities/Require.h"
-#include "Utilities/ScopedTimer.h"
+
+#include "Core/Instrumentation/Logging.h"
+#include "Core/Utilities/Format.h"
+#include "Core/Utilities/Require.h"
+#include "Core/Utilities/ScopedTimer.h"
 
 #include <regex>
 
@@ -163,7 +164,7 @@ namespace Extractor {
                 }
                 return std::regex_search(line, outMatch, FunctionRegex);
             } catch(...) {
-                LOG_ERROR(StrUtil::Format("Failed to determine if line is a function: %s", line));
+                Log::Error(StrUtil::Format("Failed to determine if line is a function: %s", line));
                 return false;
             }
         }
@@ -176,7 +177,7 @@ namespace Extractor {
                 }
                 return std::regex_search(line, outMatch, SpecialFunctionRegex) && !std::regex_search(line, StaticAssertRegex);
             } catch(...) {
-                LOG_ERROR(StrUtil::Format("Failed to determine if line is a special function: %s", line));
+                Log::Error(StrUtil::Format("Failed to determine if line is a special function: %s", line));
                 return false;
             }
         }
@@ -189,7 +190,7 @@ namespace Extractor {
                 }
                 return std::regex_search(line, outMatch, OperatorOverloadRegex);
             } catch(...) {
-                LOG_ERROR(StrUtil::Format("Failed to determine if line is an operation overload: %s", line));
+                Log::Error(StrUtil::Format("Failed to determine if line is an operation overload: %s", line));
                 return false;
             }
         }

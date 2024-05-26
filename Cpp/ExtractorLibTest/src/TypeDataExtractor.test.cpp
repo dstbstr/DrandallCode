@@ -1,9 +1,10 @@
-#include "Extractor/TypeDataExtractor.h"
+#include "TestCommon.h"
 
+#include "Extractor/TypeDataExtractor.h"
 #include "Extractor/Data/DefineData.h"
 #include "Extractor/Private/LineFetcher.h"
-#include "TestCommon.h"
-#include "Utilities/StringUtils.h"
+
+#include "Core/Utilities/StringUtils.h"
 
 namespace Extractor {
 

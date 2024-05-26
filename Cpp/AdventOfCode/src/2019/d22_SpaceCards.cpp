@@ -1,5 +1,5 @@
 #include "2019/d22_SpaceCards.h"
-#include "BigInt.h"
+#include "Core/BigInt.h"
 
 SOLUTION(2019, 22) {
     constexpr void NewStack(std::vector<u64>&deck) {

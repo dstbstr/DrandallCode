@@ -1,6 +1,6 @@
-#include "Utilities/Format.h"
-
 #include "TestCommon.h"
+
+#include "Core/Utilities/Format.h"
 
 #include <string>
 

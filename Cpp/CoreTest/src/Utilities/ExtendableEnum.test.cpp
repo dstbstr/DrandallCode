@@ -1,6 +1,6 @@
-#include "Platform/ExtendableEnum.h"
-
 #include "TestCommon.h"
+
+#include "Core/Platform/ExtendableEnum.h"
 
 #if !_HAS_CXX20
 struct BaseEnum : ExtendableEnum<BaseEnum> {

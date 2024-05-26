@@ -1,5 +1,5 @@
 #include "2017/d6_Realloc.h"
-#include "Algorithms/FloydCycle.h"
+#include "Core/Algorithms/FloydCycle.h"
 
 SOLUTION(2017, 6) {
     constexpr std::vector<u32> Next(std::vector<u32> in) {

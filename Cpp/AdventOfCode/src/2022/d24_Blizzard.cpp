@@ -1,5 +1,6 @@
 #include "2022/d24_Blizzard.h"
-#include "Algorithms/AStar.h"
+
+#include "Core/Algorithms/AStar.h"
 
 SOLUTION(2022, 24) {
     enum struct Direction { Up, Down, Left, Right };

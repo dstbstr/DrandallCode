@@ -3,11 +3,12 @@
 #include "Extractor/Data/DefineData.h"
 #include "Extractor/Data/FileData.h"
 #include "Extractor/Data/IncludeMap.h"
-#include "Utilities/FileUtils.h"
-#include "Utilities/PathUtils.h"
-#include "Utilities/ScopedTimer.h"
-#include "Utilities/StringUtils.h"
-#include "Utilities/TimeUtils.h"
+
+#include "Core/Utilities/FileUtils.h"
+#include "Core/Utilities/PathUtils.h"
+#include "Core/Utilities/ScopedTimer.h"
+#include "Core/Utilities/StringUtils.h"
+#include "Core/Utilities/TimeUtils.h"
 
 #include <algorithm>
 #include <charconv>

@@ -1,11 +1,9 @@
-#ifndef __NAMESPACEEXTRACTOR_H__
-#define __NAMESPACEEXTRACTOR_H__
+#pragma once
 
-#include "Platform/Types.h"
+#include "Core/Platform/Types.h"
 
 #include <string>
 #include <vector>
-
 
 namespace Extractor {
     class NamespaceExtractor {
@@ -28,4 +26,3 @@ namespace Extractor {
         u8 m_NestedCurlyCount{0};
     };
 } // namespace Extractor
-#endif // __NAMESPACEEXTRACTOR_H__

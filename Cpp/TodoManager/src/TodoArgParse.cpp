@@ -1,8 +1,10 @@
 #include "TodoArgParse.h"
 
 #include "CommandParser/CommandSplitter.h"
-#include "Utilities/ScopedTimer.h"
-#include "Utilities/FileUtils.h"
+
+#include "Core/Utilities/ScopedTimer.h"
+#include "Core/Utilities/FileUtils.h"
+
 #include <iostream>
 
 namespace TodoManager {
@@ -33,4 +35,4 @@ namespace TodoManager {
         return fnc.GetAllFullyQualifiedPaths();
     }
 
-} // namespace TypeCounter
+} // namespace TodoManager

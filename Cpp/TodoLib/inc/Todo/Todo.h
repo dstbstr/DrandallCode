@@ -1,6 +1,6 @@
-#ifndef __TODO_H__
-#define __TODO_H__
-#include "Platform/Types.h"
+#pragma once
+
+#include "Core/Platform/Types.h"
 
 #include <string>
 
@@ -14,4 +14,3 @@ struct Todo {
     std::string Status = "Unreviewed";
     std::string Notes = "";
 };
-#endif // __TODO_H__

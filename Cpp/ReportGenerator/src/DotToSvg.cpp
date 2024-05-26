@@ -1,7 +1,7 @@
 #include "Report/DotToSvg.h"
 
-#include "Platform/ExecuteCommand.h"
-#include "Utilities/FileUtils.h"
+#include "Core/Platform/ExecuteCommand.h"
+#include "Core/Utilities/FileUtils.h"
 
 #include <chrono>
 #include <filesystem>

@@ -1,5 +1,6 @@
 #include "2016/d14_OneTimePad.h"
-#include "Algorithms/md5Constexpr.h"
+
+#include "Core/Algorithms/md5Constexpr.h"
 
 SOLUTION(2016, 14) {
     constexpr std::string Stretch(const std::string & hash) {

@@ -1,9 +1,9 @@
-#ifndef __SPECIALFUNCTIONDATA_H__
-#define __SPECIALFUNCTIONDATA_H__
+#pragma once
 
-#include "Platform/Types.h"
 #include "Extractor/Data/SpecialFunctionType.h"
 #include "Extractor/Data/Visibility.h"
+
+#include "Core/Platform/Types.h"
 
 namespace Extractor {
     struct SpecialFunctionData {
@@ -22,5 +22,3 @@ namespace Extractor {
         bool IsExplicit{false};
     };
 }
-
-#endif // __SPECIALFUNCTIONDATA_H__

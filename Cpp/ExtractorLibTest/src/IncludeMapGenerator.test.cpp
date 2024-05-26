@@ -1,8 +1,9 @@
-#include "Extractor/Workers/IncludeMapGenerator.h"
-
-#include "Extractor/Data/FileData.h"
 #include "TestCommon.h"
-#include "Utilities/Require.h"
+
+#include "Extractor/Workers/IncludeMapGenerator.h"
+#include "Extractor/Data/FileData.h"
+
+#include "Core/Utilities/Require.h"
 
 namespace {
     Extractor::FileData MakeData(std::string name, u8 lineCount) {

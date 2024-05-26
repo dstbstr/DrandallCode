@@ -1,4 +1,4 @@
-#include "Algorithms/ShuntingYard.h"
+#include "Core/Algorithms/ShuntingYard.h"
 
 namespace ShuntingYard {
     namespace Tests {

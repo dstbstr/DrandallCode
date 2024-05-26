@@ -1,27 +1,65 @@
-#include "DesignPatterns/ServiceLocator.h"
 #include "TestCommon.h"
+#include "Core/DesignPatterns/ServiceLocator.h"
 
-#include <string>
+struct ServiceLocatorTest : public testing::Test {
+    ServiceLocator& loc = ServiceLocator::Get();
 
-class TestService {
-public:
-    explicit TestService(const std::string name) : m_name(name) {}
-
-    const std::string GetName() {
-        return m_name;
+    void TearDown() override {
+        loc.Reset<int>();
     }
-
-private:
-    const std::string m_name;
 };
 
-TEST(ServiceLocator, ServiceLocator_CanRegister_AndReturn) {
-    std::string testString = "TestString";
+TEST_F(ServiceLocatorTest, IsSet_WithEmptyLocator_ReturnsFalse) {
+    ASSERT_FALSE(loc.IsSet<int>());
+}
 
-    auto service = std::make_unique<TestService>(testString);
+TEST_F(ServiceLocatorTest, Get_WithEmptyLocator_ReturnsNullopt) {
+    ASSERT_EQ(nullptr, loc.Get<int>());
+}
 
-    ServiceLocator<TestService>::Set(*service);
+TEST_F(ServiceLocatorTest, IsSet_AfterSetting_ReturnsTrue) {
+    loc.Set<int>();
 
-    TestService result = ServiceLocator<TestService>::Get();
-    ASSERT_EQ(testString, result.GetName());
+    ASSERT_TRUE(loc.IsSet<int>());
+}
+
+TEST_F(ServiceLocatorTest, Get_AfterSetting_ReturnsSetValue) {
+    loc.Set<int>(42);
+
+    auto* result = loc.Get<int>();
+    ASSERT_NE(nullptr, result);
+    ASSERT_EQ(42, *result);
+}
+
+TEST_F(ServiceLocatorTest, Get_AfterDifferentQueryAndSet_ReturnsSetValue) {
+    loc.IsSet<long>();
+    loc.Set<int>(42);
+
+    auto result = loc.Get<int>();
+    ASSERT_NE(nullptr, result);
+    ASSERT_EQ(42, *result);
+    ASSERT_FALSE(loc.IsSet<long>());
+}
+
+struct IFoo {
+    virtual ~IFoo() = default;
+    virtual int Get() const = 0;
+};
+
+struct FooImpl : public IFoo {
+    FooImpl(int val) : val(val) {}
+    int Get() const override {
+		return val;
+	}
+
+private:
+	int val;
+};
+
+TEST_F(ServiceLocatorTest, Get_WithInterface_ReturnsSetValue) {
+    loc.SetThisAsThat<FooImpl, IFoo>(42);
+
+	auto result = loc.Get<IFoo>();
+	ASSERT_NE(nullptr, result);
+	ASSERT_EQ(42, result->Get());
 }

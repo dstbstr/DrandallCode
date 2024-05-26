@@ -1,7 +1,6 @@
-#ifndef __INCLUDEMAP_H__
-#define __INCLUDEMAP_H__
+#pragma once
 
-#include "Platform/Types.h"
+#include "Core/Platform/Types.h"
 
 #include <string>
 #include <unordered_map>
@@ -14,4 +13,3 @@ namespace Extractor {
         std::unordered_map<std::string, u64> LineCounts;
     };
 } // namespace Extractor
-#endif // __INCLUDEMAP_H__

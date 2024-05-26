@@ -1,8 +1,9 @@
 #include "CommandParser/OptionCollection.h"
 
 #include "CommandParser/Option.h"
-#include "Utilities/Format.h"
-#include "Utilities/Require.h"
+
+#include "Core/Utilities/Format.h"
+#include "Core/Utilities/Require.h"
 
 #include <unordered_set>
 

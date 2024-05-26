@@ -1,8 +1,8 @@
-#ifndef __OPERATOROVERLOADDATA_H__
-#define __OPERATOROVERLOADDATA_H__
+#pragma once
 
 #include "Extractor/Data/Visibility.h"
-#include "Platform/Types.h"
+
+#include "Core/Platform/Types.h"
 
 #include <string>
 
@@ -20,4 +20,3 @@ namespace Extractor {
         bool IsInline{false};
     };
 } // namespace Extractor
-#endif // __OPERATOROVERLOADDATA_H__

@@ -1,7 +1,8 @@
 #pragma once
 
+#include "Core/Constexpr/ConstexprGeometry.h"
+
 #include <string>
-#include "Constexpr/ConstexprGeometry.h"
 
 enum Facing { Up, Right, Down, Left };
 enum Direction {North, East, South, West};

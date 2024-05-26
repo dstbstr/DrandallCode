@@ -1,6 +1,6 @@
 #include "RomanNumeral.h"
 
-#include "Utilities/StringUtils.h"
+#include "Core/Utilities/StringUtils.h"
 
 #include <regex>
 #include <unordered_map>

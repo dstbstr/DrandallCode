@@ -1,8 +1,8 @@
-#ifndef __FUNCTIONDATA_H__
-#define __FUNCTIONDATA_H__
+#pragma once
 
 #include "Extractor/Data/Visibility.h"
-#include "Platform/Types.h"
+
+#include "Core/Platform/Types.h"
 
 #include <string>
 
@@ -23,5 +23,3 @@ namespace Extractor {
         bool IsTemplated{false};
     };
 } // namespace Extractor
-
-#endif // __FUNCTIONDATA_H__

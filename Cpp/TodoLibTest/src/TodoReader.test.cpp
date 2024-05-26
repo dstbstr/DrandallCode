@@ -1,7 +1,8 @@
+#include "TestCommon.h"
+
 #include "Todo/TodoReader.h"
 
-#include "TestCommon.h"
-#include "Utilities/StringUtils.h"
+#include "Core/Utilities/StringUtils.h"
 
 #include <sstream>
 

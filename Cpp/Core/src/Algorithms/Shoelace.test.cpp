@@ -1,4 +1,4 @@
-#include "Algorithms/Shoelace.h"
+#include "Core/Algorithms/Shoelace.h"
 
 constexpr bool TestShoelace() {
 	std::vector<Coord> points = {

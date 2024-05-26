@@ -2,7 +2,8 @@
 
 #include "Report/Data/DetailedData.h"
 #include "Report/Data/SimpleData.h"
-#include "Utilities/Format.h"
+
+#include "Core/Utilities/Format.h"
 
 #include <filesystem>
 #include <fstream>

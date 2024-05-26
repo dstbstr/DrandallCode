@@ -1,6 +1,7 @@
 #include "CommandParser/Option.h"
 
-#include "Utilities/Require.h"
+#include "Core/Utilities/Require.h"
+#include "Core/Instrumentation/Logging.h"
 
 namespace CommandParser {
     BaseOption::BaseOption(std::string shortName, std::string longName, bool required) : m_Required(required), m_IsRestOption(false) {
@@ -48,7 +49,7 @@ namespace CommandParser {
         return m_LongName;
     }
     void BaseOption::Populate(std::string) {
-        ASSERT_MSG(false, "Called Populate on BaseOption");
+        DR_ASSERT_MSG(false, "Called Populate on BaseOption");
     }
 
     bool BaseOption::IsPopulated() const {

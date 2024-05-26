@@ -1,12 +1,13 @@
-#include "Extractor/Cache/CacheStore.h"
+#include "TestCommon.h"
 
+#include "Extractor/Cache/CacheStore.h"
 #include "Extractor/Data/DefineData.h"
 #include "Extractor/Data/FileData.h"
 #include "Extractor/Data/IncludeMap.h"
 #include "Extractor/Workers/IncludeMapGenerator.h"
-#include "TestCommon.h"
-#include "Utilities/StringUtils.h"
-#include "Utilities/TimeUtils.h"
+
+#include "Core/Utilities/StringUtils.h"
+#include "Core/Utilities/TimeUtils.h"
 
 #include <sstream>
 

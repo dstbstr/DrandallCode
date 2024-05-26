@@ -5,13 +5,14 @@
 #include "Extractor/ExtractorSettings.h"
 #include "Extractor/FileDataExtractor.h"
 #include "Extractor/FilePreProcessor.h"
-#include "Instrumentation/LogWriter/StdOutLogWriter.h"
 #include "Report/ExcelReport.h"
-#include "Threading/Runner.h"
 #include "TypeArgParse.h"
-#include "Utilities/Require.h"
-#include "Utilities/ScopedTimer.h"
-#include "Utilities/TimeUtils.h"
+
+#include "Core/Instrumentation/LogWriter/StdOutLogWriter.h"
+#include "Core/Threading/Runner.h"
+#include "Core/Utilities/Require.h"
+#include "Core/Utilities/ScopedTimer.h"
+#include "Core/Utilities/TimeUtils.h"
 
 #include <filesystem>
 #include <fstream>
@@ -20,7 +21,7 @@
 #include <unordered_map>
 #include <vector>
 
-Log::StdOutLogWriter logWriter{};
+StdOutLogWriter logWriter{Log::Filter{}};
 using namespace Extractor;
 using namespace TypeCounter;
 

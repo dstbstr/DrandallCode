@@ -1,7 +1,7 @@
 #include "Todo/TodoReport.h"
 
-#include "Platform/Types.h"
-#include "Utilities/StringUtils.h"
+#include "Core/Platform/Types.h"
+#include "Core/Utilities/StringUtils.h"
 
 #include <OpenXLSX.hpp>
 

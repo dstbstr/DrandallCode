@@ -1,7 +1,8 @@
+#include "TestCommon.h"
+
 #include "Extractor/Private/NamespaceExtractor.h"
 
-#include "TestCommon.h"
-#include "Utilities/StringUtils.h"
+#include "Core/Utilities/StringUtils.h"
 
 namespace Extractor {
 
