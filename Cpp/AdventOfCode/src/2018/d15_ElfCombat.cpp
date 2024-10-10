@@ -179,7 +179,8 @@ SOLUTION(2018, 15) {
     }
 
     PART_ONE() {
-        Grid grid = CopyToVector(lines);
+        //Grid grid = CopyToVector(lines);
+        Grid grid = lines;
         auto hp = GetHp(grid);
         auto rounds = Battle(grid, hp);
         auto hpValues = hp.GetValues();
@@ -189,7 +190,8 @@ SOLUTION(2018, 15) {
     }
 
     PART_TWO() {
-        auto initialGrid = CopyToVector(lines);
+        //auto initialGrid = CopyToVector(lines);
+		auto initialGrid = lines;
         auto initialHp = GetHp(initialGrid);
         for (auto i = 15; i < 20; i++) {
             Grid grid = initialGrid;

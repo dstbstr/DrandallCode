@@ -1,5 +1,4 @@
 #include "2021/d22_Reactor.h"
-#include <bitset>
 
 SOLUTION(2021, 22) {
     class Cube {

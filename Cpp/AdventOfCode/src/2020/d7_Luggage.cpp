@@ -1,5 +1,4 @@
 #include "2020/d7_Luggage.h"
-#include <queue>
 
 SOLUTION(2020, 7) {
     //muted blue bags contain 1 vibrant lavender bag, 4 dotted silver bags, 2 dim indigo bags.

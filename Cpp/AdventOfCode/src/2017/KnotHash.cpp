@@ -1,6 +1,5 @@
 #pragma once
 #include "Common.h"
-
 #include "Core/Utilities/ToHex.h"
 
 namespace KnotHash {

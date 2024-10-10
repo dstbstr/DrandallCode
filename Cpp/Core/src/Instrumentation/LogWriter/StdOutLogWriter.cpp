@@ -20,6 +20,9 @@ StdOutLogWriter::StdOutLogWriter(Log::Filter filter)
 
 void StdOutLogWriter::Write(const Log::Entry& entry) {
     switch (entry.LogLevel) {
+    case Log::Level::Debug:
+        std::printf(InfoLineFormat, "Debug", entry.Context.FileName.c_str(), entry.Context.LineNumber, entry.Message.c_str());
+        break;
 	case Log::Level::Info:
 		std::printf(InfoLineFormat, "Info", entry.Context.FileName.c_str(), entry.Context.LineNumber, entry.Message.c_str());
 		break;

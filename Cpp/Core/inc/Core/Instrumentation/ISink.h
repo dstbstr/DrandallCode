@@ -31,7 +31,6 @@ namespace Log {
 		virtual void Write(const Entry& entry) = 0;
 
 	private:
-		PubSub<Entry>* m_PubSub{ nullptr };
 		size_t m_Handle{ std::numeric_limits<size_t>::max() };
 		Filter m_Filter;
 	};

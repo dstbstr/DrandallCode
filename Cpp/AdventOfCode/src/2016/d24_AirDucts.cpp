@@ -1,5 +1,4 @@
 #include "2016/d24_AirDucts.h"
-
 #include "Core/Algorithms/AStar.h"
 
 SOLUTION(2016, 24) {

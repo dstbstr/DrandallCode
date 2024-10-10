@@ -1,7 +1,6 @@
 #include "2016/d17_Vault.h"
-#include "Facing.h"
-
 #include "Core/Algorithms/md5Constexpr.h"
+#include "Facing.h"
 
 SOLUTION(2016, 17) {
     constexpr bool IsOpen(char value) {

@@ -15,8 +15,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#ifndef CONSTEXPR_MD5_H_
-#define CONSTEXPR_MD5_H_
+#pragma once
 
 #include <array>
 #include <climits>
@@ -245,6 +244,4 @@ static_assert(ToHexUpper(md5::compute("ckczppom3938038")) == "00000028023E3B4729
 static_assert(ToHexLower(md5::compute("")) == "d41d8cd98f00b204e9800998ecf8427e");
 static_assert(ToHexLower(md5::compute("abcdef609043")) == "000001dbbfa3a5c83a2d506429c7b00e");
 static_assert(ToHexLower(md5::compute("ckczppom3938038")) == "00000028023e3b4729684757f8dc3fbf");
-
-#endif
 

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __CONSTEXPRCOUNTER_H__
+#define __CONSTEXPRCOUNTER_H__
 
 #include <vcruntime.h>
 
@@ -44,3 +45,4 @@ namespace ConstexprCounter {
     }
 } // namespace ConstexprCounter
 #endif
+#endif // __CONSTEXPRCOUNTER_H__

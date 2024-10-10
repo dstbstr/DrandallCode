@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __IRUNNABLE_H__
+#define __IRUNNABLE_H__
 
 template<class ReturnType>
 struct IRunnable {
@@ -7,3 +8,4 @@ struct IRunnable {
 };
 
 struct VOID {};
+#endif // __IRUNNABLE_H__

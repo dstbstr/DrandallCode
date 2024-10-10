@@ -1,10 +1,10 @@
 #pragma once
 
 #include "Core/Instrumentation/Logging.h"
+#include "Core/Instrumentation/ScopedTimer.h"
 #include "Core/Platform/Types.h"
 #include "Core/Threading/IRunnable.h"
 #include "Core/Utilities/ProgressBar.h"
-#include "Core/Utilities/ScopedTimer.h"
 
 #include <algorithm>
 #include <concurrent_vector.h>
@@ -13,6 +13,12 @@
 #include <ppltasks.h>
 #include <thread>
 #include <vector>
+
+namespace RunnerImpl {
+    static inline void LogTimer(std::string_view label, std::chrono::microseconds elapsed) {
+        Log::Info(std::format("{} took {} ms", label, elapsed.count() / 1000));
+    }
+}
 
 template<typename ReturnType>
 struct TaskQueue {
@@ -56,7 +62,7 @@ private:
     public:
         std::vector<ReturnType> Run(u32 maxConcurrency, const std::vector<std::unique_ptr<IRunnable<ReturnType>>>& runnables) final {
             ProgressBar progress(runnables.size());
-            Log::Info(StrUtil::Format("Processing %d jobs with %u tasks", runnables.size(), maxConcurrency));
+            Log::Info(std::format("Processing {} jobs with {} tasks", runnables.size(), maxConcurrency));
 
             std::vector<concurrency::task<ReturnType>> tasks; // working 'threads'
             std::vector<ReturnType> result;
@@ -95,7 +101,7 @@ private:
             u32 workIndex = 0;
             u32 concurrentTasks = std::min(maxConcurrency, static_cast<u32>(runnables.size()));
 
-            Log::Info(StrUtil::Format("Processing %d jobs with %u tasks", runnables.size(), concurrentTasks));
+            Log::Info(std::format("Processing {} jobs with {} tasks", runnables.size(), concurrentTasks));
 
             for(; workIndex < concurrentTasks; workIndex++) {
                 tasks.push_back(concurrency::create_task([&runnables, workIndex] { return runnables[workIndex]->Execute(); }));
@@ -135,7 +141,7 @@ private:
 public:
     template<class ReturnType>
     std::vector<ReturnType> RunAll(Threading::ExpectedRunTime expectedRunTime, const std::vector<std::unique_ptr<IRunnable<ReturnType>>>& runnables) {
-        ScopedTimer timer("Runner::RunAll");
+        ScopedTimer timer("Runner::RunAll", RunnerImpl::LogTimer);
         if (runnables.size() < (u64)m_MaxConcurrency * 2 && expectedRunTime < Threading::ExpectedRunTime::SECONDS) {
             return SerialRunner<ReturnType>().Run(m_MaxConcurrency, runnables);
         }
@@ -149,7 +155,7 @@ public:
 
     template<typename ReturnType>
     std::vector<ReturnType> RunAll(const TaskQueue<ReturnType> tasks) {
-        ScopedTimer timer("Runner::RunAll");
+        ScopedTimer timer("Runner::RunAll", RunnerImpl::LogTimer);
         concurrency::when_all(tasks.Tasks.begin(), tasks.Tasks.end()).wait();
         std::vector<ReturnType> result;
         for (const auto& t : tasks.Tasks) {

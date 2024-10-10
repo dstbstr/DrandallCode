@@ -1,15 +1,15 @@
 #pragma once
 
-#include "Core/Instrumentation/DebugContext.h"
-#include "Core/DesignPatterns/ServiceLocator.h"
-
 #include <source_location>
 #include <string>
 #include <chrono>
 #include <format>
 
+#include "Core/Instrumentation/DebugContext.h"
+
 namespace Log {
 	enum struct Level {
+		Debug,
 		Info,
 		Warning,
 		Error
@@ -29,9 +29,9 @@ namespace Log {
 		Debug::Context Context{};
 	};
 
-	void Initialize();
 	void Flush();
 
+	void Debug(const std::string& message, std::source_location loc = std::source_location::current());
 	void Info(const std::string& message, std::source_location loc = std::source_location::current());
 	void Warn(const std::string& message, std::source_location loc = std::source_location::current());
 	void Error(const std::string& message, std::source_location loc = std::source_location::current());

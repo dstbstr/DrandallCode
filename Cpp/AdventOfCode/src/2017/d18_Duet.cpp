@@ -1,7 +1,5 @@
 #include "2017/d18_Duet.h"
 
-#include <queue>
-
 SOLUTION(2017, 18) {
     using Registers = std::array<s64, 26>;
 

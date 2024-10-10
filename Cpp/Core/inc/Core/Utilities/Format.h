@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef FORMAT_H
+#define FORMAT_H
 #include <memory>
 #include <string>
 #include <type_traits>
@@ -30,3 +30,4 @@ namespace StrUtil {
     }
 } // namespace StrUtil
 #pragma warning(pop)
+#endif // FORMAT_H

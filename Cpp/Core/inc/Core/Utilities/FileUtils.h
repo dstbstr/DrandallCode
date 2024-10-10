@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __FILEUTILS_H__
+#define __FILEUTILS_H__
 
 #include <iostream>
 #include <unordered_set>
@@ -33,3 +34,4 @@ namespace FileUtils {
     };
 
 } // namespace FileUtils
+#endif // __FILEUTILS_H__

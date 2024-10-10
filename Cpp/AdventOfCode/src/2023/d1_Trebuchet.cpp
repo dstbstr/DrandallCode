@@ -21,7 +21,7 @@ SOLUTION(2023, 1) {
     }
 
     PART_ONE() {
-         return Constexpr::ToString(SumDigits(CopyToVector(lines)));
+         return Constexpr::ToString(SumDigits(lines));
     }
 
     constexpr std::vector<std::string> ReplaceWords(const auto & lines) {

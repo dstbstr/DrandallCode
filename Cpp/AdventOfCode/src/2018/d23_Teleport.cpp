@@ -1,7 +1,5 @@
 #include "2018/d23_Teleport.h"
 
-#include <queue>
-
 SOLUTION(2018, 23) {
     struct Bot {
         Vec3<s32> Pos;

@@ -16,8 +16,8 @@ target_sources(${PROJECT_NAME} PRIVATE ${sources}
 	"src/Constexpr/ConstexprMatrix.cpp"
 	"src/Constexpr/ConstexprStrUtils.cpp"
 
-	"src/Instrumentation/Logging.cpp"
 	"src/Instrumentation/ISink.cpp"
+	"src/Instrumentation/Logging.cpp"
 	"src/Instrumentation/LogWriter/StdOutLogWriter.cpp"
 
 	"src/Platform/ExecuteCommand_win.cpp"

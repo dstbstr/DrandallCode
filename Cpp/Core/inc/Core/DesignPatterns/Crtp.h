@@ -1,4 +1,6 @@
-#pragma once
+#ifndef __CRTP_H__
+#define __CRTP_H__
+
 /*
 Example of creating a capability for CRTP or Mixin
 
@@ -32,3 +34,4 @@ private:
     Crtp() = default;
     friend CrtpType<T>;
 };
+#endif // __CRTP_H__

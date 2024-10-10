@@ -1,14 +1,71 @@
 #pragma once
 
-#include "Core/Constexpr/ConstexprHash.h"
-
 #include <vector>
 #include <array>
 #include <string>
+//#include <ranges>
 #include <algorithm>
 #include <iterator>
 
+#include "Core/Constexpr/ConstexprHash.h"
+
 namespace Constexpr {
+    /*
+    template<typename R>
+    concept nested_range = std::ranges::input_range<R> && std::ranges::range<std::ranges::range_reference_t<R>>;
+
+    struct flatten_t {
+        template<nested_range R>
+        constexpr auto operator()(R&& r) const {
+            return std::forward<R>(r) | std::ranges::views::transform(*this) | std::ranges::views::join;
+        }
+        template<typename T>
+        constexpr auto operator()(T&& t) const {
+            return std::forward<T>(t);
+        }
+    };
+
+    template<typename T>
+    constexpr auto operator |(T&& t, flatten_t f) {
+        return f(std::forward<T>(t));
+    }
+
+    constexpr flatten_t flatten;
+
+    constexpr bool TestFlatten() {
+        std::vector<std::vector<std::vector<int>>> v;
+        v.push_back({ {1, 2, 3}, {4, 5, 6} });
+        v.push_back({ { 7, 8, 9} });
+
+        auto count = 0;
+        auto total = 0;
+        for (auto x : v | flatten) {
+            count++;
+            total += x;
+        }
+        if (count != 9) return false;
+        if (total != 45) return false;
+
+        std::vector<std::vector<bool>> v2;
+        v2.push_back({ true, true, false });
+        v2.push_back({ false, true, false });
+        v2.push_back({ false, false, true });
+    
+        count = 0;
+        total = 0;
+        for (auto x : v2 | flatten) {
+            count++;
+            total += x;
+        }
+        if (count != 9) return false;
+        if (total != 4) return false;
+
+        return true;
+    }
+
+    static_assert(TestFlatten());
+    */
+
     constexpr auto Without(auto collection, const auto& toRemove) {
         std::erase_if(collection, [&](const auto& e) {
             return std::find(toRemove.begin(), toRemove.end(), e) != toRemove.end();
@@ -727,7 +784,7 @@ namespace Constexpr {
 
         constexpr std::vector<T> GetValues() const {
             std::vector<T> result;
-            std::copy_if(mData->begin(), mData->end(), std::back_inserter(result), [](const T& val) {
+            std::copy_if(mData->begin(), mData->end(), std::back_inserter(result), [&](const T& val) {
                 return val != Sentinel;
                 });
             return result;

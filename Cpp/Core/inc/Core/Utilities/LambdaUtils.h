@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef LAMBDAUTILS_H
+#define LAMBDAUTILS_H
 #include <utility>
 
 namespace LambdaUtils {
@@ -11,3 +11,4 @@ namespace LambdaUtils {
     }
 
 } // namespace LambdaUtils
+#endif // LAMDAUTILS_H

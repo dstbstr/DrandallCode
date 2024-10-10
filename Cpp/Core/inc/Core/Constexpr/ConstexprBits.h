@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Core/Platform/Types.h"
-
 #include <typeinfo>
 
 namespace Constexpr {

@@ -1,6 +1,5 @@
 #include "2023/d17_LavaPath.h"
 #include "Facing.h"
-
 #include "Core/Algorithms/AStar.h"
 
 SOLUTION(2023, 17) {

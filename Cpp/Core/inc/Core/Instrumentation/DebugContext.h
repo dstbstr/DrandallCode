@@ -2,7 +2,6 @@
 
 #include <source_location>
 #include <thread>
-#include <string>
 
 namespace Debug {
 	struct Context {

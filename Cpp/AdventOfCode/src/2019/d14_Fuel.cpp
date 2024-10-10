@@ -12,11 +12,11 @@ SOLUTION(2019, 14) {
 
     constexpr void ParseLines(const auto& lines, Produces& outProduces, Ingrediants& outIngrediants) {
         for (const auto& line : lines) {
-            auto s1 = StrUtil::Split(line, " => ");
+            auto s1 = Constexpr::Split(line, " => ");
             std::vector<Ingrediant> ingrediants;
-            auto s2 = StrUtil::Split(s1[0], ", ");
+            auto s2 = Constexpr::Split(s1[0], ", ");
             for (const auto elem : s2) {
-                auto s3 = StrUtil::Split(elem, " ");
+                auto s3 = Constexpr::Split(elem, " ");
                 u64 count;
                 Constexpr::ParseNumber(s3[0], count);
                 Ingrediant ingrediant = { std::string(s3[1]), count };
@@ -24,7 +24,7 @@ SOLUTION(2019, 14) {
             }
 
             u64 quantity;
-            auto s4 = StrUtil::Split(s1[1], " ");
+            auto s4 = Constexpr::Split(s1[1], " ");
             Constexpr::ParseNumber(s4[0], quantity);
             outIngrediants[std::string(s4[1])] = ingrediants;
             outProduces[std::string(s4[1])] = quantity;

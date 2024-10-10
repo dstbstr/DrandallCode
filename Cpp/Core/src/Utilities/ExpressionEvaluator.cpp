@@ -1,7 +1,6 @@
 #include "Core/Utilities/ExpressionEvaluator.h"
 
 #include <regex>
-
 namespace {
     constexpr char TrueVal[] = "true";
     constexpr char FalseVal[] = "false";

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Core/Platform/Types.h"
+
 class ProgressBar {
 public:
     ProgressBar(size_t finalNumber) : m_FinalNumber(finalNumber) {}

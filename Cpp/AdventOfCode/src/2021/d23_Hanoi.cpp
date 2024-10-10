@@ -1,5 +1,4 @@
 #include "2021/d23_Hanoi.h"
-#include <queue>
 
 SOLUTION(2021, 23) {
 
@@ -327,12 +326,12 @@ SOLUTION(2021, 23) {
     }
 
     PART_ONE() {
-        auto dens = GetInitialDens(CopyToVector(lines), false);
+        auto dens = GetInitialDens(lines, false);
         return Constexpr::ToString(Solve(dens));
     }
 
     PART_TWO() {
-        auto dens = GetInitialDens(CopyToVector(lines), true);
+        auto dens = GetInitialDens(lines, true);
         return Constexpr::ToString(Solve(dens));
     }
 

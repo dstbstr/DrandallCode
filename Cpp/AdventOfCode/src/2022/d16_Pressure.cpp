@@ -1,5 +1,4 @@
 #include "2022/d16_Pressure.h"
-
 #include "Core/Algorithms/FloydWarshall.h"
 
 SOLUTION(2022, 16) {

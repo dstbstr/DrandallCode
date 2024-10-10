@@ -151,7 +151,7 @@ SOLUTION(2018, 18) {
 }
 
 /*
-#include "Algorithms/FloydCycle.h"
+#include "Core/Algorithms/FloydCycle.h"
 
 constexpr char NextState(char current, const std::vector<char>&neighbors) {
     switch (current) {

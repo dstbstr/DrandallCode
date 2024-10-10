@@ -1,5 +1,4 @@
 #include "2023/d8_Maps.h"
-
 #include "Core/Algorithms/FloydCycle.h"
 
 SOLUTION(2023, 8) {

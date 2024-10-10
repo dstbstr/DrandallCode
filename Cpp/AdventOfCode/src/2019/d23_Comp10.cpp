@@ -1,6 +1,5 @@
 #include "2019/d23_Comp10.h"
 #include "2019/Comp.h"
-#include <queue>
 
 SOLUTION(2019, 23) {
     struct Packet {

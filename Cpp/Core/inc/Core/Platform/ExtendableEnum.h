@@ -1,5 +1,5 @@
-#pragma once
-
+#ifndef __EXTENDABLEENUM_H__
+#define __EXTENDABLEENUM_H__
 #include <vcruntime.h>
 
 #if !_HAS_CXX20
@@ -28,3 +28,4 @@ struct ExtendableEnum {
     constexpr ExtendableEnum() : id(N - 1) {}
 };
 #endif
+#endif // __EXTENDABLEENUM_H__

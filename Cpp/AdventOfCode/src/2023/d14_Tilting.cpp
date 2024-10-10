@@ -1,6 +1,5 @@
 #include "2023/d14_Tilting.h"
 #include "Facing.h"
-
 #include "Core/Algorithms/FloydCycle.h"
 
 SOLUTION(2023, 14) {

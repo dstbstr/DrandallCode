@@ -1,4 +1,5 @@
-#pragma once
+#ifndef __TYPES_H__
+#define __TYPES_H__
 #include <stdint.h>
 
 using s8 = int8_t;
@@ -13,3 +14,4 @@ using u64 = uint64_t;
 
 using f32 = float;
 using f64 = double;
+#endif // __TYPES_H__

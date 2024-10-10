@@ -1,10 +1,10 @@
 #pragma once
 
-#include "Core/Constexpr/ConstexprStrUtils.h"
-
 #include <vector>
 #include <array>
 #include <string>
+
+#include "Core/Constexpr/ConstexprStrUtils.h"
 
 namespace Constexpr {
     template<typename Collection>

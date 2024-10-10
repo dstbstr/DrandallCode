@@ -3,9 +3,9 @@
 SOLUTION(2023, 23) {
     constexpr std::vector<RowCol> GetNeighbors(RowCol pos, const std::vector<std::string>&lines) {
         RowCol limits = { lines.size() - 1, lines[0].size() - 1 };
-        auto h = RowCol{ 0, 1 };
-        auto v = RowCol{ 1, 0 };
-        auto c = lines[pos.Row][pos.Col];
+        const auto h = RowCol{ 0, 1 };
+        const auto v = RowCol{ 1, 0 };
+        const auto c = lines[pos.Row][pos.Col];
         std::vector<RowCol> result;
         if (c != '.') {
             switch (c) {
@@ -27,10 +27,10 @@ SOLUTION(2023, 23) {
 
     constexpr std::vector<RowCol> GetNeighborsNoSlopes(RowCol pos, const std::vector<std::string>& lines) {
         RowCol limits = { lines.size() - 1, lines[0].size() - 1 };
-        auto h = RowCol{ 0, 1 };
-        auto v = RowCol{ 1, 0 };
+        const auto h = RowCol{ 0, 1 };
+        const auto v = RowCol{ 1, 0 };
         std::vector<RowCol> result;
-        auto neighbors = GetDirectNeighbors(pos, limits);
+        const auto neighbors = GetDirectNeighbors(pos, limits);
         std::copy_if(neighbors.begin(), neighbors.end(), std::back_inserter(result), [&](RowCol rc) {
             return lines[rc.Row][rc.Col] != '#';
             });
@@ -39,9 +39,9 @@ SOLUTION(2023, 23) {
     }
 
     constexpr size_t FindMaxPath(const std::vector<std::string>& lines, auto NFunc) {
-        RowCol limits = { lines.size() - 1, lines[0].size() - 1 };
-        RowCol start = { 0, 1 };
-        RowCol end = { limits.Row, limits.Col - 1 };
+        const RowCol limits = { lines.size() - 1, lines[0].size() - 1 };
+        const RowCol start = { 0, 1 };
+        const RowCol end = { limits.Row, limits.Col - 1 };
 
         struct State {
             RowCol Pos;
@@ -50,8 +50,9 @@ SOLUTION(2023, 23) {
         std::vector<State> q{ {start, {}} };
         
         size_t best = 0;
+        State current;
         while (!q.empty()) {
-            auto current = q.back();
+            current = q.back();
             q.pop_back();
 
             if (current.Pos == end) {
@@ -84,12 +85,12 @@ SOLUTION(2023, 23) {
             return lines[rc.Row][rc.Col] != '#';
             };
 
-        size_t exits = 0;
         if (!IsPath(pos)) return false;
 
-        RowCol h = { 0, 1 };
-        RowCol v = { 1, 0 };
+        const RowCol h = { 0, 1 };
+        const RowCol v = { 1, 0 };
 
+        size_t exits = 0;
         exits += IsPath(pos - h);
         exits += IsPath(pos + h);
         exits += IsPath(pos - v);
@@ -99,12 +100,13 @@ SOLUTION(2023, 23) {
     }
 
     constexpr std::vector<RowCol> FindNodes(const std::vector<std::string>& lines) {
-
         std::vector<RowCol> result;
 
+        RowCol rc;
         for (size_t row = 1; row < lines.size() - 1; row++) {
             for (size_t col = 1; col < lines[0].size() - 1; col++) {
-                RowCol rc = { row, col };
+                rc.Row = row;
+                rc.Col = col;
                 if(IsNode(lines, rc)) {
                     result.push_back(rc);
                 }
@@ -147,7 +149,7 @@ SOLUTION(2023, 23) {
         return map;
     }
 
-    constexpr size_t GetPathLength(const std::vector<RowCol> path, const DistMap& map) {
+    constexpr size_t GetPathLength(const std::vector<RowCol>& path, const DistMap& map) {
         size_t result = 0;
         for (size_t i = 1; i < path.size(); i++) {
             result += map.at(path[i - 1]).at(path[i]);

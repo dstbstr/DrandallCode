@@ -36,7 +36,7 @@ SOLUTION(2021, 25) {
     }
 
     PART_ONE() {
-        auto current = CopyToVector(lines);
+        auto current = lines;
         size_t steps = 0;
         while (true) {
             steps++;

@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Core/Constexpr/ConstexprGeometry.h"
 
 template<typename T, size_t Rows, size_t Cols = Rows>

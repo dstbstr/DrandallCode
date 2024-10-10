@@ -1,10 +1,7 @@
-#pragma once
-
-#include "Core/Platform/Types.h"
-
 #include <array>
 #include <bit>
 
+#include "Platform/Types.h"
 
 constexpr u32 BytesToU32Big(u8 b1, u8 b2, u8 b3, u8 b4) {
     return (b1 << 24) | (b2 << 16) | (b3 << 8) | b4;

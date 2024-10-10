@@ -1,6 +1,7 @@
-#pragma once
+#ifndef __CLANGRUNNER_H__
+#define __CLANGRUNNER_H__
 
-#include "Core/Threading/IRunnable.h"
+#include "Threading/IRunnable.h"
 
 #include <memory>
 #include <vector>
@@ -26,3 +27,4 @@ public:
 private:
     ClangRunner() = default;
 };
+#endif // __CLANGRUNNER_H__

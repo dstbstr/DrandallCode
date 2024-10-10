@@ -44,7 +44,7 @@ SOLUTION(2022, 13) {
     }
 
     PART_ONE() {
-        return Constexpr::ToString(SolvePartOne(CopyToVector(lines)));
+        return Constexpr::ToString(SolvePartOne(lines));
     }
 
     constexpr size_t SolvePartTwo(const auto& lines) {
@@ -72,7 +72,7 @@ SOLUTION(2022, 13) {
         return result;
     }
     PART_TWO() {
-        return Constexpr::ToString(SolvePartTwo(CopyToVector(lines)));
+        return Constexpr::ToString(SolvePartTwo(lines));
     }
 
     TESTS() {

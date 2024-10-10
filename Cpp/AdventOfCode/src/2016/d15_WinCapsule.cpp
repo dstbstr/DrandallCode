@@ -42,8 +42,10 @@ SOLUTION(2016, 15) {
         
     }
     PART_TWO() {
-        auto copy = CopyToVector(lines);
+        auto copy = lines;
+        //auto copy = CopyToVector(lines);
         copy.push_back("Disc #7 has 11 positions; at time=0, it is at position 0.");
+
         auto discs = ParseLines(copy, ParseDisc);
 
         return Constexpr::ToString(BestSpin(discs));

@@ -2,7 +2,6 @@
 
 #include <string_view>
 #include <type_traits>
-#include <vector>
 
 namespace Constexpr {
     namespace detail {

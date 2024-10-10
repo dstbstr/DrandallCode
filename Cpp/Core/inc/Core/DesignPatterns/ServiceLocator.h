@@ -1,13 +1,15 @@
 #pragma once
 
+#include "Core/Instrumentation/Logging.h"
+
 #include <memory>
-#include <unordered_map>
+#include <map>
 
 struct ServiceLocator {
     static ServiceLocator& Get() {
         static ServiceLocator instance{};
-		return instance;
-	}
+        return instance;
+    }
 
     ~ServiceLocator() {
         services.clear();
@@ -19,12 +21,12 @@ struct ServiceLocator {
     template<typename T, typename... Args>
     void Set(Args&&... args) {
         SetThisAsThat<T, T, Args...>(std::forward<Args>(args)...);
-	}
+    }
 
     template<typename TThis, typename TThat, typename... Args>
     void SetThisAsThat(Args&&... args) {
         auto id = TypeId<TThat>();
-        if(services.contains(id)) abort();
+        DR_ASSERT_MSG(!services.contains(id), "Service already set");
 
         services[id] = std::make_shared<TThis>(std::forward<Args>(args)...);
     }
@@ -32,10 +34,12 @@ struct ServiceLocator {
     template<typename T>
     void Reset() {
         services.erase(TypeId<T>());
-	}
+    }
 
     void ResetAll() {
-        services.clear();
+        for (auto it = services.rbegin(); it != services.rend();) {
+            services.erase(std::next(it).base());
+        }
     }
 
     template<typename T>
@@ -55,7 +59,11 @@ struct ServiceLocator {
 
     template<typename T>
     T& GetRequired() const {
-        return *static_cast<T*>(services.at(TypeId<T>()).get());
+        auto id = TypeId<T>();
+        DR_ASSERT_MSG(services.contains(id), "Service not set");
+        auto* ptr = static_cast<T*>(services.at(id).get());
+        DR_ASSERT_MSG(ptr, "Service not set");
+        return *ptr;
     }
 
     template<typename T, typename... Args>
@@ -65,7 +73,7 @@ struct ServiceLocator {
             Set<T>(std::forward<Args>(args)...);
         }
 
-		return *static_cast<T*>(services.at(id).get());
+        return *static_cast<T*>(services.at(id).get());
     }
 
     template<typename T, typename... Args>
@@ -79,7 +87,7 @@ private:
     ServiceLocator() = default;
 
     // must be shared_ptr because unique_ptr can't delete void*
-    std::unordered_map<size_t, std::shared_ptr<void>> services;
+    std::map<size_t, std::shared_ptr<void>> services;
 
     template<typename T>
     size_t TypeId() const {

@@ -533,7 +533,7 @@ SOLUTION(2022, 22) {
         return GetResult(currentPos, facing);
     }
     PART_ONE() {
-        return Constexpr::ToString(SolvePartOne(CopyToVector(lines)));
+        return Constexpr::ToString(SolvePartOne(lines));
     }
 
     PART_TWO() {

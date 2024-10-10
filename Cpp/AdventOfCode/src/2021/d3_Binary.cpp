@@ -1,4 +1,6 @@
 #include "2021/d3_Binary.h"
+
+//TODO: Change this to a constexpr solution
 #include <bitset>
 
 SOLUTION(2021, 3) {

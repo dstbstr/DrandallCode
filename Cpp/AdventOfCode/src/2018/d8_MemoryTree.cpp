@@ -1,5 +1,4 @@
 #include "2018/d8_MemoryTree.h"
-#include <queue>
 
 SOLUTION(2018, 8) {
     constexpr u32 SumMetadata(Constexpr::Queue<u32>& numbers) {

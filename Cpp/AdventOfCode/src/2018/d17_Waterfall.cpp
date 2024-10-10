@@ -1,5 +1,4 @@
 #include "2018/d17_Waterfall.h"
-#include <bitset>
 
 SOLUTION(2018, 17) {
     static constexpr size_t MaxX = 700;

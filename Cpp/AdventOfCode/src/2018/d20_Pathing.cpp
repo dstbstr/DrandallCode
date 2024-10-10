@@ -1,5 +1,4 @@
 #include "2018/d20_Pathing.h"
-#include <queue>
 
 SOLUTION(2018, 20) {
     using Grid = Constexpr::SmallMap<Coord, std::vector<Coord>>;

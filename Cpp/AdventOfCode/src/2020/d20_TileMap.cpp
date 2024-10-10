@@ -123,12 +123,13 @@ SOLUTION(2020, 20) {
 
     void PrintTile(const PixelGrid & pixels) {
         for (const auto& row : pixels) {
+            std::string rowStr = "";
             for (const auto& col : row) {
-                std::cout << (col ? '#' : '.');
+				rowStr += (col ? '#' : '.');
             }
-            std::cout << '\n';
+            GET_LOGS().emplace_back(rowStr);
         }
-        std::cout << '\n';
+        GET_LOGS().emplace_back("");
     }
 
     void PrintTileGrid(const TileGrid & tileGrid) {
@@ -136,16 +137,17 @@ SOLUTION(2020, 20) {
         const size_t tileWidth = tileGrid.at(0).at(0).Pixels.at(0).size();
         for (auto gridRow = 0; gridRow < tileGrid.size(); gridRow++) {
             for (auto tileRow = 0; tileRow < tileHeight; tileRow++) {
+                std::string row = "";
                 for (auto gridCol = 0; gridCol < tileGrid.at(gridRow).size(); gridCol++) {
                     for (auto tileCol = 0; tileCol < tileWidth; tileCol++) {
                         auto val = tileGrid.at(gridRow).at(gridCol).Pixels.at(tileRow).at(tileCol);
-                        std::cout << (val ? '#' : '.');
+                        row += (val ? '#' : '.');
                     }
-                    std::cout << " ";
+                    row += " ";
                 }
-                std::cout << "\n";
+				GET_LOGS().emplace_back(row);
             }
-            std::cout << "\n";
+            GET_LOGS().emplace_back("");
         }
     }
 

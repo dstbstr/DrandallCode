@@ -1,15 +1,11 @@
-#pragma once
+#ifndef __REQUIRE_H__
+#define __REQUIRE_H__
 
 #include "Core/Utilities/StringUtils.h"
 
 #include <stdexcept>
 #include <string>
 #include <vector>
-
-#if __has_include("winerror.h")
-#include "winerror.h"
-#endif
-
 
 namespace Require {
     inline void True(bool val, std::string message) {
@@ -23,7 +19,9 @@ namespace Require {
     }
 
     inline void False(bool val, std::string message) {
-        True(!val, message);
+        if(val) {
+            throw std::runtime_error(message);
+        }
     }
 
     inline void False(bool val) {
@@ -31,7 +29,9 @@ namespace Require {
     }
 
     inline void NotNull(void* ptr, std::string message) {
-        True(ptr, message);
+        if(!ptr) {
+            throw std::runtime_error(message);
+        }
     }
 
     inline void NotNull(void* ptr) {
@@ -39,17 +39,23 @@ namespace Require {
     }
 
     inline void Null(void* ptr, std::string message) {
-        False(ptr, message);
+        if(ptr) {
+            throw std::runtime_error(message);
+        }
     }
 
     inline void Null(void* ptr) {
         Null(ptr, "Expected pointer to be null, but was not");
     }
 
-    inline void Success(HRESULT hr, std::string message) {
-        True(SUCCEEDED(hr), message);
-    }
 #if __has_include("winerror.h")
+#include "winerror.h"
+    inline void Success(HRESULT hr, std::string message) {
+        if(!(SUCCEEDED(hr))) {
+            throw std::runtime_error(message);
+        }
+    }
+
     inline void Success(HRESULT hr) {
         Success(hr, "Provided HRESULT was not a success");
     }
@@ -57,7 +63,9 @@ namespace Require {
 
     template<class T>
     inline void Empty(const T& t, std::string message) {
-        True(t.empty(), message);
+        if(!t.empty()) {
+            throw std::runtime_error(message);
+        }
     }
 
     template<class T>
@@ -67,7 +75,9 @@ namespace Require {
 
     template<class T>
     inline void NotEmpty(const T& t, std::string message) {
-        False(t.empty(), message);
+        if(t.empty()) {
+            throw std::runtime_error(message);
+        }
     }
 
     template<class T>
@@ -77,10 +87,14 @@ namespace Require {
 
     inline void NotJustWhitespace(const std::string& str, std::string message) {
         std::string cpy = str;
-        False(StrUtil::Trim(cpy).empty(), message);
+        if(StrUtil::Trim(cpy).empty()) {
+            throw std::runtime_error(message);
+        }
     }
 
     inline void NotJustWhitespace(const std::string& str) {
         NotJustWhitespace(str, "Received unexpected blank or whitespace string");
     }
+
 } // namespace Require
+#endif // __REQUIRE_H__

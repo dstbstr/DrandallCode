@@ -1,5 +1,4 @@
 #include "2016/d5_DoorPass.h"
-
 #include "Core/Algorithms/md5Constexpr.h"
 
 SOLUTION(2016, 5) {
@@ -10,7 +9,7 @@ SOLUTION(2016, 5) {
 			u64 index = 0;
 			std::string result = "";
 			while (result.size() < 8) {
-				std::string attempt = prefix + ToString(index);
+				std::string attempt = prefix + Constexpr::ToString(index);
 				auto hex = ToHexLower(md5::compute(attempt.c_str()));
 				if (hex.substr(0, 5) == "00000") {
 					result += hex[5];
@@ -22,7 +21,7 @@ SOLUTION(2016, 5) {
 		else {
 			std::string result = "";
 			for (auto hint : hints) {
-				std::string attempt = prefix + ToString(hint);
+				std::string attempt = prefix + Constexpr::ToString(hint);
 				auto hex = ToHexLower(md5::compute(attempt.c_str()));
 				if (hex.substr(0, 5) != "00000") {
 					throw "Bad hint";
@@ -57,7 +56,7 @@ SOLUTION(2016, 5) {
 
 			int totalFound = 0;
 			while (totalFound < 8) {
-				std::string attempt = prefix + ToString(index);
+				std::string attempt = prefix + Constexpr::ToString(index);
 				auto hex = ToHexLower(md5::compute(attempt.c_str()));
 				if (hex.substr(0, 5) == "00000" && hex[5] < '8') {
 					auto pos = hex[5] - '0';
@@ -72,7 +71,7 @@ SOLUTION(2016, 5) {
 		}
 		else {
 			for (const auto hint : hints) {
-				std::string attempt = prefix + ToString(hint);
+				std::string attempt = prefix + Constexpr::ToString(hint);
 				auto hex = ToHexLower(md5::compute(attempt.c_str()));
 				if (hex.substr(0, 5) != "00000" || hex[5] >= '8') throw "Bad hint";
 

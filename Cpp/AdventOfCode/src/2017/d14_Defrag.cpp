@@ -1,9 +1,7 @@
 #include "2017/d14_Defrag.h"
 #include "2017/KnotHash.h"
-
 #include "Core/Algorithms/FloodFill.h"
 
-#include <bitset>
 #include <bit>
 
 SOLUTION(2017, 14) {
@@ -13,7 +11,7 @@ SOLUTION(2017, 14) {
         Grid result;
         std::string prefix = std::string(key);
         for (auto i = 0; i < 128; i++) {
-            std::string toHash = prefix + "-" + ToString(i);
+            std::string toHash = prefix + "-" + Constexpr::ToString(i);
             auto hash = KnotHash::Hash(toHash);
             std::vector<bool> line;
 
@@ -64,7 +62,7 @@ SOLUTION(2017, 14) {
         const auto& key = std::string(lines[0]);
         u32 used = 0;
         for (auto i = 0; i < 128; i++) {
-            std::string toHash = key + "-" + ToString(i);
+            std::string toHash = key + "-" + Constexpr::ToString(i);
             auto hash = KnotHash::Hash(toHash);
             for (auto value : hash) {
                 used += std::popcount(value);

@@ -1,13 +1,13 @@
 #pragma once
 
-#include "Core/Constexpr/ConstexprMath.h"
-#include "Core/Constexpr/ConstexprStrUtils.h"
-
 #include <string>
 #include <vector>
 #include <array>
 #include <ostream>
 #include <algorithm>
+
+#include "Constexpr/ConstexprMath.h"
+#include "Constexpr/ConstexprStrUtils.h"
 
 struct BigInt {
 private:

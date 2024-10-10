@@ -1,6 +1,5 @@
 #include "2019/d15_Comp7.h"
 #include "2019/Comp.h"
-
 #include "Core/Algorithms/AStar.h"
 #include "Core/Algorithms/FloodFill.h"
 

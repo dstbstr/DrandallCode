@@ -1,6 +1,7 @@
-#pragma once
+#ifndef __GNURUNNER_H__
+#define __GNURUNNER_H__
 
-#include "Core/Threading/IRunnable.h"
+#include "Threading/IRunnable.h"
 
 #include <memory>
 #include <vector>
@@ -26,3 +27,5 @@ public:
 private:
     GnuRunner() = default;
 };
+
+#endif // __GNURUNNER_H__

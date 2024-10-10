@@ -1,5 +1,4 @@
 #include "2016/d14_OneTimePad.h"
-
 #include "Core/Algorithms/md5Constexpr.h"
 
 SOLUTION(2016, 14) {

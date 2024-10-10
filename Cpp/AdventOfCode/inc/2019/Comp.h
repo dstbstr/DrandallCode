@@ -2,8 +2,6 @@
 
 #include "Common.h"
 
-#include <iostream>
-
 constexpr s64 Unset = -9919;
 
 struct Args {
@@ -172,11 +170,12 @@ inline bool ApplyDebug(std::vector<s64>& instructions, Args& args) {
         parameters.push_back(std::make_pair(val, mode));
     }
 
-    std::cout << "IP: " << args.Ip << ": ";
+	std::string logMessage = "IP: " + std::to_string(args.Ip) + ": ";
     switch (op)
     {
     case Halt: {
-        std::cout << "Halt\n";
+        logMessage += "Halt";
+        GET_LOGS().emplace_back(logMessage);
         return false;
     }
     case Add: {
@@ -184,7 +183,7 @@ inline bool ApplyDebug(std::vector<s64>& instructions, Args& args) {
         auto b = detail::Read(instructions, parameters[1], args.Base);
         auto& c = detail::GetRegister(instructions, parameters[2], args.Base);
         c = a + b;
-        std::cout << "Add: Instruction[" << parameters[2].first << "] = " << a << " + " << b << " (" << c << ")\n";
+		logMessage += "Add: Instruction[" + std::to_string(parameters[2].first) + "] = " + std::to_string(a) + " + " + std::to_string(b) + " (" + std::to_string(c) + ")";
         break;
     }
     case Mul: {
@@ -192,41 +191,43 @@ inline bool ApplyDebug(std::vector<s64>& instructions, Args& args) {
         auto b = detail::Read(instructions, parameters[1], args.Base);
         auto& c = detail::GetRegister(instructions, parameters[2], args.Base);
         c = a * b;
-        std::cout << "Mul: Instruction[" << parameters[2].first << "] = " << a << " * " << b << " (" << c << ")\n";
+		logMessage += "Mul: Instruction[" + std::to_string(parameters[2].first) + "] = " + std::to_string(a) + " * " + std::to_string(b) + " (" + std::to_string(c) + ")";
         break;
     }
     case Set: {
         auto& reg = detail::GetRegister(instructions, parameters[0], args.Base);
         reg = args.Inputs[args.CurrentInput++];
-        std::cout << "Set: Instruction[" << parameters[0].first << "] = " << reg << "\n";
+		logMessage += "Set: Instruction[" + std::to_string(parameters[0].first) + "] = " + std::to_string(reg);
         break;
     }
     case Print: {
         args.Output = detail::Read(instructions, parameters[0], args.Base);
-        std::cout << "Print: Output = " << args.Output << "\n";
+		logMessage += "Print: Output = " + std::to_string(args.Output);
         break;
     }
     case Jnz: {
         auto a = detail::Read(instructions, parameters[0], args.Base);
-        std::cout << "Jnz: " << a;
+		logMessage += "Jnz: " + std::to_string(a);
 
         if (a != 0) {
             args.Ip = detail::Read(instructions, parameters[1], args.Base);
-            std::cout << " Ip = " << args.Ip << "\n";
+			logMessage += " Ip = " + std::to_string(args.Ip);
+			GET_LOGS().emplace_back(logMessage);
             return true;
         }
-        std::cout << " Did not jump\n";
+		logMessage += " Did not jump";
         break;
     }
     case Jz: {
         auto a = detail::Read(instructions, parameters[0], args.Base);
-        std::cout << "Jz: " << a;
+		logMessage += "Jz: " + std::to_string(a);
         if (a == 0) {
             args.Ip = detail::Read(instructions, parameters[1], args.Base);
-            std::cout << " Ip = " << args.Ip << "\n";
+			logMessage += " Ip = " + std::to_string(args.Ip);
+			GET_LOGS().emplace_back(logMessage);
             return true;
         }
-        std::cout << " Did not jump\n";
+		logMessage += " Did not jump";
         break;
     }
     case Lt: {
@@ -234,7 +235,7 @@ inline bool ApplyDebug(std::vector<s64>& instructions, Args& args) {
         auto b = detail::Read(instructions, parameters[1], args.Base);
         auto& reg = detail::GetRegister(instructions, parameters[2], args.Base);
         reg = a < b ? 1 : 0;
-        std::cout << "Lt: Instruction[" << parameters[2].first << "] = " << a << " < " << b << " (" << reg << ")\n";
+		logMessage += "Lt: Instruction[" + std::to_string(parameters[2].first) + "] = " + std::to_string(a) + " < " + std::to_string(b) + " (" + std::to_string(reg) + ")";
         break;
     }
     case Eq: {
@@ -242,18 +243,19 @@ inline bool ApplyDebug(std::vector<s64>& instructions, Args& args) {
         auto b = detail::Read(instructions, parameters[1], args.Base);
         auto& reg = detail::GetRegister(instructions, parameters[2], args.Base);
         reg = a == b ? 1 : 0;
-        std::cout << "Eq: Instructions[" << parameters[2].first << "] = " << a << " == " << b << " (" << reg << ")\n";
+		logMessage += "Eq: Instructions[" + std::to_string(parameters[2].first) + "] = " + std::to_string(a) + " == " + std::to_string(b) + " (" + std::to_string(reg) + ")";
         break;
     }
     case MoveBase: {
         auto a = detail::Read(instructions, parameters[0], args.Base);
-        std::cout << "MoveBase: " << args.Base << " + " << a;
+		logMessage += "MoveBase: " + std::to_string(args.Base) + " + " + std::to_string(a);
         args.Base += a;
-        std::cout << " (" << args.Base << ")\n";
+		logMessage += "(" + std::to_string(args.Base) + ")";
         break;
     }
     }
 
+	GET_LOGS().emplace_back(logMessage);
     args.Ip += parameters.size() + 1;
     return true;
 }

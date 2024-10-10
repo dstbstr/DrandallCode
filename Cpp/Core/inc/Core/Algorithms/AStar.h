@@ -1,14 +1,13 @@
 #pragma once
-
-#include "Core/Constexpr/ConstexprGeometry.h"
-#include "Core/Constexpr/ConstexprCollections.h"
-
 #include <vector>
 #include <unordered_map>
 #include <unordered_set>
 #include <functional>
 #include <algorithm>
 #include <queue>
+
+#include "Core/Constexpr/ConstexprGeometry.h"
+#include "Core/Constexpr/ConstexprCollections.h"
 
 namespace AStarPrivate {
     template<typename T>

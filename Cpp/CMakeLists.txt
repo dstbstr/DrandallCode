@@ -1,7 +1,5 @@
-#cmake_minimum_required(VERSION 3.14)
-cmake_minimum_required(VERSION 3.8)
+cmake_minimum_required(VERSION 3.16)
 project("Cpp Scratch")
-#enable_testing()
 
 include(FetchContent)
 

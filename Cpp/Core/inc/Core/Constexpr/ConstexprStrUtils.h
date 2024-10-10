@@ -185,6 +185,14 @@ namespace Constexpr {
         return result;
     }
 
+    constexpr bool StartsWith(std::string_view string, std::string_view prefix) {
+		return string.rfind(prefix, 0) == 0;
+    }
+
+    constexpr bool EndsWith(std::string_view string, std::string_view suffix) {
+        return string.rfind(suffix) == string.length() - suffix.length() && string.length() >= suffix.length();
+    }
+
     namespace StrUtilsTests {
         bool Run();
     }

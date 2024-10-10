@@ -1,12 +1,11 @@
 #pragma once
+#include <string>
+#include <ostream>
 
 #include "Core/Platform/Types.h"
 #include "Core/Constexpr/ConstexprMath.h"
 #include "Core/Constexpr/ConstexprStrUtils.h"
 #include "Core/Constexpr/ConstexprHash.h"
-
-#include <string>
-#include <ostream>
 
 template<typename T>
 std::string ToString(T input);

@@ -176,7 +176,7 @@ SOLUTION(2020, 16) {
 
         size_t result = 1;
         for (const auto& [name, index] : fieldMapping) {
-            if (StrUtil::StartsWith(name, "departure")) {
+            if (Constexpr::StartsWith(name, "departure")) {
                 result *= myTicket[index];
             }
         }

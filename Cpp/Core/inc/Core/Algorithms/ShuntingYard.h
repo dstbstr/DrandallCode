@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Core/Constexpr/ConstexprCollections.h"
-#include "Core/Constexpr/ConstexprStrUtils.h"
-
 #include <functional>
 #include <string>
 #include <string_view>
+
+#include "Core/Constexpr/ConstexprCollections.h"
+#include "Core/Constexpr/ConstexprStrUtils.h"
 
 namespace ShuntingYard {
     enum struct Associativity { Left, Right };

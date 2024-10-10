@@ -33,10 +33,9 @@ namespace Log {
 	ISink::ISink(Filter filter)
 		: m_Filter(filter)
 	{
-		m_PubSub = ServiceLocator::Get().Get<PubSub<Entry>>();
-		if (!m_PubSub) return;
+		auto& services = ServiceLocator::Get().GetOrCreate<PubSub<Entry>>();
 
-		m_Handle = m_PubSub->Subscribe([this](const Entry& entry) {
+		m_Handle = services.Subscribe([this](const Entry& entry) {
 			if (m_Filter.Matches(entry)) {
 				Write(entry);
 			}
@@ -44,8 +43,8 @@ namespace Log {
 	}
 
 	ISink::~ISink() {
-		if (m_Handle != std::numeric_limits<size_t>::max()) {
-			m_PubSub->Unsubscribe(m_Handle);
+		if (auto* ps = ServiceLocator::Get().Get<PubSub<Entry>>()) {
+			ps->Unsubscribe(m_Handle);
 		}
 	}
 }

@@ -1,5 +1,4 @@
 #include "2022/d24_Blizzard.h"
-
 #include "Core/Algorithms/AStar.h"
 
 SOLUTION(2022, 24) {

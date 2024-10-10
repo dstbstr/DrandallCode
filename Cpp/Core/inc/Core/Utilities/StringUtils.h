@@ -132,3 +132,4 @@ namespace StrUtil {
     bool StartsWith(std::string_view string, std::string_view prefix);
     bool EndsWith(std::string_view string, std::string_view suffix);
 } // namespace StrUtil
+
