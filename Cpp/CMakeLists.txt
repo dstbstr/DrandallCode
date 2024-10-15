@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project("Cpp Scratch")
+project("Drandall Code")
 
 include(FetchContent)
 
@@ -9,11 +9,14 @@ include(FetchContent)
 FetchContent_Declare(
   googletest
   GIT_REPOSITORY https://github.com/google/googletest.git
-  GIT_TAG release-1.11.0
+  GIT_TAG v1.15.2
 )
+
+FetchContent_Declare(CppCore GIT_REPOSITORY https://github.com/dstbstr/CppCore GIT_TAG main)
 
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
+FetchContent_MakeAvailable(CppCore)
 
 #################################
 # Drandall Code
@@ -46,13 +49,12 @@ else()
     add_definitions(-DRELEASE)
 endif()
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #External
-add_subdirectory(OpenXLSX)
+#add_subdirectory(OpenXLSX)
 #Internal
-add_subdirectory(Core)
 add_subdirectory(CommandParser)
 add_subdirectory(ExtractorLib)
 add_subdirectory(ReportGenerator)
@@ -62,14 +64,12 @@ add_subdirectory(IncludeCounter)
 add_subdirectory(TypeCounter)
 add_subdirectory(TodoManager)
 
-add_subdirectory(CoreTest)
 add_subdirectory(CommandParserTest)
 add_subdirectory(ExtractorLibTest)
 add_subdirectory(TodoLibTest)
 
 add_subdirectory(CppKata)
 add_subdirectory(CppKataTest)
-add_subdirectory(AdventOfCode)
 
 set(CONFIGURED_ONCE TRUE CACHE INTERNAL
     "A flag showing that CMake has configured at least once.")
