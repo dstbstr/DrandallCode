@@ -1,5 +1,4 @@
-#ifndef __BASEREPORT_H__
-#define __BASEREPORT_H__
+#pragma once
 
 #include "Extractor/Data/FileData.h"
 #include "IReport.h"
@@ -16,4 +15,3 @@ namespace Report {
         std::vector<Extractor::FileData> m_FileData;
     };
 } // namespace Report
-#endif // __BASEREPORT_H__

@@ -1,11 +1,10 @@
-#ifndef __VISIBILITY_H__
-#define __VISIBILITY_H__
+#pragma once
 
 #include <string>
 
 namespace Extractor {
     enum Visibility { PRIVATE, PROTECTED, PUBLIC };
-    static inline std::string ToString(Visibility visibility) {
+    constexpr std::string ToString(Visibility visibility) {
         switch(visibility) {
         case PRIVATE: return "Private";
         case PROTECTED: return "Protected";
@@ -14,5 +13,3 @@ namespace Extractor {
         }
     }
 } // namespace Extractor
-
-#endif // __VISIBILITY_H__

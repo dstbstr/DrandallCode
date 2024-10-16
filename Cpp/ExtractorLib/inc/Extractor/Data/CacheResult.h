@@ -1,5 +1,4 @@
-#ifndef __CACHERESULT_H__
-#define __CACHERESULT_H__
+#pragma once
 
 #include "Extractor/Data/FileData.h"
 
@@ -16,4 +15,3 @@ namespace Extractor {
         std::unordered_map<std::string, std::unordered_set<std::string>> IncludedByMap;
     };
 } // namespace Extractor
-#endif // __CACHERESULT_H__

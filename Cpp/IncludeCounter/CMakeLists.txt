@@ -6,6 +6,10 @@ target_link_libraries(${PROJECT_NAME} ExtractorLib)
 target_link_libraries(${PROJECT_NAME} CommandParser)
 target_link_libraries(${PROJECT_NAME} ReportGenerator)
 
-file(GLOB_RECURSE sources CONFIGURE_DEPENDS "Src/*.cpp")
-target_sources(${PROJECT_NAME} PRIVATE ${sources})
-target_include_directories(${PROJECT_NAME} PRIVATE Inc)
+target_include_directories(${PROJECT_NAME} PRIVATE inc)
+target_compile_options(${PROJECT_NAME} PRIVATE ${warnings})
+
+target_sources(${PROJECT_NAME} PRIVATE 
+	src/IncludeArgParse.cpp
+	src/IncludeCounterMain.cpp
+)

@@ -1,5 +1,4 @@
-#ifndef __ARGPARSE_H__
-#define __ARGPARSE_H__
+#pragma once
 
 #include "CommandParser/Option.h"
 #include "CommandParser/OptionCollection.h"
@@ -44,5 +43,3 @@ namespace TypeCounter {
         CommandParser::OptionCollection m_Options{"Produces a report about the types and their functions"};
     };
 } // namespace TypeCounter
-
-#endif // __ARGPARSE_H__

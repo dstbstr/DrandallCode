@@ -1,5 +1,4 @@
-#ifndef __COMMENTEXTRACTOR_H__
-#define __COMMENTEXTRACTOR_H__
+#pragma once
 
 #include <string>
 
@@ -8,4 +7,3 @@ namespace Extractor {
         void StripComments(std::string& line, bool& isInBlockComment);
     }
 } // namespace Extractor
-#endif // __COMMENTEXTRACTOR_H__

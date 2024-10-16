@@ -3,21 +3,19 @@
 #include "Extractor/Data/FileData.h"
 #include "Extractor/ExtractorSettings.h"
 
-#include "Core/Threading/IRunnable.h"
-
 #include <unordered_map>
 
 namespace Extractor {
     struct DefineData;
     struct CacheResult;
 
-    class FileDataExtractor : public IRunnable<FileData> {
+    class FileDataExtractor {
     public:
         FileDataExtractor(std::string filePath, const CacheResult& cache, const DefineData& defines, ExtractorSettings settings) : m_FilePath(filePath), m_Cache(&cache), m_Defines(&defines), m_Settings(settings) {}
         FileDataExtractor(const FileDataExtractor&) = delete;
         FileDataExtractor& operator=(const FileDataExtractor&) = delete;
 
-        FileData Execute() const override;
+        FileData Execute() const;
 
     private:
         std::string m_FilePath;

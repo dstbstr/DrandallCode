@@ -1,5 +1,4 @@
-#ifndef __CSVREPORT_H__
-#define __CSVREPORT_H__
+#pragma once
 
 #include "Report/BaseReport.h"
 
@@ -11,4 +10,3 @@ namespace Report {
         void WriteReportToStream(std::ostream& targetStream) const;
     };
 } // namespace Report
-#endif // __CSVREPORT_H__

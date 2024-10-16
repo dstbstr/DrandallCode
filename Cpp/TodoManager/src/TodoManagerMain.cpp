@@ -3,11 +3,11 @@
 #include "Todo/TodoSettings.h"
 #include "TodoArgParse.h"
 
+#include "Core/Instrumentation/Logging.h"
+#include "Core/Instrumentation/ScopedTimer.h"
 #include "Core/Utilities/Require.h"
-#include "Core/Utilities/ScopedTimer.h"
 #include "Core/Utilities/TimeUtils.h"
-#include "Core/Threading/IRunnable.h"
-#include "Core/Threading/Runner.h"
+#include "Core/Threading/Tasks.h"
 
 #include <iostream>
 
@@ -16,12 +16,12 @@ using namespace TodoLib;
 
 namespace {
     std::vector<Todo> FindAllTodos(const std::vector<std::string>& fileNames) {
-        std::vector<std::unique_ptr<IRunnable<std::vector<Todo>>>> jobs;
-        auto settings = TodoSettings{};
-        std::transform(fileNames.begin(), fileNames.end(), std::back_inserter(jobs), [&settings](const std::string& file) { return std::make_unique<TodoReader>(settings, file); });
-
-        Threading::ExpectedRunTime expectedRuntime = jobs.size() < 100 ? Threading::ExpectedRunTime::MILLISECONDS : Threading::ExpectedRunTime::SECONDS;
-        auto results = Runner::Get().RunAll(expectedRuntime, jobs);
+        TodoSettings settings;
+        std::vector<std::function<std::vector<Todo>()>> jobs;
+        for (const auto& file : fileNames) {
+            jobs.emplace_back([&settings, file]() { return TodoReader(settings, file).Execute(); });
+        }
+        auto results = WhenAll(jobs).get();
 
         std::vector<Todo> result{};
         for(const auto& list: results) {
@@ -38,9 +38,13 @@ namespace {
             return targetFileOption;
         }
     }
+
+    void LogTime(std::string_view label, std::chrono::microseconds elapsed) {
+        Log::Info(std::format("{}: {}ms", label, elapsed.count() / 1000));
+    }
 } // namespace
 int main(int argc, char* argv[]) {
-    ScopedTimer executionTimer("Total Runtime");
+    ScopedTimer executionTimer("Total Runtime", LogTime);
     try {
         ArgParse argParse(argc, argv);
         if(!argParse.ShouldParse()) {

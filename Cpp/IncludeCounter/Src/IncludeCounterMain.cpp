@@ -13,8 +13,9 @@
 #include "Report/DotToSvg.h"
 
 #include "Core/Instrumentation/LogWriter/StdOutLogWriter.h"
-#include "Core/Threading/Runner.h"
-#include "Core/Utilities/ScopedTimer.h"
+#include "Core/Instrumentation/ScopedTimer.h"
+#include "Core/Threading/Tasks.h"
+#include "Core/Utilities/TimeUtils.h"
 
 #include <filesystem>
 #include <fstream>
@@ -69,12 +70,14 @@ namespace {
         }
     }
 
+    void LogTime(std::string_view label, std::chrono::microseconds elapsed) {
+        Log::Info(std::format("{}: {}ms", label, elapsed.count() / 1000));
+    }
 } // namespace
 
 int main(int argc, char* argv[]) {
-    ScopedTimer executionTimer("Total Runtime");
+    ScopedTimer executionTimer("Total Runtime", LogTime);
     try {
-        
         ArgParse argParse(argc, argv);
         if(!argParse.ShouldParse()) {
             return 0;
@@ -88,6 +91,7 @@ int main(int argc, char* argv[]) {
         auto defines = BuildDefineData(argParse.GetDefines()); // TODO: if user defines have changed, does that invalidate the cache?
         //PreProcessFiles(fileNames, cache, defines);
 
+        /*
         std::vector<std::unique_ptr<IRunnable<FileData>>> jobs;
         for(const auto& file: fileNames) {
             jobs.push_back(std::move(std::make_unique<FileDataExtractor>(file, cache, defines, Settings)));
@@ -96,6 +100,13 @@ int main(int argc, char* argv[]) {
         Threading::ExpectedRunTime expectedRunTime = jobs.size() < 100 ? Threading::ExpectedRunTime::MILLISECONDS : Threading::ExpectedRunTime::SECONDS;
 
         std::vector<FileData> files = Runner::Get().RunAll(expectedRunTime, jobs);
+        */
+        std::vector<std::function<FileData()>> jobs;
+		for (const auto& file : fileNames) {
+			jobs.emplace_back([file, &cache, &defines]() { return FileDataExtractor(file, cache, defines, Settings).Execute(); });
+		}
+		auto files = WhenAll(jobs).get();
+
         auto includeMap = GenerateIncludeMap(files);
         cacheStore.WriteCache(files, defines, includeMap);
 

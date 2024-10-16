@@ -1,5 +1,4 @@
-#ifndef __EXTRACTORSETTINGS_H__
-#define __EXTRACTORSETTINGS_H__
+#pragma once
 
 namespace Extractor {
     struct ExtractorSettings {
@@ -8,4 +7,3 @@ namespace Extractor {
         bool ExtractFunctions{false};
     };
 } // namespace Extractor
-#endif // __EXTRACTORSETTINGS_H__

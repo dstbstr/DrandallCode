@@ -1,5 +1,4 @@
-#ifndef __VISIBILITYEXTRACTOR_H__
-#define __VISIBILITYEXTRACTOR_H__
+#pragma once
 
 #include "Extractor/Data/Visibility.h"
 
@@ -10,4 +9,3 @@ namespace Extractor {
         Visibility ExtractVisibility(std::string& line);
     } // namespace VisibilityExtractor
 } // namespace Extractor
-#endif // __VISIBILITYEXTRACTOR_H__

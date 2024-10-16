@@ -1,5 +1,4 @@
-#ifndef __TESTCOMMON_H__
-#define __TESTCOMMON_H__
+#pragma once
 
 #include "gmock/gmock.h"
 #include "gtest/gtest.h"
@@ -28,5 +27,3 @@ using ::testing::StartsWith;
     try {                                                                                        \
         std::rethrow_exception(exceptionToSave);                                                 \
     } catch(const exceptionType& e)
-
-#endif // __TESTCOMMON_H__

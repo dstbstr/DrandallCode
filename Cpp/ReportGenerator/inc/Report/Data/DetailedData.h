@@ -1,5 +1,4 @@
-#ifndef __DETAILEDDATA_H__
-#define __DETAILEDDATA_H__
+#pragma once
 
 #include <string>
 
@@ -55,4 +54,3 @@ namespace Report {
         std::string IsDefaulted;
     };
 } // namespace Report
-#endif // __DETAILEDDATA_H__

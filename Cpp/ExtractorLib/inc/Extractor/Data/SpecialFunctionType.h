@@ -1,10 +1,10 @@
-#ifndef __SPECIALFUNCTIONTYPE_H__
-#define __SPECIALFUNCTIONTYPE_H__
+#pragma once
 
 #include <string>
+
 namespace Extractor {
     enum SpecialFunctionType { CONSTRUCTOR, DESTRUCTOR };
-    static inline std::string ToString(SpecialFunctionType type) {
+    constexpr std::string ToString(SpecialFunctionType type) {
         switch(type) {
         case CONSTRUCTOR: return "Constructor";
         case DESTRUCTOR: return "Destructor";
@@ -13,4 +13,3 @@ namespace Extractor {
     }
 
 } // namespace Extractor
-#endif // __SPECIALFUNCTIONTYPE_H__

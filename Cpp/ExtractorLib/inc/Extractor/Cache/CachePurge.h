@@ -1,6 +1,4 @@
-#ifndef __CACHEPURGE_H__
-#define __CACHEPURGE_H__
-
+#pragma once
 #include <string>
 #include <vector>
 
@@ -12,4 +10,3 @@ namespace Extractor {
         void Purge(CacheResult& cache, std::vector<std::string> fileNames);
     }
 } // namespace Extractor
-#endif // __CACHEPURGE_H__

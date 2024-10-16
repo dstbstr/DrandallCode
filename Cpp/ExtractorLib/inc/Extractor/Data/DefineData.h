@@ -1,9 +1,6 @@
-#ifndef __DEFINEDATA_H__
-#define __DEFINEDATA_H__
-
+#pragma once
 #include <string>
 #include <unordered_map>
-
 
 namespace Extractor {
     struct DefineData {
@@ -11,4 +8,3 @@ namespace Extractor {
         std::unordered_map<std::string, std::string> DefineSource;
     };
 } // namespace Extractor
-#endif // __DEFINEDATA_H__

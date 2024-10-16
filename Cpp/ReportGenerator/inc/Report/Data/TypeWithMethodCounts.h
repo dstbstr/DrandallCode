@@ -1,5 +1,5 @@
-#ifndef __TYPEWITHMETHODCOUNTS_H__
-#define __TYPEWITHMETHODCOUNTS_H__
+#pragma once
+
 #include "Extractor/Data/TypeData.h"
 
 namespace Report {
@@ -20,4 +20,3 @@ namespace Report {
         u32 PrivateMethodCount{0};
     };
 } // namespace Report
-#endif // __TYPEWITHMETHODCOUNTS_H__

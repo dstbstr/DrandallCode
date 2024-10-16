@@ -1,5 +1,4 @@
-#ifndef __SIMPLEDATA_H__
-#define __SIMPLEDATA_H__
+#pragma once
 
 #include <stdexcept>
 #include <string>
@@ -44,4 +43,3 @@ namespace Report {
         std::string SizeImpact;
     };
 } // namespace Report
-#endif // __SIMPLEDATA_H__

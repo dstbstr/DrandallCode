@@ -4,7 +4,7 @@ project("Drandall Code")
 include(FetchContent)
 
 #################################
-# GTest
+# Includes
 #################################
 FetchContent_Declare(
   googletest
@@ -12,35 +12,31 @@ FetchContent_Declare(
   GIT_TAG v1.15.2
 )
 
+FetchContent_Declare(
+    OpenXlsx
+    GIT_REPOSITORY https://github.com/troldal/openxlsx.git
+    GIT_TAG master
+)
 FetchContent_Declare(CppCore GIT_REPOSITORY https://github.com/dstbstr/CppCore GIT_TAG main)
 
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
+FetchContent_MakeAvailable(OpenXlsx)
 FetchContent_MakeAvailable(CppCore)
 
 #################################
 # Drandall Code
 #################################
 
-#set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
-
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" OR
     "${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    set(warnings "-Wall -Wextra -Werror")
     if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
         add_definitions(-DGNU)
     else()
         add_definitions(-DCLANG)
     endif()
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-    set(warnings "/W4 /WX /EHsc")
     add_definitions(-DMSVC)
-endif()
-if (NOT CONFIGURED_ONCE)
-    set(CMAKE_CXX_FLAGS "${warnings}"
-        CACHE STRING "Flags used by the compiler during all build types." FORCE)
-    set(CMAKE_C_FLAGS   "${warnings}"
-        CACHE STRING "Flags used by the compiler during all build types." FORCE)
 endif()
 
 if ("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
@@ -67,9 +63,6 @@ add_subdirectory(TodoManager)
 add_subdirectory(CommandParserTest)
 add_subdirectory(ExtractorLibTest)
 add_subdirectory(TodoLibTest)
-
-add_subdirectory(CppKata)
-add_subdirectory(CppKataTest)
 
 set(CONFIGURED_ONCE TRUE CACHE INTERNAL
     "A flag showing that CMake has configured at least once.")

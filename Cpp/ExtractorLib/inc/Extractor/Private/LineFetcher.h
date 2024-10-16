@@ -1,5 +1,4 @@
-#ifndef __LINEFETCHER_H__
-#define __LINEFETCHER_H__
+#pragma once
 
 #include <string>
 #include <iostream>
@@ -10,4 +9,3 @@ namespace Extractor {
         bool GetNextLine(std::istream& stream, std::string& outString);
     }
 }
-#endif // __LINEFETCHER_H__

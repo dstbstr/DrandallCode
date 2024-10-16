@@ -9,9 +9,9 @@
 #include "TypeArgParse.h"
 
 #include "Core/Instrumentation/LogWriter/StdOutLogWriter.h"
-#include "Core/Threading/Runner.h"
+#include "Core/Instrumentation/ScopedTimer.h"
+#include "Core/Threading/Tasks.h"
 #include "Core/Utilities/Require.h"
-#include "Core/Utilities/ScopedTimer.h"
 #include "Core/Utilities/TimeUtils.h"
 
 #include <filesystem>
@@ -60,12 +60,17 @@ namespace {
     }
 
     std::vector<FileData> GatherFileData(const std::vector<std::string>& fileNames, const CacheResult& cache, const DefineData& defines) {
-        std::vector<std::unique_ptr<IRunnable<FileData>>> jobs;
-        std::transform(fileNames.begin(), fileNames.end(), std::back_inserter(jobs), [&cache, &defines](const std::string& file) { return std::make_unique<FileDataExtractor>(file, cache, defines, Settings); });
+        std::vector<std::function<FileData()>> jobs;
+        for(const auto& file : fileNames) {
+			jobs.emplace_back([file, &cache, &defines]() { return FileDataExtractor(file, cache, defines, Settings).Execute(); });
+        }
+        return WhenAll(jobs).get();
+        //std::vector<std::unique_ptr<IRunnable<FileData>>> jobs;
+        //std::transform(fileNames.begin(), fileNames.end(), std::back_inserter(jobs), [&cache, &defines](const std::string& file) { return std::make_unique<FileDataExtractor>(file, cache, defines, Settings); });
 
-        // large code bases tend to have bigger files which take longer to parse
-        Threading::ExpectedRunTime expectedRuntime = jobs.size() < 100 ? Threading::ExpectedRunTime::MILLISECONDS : Threading::ExpectedRunTime::SECONDS;
-        return Runner::Get().RunAll(expectedRuntime, jobs);
+        //// large code bases tend to have bigger files which take longer to parse
+        //Threading::ExpectedRunTime expectedRuntime = jobs.size() < 100 ? Threading::ExpectedRunTime::MILLISECONDS : Threading::ExpectedRunTime::SECONDS;
+        //return Runner::Get().RunAll(expectedRuntime, jobs);
     }
 
     std::string GetFilePrefix(std::string targetFileOption) {
@@ -75,11 +80,14 @@ namespace {
             return targetFileOption;
         }
     }
+    void LogTime(std::string_view label, std::chrono::microseconds elapsed) {
+        Log::Info(std::format("{}: {}ms", label, elapsed.count() / 1000));
+    }
 
 } // namespace
 
 int main(int argc, char* argv[]) {
-    ScopedTimer executionTimer("Total Runtime");
+    ScopedTimer executionTimer("Total Runtime", LogTime);
     try {
         ArgParse argParse(argc, argv);
         if(!argParse.ShouldParse()) {

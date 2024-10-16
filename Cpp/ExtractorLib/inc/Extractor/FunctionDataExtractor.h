@@ -1,5 +1,4 @@
-#ifndef __FUNCTIONDATAEXTRACTOR_H__
-#define __FUNCTIONDATAEXTRACTOR_H__
+#pragma once
 
 #include "Extractor/Data/FunctionData.h"
 #include "Extractor/Data/OperatorOverloadData.h"
@@ -8,7 +7,6 @@
 #include <iostream>
 #include <regex>
 #include <string>
-
 
 namespace Extractor {
     namespace FunctionDataExtractor {
@@ -21,4 +19,3 @@ namespace Extractor {
         OperatorOverloadData ExtractOperatorOverload(const std::string& line, const std::smatch& match, std::istream& stream, const std::string& ns, const std::string& className, Visibility visibility);
     } // namespace FunctionDataExtractor
 } // namespace Extractor
-#endif // __FUNCTIONDATAEXTRACTOR_H__

@@ -1,5 +1,4 @@
-#ifndef __EXCELREPORT_H__
-#define __EXCELREPORT_H__
+#pragma once
 
 #include "Report/BaseReport.h"
 
@@ -10,5 +9,3 @@ namespace Report {
         void WriteReport(std::string fileName) const final;
     };
 } // namespace Report
-
-#endif // __EXCELREPORT_H__

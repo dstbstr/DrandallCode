@@ -1,12 +1,11 @@
-#ifndef __TYPEKEYWORD_H__
-#define __TYPEKEYWORD_H__
+#pragma once
 
 #include <string>
 
 namespace Extractor {
     enum TypeKeyword { STRUCT, CLASS, UNION, ENUM };
 
-    static inline std::string ToString(TypeKeyword type) {
+    constexpr std::string ToString(TypeKeyword type) {
         switch(type) {
         case STRUCT: return "Struct";
         case CLASS: return "Class";
@@ -16,4 +15,3 @@ namespace Extractor {
         }
     }
 } // namespace Extractor
-#endif // __TYPEKEYWORD_H__

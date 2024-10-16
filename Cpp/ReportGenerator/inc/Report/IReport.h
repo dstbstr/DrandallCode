@@ -1,5 +1,4 @@
-#ifndef __IREPORT_H__
-#define __IREPORT_H__
+#pragma once
 
 #include <iostream>
 
@@ -9,4 +8,3 @@ namespace Report {
         virtual void WriteReport(std::string fileName) const = 0;
     };
 } // namespace Report
-#endif // __IREPORT_H__

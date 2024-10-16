@@ -1,5 +1,4 @@
-#ifndef __CACHESTORE_H__
-#define __CACHESTORE_H__
+#pragma once
 
 #include "Extractor/Data/CacheResult.h"
 
@@ -28,4 +27,3 @@ namespace Extractor {
         std::shared_ptr<std::ostream> m_OutStream;
     };
 } // namespace Extractor
-#endif // __CACHESTORE_H__

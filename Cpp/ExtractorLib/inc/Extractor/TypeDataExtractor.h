@@ -1,5 +1,4 @@
-#ifndef __TYPEDATAEXTRACTOR_H__
-#define __TYPEDATAEXTRACTOR_H__
+#pragma once
 
 #include "Extractor/Data/TypeData.h"
 
@@ -16,4 +15,3 @@ namespace Extractor {
         TypeData Extract(const std::smatch& match, const std::string& fileName, const std::string& ns, const DefineData& knownDefines, std::istream& stream);
     } // namespace TypeDataExtractor
 } // namespace Extractor
-#endif // __TYPEDATAEXTRACTOR_H__

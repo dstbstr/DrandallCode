@@ -1,5 +1,4 @@
-#ifndef __DEFINEFILEPARSER_H__
-#define __DEFINEFILEPARSER_H__
+#pragma once
 
 #include <string>
 #include <unordered_map>
@@ -9,5 +8,3 @@ namespace Extractor {
         std::unordered_map<std::string, std::string> Parse(std::istream& fileStream);
     }
 } // namespace Extractor
-
-#endif // __DEFINEFILEPARSER_H__
