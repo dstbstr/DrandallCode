@@ -17,7 +17,7 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/troldal/openxlsx.git
     GIT_TAG master
 )
-FetchContent_Declare(CppCore GIT_REPOSITORY https://github.com/dstbstr/CppCore GIT_TAG main)
+FetchContent_Declare(CppCore GIT_REPOSITORY https://github.com/dstbstr/CppCore GIT_TAG origin/main)
 
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
@@ -48,9 +48,6 @@ endif()
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-#External
-#add_subdirectory(OpenXLSX)
-#Internal
 add_subdirectory(CommandParser)
 add_subdirectory(ExtractorLib)
 add_subdirectory(ReportGenerator)

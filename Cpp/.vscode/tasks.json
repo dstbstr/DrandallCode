@@ -1,0 +1,100 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "PrepareFoldersWindows",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}"
+            },
+            "command": "if(-not(test-path Build/VS/2022)) {mkdir Build/VS/2022}; if(-not(test-path bin)) {mkdir bin}"
+        },
+        {
+            "label": "GenerateWindowsDebug2022",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/Build/VS/2022"
+            },
+            "dependsOn": "PrepareFoldersWindows",
+            "command": "cmake -G 'Visual Studio 17 2022' -DCMAKE_BUILD_TYPE=Debug ../../.."
+        },
+        {
+            "label": "GenerateWindowsRelease2022",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/Build/VS/2022"
+            },
+            "dependsOn": "PrepareFoldersWindows",
+            "command": "cmake -G 'Visual Studio 17 2022' -DCMAKE_BUILD_TYPE=Release ../../.."
+        },
+        {
+            "label": "GenerateNixDebug",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/Build"
+            },
+            "command": "cmake -G 'Unix Makefiles' -DCMAKE_BUILD_TYPE=Debug .."
+        },
+        {
+            "label": "GenerateNixRelease",
+            "type": "shell",
+            "options": {
+                "cwd": "${workspaceRoot}/Build"
+            },
+            "command": "cmake -G 'Unix Makefiles' -DCMAKE_BUILD_TYPE=Release .."
+        },
+        {
+            "label": "buildWindowsDebug2022",
+            "type": "shell",
+            "command": "cmake --build . --config Debug ",
+            "options": {
+                "cwd": "${workspaceRoot}/Build/VS/2022"
+            },
+            "dependsOn": [
+                "GenerateWindowsDebug2022"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "buildNixDebug",
+            "type": "shell",
+            "command": "cmake --build .",
+            "options": {
+                "cwd": "${workspaceRoot}/Build"
+            },
+            "dependsOn": [
+                "GenerateNixDebug"
+            ],
+            "group": "build"
+        },
+        {
+            "label": "buildWindowsRelease2022",
+            "type": "shell",
+            "command": "cmake --build . --config Release ",
+            "options": {
+                "cwd": "${workspaceRoot}/Build/VS/2022"
+            },
+            "dependsOn": [
+                "GenerateWindowsRelease2022"
+            ],
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "buildNixRelease",
+            "type": "shell",
+            "command": "cmake --build .",
+            "options": {
+                "cwd": "${workspaceRoot}/Build"
+            },
+            "dependsOn": [
+                "GenerateNixRelease"
+            ],
+            "group": "build"
+        }
+    ]
+}

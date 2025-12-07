@@ -111,6 +111,7 @@ fn get_file_name(year: i32, day: i32) -> PathBuf {
     let mut result = match env::current_dir() {
         Ok(r) => r,
         Err(..) => {
+            
             panic!("Failed to find current_dir");
         }
     };
