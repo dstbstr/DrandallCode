@@ -50,7 +50,45 @@ function repo {
 	}
 }
 
-function profile { np $Profile }
+function profile { code $Profile }
 
 [console]::backgroundcolor = "black"
 [console]::foregroundcolor = "green"
+
+function loc {
+	param(
+		[Parameter(ValueFromRemainingArguments=$true, Position=999)]
+		[string[]]$Roots = @('.'),
+		[ValidateSet('name','line','lines','word','words','char','chars')]
+		[string]$SortBy = 'name',
+		[ValidateSet('asc','desc')]
+		[string]$Dir = 'asc',
+		[switch]$Full
+	)
+
+	if($Full) {
+		$prop = switch ($SortBy) {
+			'name' { 'Name' }
+			'line' { 'LineCount' }
+			'lines' { 'LineCount' }
+			'word' { 'WordCount' }
+			'words' { 'WordCount' }
+			'char' { 'CharCount' }
+			'chars' { 'CharCount' }
+		}
+		$items = Get-ChildItem -Path $Roots -Recurse -Include @("*.cpp","*.h","*.cs") | Select-Object name, `
+			@{name="LineCount";expression={(Get-Content $_.FullName | Measure-Object -Line).Lines}}, `
+			@{name="WordCount";expression={(Get-Content $_.FullName | Measure-Object -Word).Words}}, `
+			@{name="CharCount";expression={(Get-Content $_.FullName | Measure-Object -Character).Characters}}
+		if($Dir -eq 'desc') {
+			$items | Sort-Object -Property $prop -Descending
+		} else {
+			$items | Sort-Object -Property $prop
+		}
+	} else {
+		Get-ChildItem -Path $Roots -Recurse -Include @("*.cpp","*.h","*.cs") | `
+			Get-Content | `
+			Measure-Object -Line -Word -Character | `
+			Select-Object Lines, Words, Characters
+	}
+}
