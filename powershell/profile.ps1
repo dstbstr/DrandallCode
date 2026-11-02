@@ -1,3 +1,11 @@
+cd ~
+
+if ((Get-Module PSReadLine).Version -ge '2.2.0') {
+    Set-PSReadLineOption -PredictionViewStyle ListView
+} else {
+	Write-Warning "Please update PSReadLine running the following from an admin prompt: Install-Module PSReadLine -Force -SkipPublisherCheck"
+}
+
 if(test-path 'C:\Program Files\Notepad++\notepad++.exe') {
 	Set-Alias -name np -value 'C:\Program Files\Notepad++\notepad++.exe'
 } else {
